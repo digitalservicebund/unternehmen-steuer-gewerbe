@@ -1,6 +1,6 @@
 name: CI Pipeline
 
-run-name: ${{ github.actor }} running the CI pipeline
+# run-name: ${{ github.actor }} running the CI pipeline
 
 permissions:
   contents: read
@@ -10,8 +10,10 @@ on:
   push:
     branches:
       - main
-  # run on PRs
+  # run on PRs based on main
   pull_request:
+    branches:
+      - main
   # also: allow to run this workflow manually
   workflow_dispatch:
 
