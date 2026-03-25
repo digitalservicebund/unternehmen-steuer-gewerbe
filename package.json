@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "format": "oxfmt --check",
+    "format:fix": "oxfmt",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "start": "ts-node index.ts",
@@ -15,6 +17,7 @@
   "packageManager": "pnpm@10.33.0",
   "devDependencies": {
     "nodemon": "^3.1.14",
+    "oxfmt": "^0.42.0",
     "oxlint": "^1.57.0",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.2"
