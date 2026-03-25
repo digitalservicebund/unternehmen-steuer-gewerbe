@@ -1,0 +1,60 @@
+name: CI Pipeline
+
+run-name: ${{ github.actor }} running the CI pipeline
+
+on:
+  # run when pushing to main
+  push:
+    branches:
+      - main
+  # run on PRs
+  pull_request:
+  # also: allow to run this workflow manually
+  workflow_dispatch:
+
+
+jobs:
+  check-format-and-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320
+        name: Install pnpm
+        with:
+          version: 10
+          cache: true
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          # node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+
+      - name: Check format
+        run: pnpm run format
+
+      - name: Lint
+        run: pnpm run lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320
+        name: Install pnpm
+        with:
+          version: 10
+          cache: true
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run tests
+        run: pnpm run test
