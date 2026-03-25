@@ -20,3 +20,10 @@ or in watcher, restarting on changes
 ```bash
 pnpm run start:watch
 ```
+
+### Scripts
+
+- `format` - checks the format
+- `format:fix` - fixes formatting errors
+- `lint` - checks linting
+- `lint:fix` - fixes linting errors
