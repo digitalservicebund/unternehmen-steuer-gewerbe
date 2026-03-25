@@ -2,6 +2,9 @@
   "name": "unternehmen-steuer-gewerbe",
   "version": "1.0.0",
   "description": "",
+  "keywords": [],
+  "license": "",
+  "author": "",
   "scripts": {
     "format": "oxfmt --check",
     "format:fix": "oxfmt",
@@ -11,15 +14,12 @@
     "start:watch": "nodemon --watch . --ext ts,json,yml,md --exec pnpm run start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "",
-  "packageManager": "pnpm@10.33.0",
   "devDependencies": {
     "nodemon": "^3.1.14",
     "oxfmt": "^0.42.0",
     "oxlint": "^1.57.0",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.2"
-  }
+  },
+  "packageManager": "pnpm@10.33.0"
 }

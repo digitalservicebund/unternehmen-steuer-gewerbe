@@ -2,9 +2,8 @@
 name: Custom issue
 about: Neither a bug nor a feature request? Use this template for your input
 title: "[Issue]"
-labels: ''
-assignees: ''
-
+labels: ""
+assignees: ""
 ---
 
 **My input in a single sentence**
