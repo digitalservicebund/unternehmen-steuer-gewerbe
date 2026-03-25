@@ -9,6 +9,14 @@ Component of [digitalservicebund/unternehmen-one-stop-shop](https://github.com/d
 
 ## Developing
 
+### GitHooks
+
+Requires [lefthook](https://lefthook.dev/) and a
+
+```bash
+lefthook install
+```
+
 ### Running the API
 
 ```bash
