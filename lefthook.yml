@@ -46,8 +46,10 @@ pre-commit:
   jobs:
     - name: Lint
       run: pnpm run lint:fix
+      stage_fixed: true
     - name: Format
       run: pnpm run format:fix
+      stage_fixed: true
 #       glob: "*.{js,ts,jsx,tsx}"
 #
 #     - name: rubocop
