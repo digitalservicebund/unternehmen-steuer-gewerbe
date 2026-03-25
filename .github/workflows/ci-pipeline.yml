@@ -12,7 +12,6 @@ on:
   # also: allow to run this workflow manually
   workflow_dispatch:
 
-
 jobs:
   check-format-and-lint:
     runs-on: ubuntu-latest
