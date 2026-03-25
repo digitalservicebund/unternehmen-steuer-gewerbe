@@ -1,6 +1,6 @@
-🇬🇧 Everyone is welcome to contribute to the development of this project. You can contribute by opening pull requests, providing documentation, answering questions or giving feedback. Please do follow our guidelines and our Code of Conduct.
+🇬🇧 Everyone is welcome to contribute to the development of this project. You can contribute by opening pull requests, providing documentation, answering questions or giving feedback. Please do follow our guidelines and our [Code of Conduct](CODE_OF_CONDUCT.md).
 
-🇩🇪 Jede:r ist herzlich eingeladen, die Entwicklung dieses Projekts mitzugestalten. Du kannst einen Beitrag leisten, indem du Pull-Requests eröffnest, die Dokumentation erweiterst, Fragen beantwortest oder Feedback gibst. Bitte befolge die Richtlinien und unseren Verhaltenskodex.
+🇩🇪 Jede:r ist herzlich eingeladen, die Entwicklung dieses Projekts mitzugestalten. Du kannst einen Beitrag leisten, indem du Pull-Requests eröffnest, die Dokumentation erweiterst, Fragen beantwortest oder Feedback gibst. Bitte befolge die Richtlinien und unseren [Verhaltenskodex](./CODE_OF_CONDUCT_DE.md).
 
 Code Contributions
 🇬🇧 Open a pull request with your changes and it will be reviewed by someone from the team. When you submit a pull request, you declare that you have the right to license your contribution to DigitalService and the community. By submitting the patch, you agree that your contributions are licensed under the GPLv3 license.
