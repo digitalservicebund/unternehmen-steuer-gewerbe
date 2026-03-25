@@ -5,6 +5,7 @@
   "keywords": [],
   "license": "",
   "author": "",
+  "type": "module",
   "scripts": {
     "format": "oxfmt --check",
     "format:fix": "oxfmt",
