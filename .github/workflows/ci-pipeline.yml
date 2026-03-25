@@ -2,6 +2,9 @@ name: CI Pipeline
 
 run-name: ${{ github.actor }} running the CI pipeline
 
+permissions:
+  contents: read
+
 on:
   # run when pushing to main
   push:
