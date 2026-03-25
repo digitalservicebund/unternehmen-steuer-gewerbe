@@ -28,11 +28,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          cache: "pnpm"
-
       - name: Check format
         run: pnpm run format
 
