@@ -12,3 +12,9 @@ Component of [digitalservicebund/unternehmen-one-stop-shop](https://github.com/d
 ```bash
 pnpm start
 ```
+
+or in watcher, restarting on changes
+
+```bash
+pnpm run start:watch
+```

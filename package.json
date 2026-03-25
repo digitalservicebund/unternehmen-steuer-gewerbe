@@ -2,9 +2,9 @@
   "name": "unternehmen-steuer-gewerbe",
   "version": "1.0.0",
   "description": "",
-  
   "scripts": {
     "start": "ts-node index.ts",
+    "start:watch": "nodemon --watch . --ext ts,json,yml,md --exec pnpm run start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -12,6 +12,7 @@
   "license": "",
   "packageManager": "pnpm@10.33.0",
   "devDependencies": {
+    "nodemon": "^3.1.14",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.2"
   }
