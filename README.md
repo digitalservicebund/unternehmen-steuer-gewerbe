@@ -1,3 +1,6 @@
+[![Pipeline](https://github.com/digitalservicebund/unternehmen-steuer-gewerbe/actions/workflows/ci-pipeline.yml/badge.svg)](https://github.com/digitalservicebund/unternehmen-steuer-gewerbe/actions/workflows/ci-pipeline.yml)<br/>
+Quality Gate badge (missing)
+
 > [!NOTE]
 > We're currently in the process of setting up this repository. Nothing of value is to be expected at this stage.
 
