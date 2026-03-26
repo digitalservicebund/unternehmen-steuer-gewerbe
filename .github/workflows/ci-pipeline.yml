@@ -30,7 +30,7 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --ignore-scripts
 
       - name: Check format
         run: pnpm run format
@@ -50,7 +50,7 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --ignore-scripts
 
       - name: Run tests
         run: pnpm run test
