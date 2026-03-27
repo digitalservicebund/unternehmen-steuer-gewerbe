@@ -14,9 +14,11 @@
     "start": "ts-node index.ts",
     "start:watch": "nodemon --watch . --ext ts,json,yml,md --exec pnpm run start",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:watch": "vitest"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "4.1.1",
     "nodemon": "^3.1.14",
     "oxfmt": "^0.42.0",
     "oxlint": "^1.57.0",
