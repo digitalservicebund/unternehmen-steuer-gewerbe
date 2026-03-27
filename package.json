@@ -11,7 +11,7 @@
     "format:fix": "oxfmt",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
-    "start": "ts-node index.ts",
+    "start": "ts-node src/index.ts",
     "start:watch": "nodemon --watch . --ext ts,json,yml,md --exec pnpm run start",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
