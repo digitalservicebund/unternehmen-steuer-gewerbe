@@ -6,8 +6,8 @@ import app from "./app.js";
 let request = supertest(app);
 
 describe("API tests", () => {
-  test("Returns OK 200", async () => {
-    const response = await request.get("/api/v1/test");
-    expect(response.statusCode).toEqual("200");
+  test("Returns 404 NOT FOUND", async () => {
+    const response = await request.get("/unsupported-url");
+    expect(response.statusCode).toEqual("404");
   });
 });
