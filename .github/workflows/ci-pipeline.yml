@@ -52,5 +52,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install --ignore-scripts
 
-      - name: Run tests
-        run: pnpm run test
+      - name: Run tests with coverage report
+        run: pnpm run test:coverage
