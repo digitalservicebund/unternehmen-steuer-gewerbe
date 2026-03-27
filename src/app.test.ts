@@ -7,7 +7,7 @@ let request = supertest(app);
 
 describe("API tests", () => {
   test("Returns 404 NOT FOUND", async () => {
-    const response = await request.get("/unsupported-url");
+    const response = await request.get("/unsupported-url").send();
     expect(response.statusCode).toEqual(404);
   });
 });
