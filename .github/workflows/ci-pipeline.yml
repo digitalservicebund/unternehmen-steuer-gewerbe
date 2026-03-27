@@ -38,7 +38,7 @@ jobs:
       - name: Lint
         run: pnpm run lint
 
-  test:
+  test-and-scan-with-sonarcloud:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
