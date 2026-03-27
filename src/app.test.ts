@@ -1,14 +1,13 @@
 import { describe, test, expect } from "vitest";
-import supertest, { type SuperTest, Test } from "supertest";
-import express, { type Express } from "express";
+import supertest from "supertest";
 
-const app: Express = express();
+import app from "./app.js";
 
 let request = supertest(app);
 
 describe("API tests", () => {
   test("Returns OK 200", async () => {
     const response = await request.get("/api/v1/test");
-    expect(response.status).toEqual("200");
+    expect(response.statusCode).toEqual("200");
   });
 });
