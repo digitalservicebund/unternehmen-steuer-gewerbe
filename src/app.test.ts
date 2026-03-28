@@ -2,7 +2,6 @@ import { describe, test, expect } from "vitest";
 import supertest from "supertest";
 
 import app from "./app.js";
-import { json } from "express";
 
 let request = supertest(app);
 
