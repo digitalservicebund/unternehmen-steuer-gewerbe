@@ -9,4 +9,8 @@ app.post("/register-steuernummer", (req, res) => {
   res.sendStatus(200);
 });
 
+app.post("/register-gewerbe", (req, res) => {
+  res.sendStatus(200);
+});
+
 export default app;
