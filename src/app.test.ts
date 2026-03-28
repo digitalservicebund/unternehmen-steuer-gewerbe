@@ -15,4 +15,9 @@ describe("API tests", () => {
     const response = await request.post("/register-steuernummer").send();
     expect(response.statusCode).toEqual(200);
   });
+
+  test("Returns 200 OK on POST to /register-gewerbe", async () => {
+    const response = await request.post("/register-gewerbe").send();
+    expect(response.statusCode).toEqual(200);
+  });
 });
