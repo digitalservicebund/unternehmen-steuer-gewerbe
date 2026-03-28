@@ -26,15 +26,24 @@ lefthook install
 pnpm start
 ```
 
-or in watcher, restarting on changes
+or in watch mode, restarting on changes
 
 ```bash
 pnpm run start:watch
 ```
 
+### Running the Tests
+
+```bash
+pnmp run test
+```
+
+or in watch mode, restarting on changes
+
+```bash
+pnmp run test:watch
+```
+
 ### Scripts
 
-- `format` - checks the format
-- `format:fix` - fixes formatting errors
-- `lint` - checks linting
-- `lint:fix` - fixes linting errors
+Cf. [package.json](./package.json)
