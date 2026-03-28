@@ -2,6 +2,7 @@ import { describe, test, expect } from "vitest";
 import supertest from "supertest";
 
 import app from "./app.js";
+import { json } from "express";
 
 let request = supertest(app);
 
@@ -11,13 +12,15 @@ describe("API tests", () => {
     expect(response.statusCode).toEqual(404);
   });
 
-  test("Returns 200 OK on POST to /register-steuernummer", async () => {
+  test("Returns 200 OK and JSON on POST to /register-steuernummer", async () => {
     const response = await request.post("/register-steuernummer").send();
     expect(response.statusCode).toEqual(200);
+    expect(response.header["content-type"]).toMatch(/json/);
   });
 
-  test("Returns 200 OK on POST to /register-gewerbe", async () => {
+  test("Returns 200 OK and JSON on POST to /register-gewerbe", async () => {
     const response = await request.post("/register-gewerbe").send();
     expect(response.statusCode).toEqual(200);
+    expect(response.header["content-type"]).toMatch(/json/);
   });
 });
