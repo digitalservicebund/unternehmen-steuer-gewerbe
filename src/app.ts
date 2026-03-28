@@ -6,11 +6,11 @@ app.use(helmet.hidePoweredBy());
 
 // routes (keep here until complex)
 app.post("/register-steuernummer", (req, res) => {
-  res.sendStatus(200);
+  res.json();
 });
 
 app.post("/register-gewerbe", (req, res) => {
-  res.sendStatus(200);
+  res.json();
 });
 
 export default app;
