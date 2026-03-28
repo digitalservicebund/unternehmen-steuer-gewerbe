@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     exclude: ["**/node_modules/**", "**/.git/**", "**/dist/**"],
     coverage: {
-      reporter: ["lcov"],
+      reporter: ["text", "lcov"],
     },
   },
 });
