@@ -1,0 +1,48 @@
+{
+  name: "unternehmen-steuer-gewerbe",
+  version: "1.0.0",
+  description: "",
+  keywords: [],
+  license: "",
+  author: "",
+  type: "module",
+  scripts: {
+    // Build JavaScript in ./dist
+    build: "tsc ",
+    // Check format, fail on error (used in CI)
+    format: "oxfmt --check",
+    // Check format, fix if possible (used in pre-commit GitHook)
+    "format:fix": "oxfmt",
+    // Lint, fail on error (used in CI)
+    lint: "oxlint",
+    // Lint, fix if possible (used in pre-commit GitHook)
+    "lint:fix": "oxlint --fix",
+    // Start API locally via ts-node (no building involved)
+    start: "ts-node src/index.ts",
+    // Start API locally via ts-node (no building involved), restart on changes to files of type TS, JS, JSON, YAML, MD
+    "start:watch": "nodemon --watch . --ext ts,json,yml,md --exec pnpm run start",
+    // Run tests once
+    test: "vitest run",
+    // Run tests once, report coverage on console and in ./coverage. Format is HTML and lconv (in pipeline, lconv is consumed by SonarCloud)
+    "test:coverage": "vitest run --coverage",
+    // Run tests, restart on code changes
+    "test:watch": "vitest",
+  },
+  dependencies: {
+    "@types/express": "^5.0.6",
+    express: "^5.2.1",
+    helmet: "^8.1.0",
+  },
+  devDependencies: {
+    "@types/supertest": "^7.2.0",
+    "@vitest/coverage-v8": "4.1.1",
+    nodemon: "^3.1.14",
+    oxfmt: "^0.42.0",
+    oxlint: "^1.57.0",
+    supertest: "^7.2.2",
+    "ts-node": "^10.9.2",
+    typescript: "^6.0.2",
+    vitest: "^4.1.1",
+  },
+  packageManager: "pnpm@10.33.0",
+}
