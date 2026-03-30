@@ -5,11 +5,11 @@ const app: Express = express();
 app.use(helmet.hidePoweredBy());
 
 // routes (keep here until complex)
-app.post("/register-steuernummer", (req, res) => {
+app.post("/api/v1/register-steuernummer", (req, res) => {
   res.json();
 });
 
-app.post("/register-gewerbe", (req, res) => {
+app.post("/api/v1/register-gewerbe", (req, res) => {
   res.json();
 });
 
