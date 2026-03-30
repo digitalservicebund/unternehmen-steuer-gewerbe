@@ -18,6 +18,9 @@ on:
   workflow_dispatch:
 
 jobs:
+  #######################################
+  # Checks and scans that break the pipeline
+  #######################################
   check-format-and-lint:
     runs-on: ubuntu-latest
     steps:
@@ -78,3 +81,32 @@ jobs:
           pollingTimeoutSec: 600
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  #######################################
+  # Automerge if dependabot branch and all tests passing and non-major version update
+  # cf. ../dependabot.yml for details on Dependabot like e.g. the cooldown period we're using
+  #######################################
+
+  dependabot-auto-merge:
+    runs-on: ubuntu-latest
+    # the ${{ success() }} is required for the "if" not to override the "needs" below
+    # (we did run into this problem and saw auto-merges even as "frontend-checks" failed)
+    if: ${{ github.event_name != 'schedule' && success() && github.actor == 'dependabot[bot]' && !cancelled() && github.ref != 'refs/heads/main' && github.repository == 'digitalservicebund/ris-adm-literature'}}
+    permissions: write-all
+    needs:
+      - check-format-and-lint
+      - test-and-scan-with-sonarcloud
+    steps:
+      - name: Dependabot metadata
+        continue-on-error: true
+        id: metadata
+        uses: dependabot/fetch-metadata@21025c705c08248db411dc16f3619e6b5f9ea21a
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Auto-merge Dependabot PRs except major version updates
+        continue-on-error: true
+        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
+        run: gh pr merge --squash "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
