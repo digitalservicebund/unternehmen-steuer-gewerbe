@@ -1,3 +1,6 @@
+# Local lefthook config
+lefthook-local.yml
+
 # IDE specifics
 .vscode
 
