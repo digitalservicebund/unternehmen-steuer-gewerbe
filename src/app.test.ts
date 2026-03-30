@@ -12,13 +12,13 @@ describe("API tests", () => {
   });
 
   test("Returns 200 OK and JSON on POST to /register-steuernummer", async () => {
-    const response = await request.post("/register-steuernummer").send();
+    const response = await request.post("/api/v1/register-steuernummer").send();
     expect(response.statusCode).toEqual(200);
     expect(response.header["content-type"]).toMatch(/json/);
   });
 
   test("Returns 200 OK and JSON on POST to /register-gewerbe", async () => {
-    const response = await request.post("/register-gewerbe").send();
+    const response = await request.post("/api/v1/register-gewerbe").send();
     expect(response.statusCode).toEqual(200);
     expect(response.header["content-type"]).toMatch(/json/);
   });
