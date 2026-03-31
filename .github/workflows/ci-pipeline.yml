@@ -30,7 +30,7 @@ jobs:
       - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320
         name: Install pnpm
         with:
-          version: 10
+          version: 10 # does this always install the latest? How to pin?
           cache: true
 
       - name: Install dependencies
@@ -91,8 +91,10 @@ jobs:
     runs-on: ubuntu-latest
     # the ${{ success() }} is required for the "if" not to override the "needs" below
     # (we did run into this problem and saw auto-merges even as "frontend-checks" failed)
-    if: ${{ github.event_name != 'schedule' && success() && github.actor == 'dependabot[bot]' && !cancelled() && github.ref != 'refs/heads/main' && github.repository == 'digitalservicebund/ris-adm-literature'}}
-    permissions: write-all
+    if: ${{ github.event_name != 'schedule' && success() && github.actor == 'dependabot[bot]' && !cancelled() && github.ref != 'refs/heads/main' && github.repository == 'digitalservicebund/unternehmen-steuer-gewerbe'}}
+    permissions:
+      contents: write
+      pull-requests: write
     needs:
       - check-format-and-lint
       - test-and-scan-with-sonarcloud
