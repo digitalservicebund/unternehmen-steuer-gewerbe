@@ -41,7 +41,7 @@ jobs:
       - name: Lint
         run: pnpm run lint
 
-  test-and-scan-with-sonarcloud:
+  test-and-scan-with-sonarcloud-if-not-dependabot:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -66,6 +66,7 @@ jobs:
         run: pnpm run test:coverage
 
       - name: Cache SonarQube packages
+        if: ${{ github.actor == 'dependabot[bot]' }}
         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
         with:
           path: ~/.sonar/cache
@@ -75,17 +76,16 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@a31c9398be7ace6bbfaf30c0bd5d415f843d45e9
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GITHUB_TOKEN: ${{ github.actor == 'dependabot[bot]' && secrets.SPECIAL_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
 
       # Break pipeline on Sonar quality gate
       - name: SonarQube Quality Gate check
+        if: ${{ github.actor == 'dependabot[bot]' }}
         id: sonarqube-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b
         with:
           pollingTimeoutSec: 600
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GITHUB_TOKEN: ${{ github.actor == 'dependabot[bot]' && secrets.SPECIAL_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
 
   #######################################
   # Automerge if dependabot branch and all tests passing and non-major version update
