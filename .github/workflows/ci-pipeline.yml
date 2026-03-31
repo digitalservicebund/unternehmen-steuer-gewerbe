@@ -2,9 +2,6 @@ name: CI Pipeline
 
 # run-name: ${{ github.actor }} running the CI pipeline
 
-permissions:
-  contents: read
-
 on:
   # run when pushing to main
   push:
@@ -23,6 +20,8 @@ jobs:
   #######################################
   check-format-and-lint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -44,6 +43,8 @@ jobs:
 
   test-and-scan-with-sonarcloud:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
