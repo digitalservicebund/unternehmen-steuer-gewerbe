@@ -79,7 +79,7 @@ jobs:
 
       - name: Print github.actor
         run: echo actor? ${{ github.actor }}
-          echo are we dependabot? ${{ github.actor != 'dependabot[bot]' }}"
+          echo are we dependabot? ${{ github.actor != 'dependabot[bot]' }}
 
       # Break pipeline on Sonar quality gate
       - name: SonarQube Quality Gate check
