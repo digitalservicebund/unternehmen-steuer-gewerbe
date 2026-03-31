@@ -92,12 +92,12 @@ jobs:
     # the ${{ success() }} is required for the "if" not to override the "needs" below
     # (we did run into this problem and saw auto-merges even as "frontend-checks" failed)
     if: ${{ github.event_name != 'schedule' && success() && github.actor == 'dependabot[bot]' && !cancelled() && github.ref != 'refs/heads/main' && github.repository == 'digitalservicebund/unternehmen-steuer-gewerbe'}}
-    permissions:
-      contents: write
-      pull-requests: write
     needs:
       - check-format-and-lint
       - test-and-scan-with-sonarcloud
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Dependabot metadata
         continue-on-error: true
