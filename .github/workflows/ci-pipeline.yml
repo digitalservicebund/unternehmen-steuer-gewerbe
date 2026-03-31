@@ -99,7 +99,7 @@ jobs:
     if: ${{ github.event_name != 'schedule' && success() && github.actor == 'dependabot[bot]' && !cancelled() && github.ref != 'refs/heads/main' && github.repository == 'digitalservicebund/unternehmen-steuer-gewerbe'}}
     needs:
       - check-format-and-lint
-      - test-and-scan-with-sonarcloud
+      - test-and-scan-with-sonarcloud-if-not-dependabot
     permissions:
       contents: write
       pull-requests: write
