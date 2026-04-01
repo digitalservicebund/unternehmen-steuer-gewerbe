@@ -1,7 +1,5 @@
 name: CI Pipeline
 
-# run-name: ${{ github.actor }} running the CI pipeline
-
 on:
   # run when pushing to main
   push:
@@ -11,13 +9,12 @@ on:
   pull_request:
     branches:
       - main
-  # also: allow to run this workflow manually
+  # allow for running this workflow manually (button in GitHub Actions UI)
   workflow_dispatch:
 
 jobs:
-  #######################################
-  # Checks and scans that break the pipeline
-  #######################################
+  # Note: Formatting and linting do break the pipeline
+  # There's a Git hooks setup to fix both before pushing. Cf. the repository README
   check-format-and-lint:
     runs-on: ubuntu-latest
     permissions:
@@ -41,7 +38,7 @@ jobs:
       - name: Lint
         run: pnpm run lint
 
-  test-and-scan-with-sonarcloud-if-not-dependabot:
+  test-and-scan-with-sonarcloud-if-not-dependabot-pr:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -62,17 +59,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --ignore-scripts
 
+      ##################################
+      # Tests run here
+      ##################################
+
       - name: Run tests with coverage report
         run: pnpm run test:coverage
 
-      - name: Conditional Step (not dependabot PR)
-        if: github.event.pull_request.user.login != 'dependabot[bot]'
-        run: echo "This is not a Dependabot PR"
-
-      - name: Conditional Step (IS dependabot PR)
-        if: github.event.pull_request.user.login == 'dependabot[bot]'
-        run: echo "This IS a Dependabot PR"
-
+      ################################
+      # SonarCloud for static code and test coverage analyses
+      # Skipped on dependabot PRs as GITHUB_TOKEN is too limited for Sonar to access the repository
+      ################################
       - name: Cache SonarQube packages
         if: github.event.pull_request.user.login != 'dependabot[bot]'
         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
@@ -80,6 +77,7 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
+
       - name: SonarQube Scan
         if: github.event.pull_request.user.login != 'dependabot[bot]'
         uses: SonarSource/sonarqube-scan-action@a31c9398be7ace6bbfaf30c0bd5d415f843d45e9
@@ -97,8 +95,9 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   #######################################
-  # Automerge if dependabot branch and all tests passing and non-major version update
+  # Automerge if it's a dependabot PR and all tests are passing and it's a non-major version update
   # cf. ../dependabot.yml for details on Dependabot like e.g. the cooldown period we're using
+  # Follows this recipe of the GitHub docs: https://docs.github.com/en/code-security/tutorials/secure-your-dependencies/automating-dependabot-with-github-actions#enabling-automerge-on-a-pull-request
   #######################################
 
   dependabot-auto-merge:
@@ -108,7 +107,7 @@ jobs:
     if: ${{ github.event_name != 'schedule' && success() && github.actor == 'dependabot[bot]' && !cancelled() && github.ref != 'refs/heads/main' && github.repository == 'digitalservicebund/unternehmen-steuer-gewerbe'}}
     needs:
       - check-format-and-lint
-      - test-and-scan-with-sonarcloud-if-not-dependabot
+      - test-and-scan-with-sonarcloud-if-not-dependabot-pr
     permissions:
       contents: write
       pull-requests: write
