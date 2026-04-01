@@ -26,7 +26,7 @@ jobs:
       - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320
         name: Install pnpm
         with:
-          version: 10 # does this always install the latest? How to pin?
+          version: 10.33.0
           cache: true
 
       - name: Install dependencies
@@ -53,7 +53,7 @@ jobs:
       - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320
         name: Install pnpm
         with:
-          version: 10
+          version: 10.33.0
           cache: true
 
       - name: Install dependencies
