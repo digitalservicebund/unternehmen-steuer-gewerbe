@@ -26,7 +26,7 @@ pnmp run test:watch
 
 ## Using GitHooks
 
-Requires [lefthook](https://lefthook.dev/) and a
+Requires [lefthook](https://lefthook.dev/)
 
 ```bash
 lefthook install
