@@ -24,9 +24,9 @@ or in watch mode, restarting on changes
 pnpm run test:watch
 ```
 
-## Using GitHooks
+## Using Git Hooks
 
-Requires [lefthook](https://lefthook.dev/)
+We're using [lefthook](https://lefthook.dev/) for Git hook configuration. After installing `lefthook`, run the following once:
 
 ```bash
 lefthook install
@@ -34,4 +34,4 @@ lefthook install
 
 ## NPM Scripts
 
-Cf. [package.json](./package.json)
+We have an annotated [package.json](./package.json). Please have a look, there.
