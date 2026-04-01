@@ -65,6 +65,14 @@ jobs:
       - name: Run tests with coverage report
         run: pnpm run test:coverage
 
+      - name: Conditional Step (not dependabot PR)
+        if: github.event.pull_request.user.login != 'dependabot[bot]'
+        run: echo "This is not a Dependabot PR"
+
+      - name: Conditional Step (IS dependabot PR)
+        if: github.event.pull_request.user.login == 'dependabot[bot]'
+        run: echo "This IS a Dependabot PR"
+
       - name: Cache SonarQube packages
         if: github.event.pull_request.user.login != 'dependabot[bot]'
         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
@@ -73,6 +81,7 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
       - name: SonarQube Scan
+        if: github.event.pull_request.user.login != 'dependabot[bot]'
         uses: SonarSource/sonarqube-scan-action@a31c9398be7ace6bbfaf30c0bd5d415f843d45e9
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
