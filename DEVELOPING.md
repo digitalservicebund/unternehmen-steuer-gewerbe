@@ -15,13 +15,13 @@ pnpm run start:watch
 ## Running the Tests
 
 ```bash
-pnmp run test
+pnpm run test
 ```
 
 or in watch mode, restarting on changes
 
 ```bash
-pnmp run test:watch
+pnpm run test:watch
 ```
 
 ## Using GitHooks
