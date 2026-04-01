@@ -3,7 +3,7 @@ import supertest from "supertest";
 
 import app from "./app.js";
 
-let request = supertest(app);
+const request = supertest(app);
 
 describe("API tests", () => {
   test("Returns 404 NOT FOUND on unsupported route", async () => {
