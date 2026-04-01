@@ -9,40 +9,6 @@ API for registering with "ELSTER" and "Gewerbeämtern"
 
 Component of [digitalservicebund/unternehmen-one-stop-shop](https://github.com/digitalservicebund/unternehmen-one-stop-shop)
 
-## Developing
+## Development
 
-### GitHooks
-
-Requires [lefthook](https://lefthook.dev/) and a
-
-```bash
-lefthook install
-```
-
-### Running the API
-
-```bash
-pnpm start
-```
-
-or in watch mode, restarting on changes
-
-```bash
-pnpm run start:watch
-```
-
-### Running the Tests
-
-```bash
-pnmp run test
-```
-
-or in watch mode, restarting on changes
-
-```bash
-pnmp run test:watch
-```
-
-### Scripts
-
-Cf. [package.json](./package.json)
+Cf. [./DEVELOPING.md](./DEVELOPING.md)
