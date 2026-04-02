@@ -68,15 +68,12 @@ class FitConnectClient {
   }
 
   private async authenticate(): Promise<void> {
-    const tokenResponse = await this.fetchFitConnect<TokenResponse>(
-      this.config.oauthTokenUrl,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `grant_type=client_credentials&client_id=${this.config.clientId}&client_secret=${this.config.clientSecret}`,
-        redirect: "follow",
-      },
-    );
+    const tokenResponse = await this.fetchFitConnect<TokenResponse>(this.config.oauthTokenUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `grant_type=client_credentials&client_id=${this.config.clientId}&client_secret=${this.config.clientSecret}`,
+      redirect: "follow",
+    });
     this.accessToken = tokenResponse.access_token;
   }
 
@@ -86,10 +83,7 @@ class FitConnectClient {
     );
   }
 
-  async getEncryptionKey(
-    destinationId: string,
-    encryptionKid: string,
-  ): Promise<JWK> {
+  async getEncryptionKey(destinationId: string, encryptionKid: string): Promise<JWK> {
     return this.fetchFitConnect<JWK>(
       `${this.config.submissionApiUrl}/v2/destinations/${destinationId}/keys/${encryptionKid}`,
     );
@@ -122,10 +116,7 @@ class FitConnectClient {
   }: SubmitDataOptions): Promise<SendSubmissionResponse> {
     await this.authenticate();
 
-    const { submissionId } = await this.createSubmission(
-      destinationId,
-      publicService,
-    );
+    const { submissionId } = await this.createSubmission(destinationId, publicService);
 
     const { encryptionKid } = await this.getDestination(destinationId);
 
@@ -133,16 +124,11 @@ class FitConnectClient {
 
     console.log(dataSchema);
 
-    const encryptedData = await this.encryptData(
-      data,
-      publicJwk,
-      dataSchema.mimeType,
-    );
+    const encryptedData = await this.encryptData(data, publicJwk, dataSchema.mimeType);
 
     const dataHash = createHash("sha512").update(data).digest("hex");
     const metadata = {
-      $schema:
-        "https://schema.fitko.de/fit-connect/metadata/2.1.0/metadata.schema.json",
+      $schema: "https://schema.fitko.de/fit-connect/metadata/2.1.0/metadata.schema.json",
       contentStructure: {
         data: {
           submissionSchema: {
@@ -158,18 +144,12 @@ class FitConnectClient {
       },
     };
 
-    const encryptedMetadata = await this.encryptData(
-      JSON.stringify(metadata),
-      publicJwk,
-    );
+    const encryptedMetadata = await this.encryptData(JSON.stringify(metadata), publicJwk);
 
     return this.sendSubmission(submissionId, encryptedData, encryptedMetadata);
   }
 
-  private async fetchFitConnect<T>(
-    url: string,
-    options?: RequestInit,
-  ): Promise<T> {
+  private async fetchFitConnect<T>(url: string, options?: RequestInit): Promise<T> {
     const res = await this.fetch(url, options);
     if (!res.ok) {
       const text = await res.text();

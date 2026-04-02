@@ -7,12 +7,8 @@ const ENCRYPTION_KID = "f0d4c8a1-ddb9-4f5c-9f70-350ffe14d83c";
 const CASE_ID = "471aff14-16c3-4e15-b799-b843cb8fc78d";
 const SUBMISSION_ID = "29899b73-a92d-4284-93be-8a32eeabdda5";
 
-const publicKeyEncryption = JSON.parse(
-  process.env.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK!,
-);
-const privateKeyDecryption = JSON.parse(
-  process.env.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK!,
-);
+const publicKeyEncryption = JSON.parse(process.env.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK!);
+const privateKeyDecryption = JSON.parse(process.env.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK!);
 
 function jsonResponse(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
@@ -135,17 +131,13 @@ describe("FitConnectClient", () => {
             "Content-Type": "application/json",
             Authorization: "Bearer test-token",
           }),
-          body: expect.stringMatching(
-            /"encryptedData":"ey.+","encryptedMetadata":"ey.+"/,
-          ),
+          body: expect.stringMatching(/"encryptedData":"ey.+","encryptedMetadata":"ey.+"/),
         }),
       );
     });
 
     it("throws when authentication fails", async () => {
-      mockFetch.mockResolvedValueOnce(
-        new Response("Unauthorized", { status: 401 }),
-      );
+      mockFetch.mockResolvedValueOnce(new Response("Unauthorized", { status: 401 }));
 
       await expect(
         client.submitData({
@@ -154,9 +146,7 @@ describe("FitConnectClient", () => {
           data: "data",
           dataSchema: { schemaUri: "urn:schema", mimeType: "application/json" },
         }),
-      ).rejects.toThrow(
-        "POST https://auth-testing.fit-connect.fitko.dev/token: Unauthorized",
-      );
+      ).rejects.toThrow("POST https://auth-testing.fit-connect.fitko.dev/token: Unauthorized");
     });
   });
 
