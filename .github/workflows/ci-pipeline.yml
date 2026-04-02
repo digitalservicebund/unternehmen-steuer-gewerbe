@@ -13,24 +13,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-
-      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320
-        name: Install pnpm
-        with:
-          version: 10.33.0
-          cache: true
-
-      - name: Install dependencies
-        run: pnpm install --ignore-scripts
-
-      - name: Build
-        run: pnpm build
-
   # Note: Formatting and linting do break the pipeline
   # There's a Git hooks setup to fix both before pushing. Cf. the repository README
   check-format-and-lint:
@@ -124,7 +106,8 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --ignore-scripts
-      - name: Build docker image
+
+      - name: Build project and docker image
         run: pnpm run build:image
 
       - name: Run Trivy vulnerability image scanner
