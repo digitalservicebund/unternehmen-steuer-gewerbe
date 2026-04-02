@@ -110,6 +110,14 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+  build-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - name: Build docker image
+        run: docker build . --tag "unternehmen-steuer-gewerbe"
+
   #######################################
   # Automerge if it's a dependabot PR and all tests are passing and it's a non-major version update
   # cf. ../dependabot.yml for details on Dependabot like e.g. the cooldown period we're using
