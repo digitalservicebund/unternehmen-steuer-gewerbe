@@ -7,7 +7,7 @@ const CASE_ID = "471aff14-16c3-4e15-b799-b843cb8fc78d";
 const SUBMISSION_ID = "29899b73-a92d-4284-93be-8a32eeabdda5";
 
 const publicKeyEncryption = JSON.parse(
-  process.env.FIT_CONNECT_PRIVATE_KEY_ENCRYPTION_JWK!,
+  process.env.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK!,
 );
 const privateKeyDecryption = JSON.parse(
   process.env.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK!,
