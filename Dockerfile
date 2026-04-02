@@ -13,7 +13,8 @@ COPY package.json5 pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # copy project files and folders to the current working directory (i.e. 'app' folder)
-COPY . .
+COPY ./src .
+COPY tsconfig.json .
 
 # build app for production with minification
 RUN pnpm run build
