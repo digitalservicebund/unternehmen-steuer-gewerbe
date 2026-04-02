@@ -5,6 +5,8 @@ RUN addgroup -S nonroot \
 
 USER nonroot
 
+WORKDIR /app
+
 # bundle created by `npm run build`, which uses rolldown for bundling
 COPY ./dist/bundle.js .
 

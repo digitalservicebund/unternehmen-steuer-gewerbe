@@ -145,26 +145,27 @@ jobs:
       - name: Print trivy results (sarif format)
         run: cat trivy-image-results.sarif
 
-      - name: Fail build on High/Criticial Vulnerabilities (on branches)
-        # ignore on `main`
-        if: ${{ github.ref != 'refs/heads/main' }}
-        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
-        env:
-          TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
-          TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
-          TRIVY_FORMAT: table
-          TRIVY_SEVERITY: HIGH,CRITICAL
-          TRIVY_EXIT_CODE: 1
-        with:
-          # image-ref: ${{ inputs.image-ref }}
-          image-ref: unternehmen-steuer-gewerbe
-          # following three are ignored unfortunately -> therefore using ENV vars directly
-          # https://github.com/aquasecurity/trivy-action/issues/435
-          format: table
-          severity: HIGH,CRITICAL
-          exit-code: 1
-          # On a subsequent call to the action we know trivy is already installed so can skip this
-          skip-setup-trivy: true
+      # disabled as we don't have "advanced security" available
+      # - name: Fail build on High/Criticial Vulnerabilities (on branches)
+      #   # ignore on `main`
+      #   if: ${{ github.ref != 'refs/heads/main' }}
+      #   uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+      #   env:
+      #     TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
+      #     TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
+      #     TRIVY_FORMAT: table
+      #     TRIVY_SEVERITY: HIGH,CRITICAL
+      #     TRIVY_EXIT_CODE: 1
+      #   with:
+      #     # image-ref: ${{ inputs.image-ref }}
+      #     image-ref: unternehmen-steuer-gewerbe
+      #     # following three are ignored unfortunately -> therefore using ENV vars directly
+      #     # https://github.com/aquasecurity/trivy-action/issues/435
+      #     format: table
+      #     severity: HIGH,CRITICAL
+      #     exit-code: 1
+      #     # On a subsequent call to the action we know trivy is already installed so can skip this
+      #     skip-setup-trivy: true
 
   #######################################
   # Automerge if it's a dependabot PR and all tests are passing and it's a non-major version update
