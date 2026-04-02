@@ -70,29 +70,29 @@ jobs:
       # SonarCloud for static code and test coverage analyses
       # Skipped on dependabot PRs as GITHUB_TOKEN is too limited for Sonar to access the repository
       ################################
-      - name: Cache SonarQube packages
-        if: github.event.pull_request.user.login != 'dependabot[bot]'
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
 
-      - name: SonarQube Scan
-        if: github.event.pull_request.user.login != 'dependabot[bot]'
-        uses: SonarSource/sonarqube-scan-action@299e4b793aaa83bf2aba7c9c14bedbb485688ec4
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      # 🚧 disabled as we need the sonar github app for private repository access
 
-      # Break pipeline on Sonar quality gate
-      - name: SonarQube Quality Gate check
-        if: github.event.pull_request.user.login != 'dependabot[bot]'
-        id: sonarqube-quality-gate-check
-        uses: sonarsource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b
-        with:
-          pollingTimeoutSec: 600
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      # - name: Cache SonarQube packages
+      #   uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
+      #   with:
+      #     path: ~/.sonar/cache
+      #     key: ${{ runner.os }}-sonar
+      #     restore-keys: ${{ runner.os }}-sonar
+
+      # - name: SonarQube Scan
+      #   uses: SonarSource/sonarqube-scan-action@299e4b793aaa83bf2aba7c9c14bedbb485688ec4
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # # Break pipeline on Sonar quality gate
+      # - name: SonarQube Quality Gate check
+      #   id: sonarqube-quality-gate-check
+      #   uses: sonarsource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b
+      #   with:
+      #     pollingTimeoutSec: 600
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   #######################################
   # Automerge if it's a dependabot PR and all tests are passing and it's a non-major version update
