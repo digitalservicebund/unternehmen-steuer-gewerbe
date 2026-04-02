@@ -38,6 +38,13 @@ jobs:
       - name: Lint
         run: pnpm run lint
 
+      - name: Send failure to Slack
+        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+        if: ${{ failure() && github.ref == 'refs/heads/main' }}
+        with:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
+
   test-and-scan-with-sonarcloud:
     runs-on: ubuntu-latest
     permissions:
@@ -91,6 +98,13 @@ jobs:
           pollingTimeoutSec: 600
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Send failure to Slack
+        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+        if: ${{ failure() && github.ref == 'refs/heads/main' }}
+        with:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
   build-and-scan-image:
     runs-on: ubuntu-latest
@@ -166,6 +180,13 @@ jobs:
       #     exit-code: 1
       #     # On a subsequent call to the action we know trivy is already installed so can skip this
       #     skip-setup-trivy: true
+
+      - name: Send failure to Slack
+        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+        if: ${{ failure() && github.ref == 'refs/heads/main' }}
+        with:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
   #######################################
   # Automerge if it's a dependabot PR and all tests are passing and it's a non-major version update
