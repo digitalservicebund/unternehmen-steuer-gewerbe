@@ -7,8 +7,10 @@
   author: "",
   type: "module",
   scripts: {
-    // Build JavaScript in ./dist
-    build: "tsc ",
+    // Build and bundle to./dist/bundle.js
+    build: "rolldown -c rolldown.config.js",
+    // Build app and docker image
+    "build:image": "pnpm build; docker build . --tag unternehmen-steuer-gewerbe",
     // Check format, fail on error (used in CI)
     format: "oxfmt --check",
     // Check format, fix if possible (used in pre-commit GitHook)
@@ -39,6 +41,7 @@
     nodemon: "^3.1.14",
     oxfmt: "^0.42.0",
     oxlint: "^1.58.0",
+    rolldown: "1.0.0-rc.13",
     supertest: "^7.2.2",
     "ts-node": "^10.9.2",
     typescript: "^6.0.2",

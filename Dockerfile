@@ -1,23 +1,14 @@
 FROM node:25.8.1-alpine
 
-# make the 'app' folder the current working directory
-WORKDIR /frontend
+RUN addgroup -S nonroot \
+    && adduser -S nonroot -G nonroot
 
-# Install pnpm
-RUN npm install -g pnpm
+USER nonroot
 
-# copy both 'package.json5' and 'pnpm-lock.yaml'
-COPY package.json5 pnpm-lock.yaml ./
-
-# install project dependencies
-RUN pnpm install --frozen-lockfile --ignore-scripts
-
-# copy project files and folders to the current working directory (i.e. 'app' folder)
-COPY ./src .
-COPY tsconfig.json .
-
-# build app for production with minification
-RUN pnpm run build
+# bundle created by `npm run build`, which uses rolldown for bundling
+COPY ./dist/bundle.js .
 
 EXPOSE 3000
-CMD [ "pnpm", "run", "start" ]
+
+# CMD [ "ls", "-la" ]
+CMD [ "node", "bundle.js" ]

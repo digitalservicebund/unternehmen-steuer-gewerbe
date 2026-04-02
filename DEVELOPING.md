@@ -19,7 +19,7 @@ pnpm run start:watch
 Build image with
 
 ```bash
-docker build . --tag "unternehmen-steuer-gewerbe"
+pnpm run build:image
 ```
 
 start, mapping local port to container port
