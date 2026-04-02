@@ -1,12 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import publicKeyEncryption from "./testCertificates/publicKey_encryption.jwk.json";
-import privateKeyDecryption from "./testCertificates/privateKey_decryption.jwk.json";
 import FitConnectClient from "./fitConnectClient";
 
 const DESTINATION_ID = "ec0a9e69-dc34-427d-ab82-a5c90e4687c0";
 const ENCRYPTION_KID = "f0d4c8a1-ddb9-4f5c-9f70-350ffe14d83c";
 const CASE_ID = "471aff14-16c3-4e15-b799-b843cb8fc78d";
 const SUBMISSION_ID = "29899b73-a92d-4284-93be-8a32eeabdda5";
+
+const publicKeyEncryption = JSON.parse(
+  process.env.FIT_CONNECT_PRIVATE_KEY_ENCRYPTION_JWK!,
+);
+const privateKeyDecryption = JSON.parse(
+  process.env.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK!,
+);
 
 function jsonResponse(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
