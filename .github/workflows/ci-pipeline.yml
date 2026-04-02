@@ -13,24 +13,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-
-      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320
-        name: Install pnpm
-        with:
-          version: 10.33.0
-          cache: true
-
-      - name: Install dependencies
-        run: pnpm install --ignore-scripts
-
-      - name: Build
-        run: pnpm build
-
   # Note: Formatting and linting do break the pipeline
   # There's a Git hooks setup to fix both before pushing. Cf. the repository README
   check-format-and-lint:
@@ -110,7 +92,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  build-image:
+  build-and-scan-image:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -124,8 +106,64 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --ignore-scripts
-      - name: Build docker image
+
+      - name: Build project and docker image
         run: pnpm run build:image
+
+      - name: Run Trivy vulnerability image scanner
+        # Note: Results are shown in the GitHub Security tab
+        #       cf. step "Upload Trivy scan results to GitHub Security tab"
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+        env:
+          TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
+          TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
+        with:
+          # image-ref: ${{ inputs.image-ref }}
+          image-ref: unternehmen-steuer-gewerbe
+          format: "sarif"
+          output: "trivy-image-results.sarif"
+          exit-code: 0
+
+      - name: Upload trivy results as artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-trivy-image-results.sarif
+          retention-days: 3
+          path: trivy-image-results.sarif
+          if-no-files-found: error
+
+      - name: Upload Trivy scan results to GitHub Security tab (on `main`)
+        uses: github/codeql-action/upload-sarif@v4
+        # only on `main`
+        if: ${{ github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
+        with:
+          sarif_file: "trivy-image-results.sarif"
+
+      - name: Print trivy results (sarif format)
+        run: cat trivy-image-results.sarif
+
+      - name: Fail build on High/Criticial Vulnerabilities (on branches)
+        # ignore on `main`
+        if: ${{ github.ref != 'refs/heads/main' }}
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+        env:
+          TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
+          TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
+          TRIVY_FORMAT: table
+          TRIVY_SEVERITY: HIGH,CRITICAL
+          TRIVY_EXIT_CODE: 1
+        with:
+          # image-ref: ${{ inputs.image-ref }}
+          image-ref: unternehmen-steuer-gewerbe
+          # following three are ignored unfortunately -> therefore using ENV vars directly
+          # https://github.com/aquasecurity/trivy-action/issues/435
+          format: table
+          severity: HIGH,CRITICAL
+          exit-code: 1
+          # On a subsequent call to the action we know trivy is already installed so can skip this
+          skip-setup-trivy: true
 
   #######################################
   # Automerge if it's a dependabot PR and all tests are passing and it's a non-major version update
