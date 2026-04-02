@@ -110,6 +110,23 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+  build-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320
+        name: Install pnpm
+        with:
+          version: 10.33.0
+          cache: true
+
+      - name: Install dependencies
+        run: pnpm install --ignore-scripts
+      - name: Build docker image
+        run: pnpm run build:image
+
   #######################################
   # Automerge if it's a dependabot PR and all tests are passing and it's a non-major version update
   # cf. ../dependabot.yml for details on Dependabot like e.g. the cooldown period we're using
