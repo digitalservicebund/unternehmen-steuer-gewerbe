@@ -36,7 +36,7 @@ jobs:
         run: pnpm run format
 
       - name: Lint
-        run: pnpm run lint
+        run: pnpm run lint-this-at-once # break the pipeline, trigger alert
 
       - name: Send failure to Slack
         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
