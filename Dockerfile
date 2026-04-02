@@ -14,5 +14,4 @@ COPY --chown=nonroot:nonroot --chmod=755 ./dist/bundle.js .
 
 EXPOSE 3000
 
-# CMD [ "ls", "-la" ]
 CMD [ "node", "bundle.js" ]
