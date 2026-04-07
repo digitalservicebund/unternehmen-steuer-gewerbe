@@ -67,6 +67,25 @@ class FitConnectClient {
     this.fetch = config.fetch ?? globalThis.fetch; // for testing
   }
 
+  async encryptData(
+    data: string,
+    publicJwk: JWK,
+    contentType = "application/json",
+  ): Promise<string> {
+    const { key_ops: _, ...jwkForImport } = publicJwk;
+    const publicKey = await importJWK(jwkForImport, "RSA-OAEP-256");
+    const payload = new TextEncoder().encode(data);
+
+    return new CompactEncrypt(payload)
+      .setProtectedHeader({
+        alg: "RSA-OAEP-256",
+        enc: "A256GCM",
+        kid: publicJwk.kid!,
+        cty: contentType,
+      })
+      .encrypt(publicKey);
+  }
+
   async submitData({
     destinationId,
     publicService,
@@ -87,7 +106,7 @@ class FitConnectClient {
 
     const dataHash = createHash("sha512").update(data).digest("hex");
     const metadata = {
-      $schema: "https://schema.fitko.de/fit-connect/metadata/2.1.0/metadata.schema.json",
+      $schema: "https://schema.fitko.de/fit-connect/metadata/2.0.0/metadata.schema.json",
       contentStructure: {
         data: {
           submissionSchema: {
@@ -99,7 +118,6 @@ class FitConnectClient {
             content: dataHash,
           },
         },
-        attachments: [],
       },
     };
 
@@ -128,25 +146,6 @@ class FitConnectClient {
     return this.fetchFitConnect<JWK>(
       `${this.config.submissionApiUrl}/v2/destinations/${destinationId}/keys/${encryptionKid}`,
     );
-  }
-
-  private async encryptData(
-    data: string,
-    publicJwk: JWK,
-    contentType = "application/json",
-  ): Promise<string> {
-    const { key_ops: _, ...jwkForImport } = publicJwk;
-    const publicKey = await importJWK(jwkForImport, "RSA-OAEP-256");
-    const payload = new TextEncoder().encode(data);
-
-    return new CompactEncrypt(payload)
-      .setProtectedHeader({
-        alg: "RSA-OAEP-256",
-        enc: "A256GCM",
-        kid: publicJwk.kid!,
-        cty: contentType,
-      })
-      .encrypt(publicKey);
   }
 
   private async fetchFitConnect<T>(url: string, options?: RequestInit): Promise<T> {
