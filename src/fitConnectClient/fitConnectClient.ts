@@ -67,47 +67,6 @@ class FitConnectClient {
     this.fetch = config.fetch ?? globalThis.fetch; // for testing
   }
 
-  private async authenticate(): Promise<void> {
-    const tokenResponse = await this.fetchFitConnect<TokenResponse>(this.config.oauthTokenUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `grant_type=client_credentials&client_id=${this.config.clientId}&client_secret=${this.config.clientSecret}`,
-      redirect: "follow",
-    });
-    this.accessToken = tokenResponse.access_token;
-  }
-
-  async getDestination(destinationId: string): Promise<DestinationResponse> {
-    return this.fetchFitConnect<DestinationResponse>(
-      `${this.config.submissionApiUrl}/v2/destinations/${destinationId}`,
-    );
-  }
-
-  async getEncryptionKey(destinationId: string, encryptionKid: string): Promise<JWK> {
-    return this.fetchFitConnect<JWK>(
-      `${this.config.submissionApiUrl}/v2/destinations/${destinationId}/keys/${encryptionKid}`,
-    );
-  }
-
-  async encryptData(
-    data: string,
-    publicJwk: JWK,
-    contentType = "application/json",
-  ): Promise<string> {
-    const { key_ops: _, ...jwkForImport } = publicJwk;
-    const publicKey = await importJWK(jwkForImport, "RSA-OAEP-256");
-    const payload = new TextEncoder().encode(data);
-
-    return new CompactEncrypt(payload)
-      .setProtectedHeader({
-        alg: "RSA-OAEP-256",
-        enc: "A256GCM",
-        kid: publicJwk.kid!,
-        cty: contentType,
-      })
-      .encrypt(publicKey);
-  }
-
   async submitData({
     destinationId,
     publicService,
@@ -147,6 +106,47 @@ class FitConnectClient {
     const encryptedMetadata = await this.encryptData(JSON.stringify(metadata), publicJwk);
 
     return this.sendSubmission(submissionId, encryptedData, encryptedMetadata);
+  }
+
+  private async authenticate(): Promise<void> {
+    const tokenResponse = await this.fetchFitConnect<TokenResponse>(this.config.oauthTokenUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `grant_type=client_credentials&client_id=${this.config.clientId}&client_secret=${this.config.clientSecret}`,
+      redirect: "follow",
+    });
+    this.accessToken = tokenResponse.access_token;
+  }
+
+  async getDestination(destinationId: string): Promise<DestinationResponse> {
+    return this.fetchFitConnect<DestinationResponse>(
+      `${this.config.submissionApiUrl}/v2/destinations/${destinationId}`,
+    );
+  }
+
+  private async getEncryptionKey(destinationId: string, encryptionKid: string): Promise<JWK> {
+    return this.fetchFitConnect<JWK>(
+      `${this.config.submissionApiUrl}/v2/destinations/${destinationId}/keys/${encryptionKid}`,
+    );
+  }
+
+  private async encryptData(
+    data: string,
+    publicJwk: JWK,
+    contentType = "application/json",
+  ): Promise<string> {
+    const { key_ops: _, ...jwkForImport } = publicJwk;
+    const publicKey = await importJWK(jwkForImport, "RSA-OAEP-256");
+    const payload = new TextEncoder().encode(data);
+
+    return new CompactEncrypt(payload)
+      .setProtectedHeader({
+        alg: "RSA-OAEP-256",
+        enc: "A256GCM",
+        kid: publicJwk.kid!,
+        cty: contentType,
+      })
+      .encrypt(publicKey);
   }
 
   private async fetchFitConnect<T>(url: string, options?: RequestInit): Promise<T> {
