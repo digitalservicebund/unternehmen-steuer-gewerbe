@@ -38,7 +38,14 @@ jobs:
       - name: Lint
         run: pnpm run lint
 
-  test-and-scan-with-sonarcloud-if-not-dependabot-pr:
+      - name: Send failure to Slack
+        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+        if: ${{ failure() && github.ref == 'refs/heads/main' }}
+        with:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
+
+  test-and-scan-with-sonarcloud:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -71,31 +78,118 @@ jobs:
 
       ################################
       # SonarCloud for static code and test coverage analyses
-      # Skipped on dependabot PRs as GITHUB_TOKEN is too limited for Sonar to access the repository
+      # requires the SonarQubeCloud GitHub app in the repository
       ################################
 
-      # 🚧 disabled as we need the sonar github app for private repository access
+      - name: Cache SonarQube packages
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
 
-      # - name: Cache SonarQube packages
-      #   uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@299e4b793aaa83bf2aba7c9c14bedbb485688ec4
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # Break pipeline on Sonar quality gate
+      - name: SonarQube Quality Gate check
+        id: sonarqube-quality-gate-check
+        uses: sonarsource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b
+        with:
+          pollingTimeoutSec: 600
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Send failure to Slack
+        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+        if: ${{ failure() && github.ref == 'refs/heads/main' }}
+        with:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
+
+  build-and-scan-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320
+        name: Install pnpm
+        with:
+          version: 10.33.0
+          cache: true
+
+      - name: Install dependencies
+        run: pnpm install --ignore-scripts
+
+      - name: Build project and docker image
+        run: pnpm run build:image
+
+      - name: Run Trivy vulnerability image scanner
+        # Note: Results are shown in the GitHub Security tab
+        #       cf. step "Upload Trivy scan results to GitHub Security tab"
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+        env:
+          TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
+          TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
+        with:
+          # image-ref: ${{ inputs.image-ref }}
+          image-ref: unternehmen-steuer-gewerbe
+          format: "sarif"
+          output: "trivy-image-results.sarif"
+          exit-code: 0
+
+      - name: Upload trivy results as artifact
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: backend-trivy-image-results.sarif
+          retention-days: 3
+          path: trivy-image-results.sarif
+          if-no-files-found: error
+
+      # disabled as we don't have "advanced security" available, being a private repository
+      # - name: Upload Trivy scan results to GitHub Security tab (on `main`)
+      #   uses: github/codeql-action/upload-sarif@v4
+      #   # only on `main`
+      #   if: ${{ github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
       #   with:
-      #     path: ~/.sonar/cache
-      #     key: ${{ runner.os }}-sonar
-      #     restore-keys: ${{ runner.os }}-sonar
+      #     sarif_file: "trivy-image-results.sarif"
 
-      # - name: SonarQube Scan
-      #   uses: SonarSource/sonarqube-scan-action@299e4b793aaa83bf2aba7c9c14bedbb485688ec4
+      - name: Print trivy results (sarif format)
+        run: cat trivy-image-results.sarif
+
+      # disabled as we don't have "advanced security" available
+      # - name: Fail build on High/Criticial Vulnerabilities (on branches)
+      #   # ignore on `main`
+      #   if: ${{ github.ref != 'refs/heads/main' }}
+      #   uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
       #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      # # Break pipeline on Sonar quality gate
-      # - name: SonarQube Quality Gate check
-      #   id: sonarqube-quality-gate-check
-      #   uses: sonarsource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b
+      #     TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
+      #     TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
+      #     TRIVY_FORMAT: table
+      #     TRIVY_SEVERITY: HIGH,CRITICAL
+      #     TRIVY_EXIT_CODE: 1
       #   with:
-      #     pollingTimeoutSec: 600
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     # image-ref: ${{ inputs.image-ref }}
+      #     image-ref: unternehmen-steuer-gewerbe
+      #     # following three are ignored unfortunately -> therefore using ENV vars directly
+      #     # https://github.com/aquasecurity/trivy-action/issues/435
+      #     format: table
+      #     severity: HIGH,CRITICAL
+      #     exit-code: 1
+      #     # On a subsequent call to the action we know trivy is already installed so can skip this
+      #     skip-setup-trivy: true
+
+      - name: Send failure to Slack
+        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+        if: ${{ failure() && github.ref == 'refs/heads/main' }}
+        with:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
   #######################################
   # Automerge if it's a dependabot PR and all tests are passing and it's a non-major version update
@@ -110,7 +204,7 @@ jobs:
     if: ${{ github.event_name != 'schedule' && success() && github.actor == 'dependabot[bot]' && !cancelled() && github.ref != 'refs/heads/main' && github.repository == 'digitalservicebund/unternehmen-steuer-gewerbe'}}
     needs:
       - check-format-and-lint
-      - test-and-scan-with-sonarcloud-if-not-dependabot-pr
+      - test-and-scan-with-sonarcloud
     permissions:
       contents: write
       pull-requests: write

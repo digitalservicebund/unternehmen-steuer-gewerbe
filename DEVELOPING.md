@@ -20,6 +20,8 @@ cp .env.example .env
 
 ## Running the API
 
+### Locally via pnpm
+
 ```bash
 pnpm start
 ```
@@ -28,6 +30,20 @@ or in watch mode, restarting on changes
 
 ```bash
 pnpm run start:watch
+```
+
+### Locally via Docker
+
+Build image with
+
+```bash
+pnpm run build:image
+```
+
+start, mapping local port to container port
+
+```bash
+docker run -p 3000:3000 unternehmen-steuer-gewerbe:latest
 ```
 
 ## Running the Tests
