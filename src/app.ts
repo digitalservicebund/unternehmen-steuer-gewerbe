@@ -40,11 +40,11 @@ app.post("/api/v1/register-gewerbe", async (req, res) => {
   res.json();
 });
 
-app.get("/api/v1/case-events/:caseId", async (req, res) => {
+app.get("/api/v1/register-gewerbe/:submissionId/events", async (req, res) => {
   try {
-    const { caseId } = req.params;
-    const caseEvents = await fitConnectClient.getCaseEvents(caseId);
-    res.json(caseEvents);
+    const { submissionId } = req.params;
+    const submissionEvents = await fitConnectClient.getSubmissionEvents(submissionId);
+    res.json(submissionEvents);
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");

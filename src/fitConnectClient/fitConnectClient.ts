@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import type { JWK } from "jose";
-import { encryptData } from "./crypto";
+import { decryptData, encryptData } from "./crypto";
 
 export interface FitConnectClientConfig {
   clientId: string;
@@ -96,6 +96,39 @@ class FitConnectClient {
     return this.fetchFitConnect<DestinationResponse>(
       `${this.config.submissionApiUrl}/v2/destinations/${destinationId}`,
     );
+  }
+
+  async getSubmissionEvents(submissionId: string) {
+    await this.authenticate();
+
+    interface CaseEventsResponse {
+      count: number;
+      offset: number;
+      totalCount: number;
+      eventLog: string[];
+    }
+
+    const result = await this.fetchFitConnect<CaseEventsResponse>(
+      `${this.config.submissionApiUrl}/v2/submissions/${submissionId}/events`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
+        },
+      },
+    );
+
+    const eventLog = [];
+
+    for (const entry of result.eventLog) {
+      // TODO the entries should be decrypted
+      eventLog.push(entry);
+    }
+
+    console.log(eventLog);
+    return {
+      ...result,
+      eventLog,
+    };
   }
 
   private async authenticate(): Promise<void> {
