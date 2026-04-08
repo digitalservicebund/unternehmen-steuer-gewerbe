@@ -120,7 +120,7 @@ class FitConnectClient {
     const eventLog = [];
 
     for (const entry of result.eventLog) {
-      // TODO the entries should be decrypted
+      // the entries should be decrypted
       eventLog.push(entry);
     }
 
