@@ -153,7 +153,7 @@ jobs:
           TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
         with:
           # image-ref: ${{ inputs.image-ref }}
-          image-ref: unternehmen-steuer-gewerbe
+          image-ref: unternehmen-steuer-gewerbe:${{ github.sha }}
           format: "sarif"
           output: "trivy-image-results.sarif"
           exit-code: 0
