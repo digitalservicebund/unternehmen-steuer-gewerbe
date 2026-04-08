@@ -120,8 +120,12 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
-  build-and-scan-image:
+  build-scan-and-push-image:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # Required for identity challenge with sigstore/fulcio
+      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -242,7 +246,7 @@ jobs:
   deploy-development:
     name: Deploy to development environment
     runs-on: ubuntu-latest
-    needs: [check-format-and-lint, test-and-scan-with-sonarcloud, build-and-scan-image]
+    needs: [check-format-and-lint, test-and-scan-with-sonarcloud, build-scan-and-push-image]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Deploy to development
