@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import type { JWK } from "jose";
-import { decryptData, encryptData } from "./crypto";
+import { encryptData } from "./crypto";
 
 export interface FitConnectClientConfig {
   clientId: string;
