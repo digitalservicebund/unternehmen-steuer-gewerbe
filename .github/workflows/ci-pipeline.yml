@@ -140,7 +140,7 @@ jobs:
         run: pnpm install --ignore-scripts
 
       - name: Build project and docker image
-        run: pnpm run build:image
+        run: pnpm build; docker build . --tag unternehmen-steuer-gewerbe:${{ github.sha }}
 
       - name: Run Trivy vulnerability image scanner
         # Note: Results are shown in the GitHub Security tab
