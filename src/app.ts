@@ -1,16 +1,16 @@
 import express, { type Express } from "express";
 import helmet from "helmet";
 import FitConnectClient from "./fitConnectClient";
+import type { Environment } from "./fitConnectClient/environments";
 
 const app: Express = express();
 app.use(helmet.hidePoweredBy());
 app.use(express.json());
 
 const fitConnectClient = new FitConnectClient({
+  environment: (process.env.FIT_CONNECT_ENV ?? "test") as Environment,
   clientId: process.env.FIT_CONNECT_CLIENT_ID!,
   clientSecret: process.env.FIT_CONNECT_CLIENT_SECRET!,
-  oauthTokenUrl: process.env.FIT_CONNECT_OAUTH_TOKEN_URL!,
-  submissionApiUrl: process.env.FIT_CONNECT_SUBMISSION_API_URL!,
   privateKey: process.env.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK
     ? JSON.parse(process.env.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK)
     : undefined,

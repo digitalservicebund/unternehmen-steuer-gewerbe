@@ -31,10 +31,9 @@ function generateTestKeyPair() {
 }
 
 const defaultConfig = {
+  environment: "test",
   clientId: "test-client-id",
   clientSecret: "test-client-secret",
-  oauthTokenUrl: "https://auth-testing.fit-connect.fitko.dev/token",
-  submissionApiUrl: "https://test.fit-connect.fitko.dev/submission-api",
 };
 
 const tokenResponse = {

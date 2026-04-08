@@ -1,13 +1,13 @@
 import { createHash } from "node:crypto";
 import type { JWK } from "jose";
 import { encryptData } from "./crypto";
+import { type Environment, getEnvironmentUrls } from "./environments";
 
 export interface FitConnectClientConfig {
+  environment: Environment;
   clientId: string;
   clientSecret: string;
   privateKey: JWK;
-  oauthTokenUrl: string;
-  submissionApiUrl: string;
   fetch?: typeof globalThis.fetch;
 }
 
@@ -61,11 +61,13 @@ export interface SubmitDataOptions {
 
 class FitConnectClient {
   private readonly config: FitConnectClientConfig;
+  private readonly urls: ReturnType<typeof getEnvironmentUrls>;
   private readonly fetch: typeof globalThis.fetch;
   private accessToken: string | null = null;
 
   constructor(config: FitConnectClientConfig) {
     this.config = config;
+    this.urls = getEnvironmentUrls(config.environment);
     this.fetch = config.fetch ?? globalThis.fetch; // for testing
   }
 
@@ -94,7 +96,7 @@ class FitConnectClient {
 
   async getDestination(destinationId: string): Promise<DestinationResponse> {
     return this.fetchFitConnect<DestinationResponse>(
-      `${this.config.submissionApiUrl}/v2/destinations/${destinationId}`,
+      `${this.urls.submissionApiUrl}/v2/destinations/${destinationId}`,
     );
   }
 
@@ -109,7 +111,7 @@ class FitConnectClient {
     }
 
     const result = await this.fetchFitConnect<CaseEventsResponse>(
-      `${this.config.submissionApiUrl}/v2/submissions/${submissionId}/events`,
+      `${this.urls.submissionApiUrl}/v2/submissions/${submissionId}/events`,
       {
         headers: {
           Authorization: `Bearer ${this.accessToken}`,
@@ -132,7 +134,7 @@ class FitConnectClient {
   }
 
   private async authenticate(): Promise<void> {
-    const tokenResponse = await this.fetchFitConnect<TokenResponse>(this.config.oauthTokenUrl, {
+    const tokenResponse = await this.fetchFitConnect<TokenResponse>(this.urls.oauthTokenUrl, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: `grant_type=client_credentials&client_id=${this.config.clientId}&client_secret=${this.config.clientSecret}`,
@@ -143,7 +145,7 @@ class FitConnectClient {
 
   private async getDestinationKeys(destinationId: string, encryptionKid: string): Promise<JWK> {
     return this.fetchFitConnect<JWK>(
-      `${this.config.submissionApiUrl}/v2/destinations/${destinationId}/keys/${encryptionKid}`,
+      `${this.urls.submissionApiUrl}/v2/destinations/${destinationId}/keys/${encryptionKid}`,
     );
   }
 
@@ -161,7 +163,7 @@ class FitConnectClient {
     publicService: PublicService,
   ): Promise<CreateSubmissionResponse> {
     return this.fetchFitConnect<CreateSubmissionResponse>(
-      `${this.config.submissionApiUrl}/v2/submissions`,
+      `${this.urls.submissionApiUrl}/v2/submissions`,
       {
         method: "POST",
         headers: {
@@ -202,7 +204,7 @@ class FitConnectClient {
     encryptedMetadata: string,
   ): Promise<SendSubmissionResponse> {
     return this.fetchFitConnect<SendSubmissionResponse>(
-      `${this.config.submissionApiUrl}/v2/submissions/${submissionId}`,
+      `${this.urls.submissionApiUrl}/v2/submissions/${submissionId}`,
       {
         method: "PUT",
         headers: {
