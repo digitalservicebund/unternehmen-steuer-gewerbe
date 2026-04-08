@@ -8,15 +8,17 @@ Copy `.env.example` to `.env` and fill in the values:
 cp .env.example .env
 ```
 
-| Variable                                 | Description                                                                                                                                                                            |
-| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `FIT_CONNECT_CLIENT_ID`                  | OAuth2 Client-ID from the [Self-Service-Portal](https://docs.fitko.de/fit-connect/docs/receiving/destination/#zustellpunktverwaltung)                                                  |
-| `FIT_CONNECT_CLIENT_SECRET`              | OAuth2 Client-Secret, same source as above                                                                                                                                             |
-| `FIT_CONNECT_OAUTH_TOKEN_URL`            | Token endpoint, e.g. `https://auth-testing.fit-connect.fitko.dev/token` (see [Betriebsumgebungen](https://docs.fitko.de/fit-connect/docs/getting-started/environments#test))           |
-| `FIT_CONNECT_SUBMISSION_API_URL`         | Submission API base URL, e.g. `https://test.fit-connect.fitko.dev/submission-api` (see [Betriebsumgebungen](https://docs.fitko.de/fit-connect/docs/getting-started/environments#test)) |
-| `FIT_CONNECT_DESTINATION_ID`             | UUID of the destination ([Zustellpunkt](https://docs.fitko.de/fit-connect/docs/receiving/destination/#zustellpunktverwaltung))                                                         |
-| `FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK`  | Public JWK for encryption, as JSON string ([JWK erzeugen](https://docs.fitko.de/fit-connect/docs/organisation-tasks/jwks-erzeugen#jwk_erzeugen))                                       |
-| `FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK` | Corresponding private JWK for decryption, same source as above                                                                                                                         |
+| Variable                                 | Description                                                                                                                                                                              |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `FIT_CONNECT_CLIENT_ID`                  | OAuth2 Client-ID from the [Self-Service-Portal](https://docs.fitko.de/fit-connect/docs/receiving/destination/#zustellpunktverwaltung)                                                    |
+| `FIT_CONNECT_CLIENT_SECRET`              | OAuth2 Client-Secret, same source as above                                                                                                                                               |
+| `FIT_CONNECT_OAUTH_TOKEN_URL`            | Token endpoint, e.g. `https://auth-testing.fit-connect.fitko.dev/token` (see [Betriebsumgebungen](https://docs.fitko.de/fit-connect/docs/getting-started/environments#test))             |
+| `FIT_CONNECT_SUBMISSION_API_URL`         | Submission API base URL, e.g. `https://test.fit-connect.fitko.dev/submission-api` (see [Betriebsumgebungen](https://docs.fitko.de/fit-connect/docs/getting-started/environments#test))   |
+| `FIT_CONNECT_DESTINATION_API_URL`        | Destination API base URL, e.g. `https://test.fit-connect.fitko.dev/destination-api` (see [Betriebsumgebungen](https://docs.fitko.de/fit-connect/docs/getting-started/environments#test)) |
+| `FIT_CONNECT_ROUTING_API_URL`            | Routing API base URL, e.g. `https://routing-api-testing.fit-connect.fitko.dev.` (see [Betriebsumgebungen](https://docs.fitko.de/fit-connect/docs/getting-started/environments#test))     |
+| `FIT_CONNECT_DESTINATION_ID`             | UUID of the destination ([Zustellpunkt](https://docs.fitko.de/fit-connect/docs/receiving/destination/#zustellpunktverwaltung))                                                           |
+| `FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK`  | Public JWK for encryption, as JSON string ([JWK erzeugen](https://docs.fitko.de/fit-connect/docs/organisation-tasks/jwks-erzeugen#jwk_erzeugen))                                         |
+| `FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK` | Corresponding private JWK for decryption, same source as above                                                                                                                           |
 
 ## Running the API
 
@@ -68,4 +70,4 @@ lefthook install
 
 ## NPM Scripts
 
-We have an annotated [package.json](./package.json). Please have a look, there.
+We have an annotated [package.json5](./package.json5). Please have a look, there.
