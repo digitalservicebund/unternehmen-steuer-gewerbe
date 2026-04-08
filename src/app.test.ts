@@ -19,7 +19,21 @@ describe("API tests", () => {
   });
 
   test("Returns 200 OK and JSON on POST to /register-gewerbe", async () => {
-    const response = await request.post("/api/v1/register-gewerbe").send();
+    const testData = {
+      antragsteller: {
+        vorname: "Erika",
+        nachname: "Mustermann",
+        geburtsdatum: "1985-08-12",
+        adresse: {
+          strasseHausnummer: "Musterstraße 1",
+          plz: "12345",
+          ort: "Musterstadt",
+        },
+      },
+      antrag: "Hello FIT-Connect",
+    };
+    const response = await request.post("/api/v1/register-gewerbe").send(testData);
+    console.log(response.body);
     expect(response.statusCode).toEqual(200);
     expect(response.header["content-type"]).toMatch(/json/);
   });

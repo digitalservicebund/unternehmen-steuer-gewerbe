@@ -150,15 +150,4 @@ describe("FitConnectClient", () => {
     });
   });
 
-  describe("encryptData", () => {
-    it("can be decrypted with the private key", async () => {
-      const { privateKey, publicJwk } = generateTestKeyPair();
-      const { compactDecrypt } = await import("jose");
-
-      const encrypted = await client.encryptData("hello world.", publicJwk);
-      const { plaintext } = await compactDecrypt(encrypted, privateKey);
-
-      expect(new TextDecoder().decode(plaintext)).toBe("hello world.");
-    });
-  });
 });

@@ -1,9 +1,11 @@
 import { createHash } from "node:crypto";
-import { importJWK, CompactEncrypt, type JWK } from "jose";
+import type { JWK } from "jose";
+import { encryptData } from "./crypto";
 
 export interface FitConnectClientConfig {
   clientId: string;
   clientSecret: string;
+  privateKey: JWK;
   oauthTokenUrl: string;
   submissionApiUrl: string;
   fetch?: typeof globalThis.fetch;
@@ -67,25 +69,6 @@ class FitConnectClient {
     this.fetch = config.fetch ?? globalThis.fetch; // for testing
   }
 
-  async encryptData(
-    data: string,
-    publicJwk: JWK,
-    contentType = "application/json",
-  ): Promise<string> {
-    const { key_ops: _, ...jwkForImport } = publicJwk;
-    const publicKey = await importJWK(jwkForImport, "RSA-OAEP-256");
-    const payload = new TextEncoder().encode(data);
-
-    return new CompactEncrypt(payload)
-      .setProtectedHeader({
-        alg: "RSA-OAEP-256",
-        enc: "A256GCM",
-        kid: publicJwk.kid!,
-        cty: contentType,
-      })
-      .encrypt(publicKey);
-  }
-
   async submitData({
     destinationId,
     publicService,
@@ -98,32 +81,21 @@ class FitConnectClient {
 
     const { encryptionKid } = await this.getDestination(destinationId);
 
-    const publicJwk = await this.getEncryptionKey(destinationId, encryptionKid);
+    const publicJwk = await this.getDestinationKeys(destinationId, encryptionKid);
 
-    console.log(dataSchema);
+    const encryptedData = await encryptData(data, publicJwk, dataSchema.mimeType);
 
-    const encryptedData = await this.encryptData(data, publicJwk, dataSchema.mimeType);
+    const metadata = this.createMetadata(dataSchema, data);
 
-    const dataHash = createHash("sha512").update(data).digest("hex");
-    const metadata = {
-      $schema: "https://schema.fitko.de/fit-connect/metadata/2.0.0/metadata.schema.json",
-      contentStructure: {
-        data: {
-          submissionSchema: {
-            schemaUri: dataSchema.schemaUri,
-            mimeType: dataSchema.mimeType,
-          },
-          hash: {
-            type: "sha512",
-            content: dataHash,
-          },
-        },
-      },
-    };
-
-    const encryptedMetadata = await this.encryptData(JSON.stringify(metadata), publicJwk);
+    const encryptedMetadata = await encryptData(JSON.stringify(metadata), publicJwk);
 
     return this.sendSubmission(submissionId, encryptedData, encryptedMetadata);
+  }
+
+  async getDestination(destinationId: string): Promise<DestinationResponse> {
+    return this.fetchFitConnect<DestinationResponse>(
+      `${this.config.submissionApiUrl}/v2/destinations/${destinationId}`,
+    );
   }
 
   private async authenticate(): Promise<void> {
@@ -136,13 +108,7 @@ class FitConnectClient {
     this.accessToken = tokenResponse.access_token;
   }
 
-  async getDestination(destinationId: string): Promise<DestinationResponse> {
-    return this.fetchFitConnect<DestinationResponse>(
-      `${this.config.submissionApiUrl}/v2/destinations/${destinationId}`,
-    );
-  }
-
-  private async getEncryptionKey(destinationId: string, encryptionKid: string): Promise<JWK> {
+  private async getDestinationKeys(destinationId: string, encryptionKid: string): Promise<JWK> {
     return this.fetchFitConnect<JWK>(
       `${this.config.submissionApiUrl}/v2/destinations/${destinationId}/keys/${encryptionKid}`,
     );
@@ -176,6 +142,25 @@ class FitConnectClient {
         }),
       },
     );
+  }
+
+  private createMetadata(dataSchema: DataSchema, data: string) {
+    const dataHash = createHash("sha512").update(data).digest("hex");
+    return {
+      $schema: "https://schema.fitko.de/fit-connect/metadata/2.0.0/metadata.schema.json",
+      contentStructure: {
+        data: {
+          submissionSchema: {
+            schemaUri: dataSchema.schemaUri,
+            mimeType: dataSchema.mimeType,
+          },
+          hash: {
+            type: "sha512",
+            content: dataHash,
+          },
+        },
+      },
+    };
   }
 
   private async sendSubmission(
