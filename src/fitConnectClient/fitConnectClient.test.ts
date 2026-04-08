@@ -149,5 +149,4 @@ describe("FitConnectClient", () => {
       ).rejects.toThrow("POST https://auth-testing.fit-connect.fitko.dev/token: Unauthorized");
     });
   });
-
 });
