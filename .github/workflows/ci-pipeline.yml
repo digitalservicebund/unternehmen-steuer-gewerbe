@@ -12,6 +12,14 @@ on:
   # allow for running this workflow manually (button in GitHub Actions UI)
   workflow_dispatch:
 
+env:
+  PROJECT_NAME: unternehmen-steuer-gewerbe
+  CONTAINER_REGISTRY: ghcr.io
+  CONTAINER_IMAGE_NAME: ${{ github.repository }}
+  CONTAINER_IMAGE_VERSION: ${{ github.event.pull_request.head.sha || github.sha }}
+  INFRA_REPO: gruenden-infra
+  SLACK_ALERTS_CHANNEL_ID: C0ANPH72UDT
+
 jobs:
   # Note: Formatting and linting do break the pipeline
   # There's a Git hooks setup to fix both before pushing. Cf. the repository README
@@ -78,10 +86,6 @@ jobs:
           FIT_CONNECT_CLIENT_ID: ${{ vars.FIT_CONNECT_CLIENT_ID }}
           FIT_CONNECT_CLIENT_SECRET: ${{ secrets.FIT_CONNECT_CLIENT_SECRET }}
           FIT_CONNECT_DESTINATION_ID: ${{ vars.FIT_CONNECT_DESTINATION_ID }}
-          FIT_CONNECT_DESTINATION_API_URL: ${{ vars.FIT_CONNECT_DESTINATION_API_URL }}
-          FIT_CONNECT_OAUTH_TOKEN_URL: ${{ vars.FIT_CONNECT_OAUTH_TOKEN_URL }}
-          FIT_CONNECT_ROUTING_API_URL: ${{ vars.FIT_CONNECT_ROUTING_API_URL }}
-          FIT_CONNECT_SUBMISSION_API_URL: ${{ vars.FIT_CONNECT_SUBMISSION_API_URL }}
 
       ################################
       # SonarCloud for static code and test coverage analyses
@@ -116,8 +120,12 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
-  build-and-scan-image:
+  build-scan-and-push-image:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # Required for identity challenge with sigstore/fulcio
+      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -131,8 +139,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --ignore-scripts
 
-      - name: Build project and docker image
-        run: pnpm run build:image
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
+        with:
+          registry: ${{ env.CONTAINER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build project and docker image and Push Docker image to GitHub Container Registry
+        run: |
+          pnpm build
+          docker build . --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+          docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
 
       - name: Run Trivy vulnerability image scanner
         # Note: Results are shown in the GitHub Security tab
@@ -145,7 +163,7 @@ jobs:
           TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
         with:
           # image-ref: ${{ inputs.image-ref }}
-          image-ref: unternehmen-steuer-gewerbe
+          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "sarif"
           output: "trivy-image-results.sarif"
           exit-code: 0
@@ -191,12 +209,58 @@ jobs:
       #     # On a subsequent call to the action we know trivy is already installed so can skip this
       #     skip-setup-trivy: true
 
+      - name: Generate cosign vulnerability scan record
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+        env:
+          TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
+        with:
+          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+          format: "cosign-vuln"
+          output: "${{ env.PROJECT_NAME }}-vulnerabilities.json"
+
+      - name: Upload cosign vulnerability scan record
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: "${{ env.PROJECT_NAME }}-vulnerabilities.json"
+          path: "${{ env.PROJECT_NAME }}-vulnerabilities.json"
+          if-no-files-found: error
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad
+        with:
+          cosign-release: "v2.6.0" # We need this, because the kyverno policy that is validating the signature is not yet compatible with the newer version of cosign. Cosign switch the bundle format in version 3.
+
+      - name: Sign the published Docker image
+        run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+
+      - name: Attest the vulnerability scan
+        run: cosign attest --yes --replace --predicate ${{ env.PROJECT_NAME }}-vulnerabilities.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+
       - name: Send failure to Slack
         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
         if: ${{ failure() && github.ref == 'refs/heads/main' }}
         with:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
+
+  deploy-development:
+    name: Deploy to development environment
+    runs-on: ubuntu-latest
+    needs: [check-format-and-lint, test-and-scan-with-sonarcloud, build-scan-and-push-image]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to development
+        uses: digitalservicebund/argocd-deploy@6033da861398e0d7fcffe1b195f8d58f10b62c4e # auth-token branch
+        with:
+          environment: development/unternehmen-steuer-gewerbe
+          version: ${{ github.sha }}
+          deploying_repo: ${{ github.event.repository.name }}
+          infra_repo: ${{ env.INFRA_REPO }}
+          github_app_id: ${{ secrets.GITOPS_GRUENDEN_APP_ID }}
+          github_app_private_key: ${{ secrets.GITOPS_GRUENDEN_APP_PRIVATE_KEY }}
+          app: ${{ env.PROJECT_NAME }}-development
+          argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+          argocd_server: ${{ secrets.ARGOCD_SERVER_STACKIT }}
 
   #######################################
   # Automerge if it's a dependabot PR and all tests are passing and it's a non-major version update
