@@ -16,6 +16,10 @@ const fitConnectClient = new FitConnectClient({
     : undefined,
 });
 
+app.get("/", (req, res) => {
+  res.send("running");
+});
+
 // routes (keep here until complex)
 app.post("/api/v1/register-steuernummer", (req, res) => {
   res.json();
