@@ -17,7 +17,10 @@ const fitConnectClient = new FitConnectClient({
 });
 
 app.get("/", (req, res) => {
-  res.send("running");
+  res.json({
+    status: "ok",
+    fitConnectEnvironment: process.env.FIT_CONNECT_ENV,
+  });
 });
 
 // routes (keep here until complex)
@@ -30,7 +33,10 @@ app.post("/api/v1/register-gewerbe", async (req, res) => {
     const data = req.body;
     const fitConnectResponse = await fitConnectClient.submitData({
       destinationId: "dbc4efa5-58e7-4527-8898-00d58450c68e",
-      publicService: { identifier: "urn:de:fim:leika:leistung:99050012104000", name: "Test" },
+      publicService: {
+        identifier: "urn:de:fim:leika:leistung:99050012104000",
+        name: "Test",
+      },
       dataSchema: {
         schemaUri: "https://schema.fitko.de/demo/muster-fachdaten.schema.json",
         mimeType: "application/json",
