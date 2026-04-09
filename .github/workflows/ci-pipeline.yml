@@ -120,7 +120,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
-  build-scan-and-push-image:
+  build-and-push-image:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -246,7 +246,7 @@ jobs:
   deploy-development:
     name: Deploy to development environment
     runs-on: ubuntu-latest
-    needs: [check-format-and-lint, test-and-scan-with-sonarcloud, build-scan-and-push-image]
+    needs: [check-format-and-lint, test-and-scan-with-sonarcloud, build-and-push-image]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Deploy to development
