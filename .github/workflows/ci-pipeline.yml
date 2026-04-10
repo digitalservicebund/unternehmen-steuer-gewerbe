@@ -18,7 +18,7 @@ env:
   CONTAINER_IMAGE_NAME: ${{ github.repository }}
   CONTAINER_IMAGE_VERSION: ${{ github.event.pull_request.head.sha || github.sha }}
   INFRA_REPO: gruenden-infra
-  SLACK_ALERTS_CHANNEL_ID: C0ANPH72UDT
+  SLACK_ALERTS_CHANNEL_ID: C0AQJKRSPM4
 
 jobs:
   # Note: Formatting and linting do break the pipeline
@@ -251,9 +251,9 @@ jobs:
     steps:
       - name: Deploy to development
         uses: digitalservicebund/argocd-deploy@6033da861398e0d7fcffe1b195f8d58f10b62c4e # auth-token branch
+        version: ${{ github.sha }}
         with:
           environment: development/unternehmen-steuer-gewerbe
-          version: ${{ github.sha }}
           deploying_repo: ${{ github.event.repository.name }}
           infra_repo: ${{ env.INFRA_REPO }}
           github_app_id: ${{ secrets.GITOPS_GRUENDEN_APP_ID }}
@@ -261,6 +261,13 @@ jobs:
           app: ${{ env.PROJECT_NAME }}-development
           argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
           argocd_server: ${{ secrets.ARGOCD_SERVER_STACKIT }}
+
+      - name: Send failure to Slack
+        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+        if: ${{ failure() && github.ref == 'refs/heads/main' }}
+        with:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
   deploy-production:
     name: Deploy to production environment
@@ -280,6 +287,13 @@ jobs:
           app: ${{ env.PROJECT_NAME }}-production
           argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
           argocd_server: ${{ secrets.ARGOCD_SERVER_STACKIT }}
+
+      - name: Send failure to Slack
+        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+        if: ${{ failure() && github.ref == 'refs/heads/main' }}
+        with:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
   #######################################
   # Automerge if it's a dependabot PR and all tests are passing and it's a non-major version update
