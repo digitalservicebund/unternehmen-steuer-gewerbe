@@ -1,55 +1,23 @@
-import { createHash } from "node:crypto";
 import type { JWK } from "jose";
+import { AuthenticationApi } from "./apis/authenticationApi";
+import { RoutingApi } from "./apis/routingApi";
+import {
+  type PublicService,
+  type SendSubmissionResponse,
+  SubmissionApi,
+} from "./apis/submissionApi";
 import { encryptData } from "./crypto";
 import { type Environment, getEnvironmentUrls } from "./environments";
+import type { FetchFn } from "./http";
+import { createMetadata, type DataSchema } from "./metadata";
+export type { PublicService } from "./apis/submissionApi";
 
 export interface FitConnectClientConfig {
   environment: Environment;
   clientId: string;
   clientSecret: string;
   privateKey: JWK;
-  fetch?: typeof globalThis.fetch;
-}
-
-interface TokenResponse {
-  access_token: string;
-  scope: string;
-  token_type: string;
-  expires_in: number;
-}
-
-interface DestinationResponse {
-  destinationId: string;
-  encryptionKid: string;
-  publicServices: { submissionSchemas: { schemaUri: string }[] }[];
-}
-
-interface CreateSubmissionResponse {
-  caseId: string;
-  destinationId: string;
-  submissionId: string;
-}
-
-interface SendSubmissionResponse {
-  caseId: string;
-  destinationId: string;
-  submissionId: string;
-  publicService: {
-    description: string | null;
-    identifier: string;
-    name: string;
-  };
-}
-
-export interface DataSchema {
-  schemaUri: string;
-  mimeType: string;
-}
-
-export interface PublicService {
-  identifier: string;
-  name: string;
-  description?: string | null;
+  fetch?: FetchFn;
 }
 
 export interface SubmitDataOptions {
@@ -59,18 +27,58 @@ export interface SubmitDataOptions {
   dataSchema: DataSchema;
 }
 
+/**
+ * A client for interacting with the FIT-Connect APIs, handling authentication, submission creation, data encryption, and event retrieval.
+ */
 class FitConnectClient {
   private readonly config: FitConnectClientConfig;
-  private readonly urls: ReturnType<typeof getEnvironmentUrls>;
-  private readonly fetch: typeof globalThis.fetch;
   private accessToken: string | null = null;
+
+  private readonly authenticationApi: AuthenticationApi;
+  private readonly submissionApi: SubmissionApi;
+  readonly routingApi: RoutingApi;
 
   constructor(config: FitConnectClientConfig) {
     this.config = config;
-    this.urls = getEnvironmentUrls(config.environment);
-    this.fetch = config.fetch ?? globalThis.fetch; // for testing
+    const urls = getEnvironmentUrls(config.environment);
+    const fetch = config.fetch ?? globalThis.fetch; // for testing
+    const getAccessToken = () => this.accessToken;
+
+    this.authenticationApi = new AuthenticationApi({
+      fetch,
+      oauthTokenUrl: urls.oauthTokenUrl,
+    });
+    this.submissionApi = new SubmissionApi({
+      fetch,
+      submissionApiUrl: urls.submissionApiUrl,
+      getAccessToken,
+    });
+    this.routingApi = new RoutingApi({
+      fetch,
+      routingApiUrl: urls.routingApiUrl,
+      getAccessToken,
+    });
   }
 
+  /**
+   * Authenticate with the FIT-Connect Authentication API to obtain an access token, which is stored in the client instance for use in subsequent API calls.
+   */
+  private async authenticate(): Promise<void> {
+    const tokenResponse = await this.authenticationApi.requestToken(
+      this.config.clientId,
+      this.config.clientSecret,
+    );
+    this.accessToken = tokenResponse.access_token;
+  }
+
+  /**
+   * Submit data to a specified destination and public service.
+   * This method handles the entire workflow of authenticating, creating a submission, retrieving encryption keys, encrypting the data and metadata, and sending the submission.
+   *
+   * @param options - An object containing the destination ID, public service details, data to be submitted, and the data schema.
+   * @returns A promise that resolves to the response from the sendSubmission API call, which includes details about the submission and the public service.
+   * @throws Will throw an error if authentication fails or if any of the API calls fail.
+   */
   async submitData({
     destinationId,
     publicService,
@@ -79,48 +87,34 @@ class FitConnectClient {
   }: SubmitDataOptions): Promise<SendSubmissionResponse> {
     await this.authenticate();
 
-    const { submissionId } = await this.createSubmission(destinationId, publicService);
+    const { submissionId } = await this.submissionApi.createSubmission(
+      destinationId,
+      publicService,
+    );
 
-    const { encryptionKid } = await this.getDestination(destinationId);
+    const metadata = createMetadata(dataSchema, data);
 
-    const publicJwk = await this.getDestinationKeys(destinationId, encryptionKid);
+    const { encryptionKid } = await this.submissionApi.getDestination(destinationId);
+    const publicJwk = await this.submissionApi.getDestinationKeys(destinationId, encryptionKid);
 
     const encryptedData = await encryptData(data, publicJwk, dataSchema.mimeType);
-
-    const metadata = this.createMetadata(dataSchema, data);
-
     const encryptedMetadata = await encryptData(JSON.stringify(metadata), publicJwk);
 
-    return this.sendSubmission(submissionId, encryptedData, encryptedMetadata);
+    return this.submissionApi.sendSubmission(submissionId, encryptedData, encryptedMetadata);
   }
 
-  async getDestination(destinationId: string): Promise<DestinationResponse> {
-    return this.fetchFitConnect<DestinationResponse>(
-      `${this.urls.submissionApiUrl}/v2/destinations/${destinationId}`,
-    );
-  }
-
+  /**
+   * Retrieve the event-log associated with a specific submission.
+   *
+   * @param submissionId
+   * @returns A promise that resolves to the decrypted event-log of a submission
+   */
   async getSubmissionEvents(submissionId: string) {
     await this.authenticate();
 
-    interface CaseEventsResponse {
-      count: number;
-      offset: number;
-      totalCount: number;
-      eventLog: string[];
-    }
-
-    const result = await this.fetchFitConnect<CaseEventsResponse>(
-      `${this.urls.submissionApiUrl}/v2/submissions/${submissionId}/events`,
-      {
-        headers: {
-          Authorization: `Bearer ${this.accessToken}`,
-        },
-      },
-    );
+    const result = await this.submissionApi.getSubmissionEvents(submissionId);
 
     const eventLog = [];
-
     for (const entry of result.eventLog) {
       // the entries should be decrypted
       eventLog.push(entry);
@@ -131,89 +125,6 @@ class FitConnectClient {
       ...result,
       eventLog,
     };
-  }
-
-  private async authenticate(): Promise<void> {
-    const tokenResponse = await this.fetchFitConnect<TokenResponse>(this.urls.oauthTokenUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `grant_type=client_credentials&client_id=${this.config.clientId}&client_secret=${this.config.clientSecret}`,
-      redirect: "follow",
-    });
-    this.accessToken = tokenResponse.access_token;
-  }
-
-  private async getDestinationKeys(destinationId: string, encryptionKid: string): Promise<JWK> {
-    return this.fetchFitConnect<JWK>(
-      `${this.urls.submissionApiUrl}/v2/destinations/${destinationId}/keys/${encryptionKid}`,
-    );
-  }
-
-  private async fetchFitConnect<T>(url: string, options?: RequestInit): Promise<T> {
-    const res = await this.fetch(url, options);
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`${options?.method ?? "GET"} ${url}: ${text}`);
-    }
-    return (await res.json()) as T;
-  }
-
-  private async createSubmission(
-    destinationId: string,
-    publicService: PublicService,
-  ): Promise<CreateSubmissionResponse> {
-    return this.fetchFitConnect<CreateSubmissionResponse>(
-      `${this.urls.submissionApiUrl}/v2/submissions`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.accessToken}`,
-        },
-        body: JSON.stringify({
-          announcedAttachments: [],
-          destinationId,
-          publicService,
-        }),
-      },
-    );
-  }
-
-  private createMetadata(dataSchema: DataSchema, data: string) {
-    const dataHash = createHash("sha512").update(data).digest("hex");
-    return {
-      $schema: "https://schema.fitko.de/fit-connect/metadata/2.0.0/metadata.schema.json",
-      contentStructure: {
-        data: {
-          submissionSchema: {
-            schemaUri: dataSchema.schemaUri,
-            mimeType: dataSchema.mimeType,
-          },
-          hash: {
-            type: "sha512",
-            content: dataHash,
-          },
-        },
-      },
-    };
-  }
-
-  private async sendSubmission(
-    submissionId: string,
-    encryptedData: string,
-    encryptedMetadata: string,
-  ): Promise<SendSubmissionResponse> {
-    return this.fetchFitConnect<SendSubmissionResponse>(
-      `${this.urls.submissionApiUrl}/v2/submissions/${submissionId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.accessToken}`,
-        },
-        body: JSON.stringify({ encryptedData, encryptedMetadata }),
-      },
-    );
   }
 }
 
