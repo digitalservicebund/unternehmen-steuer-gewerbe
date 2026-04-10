@@ -169,7 +169,7 @@ jobs:
           exit-code: 0
 
       - name: Upload trivy results as artifact
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: backend-trivy-image-results.sarif
           retention-days: 3
@@ -219,7 +219,7 @@ jobs:
           output: "${{ env.PROJECT_NAME }}-vulnerabilities.json"
 
       - name: Upload cosign vulnerability scan record
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: "${{ env.PROJECT_NAME }}-vulnerabilities.json"
           path: "${{ env.PROJECT_NAME }}-vulnerabilities.json"
