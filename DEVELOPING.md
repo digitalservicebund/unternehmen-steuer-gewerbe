@@ -2,6 +2,10 @@
 
 ## Environment Variables
 
+> **Local development and testing only!** `.env.example` is a template that contains no real secrets. For anything beyond test values, load secrets at runtime from [1Password](https://developer.1password.com/docs/cli/secrets-environment-variables/) (or a similar secrets manager) and never commit them to git.
+>
+> **In production we do not use a `.env` file at all** — secrets are provided exclusively through a secrets manager.
+
 Copy `.env.example` to `.env` and fill in the values:
 
 ```bash
