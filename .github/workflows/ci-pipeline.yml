@@ -251,9 +251,9 @@ jobs:
     steps:
       - name: Deploy to development
         uses: digitalservicebund/argocd-deploy@6033da861398e0d7fcffe1b195f8d58f10b62c4e # auth-token branch
-        version: ${{ github.sha }}
         with:
           environment: development/unternehmen-steuer-gewerbe
+          version: ${{ github.sha }}
           deploying_repo: ${{ github.event.repository.name }}
           infra_repo: ${{ env.INFRA_REPO }}
           github_app_id: ${{ secrets.GITOPS_GRUENDEN_APP_ID }}
