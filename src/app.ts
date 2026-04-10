@@ -2,24 +2,25 @@ import express, { type Express } from "express";
 import helmet from "helmet";
 import FitConnectClient from "./fitConnectClient";
 import type { Environment } from "./fitConnectClient/environments";
+import { getSecret } from "./secrets";
 
 const app: Express = express();
 app.use(helmet.hidePoweredBy());
 app.use(express.json());
 
 const fitConnectClient = new FitConnectClient({
-  environment: (process.env.FIT_CONNECT_ENV ?? "test") as Environment,
-  clientId: process.env.FIT_CONNECT_CLIENT_ID!,
-  clientSecret: process.env.FIT_CONNECT_CLIENT_SECRET!,
-  privateKey: process.env.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK
-    ? JSON.parse(process.env.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK)
+  environment: (getSecret("FIT_CONNECT_ENV") || "test") as Environment,
+  clientId: getSecret("FIT_CONNECT_CLIENT_ID"),
+  clientSecret: getSecret("FIT_CONNECT_CLIENT_SECRET"),
+  privateKey: getSecret("FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK")
+    ? JSON.parse(getSecret("FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK"))
     : undefined,
 });
 
 app.get("/", (req, res) => {
   res.json({
     status: "ok",
-    fitConnectEnvironment: process.env.FIT_CONNECT_ENV,
+    ...(req.query.verbose ? { fitConnectEnvironment: getSecret("FIT_CONNECT_ENV") } : {}),
   });
 });
 
