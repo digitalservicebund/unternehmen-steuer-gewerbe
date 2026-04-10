@@ -11,6 +11,22 @@ describe("API tests", () => {
     expect(response.statusCode).toEqual(404);
   });
 
+  test("Returns 200 OK and status JSON on GET to /", async () => {
+    const response = await request.get("/").send();
+    expect(response.statusCode).toEqual(200);
+    expect(response.header["content-type"]).toMatch(/json/);
+    expect(response.body).toEqual({ status: "ok" });
+  });
+
+  test("Returns fitConnectEnvironment on GET to /?verbose=true", async () => {
+    const response = await request.get("/?verbose=true").send();
+    expect(response.statusCode).toEqual(200);
+    expect(response.body).toEqual({
+      status: "ok",
+      fitConnectEnvironment: expect.any(String),
+    });
+  });
+
   test("Returns 200 OK and JSON on POST to /register-steuernummer", async () => {
     const response = await request.post("/api/v1/register-steuernummer").send();
     expect(response.statusCode).toEqual(200);
