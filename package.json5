@@ -21,6 +21,8 @@
     "lint:fix": "oxlint --fix",
     // Start API locally via ts-node (no building involved)
     start: "op run --env-file .env -- ts-node src/index.ts",
+    // Start API via docker (built via "npm run build:image")
+    "start:image": "docker run unternehmen-steuer-gewerbe",
     // Start API locally via ts-node (no building involved), restart on changes to files of type TS, JS, JSON, JSON5, YAML, MD
     "start:watch": "op run --env-file .env -- nodemon --watch . --ext ts,json,json5,yml,md --exec pnpm run start",
     // Run tests once
@@ -34,8 +36,9 @@
     "@types/express": "^5.0.6",
     dotenv: "^17.3.1",
     express: "^5.2.1",
-    jose: "^6.2.2",
     helmet: "^8.1.0",
+    jose: "^6.2.2",
+    vite: "8.0.5",
   },
   devDependencies: {
     "@types/supertest": "^7.2.0",
