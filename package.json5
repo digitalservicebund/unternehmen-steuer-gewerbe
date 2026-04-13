@@ -20,7 +20,7 @@
     // Lint, fix if possible (used in pre-commit GitHook)
     "lint:fix": "oxlint --fix",
     // Start API locally via ts-node (no building involved)
-    start: "ts-node src/index.ts",
+    start: "op run --env-file .env -- ts-node src/index.ts",
     // Start API locally via ts-node (no building involved), restart on changes to files of type TS, JS, JSON, JSON5, YAML, MD
     "start:watch": "op run --env-file .env -- nodemon --watch . --ext ts,json,json5,yml,md --exec pnpm run start",
     // Run tests once
