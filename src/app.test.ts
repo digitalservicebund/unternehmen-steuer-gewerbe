@@ -48,7 +48,6 @@ describe("API tests", () => {
       antrag: "Hello FIT-Connect",
     };
     const response = await request.post("/api/v1/register-gewerbe").send(testData);
-    console.log(response.body);
     expect(response.statusCode).toEqual(200);
     expect(response.header["content-type"]).toMatch(/json/);
   });
