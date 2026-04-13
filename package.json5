@@ -26,11 +26,11 @@
     // Start API locally via ts-node (no building involved), restart on changes to files of type TS, JS, JSON, JSON5, YAML, MD
     "start:watch": "op run --env-file .env -- nodemon --watch . --ext ts,json,json5,yml,md --exec pnpm run start",
     // Run tests once
-    test: "vitest run",
+    test: "op run --env-file .env -- vitest run",
     // Run tests once, report coverage on console and in ./coverage. Format is HTML and lconv (in pipeline, lconv is consumed by SonarCloud)
-    "test:coverage": "vitest run --coverage",
+    "test:coverage": "op run --env-file .env -- vitest run --coverage",
     // Run tests, restart on code changes
-    "test:watch": "vitest",
+    "test:watch": "op run --env-file .env -- vitest",
   },
   dependencies: {
     "@types/express": "^5.0.6",
