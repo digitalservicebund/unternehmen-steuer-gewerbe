@@ -9,7 +9,7 @@ USER nonroot
 WORKDIR /app
 
 # bundle created by `npm run build`, which uses rolldown for bundling
-COPY --chown=nonroot:nonroot --chmod=755 ./dist/bundle.js .
+COPY --chown=root:root --chmod=755 ./dist/bundle.js .
 
 EXPOSE 3000
 
