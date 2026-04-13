@@ -21,6 +21,8 @@
     "lint:fix": "oxlint --fix",
     // Start API locally via ts-node (no building involved)
     start: "ts-node src/index.ts",
+    // Start API via docker (built via "npm run build:image")
+    "start:image": "docker run unternehmen-steuer-gewerbe",
     // Start API locally via ts-node (no building involved), restart on changes to files of type TS, JS, JSON, JSON5, YAML, MD
     "start:watch": "nodemon --watch . --ext ts,json,json5,yml,md --exec pnpm run start",
     // Run tests once
