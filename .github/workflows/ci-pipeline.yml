@@ -79,7 +79,7 @@ jobs:
       ##################################
 
       - name: Run tests with coverage report
-        run: pnpm run test:coverage
+        run: pnpm run test:ci:coverage
         env:
           FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK: ${{ secrets.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK }}
           FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK: ${{ secrets.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK }}
