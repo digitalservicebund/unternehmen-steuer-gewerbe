@@ -29,6 +29,8 @@
     test: "op run --env-file .env -- vitest run",
     // Run tests once, report coverage on console and in ./coverage. Format is HTML and lconv (in pipeline, lconv is consumed by SonarCloud)
     "test:coverage": "op run --env-file .env -- vitest run --coverage",
+    // Run tests once, report coverage on console and in ./coverage. Format is HTML and lconv (in pipeline, lconv is consumed by SonarCloud)
+    "test:ci:coverage": "vitest run --coverage",
     // Run tests, restart on code changes
     "test:watch": "op run --env-file .env -- vitest",
   },
