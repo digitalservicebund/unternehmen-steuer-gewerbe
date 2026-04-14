@@ -1,59 +1,59 @@
 {
-  name: 'unternehmen-steuer-gewerbe',
-  version: '1.0.0',
-  description: '',
+  name: "unternehmen-steuer-gewerbe",
+  version: "1.0.0",
+  description: "",
   keywords: [],
-  license: '',
-  author: '',
-  type: 'module',
+  license: "",
+  author: "",
+  type: "module",
   scripts: {
     // Build and bundle to./dist/bundle.js
-    build: 'rolldown -c rolldown.config.js',
+    build: "rolldown -c rolldown.config.js",
     // Build app and docker image
-    'build:image': 'pnpm build; docker build . --tag unternehmen-steuer-gewerbe',
+    "build:image": "pnpm build; docker build . --tag unternehmen-steuer-gewerbe",
     // Check format, fail on error (used in CI)
-    format: 'oxfmt --check',
+    format: "oxfmt --check",
     // Check format, fix if possible (used in pre-commit GitHook)
-    'format:fix': 'oxfmt',
+    "format:fix": "oxfmt",
     // Lint, fail on error (used in CI)
-    lint: 'oxlint',
+    lint: "oxlint",
     // Lint, fix if possible (used in pre-commit GitHook)
-    'lint:fix': 'oxlint --fix',
+    "lint:fix": "oxlint --fix",
     // Start API locally via ts-node (no building involved)
-    start: 'op run --env-file .env -- ts-node src/index.ts',
+    start: "op run --env-file .env -- ts-node src/index.ts",
     // Start API via docker (built via "npm run build:image")
-    'start:image': 'docker run unternehmen-steuer-gewerbe',
+    "start:image": "docker run unternehmen-steuer-gewerbe",
     // Start API locally via ts-node (no building involved), restart on changes to files of type TS, JS, JSON, JSON5, YAML, MD
-    'start:watch': 'op run --env-file .env -- nodemon --watch . --ext ts,json,json5,yml,md --exec pnpm run start',
+    "start:watch": "op run --env-file .env -- nodemon --watch . --ext ts,json,json5,yml,md --exec pnpm run start",
     // Run tests once
-    test: 'op run --env-file .env -- vitest run',
+    test: "op run --env-file .env -- vitest run",
     // Run tests once, report coverage on console and in ./coverage. Format is HTML and lconv (in pipeline, lconv is consumed by SonarCloud)
-    'test:coverage': 'op run --env-file .env -- vitest run --coverage',
+    "test:coverage": "op run --env-file .env -- vitest run --coverage",
     // Run tests once, report coverage on console and in ./coverage. Format is HTML and lconv (in pipeline, lconv is consumed by SonarCloud)
-    'test:ci:coverage': 'vitest run --coverage',
+    "test:ci:coverage": "vitest run --coverage",
     // Run tests, restart on code changes
-    'test:watch': 'op run --env-file .env -- vitest',
+    "test:watch": "op run --env-file .env -- vitest",
   },
   dependencies: {
-    '@types/express': '^5.0.6',
-    dotenv: '^17.3.1',
-    express: '^5.2.1',
-    helmet: '^8.1.0',
-    jose: '^6.2.2',
-    vite: '8.0.5',
+    "@types/express": "^5.0.6",
+    dotenv: "^17.3.1",
+    express: "^5.2.1",
+    helmet: "^8.1.0",
+    jose: "^6.2.2",
+    vite: "8.0.5",
   },
   devDependencies: {
-    '@types/supertest': '^7.2.0',
-    '@vitest/coverage-v8': '4.1.1',
-    'fast-xml-parser': '^5.5.12',
-    nodemon: '^3.1.14',
-    oxfmt: '^0.42.0',
-    oxlint: '^1.58.0',
-    rolldown: '1.0.0-rc.13',
-    supertest: '^7.2.2',
-    'ts-node': '^10.9.2',
-    typescript: '^6.0.2',
-    vitest: '^4.1.2',
+    "@types/supertest": "^7.2.0",
+    "@vitest/coverage-v8": "4.1.1",
+    "fast-xml-parser": "^5.5.12",
+    nodemon: "^3.1.14",
+    oxfmt: "^0.42.0",
+    oxlint: "^1.58.0",
+    rolldown: "1.0.0-rc.13",
+    supertest: "^7.2.2",
+    "ts-node": "^10.9.2",
+    typescript: "^6.0.2",
+    vitest: "^4.1.2",
   },
-  packageManager: 'pnpm@10.33.0',
+  packageManager: "pnpm@10.33.0",
 }
