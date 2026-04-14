@@ -362,11 +362,11 @@ const anmeldung: Anmeldung = {
 };
 
 describe("xGewerbeanmeldung0300", () => {
-  it("is creating a valid xGewerbeordung 1.6 xml", () => {
+  it("creates a valid xGewerbeordnung 1.6 xml", () => {
     expect(normalizeXml(xGewerbeanmeldung0300(anmeldung))).toBe(normalizeXml(xgewo_1_6_valid));
   });
 
-  it("is woking without optional fields", () => {
+  it("works without optional fields", () => {
     const minimal: Anmeldung = {
       nachrichtenkopf: {
         nachrichtenUUID: "00000000-0000-0000-0000-000000000001",
@@ -436,7 +436,7 @@ describe("xGewerbeanmeldung0300", () => {
     expect(xml).not.toContain("<xga:aufenthaltstitel>");
   });
 
-  it("is generating escaped XML", () => {
+  it("escapes XML special characters in text fields", () => {
     const withSpecials: Anmeldung = {
       ...anmeldung,
       autor: { ...anmeldung.autor, name: "Amt <Müller & Söhne>" },
@@ -471,5 +471,96 @@ describe("xGewerbeanmeldung0300", () => {
     expect(generatedXml).not.toContain("Müller & Söhne GmbH");
     expect(generatedXml).toContain("Müller &amp; Söhne GmbH");
     expect(generatedXml).toContain("A &gt; B &amp; C &lt; D");
+  });
+
+  it("throws when the natuerlichePerson array is empty", () => {
+    const withoutPerson: Anmeldung = {
+      ...anmeldung,
+      referenzierteSubjekte: { natuerlichePerson: [] },
+    };
+    expect(() => xGewerbeanmeldung0300(withoutPerson)).toThrow(/natuerlichePerson\[0\]/);
+  });
+
+  it("includes housenumber range and suffix in the business address", () => {
+    const withRange: Anmeldung = {
+      ...anmeldung,
+      gewerbebetrieb: {
+        ...anmeldung.gewerbebetrieb,
+        betriebsstaette: {
+          ...anmeldung.gewerbebetrieb.betriebsstaette,
+          anschrift: {
+            ...anmeldung.gewerbebetrieb.betriebsstaette.anschrift,
+            hausnummerVon: "90",
+            hausnummerBis: "94",
+            hausnummernzusatz: "a",
+          },
+        },
+      },
+    };
+
+    const parsed = parser.parse(xGewerbeanmeldung0300(withRange));
+    const anschrift =
+      parsed["xga:alg.gewerbemeldung.0300"]["xga:satz"]["xga:anmeldung"]["xga:gewerbebetrieb"][
+        "xga:betriebsstaette"
+      ]["bk:anschrift"]["bk:strassenanschriftInland"];
+    expect(anschrift["bk:hausnummerVon"]).toBe(90);
+    expect(anschrift["bk:hausnummerBis"]).toBe(94);
+    expect(anschrift["bk:hausnummernzusatz"]).toBe("a");
+  });
+
+  it("includes fax, email and website even when phone is missing", () => {
+    const withoutPhone: Anmeldung = {
+      ...anmeldung,
+      gewerbebetrieb: {
+        ...anmeldung.gewerbebetrieb,
+        betriebsstaette: {
+          ...anmeldung.gewerbebetrieb.betriebsstaette,
+          kommunikation: {
+            telefax: "+49 234 555000",
+            email: "kontakt@example.de",
+            webseite: "https://example.de",
+          },
+        },
+      },
+    };
+
+    const generatedXml = xGewerbeanmeldung0300(withoutPhone);
+    const parsed = parser.parse(generatedXml);
+    const kommunikation =
+      parsed["xga:alg.gewerbemeldung.0300"]["xga:satz"]["xga:anmeldung"]["xga:gewerbebetrieb"][
+        "xga:betriebsstaette"
+      ]["bk:kommunikation"];
+    expect(kommunikation["komm:telefax"]).toBe("+49 234 555000");
+    expect(kommunikation["komm:email"]).toBe("kontakt@example.de");
+    expect(kommunikation["komm:webseite"]).toBe("https://example.de");
+    expect(kommunikation["komm:telefon"]).toBeUndefined();
+  });
+
+  it("creates every natuerlichePerson entry when the array contains multiple", () => {
+    const firstPerson = anmeldung.referenzierteSubjekte.natuerlichePerson[0]!;
+    const multiPerson: Anmeldung = {
+      ...anmeldung,
+      referenzierteSubjekte: {
+        natuerlichePerson: [
+          firstPerson,
+          {
+            ...firstPerson,
+            id: "np-2",
+            name: { familienname: "Zweitperson", vornamen: "Anna" },
+          },
+        ],
+      },
+    };
+
+    const parsed = parser.parse(xGewerbeanmeldung0300(multiPerson));
+    const personen =
+      parsed["xga:alg.gewerbemeldung.0300"]["xga:satz"]["xga:anmeldung"][
+        "xga:referenzierteSubjekte"
+      ]["xga:natuerlichePerson"];
+    expect(Array.isArray(personen)).toBe(true);
+    expect(personen).toHaveLength(2);
+    expect(personen[0]["np:natuerlichePerson.id"]).toBe("np-1");
+    expect(personen[1]["np:natuerlichePerson.id"]).toBe("np-2");
+    expect(personen[1]["np:name"]["np:familienname"]).toBe("Zweitperson");
   });
 });
