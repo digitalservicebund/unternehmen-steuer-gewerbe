@@ -71,16 +71,27 @@ interface ReferenzierteSubjekte {
 
 export interface Anmeldung {
   nachrichtenkopf: Nachrichtenkopf;
+  /** Die die Gewerbeanzeige entgegennehmende Behörde. */
   autor: Behoerde;
+  /** Angabe des Zeitpunkts der Erstellung des XML-Datensatzes für die Übermittlung. */
   satzErstellung: string;
+  /** Der Zeitpunkt, zu welchem der die Übermittlung auslösende Verwaltungsvorgang (Aufnahme / Änderung / Korrektur eines Datensatzes) im gemeindlichen Gewerbeverzeichnis gespeichert wurde. */
   ereigniszeitpunkt: string;
+  /** Angabe über das Vorliegen einer Stornierung dieser Gewerbemeldung  */
   istStorno: boolean;
+  /** Falls mit der Meldung eine Stornierung übermittelt wird, wird mit diesem Datentyp der Grund der Stornierung angegeben */
   gemeindeSchluessel: string;
+  /** Eindeutige Kennzeichnung der Gewerbeanzeige als UUID. */
   uuid: string;
+  /** Datum des Beginns, der meldepflichtigen Änderung, der Aufgabe des Gewerbes oder der Datenaktualisierung */
   gueltigAb: string;
+  /** Datum, an welchem die An-, Um-, Abmeldung bzw. Datenaktualisierung an die Gewerbemeldestelle übergeben wurde. */
   datumMeldung: string;
+  /** Ein Gewerbebetrieb beschreibt die wirtschaftliche Einheit, unter der ein oder mehrere Gewerbetreibende/r im Außenverhältnis am Wirtschaftsleben teilnehmen. */
   gewerbebetrieb: Gewerbebetrieb;
+  /** Innerhalb des Elements gewerbebetrieb über ID referenzierte Subjekte. */
   referenzierteSubjekte: ReferenzierteSubjekte;
+  /** Grund für Anmeldung - code */
   grundAnmeldungSchluessel: string;
 }
 
