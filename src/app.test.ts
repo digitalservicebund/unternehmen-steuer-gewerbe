@@ -12,7 +12,7 @@ describe("API tests", () => {
   });
 
   describe("Route /", () => {
-    test("Returns 200 OK and status JSON on GET", async () => {
+    test("Returns 200 OK and status JSON on GET (kubernetes health check)", async () => {
       const response = await request.get("/").send();
       expect(response.statusCode).toEqual(200);
       expect(response.header["content-type"]).toMatch(/json/);
