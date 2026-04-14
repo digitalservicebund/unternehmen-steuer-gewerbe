@@ -19,47 +19,67 @@ import {
 import { xml } from "./escapeXml";
 
 interface BetriebArt {
+  /** In diesem Element wird angegeben, ob es sich um einen Industriebetrieb handelt. */
   industrie: boolean;
+  /** In diesem Element wird angegeben, ob es sich um einen Handwerksbetrieb handelt. */
   handwerk: boolean;
+  /** In diesem Element wird angegeben, ob es sich um einen Handelsbetrieb handelt. */
   handel: boolean;
+  /** In diesem Element wird angegeben, ob es sich um Betrieb sonstiger Art handelt. */
   sonstiges: boolean;
 }
 
 interface Betriebsstaette {
   /** Art der Betriebsstätte (Code, listVersionID="1"); ab 2024-05-01 nur 01/02/03 zulässig (SCH-0256). */
   artBetriebsstaette: string;
+  /** Angaben für die Adressierung im Inland, */
   anschrift: StrassenanschriftInland;
   /** Kontaktdaten der Betriebsstätte. */
   kommunikation?: Kommunikation;
 }
 
 interface Taetigkeit {
+  /** Hier wird der vom Gewerbetreibenden angegebene Tätigkeitsschwerpunkt übermittelt. Es handelt sich hierbei nicht um den in Text des im Element wirtschaftszweig angegebenen Wirtschaftszweigschlüssels, sondern um die ursprüngliche Angabe des Gewerbetreibenden */
   taetigkeitSchwerpunkt: string;
+  /** Wirtschaftszweigschlüssel gemäß der Klassifikation der Wirtschaftszweige des Statistischen Bundesamts. */
   wirtschaftszweigschluessel: string;
+  /** Übermittelt werden soll, wenn im Fachverfahren vorhanden, die Sachbearbeiter-Auswahl des Stichwortes aus dem entsprechenden Schlüsselverzeichnis, das zur Zuordnung des Wirtschaftszweig-Schlüssels der Tätigkeit geführt hat. Ein Stichwort sollte nur übermittelt werden, wenn auch ein Tätigkeitsschlüssel (Element wt:wirtschaftszweig) angegeben ist. */
   stichwort: string;
 }
 
 interface TaetigkeitenGesamt {
+  /** Es ist der Schwerpunkt der tatsächlich an der gemeldeten Betriebsstätte ausgeübten Tätigkeiten anzugeben. Es gibt genau einen Schwerpunkt. Wenn an dieser Betriebstätte nur eine Tätigkeit ausgeübt wird, stellt diese den Schwerpunkt dar */
   schwerpunkt: Taetigkeit;
   /** Weitere Tätigkeiten neben der Schwerpunkttätigkeit. */
   weitereTaetigkeiten?: WeitereTaetigkeiten;
 }
 
 interface Gewerbebetrieb {
+  /** Eine UUID als eindeutige technische Identifikation des Gewerbebetriebes, gleiche fachliche, aber vom AGS unabhängige Systematik wie gemeindeMeldungNr. */
   gewerbebetriebID: string;
+  /** Nummer der Meldung des Gewerbebetriebes in der Gemeinde. Die Gemeindemeldungsnummer wird von den Gewerbeämtern i.d.R. so vergeben, dass Gewerbebetriebe damit innerhalb des Zuständigkeitsbereichs einer Gewerbebehörde eindeutig identifiziert werden können. */
   gemeindeMeldungNr: string;
+  /** Angabe der Rechtsform */
   rechtsformcode: string;
+  /** Die im Handels-, Genossenschafts- oder Gesellschaftsregister eingetragene Firma eines wirtschaftlich Tätigen oder einer wirtschaftlichen Tätigkeit (z. B. eingetragenes Einzelunternehmen, eingetragene Zweigniederlassung) bzw. der im Vereins-, Partnerschafts- oder Stiftungsregister oder im Stiftungsverzeichnis eingetragene Name */
   eingetragenerName: string;
-  /** Angaben zur Eintragung im Handels-/Genossenschafts-/Partnerschafts-/Vereinsregister. */
+  /** Dieses Kerndatenobjekt fasst die Daten, mit welchen die Eintragung eines wirtschaftlich Tätigen bzw. eines Gewerbebetriebs in ein Register (Handels-, Gesellschafts-, Genossenschafts-, Vereins- oder Stiftungsregister) oder in ein Verzeichnis (Stiftungsverzeichnis) identifiziert werden kann */
   eintragung?: Eintragung;
+  /** Angaben zu der Betriebsstätte. */
   betriebsstaette: Betriebsstaette;
+  /** Mittels dieses Datentyps werden die an der Betriebsstätte tatsächlich ausgeübten Tätigkeiten angegeben. */
   taetigkeitenGesamt: TaetigkeitenGesamt;
+  /** Mit diesem Element kann übermittelt werden, ob es sich bei dem Gewerbe um einen Nebenerwerb des angegebenen Gewerbetreibenden handelt */
   istNebenerwerb: boolean;
+  /** In diesem Element wird die Anzahl der Vollzeitbeschäftigten (inklusive Ehe- oder Lebenspartner, Aushilfen, jedoch stets ohne den Inhaber selbst) angegeben, welche zum Zeitpunkt der Gewerbemeldung in der Betriebsstätte tätig sind. */
   anzahlVollzeitBeschaeftigte: number;
+  /** In diesem Element wird die Anzahl der Teilzeitbeschäftigten (inklusive Ehe- oder Lebenspartner, Aushilfen, jedoch stets ohne den Inhaber selbst) angegeben, welche zum Zeitpunkt der Gewerbemeldung in der Betriebsstätte tätig sind. */
   anzahlTeilzeitBeschaeftigte: number;
+  /** Mit diesem Element kann übermittelt werden, ob es sich bei dem Gewerbe um eine Reisegewerbe handelt */
   istReisegewerbe: boolean;
   /** Angabe, ob und in welcher Höhe eine Beteiligung der öffentlichen Hand am Gewerbebetrieb besteht. */
   beteiligungOeffentlicheHand?: string;
+  /** Gibt die Art eine Betriebes (Handels-, Handwerks-, Industrie oder sonstiger Betrieb) an. */
   betriebArt: BetriebArt;
   /** Angaben zur Handwerkskarte – nur relevant, wenn betriebArt.handwerk = true. */
   handwerkskarte?: Handwerkskarte;
