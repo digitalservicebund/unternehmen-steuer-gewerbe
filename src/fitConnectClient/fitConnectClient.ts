@@ -120,7 +120,6 @@ class FitConnectClient {
       eventLog.push(entry);
     }
 
-    console.log(eventLog);
     return {
       ...result,
       eventLog,
