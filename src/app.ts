@@ -1,11 +1,11 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import type { Env } from "hono";
 
-import { addHealthCheckEndpoint } from "./routes/rootHealthCheck/rootHealthCheckEndpoint";
-import { addRegisterSteuernummerEndpoint } from "./routes/registerSteuernummer/registerSteuernummerEndpoint";
-import { addRegisterGewerbeEndpoint } from "./routes/registerGewerbe/registerGewerbeEndpoint";
-import { addGetEventsEndpoint } from "./routes/getEvents/getEventsEndpoint";
-import { addOpenApiEndpoints } from "./routes/openApiDocs/openApiEndpoints";
+import { addHealthCheckEndpoint } from "./routes/rootHealthCheck/rootHealthCheck";
+import { addRegisterSteuernummerEndpoint } from "./routes/registerSteuernummer/registerSteuernummer";
+import { addRegisterGewerbeEndpoint } from "./routes/registerGewerbe/registerGewerbe";
+import { addGetEventsEndpoint } from "./routes/getEvents/getEvents";
+import { addOpenApiEndpoints } from "./routes/openApiDocs/openApi";
 
 const app: OpenAPIHono<Env> = new OpenAPIHono();
 
