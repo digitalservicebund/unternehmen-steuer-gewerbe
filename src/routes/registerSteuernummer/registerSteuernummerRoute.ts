@@ -15,4 +15,6 @@ export const registerSteuernummerRoute = createRoute({
       description: "Successfully registered Steuernummer",
     },
   },
+  tags: ["Experimental"],
+  summary: "Experimental implementation",
 });

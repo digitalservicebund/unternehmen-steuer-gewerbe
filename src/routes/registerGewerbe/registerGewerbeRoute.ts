@@ -41,4 +41,6 @@ export const registerGewerbeRoute = createRoute({
       description: "Internal Server Error",
     },
   },
+  tags: ["Active Development"],
+  summary: "Feature under active development",
 });

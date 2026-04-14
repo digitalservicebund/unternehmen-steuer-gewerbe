@@ -34,4 +34,6 @@ export const healthCheckRoute = createRoute({
       description: "Health check",
     },
   },
+  tags: ["Experimental"],
+  summary: "Experimental implementation",
 });

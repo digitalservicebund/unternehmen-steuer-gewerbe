@@ -48,4 +48,6 @@ export const getEventsRoute = createRoute({
       description: "Internal Server Error",
     },
   },
+  tags: ["Experimental"],
+  summary: "Experimental implementation",
 });

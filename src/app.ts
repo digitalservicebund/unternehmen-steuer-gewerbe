@@ -12,9 +12,9 @@ const app: OpenAPIHono<Env> = new OpenAPIHono();
 export type HonoAppType = typeof app;
 
 // add business routes/endpoints
+addRegisterGewerbeEndpoint(app);
 addHealthCheckEndpoint(app);
 addRegisterSteuernummerEndpoint(app);
-addRegisterGewerbeEndpoint(app);
 addGetEventsEndpoint(app);
 
 // add documentation endpoints
