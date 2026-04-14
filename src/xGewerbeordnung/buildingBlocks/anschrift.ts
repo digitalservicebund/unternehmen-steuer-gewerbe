@@ -1,6 +1,6 @@
 import { xml } from "../escapeXml";
 
-export interface StrassenanschriftInland {
+export interface Anschrift {
   /** Falls die Anschrift unbekannt ist (z. B. bei Abmeldung von Amts wegen), so ist hier der Wert "unbekannt" zu übermitteln. */
   strasse: string;
   /** Angabe des Straßenschlüssels in der Gemeinde. */
@@ -17,19 +17,19 @@ export interface StrassenanschriftInland {
   ort: string;
 }
 
-export function createAnschrift(strassenanschriftInland: StrassenanschriftInland | undefined) {
+export function createAnschrift(strassenanschriftInland: Anschrift | undefined) {
   if (!strassenanschriftInland) return "";
 
   return `
     <bk:anschrift>
       <bk:strassenanschriftInland>
-          <adr:strasse>${xml(strassenanschriftInland.strasse)}</adr:strasse>
-          ${strassenanschriftInland.strassenschluessel ? `<bk:strassenschluessel>${xml(strassenanschriftInland.strassenschluessel)}</bk:strassenschluessel>` : ""}
-          <bk:hausnummerVon>${xml(strassenanschriftInland.hausnummerVon)}</bk:hausnummerVon>
-          ${strassenanschriftInland.hausnummerBis ? `<bk:hausnummerBis>${xml(strassenanschriftInland.hausnummerBis)}</bk:hausnummerBis>` : ""}
-          ${strassenanschriftInland.hausnummernzusatz ? `<bk:hausnummernzusatz>${xml(strassenanschriftInland.hausnummernzusatz)}</bk:hausnummernzusatz>` : ""}
-          <adr:postleitzahl>${xml(strassenanschriftInland.postleitzahl)}</adr:postleitzahl>
-          <adr:ort>${xml(strassenanschriftInland.ort)}</adr:ort>
+        <adr:strasse>${xml(strassenanschriftInland.strasse)}</adr:strasse>
+        ${strassenanschriftInland.strassenschluessel ? `<bk:strassenschluessel>${xml(strassenanschriftInland.strassenschluessel)}</bk:strassenschluessel>` : ""}
+        <bk:hausnummerVon>${xml(strassenanschriftInland.hausnummerVon)}</bk:hausnummerVon>
+        ${strassenanschriftInland.hausnummerBis ? `<bk:hausnummerBis>${xml(strassenanschriftInland.hausnummerBis)}</bk:hausnummerBis>` : ""}
+        ${strassenanschriftInland.hausnummernzusatz ? `<bk:hausnummernzusatz>${xml(strassenanschriftInland.hausnummernzusatz)}</bk:hausnummernzusatz>` : ""}
+        <adr:postleitzahl>${xml(strassenanschriftInland.postleitzahl)}</adr:postleitzahl>
+        <adr:ort>${xml(strassenanschriftInland.ort)}</adr:ort>
       </bk:strassenanschriftInland>
     </bk:anschrift>`;
 }

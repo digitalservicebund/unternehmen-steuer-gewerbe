@@ -5,7 +5,7 @@ import {
   type Nachrichtenkopf,
 } from "./buildingBlocks/g2gNachrichtenkopf";
 import { createEintragung, type Eintragung } from "./buildingBlocks/eintragung";
-import { createAnschrift, type StrassenanschriftInland } from "./buildingBlocks/anschrift";
+import { createAnschrift, type Anschrift } from "./buildingBlocks/anschrift";
 import { createKommunikation, type Kommunikation } from "./buildingBlocks/kommunikation";
 import { createHandwerkskarte, type Handwerkskarte } from "./buildingBlocks/handwerkskarte";
 import {
@@ -33,7 +33,7 @@ interface Betriebsstaette {
   /** Art der Betriebsstätte (Code, listVersionID="1"); ab 2024-05-01 nur 01/02/03 zulässig (SCH-0256). */
   artBetriebsstaette: string;
   /** Angaben für die Adressierung im Inland, */
-  anschrift: StrassenanschriftInland;
+  anschrift: Anschrift;
   /** Kontaktdaten der Betriebsstätte. */
   kommunikation?: Kommunikation;
 }
