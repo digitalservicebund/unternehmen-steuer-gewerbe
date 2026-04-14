@@ -1,4 +1,4 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 
 import FitConnectClient from "./fitConnectClient";
@@ -7,6 +7,7 @@ import { getSecret } from "./secrets";
 import { healthCheckRoute } from "./routes/root.health-check";
 import { registerSteuernummerRoute } from "./routes/register.steuernummer";
 import { registerGewerbeRoute } from "./routes/register.gewerbe";
+import { getEventsRoute } from "./routes/getEvents";
 
 const app = new OpenAPIHono();
 
@@ -66,6 +67,24 @@ app.openapi(registerGewerbeRoute, async (c) => {
   } catch (error) {
     console.error(error);
     return c.text("Internal Server Error", 500);
+  }
+});
+
+app.openapi(getEventsRoute, async (c) => {
+  try {
+    // submissionId is automatically extracted and validated as a string/uuid
+    const { submissionId } = c.req.valid("param");
+
+    const submissionEvents = await fitConnectClient.getSubmissionEvents(submissionId);
+
+    if (!submissionEvents) {
+      return c.json({ message: "Not Found" }, 404);
+    }
+
+    return c.json(submissionEvents, 200);
+  } catch (error) {
+    console.error("FIT-Connect Event Fetch Error:", error);
+    return c.json({ error: "Internal Server Error" }, 500);
   }
 });
 
