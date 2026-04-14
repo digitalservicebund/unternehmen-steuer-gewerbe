@@ -6,6 +6,7 @@ import { Hono } from "hono";
 import FitConnectClient from "./fitConnectClient";
 import type { Environment } from "./fitConnectClient/environments";
 import { getSecret } from "./secrets";
+import { healthCheckRoute } from "./routes/root.health-check";
 
 const app = new OpenAPIHono();
 // app.use(helmet.hidePoweredBy());
@@ -18,42 +19,6 @@ const fitConnectClient = new FitConnectClient({
   privateKey: getSecret("FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK")
     ? JSON.parse(getSecret("FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK"))
     : undefined,
-});
-
-const HealthCheckResponseSchema = z.object({
-  status: z.string().openapi({ example: "ok" }),
-  fitConnectEnvironment: z.string().optional().openapi({
-    example: "testing",
-    description: "Only returned if verbose is true",
-  }),
-});
-
-const HealthCheckQuerySchema = z.object({
-  verbose: z
-    .string()
-    .optional()
-    .openapi({
-      param: { name: "verbose", in: "query" },
-      example: "true",
-    }),
-});
-
-const healthCheckRoute = createRoute({
-  method: "get",
-  path: "/",
-  request: {
-    query: HealthCheckQuerySchema,
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: HealthCheckResponseSchema,
-        },
-      },
-      description: "Health check",
-    },
-  },
 });
 
 app.openapi(healthCheckRoute, (c) => {
