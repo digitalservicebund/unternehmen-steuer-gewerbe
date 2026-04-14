@@ -4,32 +4,39 @@ import { createAufenthaltstitel, type Aufenthaltstitel } from "./aufenthaltstite
 import { xml } from "../escapeXml";
 
 export interface Name {
+  /** Familienname einer natürlichen Person bestehend aus Nachname, Zuname bzw. Familienname. */
   familienname: string;
-  /** Geburtsname, falls abweichend vom Familiennamen. */
+  /** Der Geburtsname entspricht dem Familiennamen einer natürlichen Person vor der Schließung der ersten Ehe bzw. vor dem Eingehen der ersten Lebenspartnerschaft. */
   geburtsname?: string;
+  /** Vornamen einer natürlichen Person. */
   vornamen: string;
 }
 
 export interface Geburt {
+  /** Datum der Vollendung der Geburt. */
   geburtsdatum: string;
+  /** Der Ort der Geburt. */
   ort: string;
+  /** Der Staat der Geburt. */
   staat: string;
 }
 
 export interface NatuerlichePerson {
-  /** ID-Querverweis (z.B. "np-1") für wirtschaftlichTaetiger.id und gewerbetreibender.id. */
+  /** Innerhalb des jeweiligen Kontextes eindeutige ID dieser Instanz des Datentyps Natürliche Person. */
   id: string;
+  /** Datenobjekt zur Darstellung des Namens einer natürlichen Person in lateinischer Schrift, entsprechend der Vorgaben aus dem Baukasten des Föderalen Informationsmanagements (FIM). */
   name: Name;
+  /** Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Angabe zum Staat als Freitext statt Code. */
   geburt: Geburt;
-  /** Geschlecht als Code, listVersionID="1" (m/w/d/x). */
+  /** Als Geschlechtsangabe zulässig sind: "männlich", "weiblich", "divers", "keine Angabe". */
   geschlecht: string;
-  /** Staatsangehörigkeit als Code gem. Staatsangehörigkeitscode, listVersionID="2020-05-11". */
+  /** Die Staatsangehörigkeit der natürlichen Person gemäß Codierung des statistischen Bundesamts. */
   staatsangehoerigkeit: string;
   /** Anschrift der natürlichen Person (privater Wohnsitz). */
   anschrift?: StrassenanschriftInland;
   /** Private Kontaktdaten der natürlichen Person. */
   kommunikation?: Kommunikation;
-  /** Aufenthaltstitel – nur bei ausländischen Betriebsinhabern relevant. */
+  /** Mittels dieses Typs werden Angaben zum Aufenthaltstitel ausländischer Betriebsinhaber gemacht. */
   aufenthaltstitel?: Aufenthaltstitel;
 }
 

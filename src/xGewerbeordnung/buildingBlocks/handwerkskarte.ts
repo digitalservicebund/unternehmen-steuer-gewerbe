@@ -1,15 +1,15 @@
 import { xml } from "../escapeXml";
 
 export interface Handwerkskarte {
-  /** Code des Status der Handwerkskarte, listVersionID="1". */
+  /** Status der Handwerkskarte */
   status: string;
-  /** Ausstellungsdatum der Handwerkskarte. */
+  /** Ausstellungsdatum der Handwerkskarte */
   ausgestelltAm?: string;
-  /** PLZ der ausstellenden HWK. */
+  /** Postleitzahl des Sitzes der die Handwerkskarte ausstellenden Handwerkskammer (z.B. "90489"). Das Element sollte nur angegeben werden, wenn kein Schlüssel zu der Handwerkskammer im betreffenden Element angegeben wurde. */
   ausgestelltVonPLZ?: string;
-  /** Ort der ausstellenden HWK. */
+  /** Ort des Sitzes der die Handwerkskarte ausstellenden Handwerkskammer (z.B. "Nürnberg"). Das Element sollte nur angegeben werden, wenn kein Schlüssel zu der Handwerkskammer im betreffenden Element angegeben wurde */
   ausgestelltVonOrt?: string;
-  /** Schlüssel der ausstellenden Handwerkskammer, listVersionID="5". */
+  /** Schlüssel der ausstellenden Handwerkskammer */
   ausgestelltVonSchluessel?: string;
 }
 

@@ -1,14 +1,15 @@
 import { xml } from "../escapeXml";
 
 export interface Aufenthaltstitel {
+  /** Angabe des Status des Aufenthaltstitels */
   status: string;
-  /** Ausstellungsdatum des Aufenthaltstitels. */
+  /** Ausstellungsdatum des Aufenthaltstitels */
   ausgestelltAm?: string;
-  /** Name der den Aufenthaltstitel ausstellenden Behörde. */
+  /** Name der den Aufenthaltstitel ausstellenden Behörde */
   ausgestelltVonName?: string;
-  /** PLZ der den Aufenthaltstitel ausstellenden Behörde. */
+  /** Postleitzahl der den Aufenthaltstitel ausstellenden Behörde */
   ausgestelltVonPLZ?: string;
-  /** Ort der den Aufenthaltstitel ausstellenden Behörde. */
+  /** Ort der den Aufenthaltstitel ausstellenden Behörde */
   ausgestelltVonOrt?: string;
 }
 
