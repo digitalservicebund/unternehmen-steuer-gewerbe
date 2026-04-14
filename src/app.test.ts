@@ -1,9 +1,6 @@
 import { describe, test, expect } from "vitest";
-// import supertest from "supertest";
 
 import app from "./app";
-
-// const request = supertest(app);
 
 describe("API tests", () => {
   test("Returns 404 NOT FOUND on unsupported route", async () => {
