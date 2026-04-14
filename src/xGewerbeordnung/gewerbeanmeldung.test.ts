@@ -248,49 +248,191 @@ const anmeldung: Anmeldung = {
       name: "Gewerbeamt Cottbus",
     },
   },
+  autor: {
+    kennung: "MELDID:12052000",
+    name: "Gewerbeamt Cottbus",
+  },
   satzErstellung: "2022-07-04T17:54:42.000+00:00",
   ereigniszeitpunkt: "2026-05-08T12:00:29.0",
+  istStorno: false,
   gemeindeSchluessel: "12052000",
-  satzUUID: "9c3511e4-6f9d-4176-8d38-bc86df543b47",
+  uuid: "9c3511e4-6f9d-4176-8d38-bc86df543b47",
   gueltigAb: "2022-08-01",
   datumMeldung: "2022-07-02",
-  grundAnmeldung: "01",
-  betrieb: {
-    id: "0c9003a6-5b4f-4a99-98ae-b2b915708c1d",
+  grundAnmeldungSchluessel: "01",
+  gewerbebetrieb: {
+    gewerbebetriebID: "0c9003a6-5b4f-4a99-98ae-b2b915708c1d",
     gemeindeMeldungNr: "2015 1023",
-    geschaeftsbezeichnung: "Tibor Pick e.K.",
-    strasse: "Spremberger Str.",
-    strassenschluessel: "0000001801",
-    hausnummer: "90",
-    plz: "03046",
-    ort: "Cottbus",
-    taetigkeitSchwerpunkt: "Friseur",
-    wirtschaftszweigschluessel: "96021",
-    stichwort: "Friseurgewerbe (Damen- und Herrenfriseursalons)",
-    anzahlVollzeit: 0,
-    anzahlTeilzeit: 2,
+    rechtsformcode: "411000",
+    eingetragenerName: "Tibor Pick e.K.",
+    eintragung: {
+      artEintragung: "A",
+      registergericht: { code: "G1103" },
+      eintragungsnummer: 11111,
+    },
+    betriebsstaette: {
+      artBetriebsstaette: "01",
+      anschrift: {
+        strasse: "Spremberger Str.",
+        strassenschluessel: "0000001801",
+        hausnummerVon: "90",
+        postleitzahl: "03046",
+        ort: "Cottbus",
+      },
+      kommunikation: {
+        telefon: "+49 234 121314",
+      },
+    },
+    taetigkeitenGesamt: {
+      schwerpunkt: {
+        taetigkeitSchwerpunkt: "Friseur",
+        wirtschaftszweigschluessel: "96021",
+        stichwort: "Friseurgewerbe (Damen- und Herrenfriseursalons)",
+      },
+      weitereTaetigkeiten: {
+        taetigkeitenZusammengefasst: "Verkauf von Haarpflegeprodukten|Make-up-Beratung",
+        taetigkeit: [
+          {
+            taetigkeitEinzeln: "Verkauf von Haarpflegeprodukten",
+            wirtschaftszweigschluessel: "47750",
+            stichwort: "Haarbehandlungsmittel, zubereitete, Einzelhandel",
+          },
+          {
+            taetigkeitEinzeln: "Make-up-Beratung",
+            wirtschaftszweigschluessel: "96022",
+            stichwort: "Typstylist",
+          },
+        ],
+      },
+    },
+    istNebenerwerb: true,
+    anzahlVollzeitBeschaeftigte: 0,
+    anzahlTeilzeitBeschaeftigte: 2,
+    istReisegewerbe: false,
+    beteiligungOeffentlicheHand: "0",
     betriebArt: {
       industrie: false,
       handwerk: true,
       handel: false,
       sonstiges: false,
     },
-    istNebenerwerb: true,
+    handwerkskarte: {
+      status: "1",
+      ausgestelltAm: "2012-03-01",
+      ausgestelltVonPLZ: "03046",
+      ausgestelltVonOrt: "Cottbus",
+      ausgestelltVonSchluessel: "00007",
+    },
   },
-  person: {
-    familienname: "Pick",
-    geburtsname: "Rodríguez",
-    vornamen: "Tibor",
-    geburtsdatum: "1965-10-12",
-    geschlecht: "m",
-    geburtsort: "Santiago",
-    geburtsstaat: "Chile",
-    staatsangehoerigkeit: "332",
+  referenzierteSubjekte: {
+    natuerlichePerson: [
+      {
+        id: "np-1",
+        name: {
+          familienname: "Pick",
+          geburtsname: "Rodríguez",
+          vornamen: "Tibor",
+        },
+        geburt: {
+          geburtsdatum: "1965-10-12",
+          ort: "Santiago",
+          staat: "Chile",
+        },
+        geschlecht: "m",
+        staatsangehoerigkeit: "332",
+        anschrift: {
+          strasse: "Ewald-Hase-Str.",
+          hausnummerVon: "4",
+          postleitzahl: "03044",
+          ort: "Cottbus",
+        },
+        kommunikation: {
+          telefon: "+49 355 141455",
+        },
+        aufenthaltstitel: {
+          status: "1",
+          ausgestelltAm: "2002-01-02",
+          ausgestelltVonName: "Stadt Cottbus",
+          ausgestelltVonPLZ: "03044",
+          ausgestelltVonOrt: "Cottbus",
+        },
+      },
+    ],
   },
 };
 
 describe("xGewerbeanmeldung0300", () => {
   it("erzeugt XML das xgewo_1_6_valid entspricht", () => {
     expect(normalizeXml(xGewerbeanmeldung0300(anmeldung))).toBe(normalizeXml(xgewo_1_6_valid));
+  });
+
+  it("läuft ohne optionale Felder durch", () => {
+    const minimal: Anmeldung = {
+      nachrichtenkopf: {
+        nachrichtenUUID: "00000000-0000-0000-0000-000000000001",
+        erstellungszeitpunkt: "2024-01-01T10:00:00.000+01:00",
+        leser: { kennung: "xga:000000000001", name: "Empfänger" },
+        autor: { kennung: "MELDID:00000000", name: "Gewerbeamt Muster" },
+      },
+      autor: { kennung: "MELDID:00000000", name: "Gewerbeamt Muster" },
+      satzErstellung: "2024-01-01T09:00:00.000+01:00",
+      ereigniszeitpunkt: "2024-01-02T08:00:00.0",
+      istStorno: false,
+      gemeindeSchluessel: "00000000",
+      uuid: "00000000-0000-0000-0000-000000000002",
+      gueltigAb: "2024-01-02",
+      datumMeldung: "2024-01-01",
+      grundAnmeldungSchluessel: "01",
+      gewerbebetrieb: {
+        gewerbebetriebID: "00000000-0000-0000-0000-000000000003",
+        gemeindeMeldungNr: "2024 0001",
+        rechtsformcode: "411000",
+        eingetragenerName: "Muster GmbH",
+        betriebsstaette: {
+          artBetriebsstaette: "01",
+          anschrift: {
+            strasse: "Musterstraße",
+            hausnummerVon: "1",
+            postleitzahl: "12345",
+            ort: "Musterstadt",
+          },
+        },
+        taetigkeitenGesamt: {
+          schwerpunkt: {
+            taetigkeitSchwerpunkt: "Handel",
+            wirtschaftszweigschluessel: "47990",
+            stichwort: "Einzelhandel",
+          },
+        },
+        istNebenerwerb: false,
+        anzahlVollzeitBeschaeftigte: 0,
+        anzahlTeilzeitBeschaeftigte: 0,
+        istReisegewerbe: false,
+        betriebArt: {
+          industrie: false,
+          handwerk: false,
+          handel: true,
+          sonstiges: false,
+        },
+      },
+      referenzierteSubjekte: {
+        natuerlichePerson: [
+          {
+            id: "np-1",
+            name: { familienname: "Muster", vornamen: "Max" },
+            geburt: { geburtsdatum: "1980-01-01", ort: "Berlin", staat: "Deutschland" },
+            geschlecht: "m",
+            staatsangehoerigkeit: "000",
+          },
+        ],
+      },
+    };
+    const xml = xGewerbeanmeldung0300(minimal);
+    expect(xml).toContain("<xga:alg.gewerbemeldung.0300");
+    expect(xml).not.toContain("<bk:kommunikation>");
+    expect(xml).not.toContain("<xga:handwerkskarte>");
+    expect(xml).not.toContain("<xga:weitereTaetigkeiten>");
+    expect(xml).not.toContain("<xga:beteiligungOeffentlicheHand>");
+    expect(xml).not.toContain("<xga:aufenthaltstitel>");
   });
 });

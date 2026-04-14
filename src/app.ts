@@ -17,6 +17,7 @@ const fitConnectClient = new FitConnectClient({
     : undefined,
 });
 
+// K8n healtcheck endpoint
 app.get("/", (req, res) => {
   res.json({
     status: "ok",
