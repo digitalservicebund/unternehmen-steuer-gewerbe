@@ -1,5 +1,5 @@
-import { HonoAppType } from "../app";
-import { getSecret } from "../secrets";
+import { HonoAppType } from "../../app";
+import { getSecret } from "../../secrets";
 import { healthCheckRoute } from "./rootHealthCheckRoute";
 
 export function addHealthCheckEndpoint(app: HonoAppType): HonoAppType {

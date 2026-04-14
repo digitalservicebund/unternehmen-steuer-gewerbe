@@ -1,5 +1,5 @@
-import { HonoAppType } from "../app";
-import { getFitConnectClient } from "../clients/fitConnectClient/fitConnectClient";
+import { HonoAppType } from "../../app";
+import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
 import { getEventsRoute } from "./getEventsRoute";
 
 export function addGetEventsEndpoint(app: HonoAppType): HonoAppType {

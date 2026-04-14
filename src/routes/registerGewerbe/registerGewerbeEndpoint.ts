@@ -1,5 +1,5 @@
-import { HonoAppType } from "../app";
-import { getFitConnectClient } from "../clients/fitConnectClient/fitConnectClient";
+import { HonoAppType } from "../../app";
+import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
 import { registerGewerbeRoute } from "./registerGewerbeRoute";
 
 export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {

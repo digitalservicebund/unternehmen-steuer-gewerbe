@@ -1,5 +1,5 @@
 import { swaggerUI } from "@hono/swagger-ui";
-import { HonoAppType } from "../app";
+import { HonoAppType } from "../../app";
 
 export function addOpenApiEndpoints(app: HonoAppType): HonoAppType {
   // OpenAPI Documentation

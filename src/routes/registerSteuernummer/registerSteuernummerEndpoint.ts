@@ -1,4 +1,4 @@
-import { HonoAppType } from "../app";
+import { HonoAppType } from "../../app";
 import { registerSteuernummerRoute } from "./registerSteuernummerRoute";
 
 export function addRegisterSteuernummerEndpoint(app: HonoAppType): HonoAppType {
