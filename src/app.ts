@@ -1,10 +1,13 @@
+import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
+import { swaggerUI } from "@hono/swagger-ui";
+
 import { Hono } from "hono";
 // import helmet from "helmet";
 import FitConnectClient from "./fitConnectClient";
 import type { Environment } from "./fitConnectClient/environments";
 import { getSecret } from "./secrets";
 
-const app = new Hono();
+const app = new OpenAPIHono();
 // app.use(helmet.hidePoweredBy());
 // app.use(express.json());
 
@@ -17,11 +20,52 @@ const fitConnectClient = new FitConnectClient({
     : undefined,
 });
 
-app.get("/", (c) => {
-  return c.json({
-    status: "ok",
-    ...(c.req.query("verbose") ? { fitConnectEnvironment: getSecret("FIT_CONNECT_ENV") } : {}),
-  });
+const HealthCheckResponseSchema = z.object({
+  status: z.string().openapi({ example: "ok" }),
+  fitConnectEnvironment: z.string().optional().openapi({
+    example: "testing",
+    description: "Only returned if verbose is true",
+  }),
+});
+
+const HealthCheckQuerySchema = z.object({
+  verbose: z
+    .string()
+    .optional()
+    .openapi({
+      param: { name: "verbose", in: "query" },
+      example: "true",
+    }),
+});
+
+const healthCheckRoute = createRoute({
+  method: "get",
+  path: "/",
+  request: {
+    query: HealthCheckQuerySchema,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: HealthCheckResponseSchema,
+        },
+      },
+      description: "Health check",
+    },
+  },
+});
+
+app.openapi(healthCheckRoute, (c) => {
+  const { verbose } = c.req.valid("query");
+
+  return c.json(
+    {
+      status: "ok",
+      ...(verbose ? { fitConnectEnvironment: getSecret("FIT_CONNECT_ENV") } : {}),
+    },
+    200,
+  );
 });
 
 app.post("/api/v1/register-steuernummer", (c) => {
@@ -63,5 +107,17 @@ app.get("/api/v1/register-gewerbe/:submissionId/events", async (c) => {
     c.text("Internal Server Error", 500);
   }
 });
+
+// OpenAPI Documentation
+// 1) Serve the JSON file
+app.doc("/doc", {
+  openapi: "3.0.0",
+  info: {
+    version: "1.0.0",
+    title: "My API",
+  },
+});
+// 2) Serve the Swagger UI
+app.get("/ui", swaggerUI({ url: "/doc" }));
 
 export default app;
