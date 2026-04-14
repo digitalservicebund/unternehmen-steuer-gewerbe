@@ -58,7 +58,6 @@ describe("API tests", () => {
     });
   });
 
-  // TODO: expect non-empty
   test("Returns 200 OK on GET with /:submissionId/events", async () => {
     const response = await request
       .get("/api/v1/register-gewerbe/0b0dd73c-2379-4ba6-a02b-385f7c23102c/events")
