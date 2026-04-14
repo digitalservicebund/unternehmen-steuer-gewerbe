@@ -88,17 +88,6 @@ app.openapi(getEventsRoute, async (c) => {
   }
 });
 
-app.get("/api/v1/register-gewerbe/:submissionId/events", async (c) => {
-  try {
-    const submissionId = c.req.param("submissionId");
-    const submissionEvents = await fitConnectClient.getSubmissionEvents(submissionId);
-    return c.json(submissionEvents);
-  } catch (error) {
-    console.error(error);
-    c.text("Internal Server Error", 500);
-  }
-});
-
 // OpenAPI Documentation
 // 1) Serve the JSON file
 app.doc("/doc", {
