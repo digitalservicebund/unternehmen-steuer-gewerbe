@@ -1,4 +1,4 @@
-import { createAnschrift, type StrassenanschriftInland } from "./anschrift";
+import { createAnschrift, type Anschrift } from "./anschrift";
 import { createKommunikation, type Kommunikation } from "./kommunikation";
 import { createAufenthaltstitel, type Aufenthaltstitel } from "./aufenthaltstitel";
 import { xml } from "../escapeXml";
@@ -33,7 +33,7 @@ export interface NatuerlichePerson {
   /** Die Staatsangehörigkeit der natürlichen Person gemäß Codierung des statistischen Bundesamts. */
   staatsangehoerigkeit: string;
   /** Anschrift der natürlichen Person (privater Wohnsitz). */
-  anschrift?: StrassenanschriftInland;
+  anschrift?: Anschrift;
   /** Private Kontaktdaten der natürlichen Person. */
   kommunikation?: Kommunikation;
   /** Mittels dieses Typs werden Angaben zum Aufenthaltstitel ausländischer Betriebsinhaber gemacht. */
