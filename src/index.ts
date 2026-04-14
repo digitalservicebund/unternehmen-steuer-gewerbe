@@ -10,6 +10,6 @@ serve(
     port,
   },
   (info) => {
-    console.log(`Hono app listening on port ${info.port}`);
+    console.log(`Server listening on http://localhost:${info.port}`);
   },
 );
