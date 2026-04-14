@@ -1,12 +1,12 @@
-import express, { type Express } from "express";
-import helmet from "helmet";
+import { Hono } from "hono";
+// import helmet from "helmet";
 import FitConnectClient from "./fitConnectClient";
 import type { Environment } from "./fitConnectClient/environments";
 import { getSecret } from "./secrets";
 
-const app: Express = express();
-app.use(helmet.hidePoweredBy());
-app.use(express.json());
+const app = new Hono();
+// app.use(helmet.hidePoweredBy());
+// app.use(express.json());
 
 const fitConnectClient = new FitConnectClient({
   environment: (getSecret("FIT_CONNECT_ENV") || "test") as Environment,
@@ -17,21 +17,20 @@ const fitConnectClient = new FitConnectClient({
     : undefined,
 });
 
-app.get("/", (req, res) => {
-  res.json({
+app.get("/", (c) => {
+  return c.json({
     status: "ok",
-    ...(req.query.verbose ? { fitConnectEnvironment: getSecret("FIT_CONNECT_ENV") } : {}),
+    ...(c.req.query("verbose") ? { fitConnectEnvironment: getSecret("FIT_CONNECT_ENV") } : {}),
   });
 });
 
-// routes (keep here until complex)
-app.post("/api/v1/register-steuernummer", (req, res) => {
-  res.json();
+app.post("/api/v1/register-steuernummer", (c) => {
+  return c.json({});
 });
 
-app.post("/api/v1/register-gewerbe", async (req, res) => {
+app.post("/api/v1/register-gewerbe", async (c) => {
   try {
-    const data = req.body;
+    const data = await c.req.json();
     const fitConnectResponse = await fitConnectClient.submitData({
       // The destination varies from commune to commune.
       // We can hard‑code it here for the demo, but in the future we need to
@@ -47,23 +46,21 @@ app.post("/api/v1/register-gewerbe", async (req, res) => {
       },
       data: JSON.stringify(data),
     });
-    res.json(fitConnectResponse);
+    return c.json(fitConnectResponse);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Internal Server Error");
+    return c.text("Internal Server Error", 500);
   }
-
-  res.json();
 });
 
-app.get("/api/v1/register-gewerbe/:submissionId/events", async (req, res) => {
+app.get("/api/v1/register-gewerbe/:submissionId/events", async (c) => {
   try {
-    const { submissionId } = req.params;
+    const submissionId = c.req.param("submissionId");
     const submissionEvents = await fitConnectClient.getSubmissionEvents(submissionId);
-    res.json(submissionEvents);
+    return c.json(submissionEvents);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Internal Server Error");
+    c.text("Internal Server Error", 500);
   }
 });
 
