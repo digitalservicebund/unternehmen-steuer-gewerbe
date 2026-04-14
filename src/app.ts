@@ -6,6 +6,7 @@ import type { Environment } from "./fitConnectClient/environments";
 import { getSecret } from "./secrets";
 import { healthCheckRoute } from "./routes/root.health-check";
 import { registerSteuernummerRoute } from "./routes/register.steuernummer";
+import { registerGewerbeRoute } from "./routes/register.gewerbe";
 
 const app = new OpenAPIHono();
 
@@ -34,9 +35,11 @@ app.openapi(registerSteuernummerRoute, (c) => {
   return c.json({});
 });
 
-app.post("/api/v1/register-gewerbe", async (c) => {
+app.openapi(registerGewerbeRoute, async (c) => {
   try {
-    const data = await c.req.json();
+    // With OpenAPIHono, the body is already validated against your schema
+    const data = c.req.valid("json");
+
     const fitConnectResponse = await fitConnectClient.submitData({
       // The destination varies from commune to commune.
       // We can hard‑code it here for the demo, but in the future we need to
@@ -52,7 +55,14 @@ app.post("/api/v1/register-gewerbe", async (c) => {
       },
       data: JSON.stringify(data),
     });
-    return c.json(fitConnectResponse);
+
+    return c.json(
+      {
+        success: true,
+        submissionId: fitConnectResponse.submissionId,
+      },
+      200,
+    );
   } catch (error) {
     console.error(error);
     return c.text("Internal Server Error", 500);
