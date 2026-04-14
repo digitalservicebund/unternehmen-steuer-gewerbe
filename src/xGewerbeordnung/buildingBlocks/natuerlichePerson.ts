@@ -1,6 +1,7 @@
 import { createAnschrift, type StrassenanschriftInland } from "./anschrift";
 import { createKommunikation, type Kommunikation } from "./kommunikation";
 import { createAufenthaltstitel, type Aufenthaltstitel } from "./aufenthaltstitel";
+import { xml } from "../escapeXml";
 
 export interface Name {
   familienname: string;
@@ -35,24 +36,24 @@ export interface NatuerlichePerson {
 export function createNatuerlichePerson(natuerlichePerson: NatuerlichePerson) {
   return `
     <xga:natuerlichePerson>
-      <np:natuerlichePerson.id>${natuerlichePerson.id}</np:natuerlichePerson.id>
+      <np:natuerlichePerson.id>${xml(natuerlichePerson.id)}</np:natuerlichePerson.id>
       <np:name>
-        <np:familienname>${natuerlichePerson.name.familienname}</np:familienname>
-        ${natuerlichePerson.name.geburtsname ? `<np:geburtsname>${natuerlichePerson.name.geburtsname}</np:geburtsname>` : ""}
-        <np:vornamen>${natuerlichePerson.name.vornamen}</np:vornamen>
+        <np:familienname>${xml(natuerlichePerson.name.familienname)}</np:familienname>
+        ${natuerlichePerson.name.geburtsname ? `<np:geburtsname>${xml(natuerlichePerson.name.geburtsname)}</np:geburtsname>` : ""}
+        <np:vornamen>${xml(natuerlichePerson.name.vornamen)}</np:vornamen>
       </np:name>
       <bk:geburt>
         <np:geburtsdatum>
-          <dat:datum>${natuerlichePerson.geburt.geburtsdatum}</dat:datum>
+          <dat:datum>${xml(natuerlichePerson.geburt.geburtsdatum)}</dat:datum>
         </np:geburtsdatum>
-        <adr:ort>${natuerlichePerson.geburt.ort}</adr:ort>
-        <bk:staat>${natuerlichePerson.geburt.staat}</bk:staat>
+        <adr:ort>${xml(natuerlichePerson.geburt.ort)}</adr:ort>
+        <bk:staat>${xml(natuerlichePerson.geburt.staat)}</bk:staat>
       </bk:geburt>
       <np:geschlecht listVersionID="1">
-        <code>${natuerlichePerson.geschlecht}</code>
+        <code>${xml(natuerlichePerson.geschlecht)}</code>
       </np:geschlecht>
       <np:staatsangehoerigkeit listVersionID="2020-05-11">
-        <code>${natuerlichePerson.staatsangehoerigkeit}</code>
+        <code>${xml(natuerlichePerson.staatsangehoerigkeit)}</code>
       </np:staatsangehoerigkeit>
       ${createAnschrift(natuerlichePerson.anschrift)}
       ${createKommunikation(natuerlichePerson.kommunikation)}

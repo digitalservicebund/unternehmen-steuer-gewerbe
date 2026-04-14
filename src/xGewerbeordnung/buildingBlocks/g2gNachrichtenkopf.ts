@@ -1,4 +1,6 @@
-interface Behoerde {
+import { xml } from "../escapeXml";
+
+export interface Behoerde {
   kennung: string;
   name: string;
 }
@@ -15,13 +17,13 @@ export function createG2gNachrichtenkopf(nachrichtenkopf: Nachrichtenkopf) {
     <bn-g2g:nachrichtenkopf.g2g>
       <bn-g2g:identifikation.nachricht>
         <bn-g2g:nachrichtenUUID>
-          ${nachrichtenkopf.nachrichtenUUID}
+          ${xml(nachrichtenkopf.nachrichtenUUID)}
         </bn-g2g:nachrichtenUUID>
         <bn-g2g:nachrichtentyp listURI="urn:xoev-de:xgewerbeordnung:codeliste:nachrichtentypen" listVersionID="1.6">
           <code>0300</code>
         </bn-g2g:nachrichtentyp>
         <bn-g2g:erstellungszeitpunkt>
-          ${nachrichtenkopf.erstellungszeitpunkt}
+          ${xml(nachrichtenkopf.erstellungszeitpunkt)}
         </bn-g2g:erstellungszeitpunkt>
       </bn-g2g:identifikation.nachricht>
       <bn-g2g:leser>
@@ -29,10 +31,10 @@ export function createG2gNachrichtenkopf(nachrichtenkopf: Nachrichtenkopf) {
           <code>DVDV</code>
         </bn-beh:verzeichnisdienst>
         <bn-beh:kennung>
-          ${nachrichtenkopf.leser.kennung}
+          ${xml(nachrichtenkopf.leser.kennung)}
         </bn-beh:kennung>
         <bn-beh:name>
-          ${nachrichtenkopf.leser.name}
+          ${xml(nachrichtenkopf.leser.name)}
         </bn-beh:name>
       </bn-g2g:leser>
       <bn-g2g:autor>
@@ -40,10 +42,10 @@ export function createG2gNachrichtenkopf(nachrichtenkopf: Nachrichtenkopf) {
           <code>DVDV</code>
         </bn-beh:verzeichnisdienst>
         <bn-beh:kennung>
-          ${nachrichtenkopf.autor.kennung}
+          ${xml(nachrichtenkopf.autor.kennung)}
         </bn-beh:kennung>
         <bn-beh:name>
-          ${nachrichtenkopf.autor.name}
+          ${xml(nachrichtenkopf.autor.name)}
         </bn-beh:name>
       </bn-g2g:autor>
 </bn-g2g:nachrichtenkopf.g2g>`;

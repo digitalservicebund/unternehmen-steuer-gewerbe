@@ -1,3 +1,5 @@
+import { xml } from "../escapeXml";
+
 export interface StrassenanschriftInland {
   strasse: string;
   /** Amtl. Straßenschlüssel gem. AGS – nur falls verfügbar. */
@@ -17,13 +19,13 @@ export function createAnschrift(strassenanschriftInland: StrassenanschriftInland
   return `
     <bk:anschrift>
       <bk:strassenanschriftInland>
-          <adr:strasse>${strassenanschriftInland.strasse}</adr:strasse>
-          ${strassenanschriftInland.strassenschluessel ? `<bk:strassenschluessel>${strassenanschriftInland.strassenschluessel}</bk:strassenschluessel>` : ""}
-          <bk:hausnummerVon>${strassenanschriftInland.hausnummerVon}</bk:hausnummerVon>
-          ${strassenanschriftInland.hausnummerBis ? `<bk:hausnummerBis>${strassenanschriftInland.hausnummerBis}</bk:hausnummerBis>` : ""}
-          ${strassenanschriftInland.hausnummernzusatz ? `<bk:hausnummernzusatz>${strassenanschriftInland.hausnummernzusatz}</bk:hausnummernzusatz>` : ""}
-          <adr:postleitzahl>${strassenanschriftInland.postleitzahl}</adr:postleitzahl>
-          <adr:ort>${strassenanschriftInland.ort}</adr:ort>
+          <adr:strasse>${xml(strassenanschriftInland.strasse)}</adr:strasse>
+          ${strassenanschriftInland.strassenschluessel ? `<bk:strassenschluessel>${xml(strassenanschriftInland.strassenschluessel)}</bk:strassenschluessel>` : ""}
+          <bk:hausnummerVon>${xml(strassenanschriftInland.hausnummerVon)}</bk:hausnummerVon>
+          ${strassenanschriftInland.hausnummerBis ? `<bk:hausnummerBis>${xml(strassenanschriftInland.hausnummerBis)}</bk:hausnummerBis>` : ""}
+          ${strassenanschriftInland.hausnummernzusatz ? `<bk:hausnummernzusatz>${xml(strassenanschriftInland.hausnummernzusatz)}</bk:hausnummernzusatz>` : ""}
+          <adr:postleitzahl>${xml(strassenanschriftInland.postleitzahl)}</adr:postleitzahl>
+          <adr:ort>${xml(strassenanschriftInland.ort)}</adr:ort>
       </bk:strassenanschriftInland>
     </bk:anschrift>`;
 }

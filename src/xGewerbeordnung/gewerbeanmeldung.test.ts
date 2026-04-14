@@ -362,11 +362,11 @@ const anmeldung: Anmeldung = {
 };
 
 describe("xGewerbeanmeldung0300", () => {
-  it("erzeugt XML das xgewo_1_6_valid entspricht", () => {
+  it("is creating a valid xGewerbeordung 1.6 xml", () => {
     expect(normalizeXml(xGewerbeanmeldung0300(anmeldung))).toBe(normalizeXml(xgewo_1_6_valid));
   });
 
-  it("läuft ohne optionale Felder durch", () => {
+  it("is woking without optional fields", () => {
     const minimal: Anmeldung = {
       nachrichtenkopf: {
         nachrichtenUUID: "00000000-0000-0000-0000-000000000001",
@@ -434,5 +434,42 @@ describe("xGewerbeanmeldung0300", () => {
     expect(xml).not.toContain("<xga:weitereTaetigkeiten>");
     expect(xml).not.toContain("<xga:beteiligungOeffentlicheHand>");
     expect(xml).not.toContain("<xga:aufenthaltstitel>");
+  });
+
+  it("is generating escaped XML", () => {
+    const withSpecials: Anmeldung = {
+      ...anmeldung,
+      autor: { ...anmeldung.autor, name: "Amt <Müller & Söhne>" },
+      gewerbebetrieb: {
+        ...anmeldung.gewerbebetrieb,
+        eingetragenerName: "Müller & Söhne GmbH",
+        taetigkeitenGesamt: {
+          ...anmeldung.gewerbebetrieb.taetigkeitenGesamt,
+          schwerpunkt: {
+            ...anmeldung.gewerbebetrieb.taetigkeitenGesamt.schwerpunkt,
+            stichwort: "A > B & C < D",
+          },
+        },
+      },
+    };
+
+    const generatedXml = xGewerbeanmeldung0300(withSpecials);
+
+    expect(() => parser.parse(generatedXml)).not.toThrow();
+    const parsed = parser.parse(generatedXml);
+    const anmeldungNode = parsed["xga:alg.gewerbemeldung.0300"]["xga:satz"]["xga:anmeldung"];
+    expect(anmeldungNode["xga:autor"]["bn-beh:name"]).toBe("Amt <Müller & Söhne>");
+    expect(anmeldungNode["xga:gewerbebetrieb"]["ename:eingetragenerName"]).toBe(
+      "Müller & Söhne GmbH",
+    );
+    expect(
+      anmeldungNode["xga:gewerbebetrieb"]["xga:taetigkeitenGesamt"]["xga:schwerpunkt"][
+        "xga:stichwort"
+      ],
+    ).toBe("A > B & C < D");
+
+    expect(generatedXml).not.toContain("Müller & Söhne GmbH");
+    expect(generatedXml).toContain("Müller &amp; Söhne GmbH");
+    expect(generatedXml).toContain("A &gt; B &amp; C &lt; D");
   });
 });

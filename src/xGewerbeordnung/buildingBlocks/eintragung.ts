@@ -1,3 +1,5 @@
+import { xml } from "../escapeXml";
+
 export interface Eintragung {
   artEintragung: "A" | "B" | "G" | "GesR";
   registergericht: {
@@ -12,11 +14,11 @@ export function createEintragung(eintragung: Eintragung | undefined) {
   return `
     <bk:eintragung>
       <eintragung:artEintragung listVersionID="1">
-        <code>${eintragung.artEintragung}</code>
+        <code>${xml(eintragung.artEintragung)}</code>
       </eintragung:artEintragung>
       <eintragung:registergericht.code listVersionID="12">
-        <code>${eintragung.registergericht.code}</code>
+        <code>${xml(eintragung.registergericht.code)}</code>
       </eintragung:registergericht.code>
-      <eintragung:eintragungsnummer>${eintragung.eintragungsnummer}</eintragung:eintragungsnummer>
+      <eintragung:eintragungsnummer>${xml(eintragung.eintragungsnummer)}</eintragung:eintragungsnummer>
     </bk:eintragung>`;
 }
