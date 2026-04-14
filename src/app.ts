@@ -1,15 +1,18 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
+import type { Env } from "hono";
 import { swaggerUI } from "@hono/swagger-ui";
 
 import FitConnectClient from "./fitConnectClient";
 import type { Environment } from "./fitConnectClient/environments";
 import { getSecret } from "./secrets";
-import { healthCheckRoute } from "./routes/root.health-check";
-import { registerSteuernummerRoute } from "./routes/register.steuernummer";
-import { registerGewerbeRoute } from "./routes/register.gewerbe";
-import { getEventsRoute } from "./routes/getEvents";
+import { registerGewerbeRoute } from "./endpoints/registerGewerbeRoute";
+import { getEventsRoute } from "./endpoints/getEventsRoute";
+import { addHealthCheckRoute } from "./endpoints/rootHealthCheckEndpoint";
+import { addRegisterSteuerNummerRoute } from "./endpoints/registerSteuernummerEndpoint";
 
-const app = new OpenAPIHono();
+const app: OpenAPIHono<Env> = new OpenAPIHono();
+
+export type HonoAppType = typeof app;
 
 const fitConnectClient = new FitConnectClient({
   environment: (getSecret("FIT_CONNECT_ENV") || "test") as Environment,
@@ -20,21 +23,9 @@ const fitConnectClient = new FitConnectClient({
     : undefined,
 });
 
-app.openapi(healthCheckRoute, (c) => {
-  const { verbose } = c.req.valid("query");
+addHealthCheckRoute(app);
 
-  return c.json(
-    {
-      status: "ok",
-      ...(verbose ? { fitConnectEnvironment: getSecret("FIT_CONNECT_ENV") } : {}),
-    },
-    200,
-  );
-});
-
-app.openapi(registerSteuernummerRoute, (c) => {
-  return c.json({});
-});
+addRegisterSteuerNummerRoute(app);
 
 app.openapi(registerGewerbeRoute, async (c) => {
   try {
