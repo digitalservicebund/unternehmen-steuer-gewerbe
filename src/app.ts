@@ -7,8 +7,8 @@ import type { Environment } from "./fitConnectClient/environments";
 import { getSecret } from "./secrets";
 import { registerGewerbeRoute } from "./endpoints/registerGewerbeRoute";
 import { getEventsRoute } from "./endpoints/getEventsRoute";
-import { addHealthCheckRoute } from "./endpoints/rootHealthCheckEndpoint";
-import { addRegisterSteuerNummerRoute } from "./endpoints/registerSteuernummerEndpoint";
+import { addHealthCheckEndpoint } from "./endpoints/rootHealthCheckEndpoint";
+import { addRegisterSteuernummerEndpoint } from "./endpoints/registerSteuernummerEndpoint";
 
 const app: OpenAPIHono<Env> = new OpenAPIHono();
 
@@ -23,9 +23,9 @@ const fitConnectClient = new FitConnectClient({
     : undefined,
 });
 
-addHealthCheckRoute(app);
+addHealthCheckEndpoint(app);
 
-addRegisterSteuerNummerRoute(app);
+addRegisterSteuernummerEndpoint(app);
 
 app.openapi(registerGewerbeRoute, async (c) => {
   try {

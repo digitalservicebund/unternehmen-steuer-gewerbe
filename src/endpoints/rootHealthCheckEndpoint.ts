@@ -2,7 +2,7 @@ import { HonoAppType } from "../app";
 import { getSecret } from "../secrets";
 import { healthCheckRoute } from "./rootHealthCheckRoute";
 
-export function addHealthCheckRoute(app: HonoAppType): HonoAppType {
+export function addHealthCheckEndpoint(app: HonoAppType): HonoAppType {
   app.openapi(healthCheckRoute, (c) => {
     const { verbose } = c.req.valid("query");
 
