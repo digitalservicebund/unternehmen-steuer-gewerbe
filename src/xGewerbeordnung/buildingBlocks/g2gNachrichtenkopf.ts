@@ -1,12 +1,15 @@
 import { xml } from "../escapeXml";
 
 export interface Behoerde {
+  /** Dieses Element enthält die eindeutige Kennzeichnung der Behörde / öffentlichen Stelle innerhalb des angegebenen Verzeichnisdienstes. Die Behördenkennung des Autors muss das Präfix MELDID oder xga haben. */
   kennung: string;
+  /** Dieses Element enthält den Namen der Behörde / öffentlichen Stelle. */
   name: string;
 }
 
 export interface Nachrichtenkopf {
   nachrichtenUUID: string;
+  /** Dieses Element enthält den Erstellungszeitpunkt der Nachricht - es enthält explizit nicht den Sende- und Empfangszeitpunkt. */
   erstellungszeitpunkt: string;
   leser: Behoerde;
   autor: Behoerde;
