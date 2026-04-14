@@ -49,9 +49,10 @@ export interface Anmeldung {
   person: Person;
 }
 
-const xGewerbeanmeldung0300 = (anmeldung: Anmeldung) => `<?xml version="1.0" encoding="UTF-8"?>
-<xga:alg.gewerbemeldung.0300
-   xmlns:xga="http://www.xgewerbeordnung.de/spezifikation/xga/1.6"
+export const xGewerbeanmeldung0300 = (
+  anmeldung: Anmeldung,
+) => `<?xml version="1.0" encoding="UTF-8"?>
+<xga:alg.gewerbemeldung.0300 xmlns:xga="http://www.xgewerbeordnung.de/spezifikation/xga/1.6"
    xmlns:erl="http://www.xgewerbeordnung.de/spezifikation/erl/1.6"
    xmlns:bk="http://www.xgewerbeordnung.de/spezifikation/baukasten/1.6"
    xmlns:nachr="urn:xoev-de:xunternehmen:standard:basismodul:nachrichtenstruktur_1.2"
@@ -66,6 +67,7 @@ const xGewerbeanmeldung0300 = (anmeldung: Anmeldung) => `<?xml version="1.0" enc
    xmlns:komm="urn:xoev-de:xunternehmen:standard:basismodul:kommunikation_1.2"
    xmlns:wt="urn:xoev-de:xunternehmen:standard:basismodul:wirtschaftlichetaetigkeit_1.2"
    xmlns:ename="urn:xoev-de:xunternehmen:standard:basismodul:eingetragenername_1.2"
+   xmlns:eintragung="urn:xoev-de:xunternehmen:standard:basismodul:eintragung_1.2"
    xmlns:adr="urn:xoev-de:xunternehmen:standard:basismodul:adressen_1.2"
    xmlns:antr="urn:xoev-de:xunternehmen:standard:basismodul:antraege-anzeigen_1.2"
    xmlns:lc="urn:xoev-de:kosit:xoev:datentyp:din-91379_2022-08"
@@ -75,9 +77,9 @@ const xGewerbeanmeldung0300 = (anmeldung: Anmeldung) => `<?xml version="1.0" enc
    xmlns:ges="urn:xoev-de:xunternehmen:standard:basismodul:gesellschafter_1.2"
    xmlns:spv="urn:xoev-de:xunternehmen:standard:basismodul:sonstigepersonenvereinigung_1.2"
    xmlns:bspv="urn:xoev-de:xunternehmen:standard:basismodul:beteiligtersonstigepersonenvereinigung_1.2"
-   produkt="XGA-App"
-   produkthersteller="IhreFirma"
-   produktversion="1.0"
+   produkt="XGA-Testsuite"
+   produkthersteller="KoSIT"
+   produktversion="2024"
    standard="XGewerbeordnung"
    version="1.6"
    test="100">
@@ -104,7 +106,7 @@ const xGewerbeanmeldung0300 = (anmeldung: Anmeldung) => `<?xml version="1.0" enc
             <xga:gewerbebetriebID>${anmeldung.betrieb.id}</xga:gewerbebetriebID>
             <xga:gemeindeMeldungNr>${anmeldung.betrieb.gemeindeMeldungNr}</xga:gemeindeMeldungNr>
             <rf:rechtsform>
-               <rf:rechtsformcode listVersionID="2.3">
+               <rf:rechtsformcode listVersionID="2.2">
                   <code>411000</code>
                </rf:rechtsformcode>
             </rf:rechtsform>
@@ -179,4 +181,3 @@ const xGewerbeanmeldung0300 = (anmeldung: Anmeldung) => `<?xml version="1.0" enc
       </xga:anmeldung>
    </xga:satz>
 </xga:alg.gewerbemeldung.0300>`;
-
