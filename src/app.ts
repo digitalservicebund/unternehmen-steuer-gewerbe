@@ -1,16 +1,13 @@
-import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 
-import { Hono } from "hono";
-// import helmet from "helmet";
 import FitConnectClient from "./fitConnectClient";
 import type { Environment } from "./fitConnectClient/environments";
 import { getSecret } from "./secrets";
 import { healthCheckRoute } from "./routes/root.health-check";
+import { registerSteuernummerRoute } from "./routes/register.steuernummer";
 
 const app = new OpenAPIHono();
-// app.use(helmet.hidePoweredBy());
-// app.use(express.json());
 
 const fitConnectClient = new FitConnectClient({
   environment: (getSecret("FIT_CONNECT_ENV") || "test") as Environment,
@@ -33,7 +30,7 @@ app.openapi(healthCheckRoute, (c) => {
   );
 });
 
-app.post("/api/v1/register-steuernummer", (c) => {
+app.openapi(registerSteuernummerRoute, (c) => {
   return c.json({});
 });
 
