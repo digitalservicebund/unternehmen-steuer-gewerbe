@@ -13,6 +13,7 @@ const registerGewerbeResponseSchema = z
   .object({
     success: z.boolean(),
     submissionId: z.string().optional(),
+    info: z.string().optional(),
   })
   .openapi("RegisterGewerbeResponse");
 
@@ -38,6 +39,11 @@ export const registerGewerbeRoute = createRoute({
       description: "Successfully submitted to FIT-Connect",
     },
     500: {
+      content: {
+        "application/json": {
+          schema: registerGewerbeResponseSchema,
+        },
+      },
       description: "Internal Server Error",
     },
   },

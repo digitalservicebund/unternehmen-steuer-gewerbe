@@ -35,7 +35,13 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
       );
     } catch (error) {
       console.error(error);
-      return c.text("Internal Server Error", 500);
+      return c.json(
+        {
+          success: false,
+          info: "Internal Server Error",
+        },
+        500,
+      );
     }
   });
 
