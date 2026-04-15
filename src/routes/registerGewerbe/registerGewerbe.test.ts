@@ -2,24 +2,34 @@ import { describe, test, expect, vi } from "vitest";
 import app from "../../app";
 
 describe("Route /api/v1/register-gewerbe", () => {
-  const testData = {
-    antragsteller: {
+  const requestData = {
+    persönlicheDaten: {
       vorname: "Erika",
       nachname: "Mustermann",
       geburtsdatum: "1985-08-12",
       adresse: {
-        strasseHausnummer: "Musterstraße 1",
-        plz: "12345",
+        strasseUndHausnummer: "Musterstraße 1",
+        postleitzahl: "12345",
+        ort: "Musterstadt",
+      },
+      telefon: "007",
+      email: "e.mustermann@example.org",
+    },
+    unternehmensDaten: {
+      tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
+      artDesUnternehmens: "Handwerksbetrieb",
+      adresseAbweichend: {
+        strasseUndHausnummer: "Musterstraße 2",
+        postleitzahl: "67890",
         ort: "Musterstadt",
       },
     },
-    antrag: "Hello FIT-Connect",
   };
 
   test("Returns 200 OK and JSON with success=true and non-empty submissionId on POST", async () => {
     const response = await app.request("/api/v1/register-gewerbe", {
       method: "POST",
-      body: JSON.stringify(testData),
+      body: JSON.stringify(requestData),
     });
     const json = await response.json();
     expect(response.status).toEqual(200);
@@ -39,7 +49,7 @@ describe("Route /api/v1/register-gewerbe", () => {
 
     const response = await app.request("/api/v1/register-gewerbe", {
       method: "POST",
-      body: JSON.stringify(testData),
+      body: JSON.stringify(requestData),
     });
     const json = await response.json();
     expect(response.status).toEqual(500);
