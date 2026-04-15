@@ -4,7 +4,7 @@ import { HonoAppType } from "../../app";
 export function addOpenApiEndpoints(app: HonoAppType): HonoAppType {
   // OpenAPI Documentation
   // 1) Serve the JSON file
-  app.doc("/doc", {
+  app.doc("/api/v1/doc", {
     openapi: "3.0.0",
     info: {
       version: "1.0.0",
