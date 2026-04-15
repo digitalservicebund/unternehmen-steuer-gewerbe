@@ -1,15 +1,41 @@
 import { z, createRoute } from "@hono/zod-openapi";
 
-const registerGewerbeRequestSchema = z
+const AdressDataSchema = z.object({
+  strasseUndHausNummer: z.string(),
+  postleitzahl: z
+    .string()
+    .length(5, "postleitzahl must be 5 characters")
+    .regex(/^\d+$/, "postleitzahl must only contain numbers"),
+  ort: z.string(),
+});
+
+const PersönlicheDatenSchema = z.object({
+  vorname: z.string(),
+  nachname: z.string(),
+  geburtsname: z.string().optional(),
+  geburtsdatum: z.iso.date(),
+  geburtsort: z.string(),
+  geburtsland: z.string(),
+  staatsangehoerigkeitDeutsch: true,
+  adresse: AdressDataSchema,
+  telefon: z.string(),
+  email: z.string(),
+});
+
+const UnternehmensDatenSchema = z.object({
+  adresseAbweichend: AdressDataSchema.optional(),
+  tätigkeitsbeschreibung: z.string(),
+  artDesUnternehmens: z.string(),
+});
+
+const RegisterGewerbeRequestSchema = z
   .object({
-    companyName: z.string().openapi({ example: "Mein Projektname Hier GmbH" }),
-    ownerName: z.string().openapi({ example: "Riley Smith" }),
-    industry: z.string().openapi({ example: "Software Development" }),
-    // Add other fields required by the FIT-Connect schema
+    persoenlicheDaten: PersönlicheDatenSchema,
+    unternehmensDaten: UnternehmensDatenSchema,
   })
   .openapi("RegisterGewerbeRequest");
 
-const registerGewerbeResponseSchema = z
+const RegisterGewerbeResponseSchema = z
   .object({
     success: z.boolean(),
     submissionId: z.string().optional(),
@@ -24,7 +50,7 @@ export const registerGewerbeRoute = createRoute({
     body: {
       content: {
         "application/json": {
-          schema: registerGewerbeRequestSchema,
+          schema: RegisterGewerbeRequestSchema,
         },
       },
     },
@@ -33,7 +59,7 @@ export const registerGewerbeRoute = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: registerGewerbeResponseSchema,
+          schema: RegisterGewerbeResponseSchema,
         },
       },
       description: "Successfully submitted to FIT-Connect",
@@ -41,7 +67,7 @@ export const registerGewerbeRoute = createRoute({
     500: {
       content: {
         "application/json": {
-          schema: registerGewerbeResponseSchema,
+          schema: RegisterGewerbeResponseSchema,
         },
       },
       description: "Internal Server Error",
