@@ -4,10 +4,7 @@ import {
   createG2gNachrichtenkopf,
   type Nachrichtenkopf,
 } from "./buildingBlocks/g2gNachrichtenkopf";
-import {
-  createGewerbebetrieb,
-  type Gewerbebetrieb,
-} from "./buildingBlocks/gewerbebetrieb";
+import { createGewerbebetrieb, type Gewerbebetrieb } from "./buildingBlocks/gewerbebetrieb";
 import {
   createReferenzierteSubjekte,
   type ReferenzierteSubjekte,
