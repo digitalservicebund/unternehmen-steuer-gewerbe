@@ -1,7 +1,4 @@
-import {
-  createNatuerlichePerson,
-  type NatuerlichePerson,
-} from "./natuerlichePerson";
+import { createNatuerlichePerson, type NatuerlichePerson } from "./natuerlichePerson";
 
 export interface ReferenzierteSubjekte {
   natuerlichePerson: NatuerlichePerson[];
