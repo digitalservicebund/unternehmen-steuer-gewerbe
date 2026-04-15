@@ -1,7 +1,7 @@
 import { z, createRoute } from "@hono/zod-openapi";
 
-const AdressDataSchema = z.object({
-  strasseUndHausNummer: z.string(),
+const AdresseSchema = z.object({
+  strasseUndHausnummer: z.string(),
   postleitzahl: z
     .string()
     .length(5, "postleitzahl must be 5 characters")
@@ -16,21 +16,21 @@ const PersönlicheDatenSchema = z.object({
   geburtsdatum: z.iso.date(),
   geburtsort: z.string(),
   geburtsland: z.string(),
-  staatsangehoerigkeitDeutsch: true,
-  adresse: AdressDataSchema,
+  staatsangehoerigkeitDeutsch: z.boolean(),
+  adresse: AdresseSchema,
   telefon: z.string(),
   email: z.string(),
 });
 
 const UnternehmensDatenSchema = z.object({
-  adresseAbweichend: AdressDataSchema.optional(),
+  adresseAbweichend: AdresseSchema.optional(),
   tätigkeitsbeschreibung: z.string(),
   artDesUnternehmens: z.string(),
 });
 
 const RegisterGewerbeRequestSchema = z
   .object({
-    persoenlicheDaten: PersönlicheDatenSchema,
+    persönlicheDaten: PersönlicheDatenSchema,
     unternehmensDaten: UnternehmensDatenSchema,
   })
   .openapi("RegisterGewerbeRequest");
