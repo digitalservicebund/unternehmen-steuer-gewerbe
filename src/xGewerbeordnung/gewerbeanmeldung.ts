@@ -1,93 +1,18 @@
 // https://www.xrepository.de/details/urn:xoev-de:kosit:standard:xgewerbeordnung_1.6#version
+import { createBehoerde, type Behoerde } from "./buildingBlocks/behoerde";
 import {
   createG2gNachrichtenkopf,
-  type Behoerde,
   type Nachrichtenkopf,
 } from "./buildingBlocks/g2gNachrichtenkopf";
-import { createEintragung, type Eintragung } from "./buildingBlocks/eintragung";
-import { createAnschrift, type Anschrift } from "./buildingBlocks/anschrift";
-import { createKommunikation, type Kommunikation } from "./buildingBlocks/kommunikation";
-import { createHandwerkskarte, type Handwerkskarte } from "./buildingBlocks/handwerkskarte";
 import {
-  createWeitereTaetigkeiten,
-  type WeitereTaetigkeiten,
-} from "./buildingBlocks/weitereTaetigkeiten";
+  createGewerbebetrieb,
+  type Gewerbebetrieb,
+} from "./buildingBlocks/gewerbebetrieb";
 import {
-  createNatuerlichePerson,
-  type NatuerlichePerson,
-} from "./buildingBlocks/natuerlichePerson";
+  createReferenzierteSubjekte,
+  type ReferenzierteSubjekte,
+} from "./buildingBlocks/referenzierteSubjekte";
 import { xml } from "./escapeXml";
-
-interface BetriebArt {
-  /** In diesem Element wird angegeben, ob es sich um einen Industriebetrieb handelt. */
-  industrie: boolean;
-  /** In diesem Element wird angegeben, ob es sich um einen Handwerksbetrieb handelt. */
-  handwerk: boolean;
-  /** In diesem Element wird angegeben, ob es sich um einen Handelsbetrieb handelt. */
-  handel: boolean;
-  /** In diesem Element wird angegeben, ob es sich um Betrieb sonstiger Art handelt. */
-  sonstiges: boolean;
-}
-
-interface Betriebsstaette {
-  /** Art der Betriebsstätte (Code, listVersionID="1"); ab 2024-05-01 nur 01/02/03 zulässig (SCH-0256). */
-  artBetriebsstaette: string;
-  /** Angaben für die Adressierung im Inland, */
-  anschrift: Anschrift;
-  /** Kontaktdaten der Betriebsstätte. */
-  kommunikation?: Kommunikation;
-}
-
-interface Taetigkeit {
-  /** Hier wird der vom Gewerbetreibenden angegebene Tätigkeitsschwerpunkt übermittelt. Es handelt sich hierbei nicht um den in Text des im Element wirtschaftszweig angegebenen Wirtschaftszweigschlüssels, sondern um die ursprüngliche Angabe des Gewerbetreibenden */
-  taetigkeitSchwerpunkt: string;
-  /** Wirtschaftszweigschlüssel gemäß der Klassifikation der Wirtschaftszweige des Statistischen Bundesamts. */
-  wirtschaftszweigschluessel: string;
-  /** Übermittelt werden soll, wenn im Fachverfahren vorhanden, die Sachbearbeiter-Auswahl des Stichwortes aus dem entsprechenden Schlüsselverzeichnis, das zur Zuordnung des Wirtschaftszweig-Schlüssels der Tätigkeit geführt hat. Ein Stichwort sollte nur übermittelt werden, wenn auch ein Tätigkeitsschlüssel (Element wt:wirtschaftszweig) angegeben ist. */
-  stichwort: string;
-}
-
-interface TaetigkeitenGesamt {
-  /** Es ist der Schwerpunkt der tatsächlich an der gemeldeten Betriebsstätte ausgeübten Tätigkeiten anzugeben. Es gibt genau einen Schwerpunkt. Wenn an dieser Betriebstätte nur eine Tätigkeit ausgeübt wird, stellt diese den Schwerpunkt dar */
-  schwerpunkt: Taetigkeit;
-  /** Weitere Tätigkeiten neben der Schwerpunkttätigkeit. */
-  weitereTaetigkeiten?: WeitereTaetigkeiten;
-}
-
-interface Gewerbebetrieb {
-  /** Eine UUID als eindeutige technische Identifikation des Gewerbebetriebes, gleiche fachliche, aber vom AGS unabhängige Systematik wie gemeindeMeldungNr. */
-  gewerbebetriebID: string;
-  /** Nummer der Meldung des Gewerbebetriebes in der Gemeinde. Die Gemeindemeldungsnummer wird von den Gewerbeämtern i.d.R. so vergeben, dass Gewerbebetriebe damit innerhalb des Zuständigkeitsbereichs einer Gewerbebehörde eindeutig identifiziert werden können. */
-  gemeindeMeldungNr: string;
-  /** Angabe der Rechtsform */
-  rechtsformcode: string;
-  /** Die im Handels-, Genossenschafts- oder Gesellschaftsregister eingetragene Firma eines wirtschaftlich Tätigen oder einer wirtschaftlichen Tätigkeit (z. B. eingetragenes Einzelunternehmen, eingetragene Zweigniederlassung) bzw. der im Vereins-, Partnerschafts- oder Stiftungsregister oder im Stiftungsverzeichnis eingetragene Name */
-  eingetragenerName: string;
-  /** Dieses Kerndatenobjekt fasst die Daten, mit welchen die Eintragung eines wirtschaftlich Tätigen bzw. eines Gewerbebetriebs in ein Register (Handels-, Gesellschafts-, Genossenschafts-, Vereins- oder Stiftungsregister) oder in ein Verzeichnis (Stiftungsverzeichnis) identifiziert werden kann */
-  eintragung?: Eintragung;
-  /** Angaben zu der Betriebsstätte. */
-  betriebsstaette: Betriebsstaette;
-  /** Mittels dieses Datentyps werden die an der Betriebsstätte tatsächlich ausgeübten Tätigkeiten angegeben. */
-  taetigkeitenGesamt: TaetigkeitenGesamt;
-  /** Mit diesem Element kann übermittelt werden, ob es sich bei dem Gewerbe um einen Nebenerwerb des angegebenen Gewerbetreibenden handelt */
-  istNebenerwerb: boolean;
-  /** In diesem Element wird die Anzahl der Vollzeitbeschäftigten (inklusive Ehe- oder Lebenspartner, Aushilfen, jedoch stets ohne den Inhaber selbst) angegeben, welche zum Zeitpunkt der Gewerbemeldung in der Betriebsstätte tätig sind. */
-  anzahlVollzeitBeschaeftigte: number;
-  /** In diesem Element wird die Anzahl der Teilzeitbeschäftigten (inklusive Ehe- oder Lebenspartner, Aushilfen, jedoch stets ohne den Inhaber selbst) angegeben, welche zum Zeitpunkt der Gewerbemeldung in der Betriebsstätte tätig sind. */
-  anzahlTeilzeitBeschaeftigte: number;
-  /** Mit diesem Element kann übermittelt werden, ob es sich bei dem Gewerbe um eine Reisegewerbe handelt */
-  istReisegewerbe: boolean;
-  /** Angabe, ob und in welcher Höhe eine Beteiligung der öffentlichen Hand am Gewerbebetrieb besteht. */
-  beteiligungOeffentlicheHand?: string;
-  /** Gibt die Art eine Betriebes (Handels-, Handwerks-, Industrie oder sonstiger Betrieb) an. */
-  betriebArt: BetriebArt;
-  /** Angaben zur Handwerkskarte – nur relevant, wenn betriebArt.handwerk = true. */
-  handwerkskarte?: Handwerkskarte;
-}
-
-interface ReferenzierteSubjekte {
-  natuerlichePerson: NatuerlichePerson[];
-}
 
 export interface Anmeldung {
   nachrichtenkopf: Nachrichtenkopf;
@@ -149,7 +74,6 @@ const ROOT_ATTRIBUTES = `
   test="100"`;
 
 export const xGewerbeanmeldung0300 = (anmeldung: Anmeldung) => {
-  const gewerbebetrieb = anmeldung.gewerbebetrieb;
   const natuerlichePerson0 = anmeldung.referenzierteSubjekte.natuerlichePerson[0];
 
   if (!natuerlichePerson0) {
@@ -164,11 +88,7 @@ export const xGewerbeanmeldung0300 = (anmeldung: Anmeldung) => {
       <xga:satz>
         <xga:anmeldung>
             <xga:autor>
-              <bn-beh:verzeichnisdienst listVersionID="1">
-                  <code>DVDV</code>
-              </bn-beh:verzeichnisdienst>
-              <bn-beh:kennung>${xml(anmeldung.autor.kennung)}</bn-beh:kennung>
-              <bn-beh:name>${xml(anmeldung.autor.name)}</bn-beh:name>
+              ${createBehoerde(anmeldung.autor)}
             </xga:autor>
             <xga:satzErstellung>${xml(anmeldung.satzErstellung)}</xga:satzErstellung>
             <xga:ereigniszeitpunkt>${xml(anmeldung.ereigniszeitpunkt)}</xga:ereigniszeitpunkt>
@@ -179,56 +99,8 @@ export const xGewerbeanmeldung0300 = (anmeldung: Anmeldung) => {
             <xga:uuid>${xml(anmeldung.uuid)}</xga:uuid>
             <xga:gueltigAb>${xml(anmeldung.gueltigAb)}</xga:gueltigAb>
             <xga:datumMeldung>${xml(anmeldung.datumMeldung)}</xga:datumMeldung>
-            <xga:gewerbebetrieb>
-              <xga:gewerbebetriebID>${xml(gewerbebetrieb.gewerbebetriebID)}</xga:gewerbebetriebID>
-              <xga:gemeindeMeldungNr>${xml(gewerbebetrieb.gemeindeMeldungNr)}</xga:gemeindeMeldungNr>
-              <rf:rechtsform>
-                  <rf:rechtsformcode listVersionID="2.2">
-                    <code>${xml(gewerbebetrieb.rechtsformcode)}</code>
-                  </rf:rechtsformcode>
-              </rf:rechtsform>
-              <wt:wirtschaftlichTaetiger.id>${xml(natuerlichePerson0.id)}</wt:wirtschaftlichTaetiger.id>
-              <ename:eingetragenerName>${xml(gewerbebetrieb.eingetragenerName)}</ename:eingetragenerName>
-              ${createEintragung(gewerbebetrieb.eintragung)}
-              <xga:betriebsstaette>
-                  <wt:artBetriebsstaette listVersionID="1">
-                    <code>${xml(gewerbebetrieb.betriebsstaette.artBetriebsstaette)}</code>
-                  </wt:artBetriebsstaette>
-                  ${createAnschrift(gewerbebetrieb.betriebsstaette.anschrift)}
-                  ${createKommunikation(gewerbebetrieb.betriebsstaette.kommunikation)}
-              </xga:betriebsstaette>
-              <xga:taetigkeitenGesamt>
-                  <xga:schwerpunkt>
-                    <xga:taetigkeitSchwerpunkt>${xml(gewerbebetrieb.taetigkeitenGesamt.schwerpunkt.taetigkeitSchwerpunkt)}</xga:taetigkeitSchwerpunkt>
-                    <wt:wirtschaftszweig>
-                        <wt:wirtschaftszweigschluessel>${xml(gewerbebetrieb.taetigkeitenGesamt.schwerpunkt.wirtschaftszweigschluessel)}</wt:wirtschaftszweigschluessel>
-                        <wt:versionWirtschaftszweigklassifikation listVersionID="1">
-                          <code>WZ-2008</code>
-                        </wt:versionWirtschaftszweigklassifikation>
-                    </wt:wirtschaftszweig>
-                    <xga:stichwort>${xml(gewerbebetrieb.taetigkeitenGesamt.schwerpunkt.stichwort)}</xga:stichwort>
-                  </xga:schwerpunkt>
-                  ${createWeitereTaetigkeiten(gewerbebetrieb.taetigkeitenGesamt.weitereTaetigkeiten)}
-              </xga:taetigkeitenGesamt>
-              <xga:gewerbetreibender>
-                  <xga:gewerbetreibender.id>${xml(natuerlichePerson0.id)}</xga:gewerbetreibender.id>
-                  <xga:istNebenerwerb>${xml(gewerbebetrieb.istNebenerwerb)}</xga:istNebenerwerb>
-              </xga:gewerbetreibender>
-              <xga:anzahlVollzeitBeschaeftigte>${xml(gewerbebetrieb.anzahlVollzeitBeschaeftigte)}</xga:anzahlVollzeitBeschaeftigte>
-              <xga:anzahlTeilzeitBeschaeftigte>${xml(gewerbebetrieb.anzahlTeilzeitBeschaeftigte)}</xga:anzahlTeilzeitBeschaeftigte>
-              <xga:istReisegewerbe>${xml(gewerbebetrieb.istReisegewerbe)}</xga:istReisegewerbe>
-              ${gewerbebetrieb.beteiligungOeffentlicheHand ? `<xga:beteiligungOeffentlicheHand><code>${xml(gewerbebetrieb.beteiligungOeffentlicheHand)}</code></xga:beteiligungOeffentlicheHand>` : ""}
-              <xga:betriebArt>
-                  <xga:industrie>${xml(gewerbebetrieb.betriebArt.industrie)}</xga:industrie>
-                  <xga:handwerk>${xml(gewerbebetrieb.betriebArt.handwerk)}</xga:handwerk>
-                  <xga:handel>${xml(gewerbebetrieb.betriebArt.handel)}</xga:handel>
-                  <xga:sonstiges>${xml(gewerbebetrieb.betriebArt.sonstiges)}</xga:sonstiges>
-              </xga:betriebArt>
-              ${createHandwerkskarte(gewerbebetrieb.handwerkskarte)}
-            </xga:gewerbebetrieb>
-            <xga:referenzierteSubjekte>
-              ${anmeldung.referenzierteSubjekte.natuerlichePerson.map(createNatuerlichePerson).join("\n")}
-            </xga:referenzierteSubjekte>
+            ${createGewerbebetrieb(anmeldung.gewerbebetrieb, natuerlichePerson0.id)}
+            ${createReferenzierteSubjekte(anmeldung.referenzierteSubjekte)}
             <xga:grundAnmeldungSchluessel>
               <code>${xml(anmeldung.grundAnmeldungSchluessel)}</code>
             </xga:grundAnmeldungSchluessel>

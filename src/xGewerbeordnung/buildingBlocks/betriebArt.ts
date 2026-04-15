@@ -1,0 +1,22 @@
+import { xml } from "../escapeXml";
+
+export interface BetriebArt {
+  /** In diesem Element wird angegeben, ob es sich um einen Industriebetrieb handelt. */
+  industrie: boolean;
+  /** In diesem Element wird angegeben, ob es sich um einen Handwerksbetrieb handelt. */
+  handwerk: boolean;
+  /** In diesem Element wird angegeben, ob es sich um einen Handelsbetrieb handelt. */
+  handel: boolean;
+  /** In diesem Element wird angegeben, ob es sich um Betrieb sonstiger Art handelt. */
+  sonstiges: boolean;
+}
+
+export function createBetriebArt(betriebArt: BetriebArt) {
+  return `
+    <xga:betriebArt>
+      <xga:industrie>${xml(betriebArt.industrie)}</xga:industrie>
+      <xga:handwerk>${xml(betriebArt.handwerk)}</xga:handwerk>
+      <xga:handel>${xml(betriebArt.handel)}</xga:handel>
+      <xga:sonstiges>${xml(betriebArt.sonstiges)}</xga:sonstiges>
+    </xga:betriebArt>`;
+}

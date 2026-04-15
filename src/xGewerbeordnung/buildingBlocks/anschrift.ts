@@ -17,9 +17,7 @@ export interface Anschrift {
   ort: string;
 }
 
-export function createAnschrift(strassenanschriftInland: Anschrift | undefined) {
-  if (!strassenanschriftInland) return "";
-
+export function createAnschrift(strassenanschriftInland: Anschrift) {
   return `
     <bk:anschrift>
       <bk:strassenanschriftInland>

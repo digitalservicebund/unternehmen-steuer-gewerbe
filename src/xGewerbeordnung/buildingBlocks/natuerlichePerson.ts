@@ -62,7 +62,7 @@ export function createNatuerlichePerson(natuerlichePerson: NatuerlichePerson) {
       <np:staatsangehoerigkeit listVersionID="2020-05-11">
         <code>${xml(natuerlichePerson.staatsangehoerigkeit)}</code>
       </np:staatsangehoerigkeit>
-      ${createAnschrift(natuerlichePerson.anschrift)}
+      ${natuerlichePerson.anschrift ? createAnschrift(natuerlichePerson.anschrift) : ""}
       ${createKommunikation(natuerlichePerson.kommunikation)}
       ${createAufenthaltstitel(natuerlichePerson.aufenthaltstitel)}
     </xga:natuerlichePerson>`;
