@@ -16,7 +16,7 @@ export function addOpenApiEndpoints(app: HonoAppType): HonoAppType {
     },
   });
   // 2) Serve the Swagger UI
-  app.get("/ui", swaggerUI({ url: "/doc" }));
+  app.get("/api/v1/ui", swaggerUI({ url: "/api/v1/doc" }));
 
   return app;
 }
