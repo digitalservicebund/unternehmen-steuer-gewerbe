@@ -10,7 +10,7 @@ describe("XML validator", () => {
     );
     const result = await isValidXml(xml);
 
-    expect(result).to.equal(false);
+    expect(result.valid).to.equal(false);
   });
 
   it("should return true for valid XML", async () => {
@@ -20,6 +20,6 @@ describe("XML validator", () => {
     );
     const result = await isValidXml(xml);
 
-    expect(result).to.equal(true);
+    expect(result.valid).to.equal(true);
   });
 });

@@ -2,14 +2,14 @@ import { log } from "node:console";
 import fs from "node:fs/promises";
 import path from "node:path";
 
-import { validateXML } from "xmllint-wasm";
+import { validateXML, XMLValidationResult } from "xmllint-wasm";
 
-export async function isValidXml(xml: string): Promise<boolean> {
+export async function isValidXml(xml: string): Promise<XMLValidationResult> {
   const schemaDir = "./src/resources/xml/xsd/xgewerbeordnung-1.6";
 
-  // pre-loading all XSD files to be able to present to xmllint-wasm
+  // pre-loading all XSD "dependencies"
   const files = await fs.readdir(schemaDir);
-  const preload = await Promise.all(
+  const preloadedXsds = await Promise.all(
     files
       .filter((fileName) => fileName.endsWith(".xsd"))
       .map(async (fileName) => ({
@@ -17,24 +17,15 @@ export async function isValidXml(xml: string): Promise<boolean> {
         contents: await fs.readFile(path.join(schemaDir, fileName), "utf8"),
       })),
   );
+  // reading the main XSD
   const mainXsd = await fs.readFile(
     path.join(schemaDir, "xgewerbeordnung-gewerbeanzeige.xsd"),
     "utf8",
   );
 
-  const result = await validateXML({
+  return await validateXML({
     xml,
     schema: [mainXsd],
-    preload: preload,
+    preload: preloadedXsds,
   });
-
-  // result
-
-  if (result.valid) {
-    return true;
-  } else {
-    // TODO: decide what to do with errors
-    log(result.errors);
-    return false;
-  }
 }
