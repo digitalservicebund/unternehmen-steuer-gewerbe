@@ -1,4 +1,4 @@
-import { xml } from "../escapeXml";
+import { escapeXml } from "../escapeXml";
 
 export interface Handwerkskarte {
   /** Status der Handwerkskarte */
@@ -19,11 +19,11 @@ export function createHandwerkskarte(handwerkskarte: Handwerkskarte | undefined)
   return `
     <xga:handwerkskarte>
       <xga:status>
-        <code>${xml(handwerkskarte.status)}</code>
+        <code>${escapeXml(handwerkskarte.status)}</code>
       </xga:status>
-      ${handwerkskarte.ausgestelltAm ? `<xga:ausgestelltAm>${xml(handwerkskarte.ausgestelltAm)}</xga:ausgestelltAm>` : ""}
-      ${handwerkskarte.ausgestelltVonPLZ ? `<xga:ausgestelltVonPLZ>${xml(handwerkskarte.ausgestelltVonPLZ)}</xga:ausgestelltVonPLZ>` : ""}
-      ${handwerkskarte.ausgestelltVonOrt ? `<xga:ausgestelltVonOrt>${xml(handwerkskarte.ausgestelltVonOrt)}</xga:ausgestelltVonOrt>` : ""}
-      ${handwerkskarte.ausgestelltVonSchluessel ? `<xga:ausgestelltVonSchluessel listVersionID="5"><code>${xml(handwerkskarte.ausgestelltVonSchluessel)}</code></xga:ausgestelltVonSchluessel>` : ""}
+      ${handwerkskarte.ausgestelltAm ? `<xga:ausgestelltAm>${escapeXml(handwerkskarte.ausgestelltAm)}</xga:ausgestelltAm>` : ""}
+      ${handwerkskarte.ausgestelltVonPLZ ? `<xga:ausgestelltVonPLZ>${escapeXml(handwerkskarte.ausgestelltVonPLZ)}</xga:ausgestelltVonPLZ>` : ""}
+      ${handwerkskarte.ausgestelltVonOrt ? `<xga:ausgestelltVonOrt>${escapeXml(handwerkskarte.ausgestelltVonOrt)}</xga:ausgestelltVonOrt>` : ""}
+      ${handwerkskarte.ausgestelltVonSchluessel ? `<xga:ausgestelltVonSchluessel listVersionID="5"><code>${escapeXml(handwerkskarte.ausgestelltVonSchluessel)}</code></xga:ausgestelltVonSchluessel>` : ""}
     </xga:handwerkskarte>`;
 }

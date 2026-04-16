@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { XMLParser, XMLBuilder } from "fast-xml-parser";
-import { xGewerbeanmeldung0300, type Anmeldung } from "./xGewerbeanmeldung";
+import { createGewerbeanmeldung0300, type Gewerbeanmeldung } from "./gewerbeanmeldung";
 
 // Make sure that both XMLs are equally formatted
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
@@ -237,7 +237,7 @@ const xgewo_1_6_valid = `
   </xga:satz>
 </xga:alg.gewerbemeldung.0300>`;
 
-const anmeldung: Anmeldung = {
+const gewerbeanmeldung: Gewerbeanmeldung = {
   nachrichtenkopf: {
     nachrichtenUUID: "fb62d3b3-2a84-423a-bb0a-a767d32b6342",
     erstellungszeitpunkt: "2022-09-01T11:58:01.385+02:00",
@@ -363,13 +363,15 @@ const anmeldung: Anmeldung = {
   },
 };
 
-describe("xGewerbeanmeldung0300", () => {
+describe("createGewerbeanmeldung0300", () => {
   it("creates a valid xGewerbeordnung 1.6 xml", () => {
-    expect(normalizeXml(xGewerbeanmeldung0300(anmeldung))).toBe(normalizeXml(xgewo_1_6_valid));
+    expect(normalizeXml(createGewerbeanmeldung0300(gewerbeanmeldung))).toBe(
+      normalizeXml(xgewo_1_6_valid),
+    );
   });
 
   it("works without optional fields", () => {
-    const minimal: Anmeldung = {
+    const minimal: Gewerbeanmeldung = {
       nachrichtenkopf: {
         nachrichtenUUID: "00000000-0000-0000-0000-000000000001",
         erstellungszeitpunkt: "2024-01-01T10:00:00.000+01:00",
@@ -429,7 +431,7 @@ describe("xGewerbeanmeldung0300", () => {
         ],
       },
     };
-    const xml = xGewerbeanmeldung0300(minimal);
+    const xml = createGewerbeanmeldung0300(minimal);
     expect(xml).toContain("<xga:alg.gewerbemeldung.0300");
     expect(xml).not.toContain("<bk:kommunikation>");
     expect(xml).not.toContain("<xga:handwerkskarte>");
@@ -439,23 +441,23 @@ describe("xGewerbeanmeldung0300", () => {
   });
 
   it("escapes XML special characters in text fields", () => {
-    const withSpecials: Anmeldung = {
-      ...anmeldung,
-      autor: { ...anmeldung.autor, name: "Amt <Müller & Söhne>" },
+    const withSpecials: Gewerbeanmeldung = {
+      ...gewerbeanmeldung,
+      autor: { ...gewerbeanmeldung.autor, name: "Amt <Müller & Söhne>" },
       gewerbebetrieb: {
-        ...anmeldung.gewerbebetrieb,
+        ...gewerbeanmeldung.gewerbebetrieb,
         eingetragenerName: "Müller & Söhne GmbH",
         taetigkeitenGesamt: {
-          ...anmeldung.gewerbebetrieb.taetigkeitenGesamt,
+          ...gewerbeanmeldung.gewerbebetrieb.taetigkeitenGesamt,
           schwerpunkt: {
-            ...anmeldung.gewerbebetrieb.taetigkeitenGesamt.schwerpunkt,
+            ...gewerbeanmeldung.gewerbebetrieb.taetigkeitenGesamt.schwerpunkt,
             stichwort: "A > B & C < D",
           },
         },
       },
     };
 
-    const generatedXml = xGewerbeanmeldung0300(withSpecials);
+    const generatedXml = createGewerbeanmeldung0300(withSpecials);
 
     expect(() => parser.parse(generatedXml)).not.toThrow();
     const parsed = parser.parse(generatedXml);
@@ -476,22 +478,22 @@ describe("xGewerbeanmeldung0300", () => {
   });
 
   it("throws when the natuerlichePerson array is empty", () => {
-    const withoutPerson: Anmeldung = {
-      ...anmeldung,
+    const withoutPerson: Gewerbeanmeldung = {
+      ...gewerbeanmeldung,
       referenzierteSubjekte: { natuerlichePerson: [] },
     };
-    expect(() => xGewerbeanmeldung0300(withoutPerson)).toThrow(/natuerlichePerson\[0\]/);
+    expect(() => createGewerbeanmeldung0300(withoutPerson)).toThrow(/natuerlichePerson\[0\]/);
   });
 
   it("includes housenumber range and suffix in the business address", () => {
-    const withRange: Anmeldung = {
-      ...anmeldung,
+    const withRange: Gewerbeanmeldung = {
+      ...gewerbeanmeldung,
       gewerbebetrieb: {
-        ...anmeldung.gewerbebetrieb,
+        ...gewerbeanmeldung.gewerbebetrieb,
         betriebsstaette: {
-          ...anmeldung.gewerbebetrieb.betriebsstaette,
+          ...gewerbeanmeldung.gewerbebetrieb.betriebsstaette,
           anschrift: {
-            ...anmeldung.gewerbebetrieb.betriebsstaette.anschrift,
+            ...gewerbeanmeldung.gewerbebetrieb.betriebsstaette.anschrift,
             hausnummerVon: "90",
             hausnummerBis: "94",
             hausnummernzusatz: "a",
@@ -500,7 +502,7 @@ describe("xGewerbeanmeldung0300", () => {
       },
     };
 
-    const parsed = parser.parse(xGewerbeanmeldung0300(withRange));
+    const parsed = parser.parse(createGewerbeanmeldung0300(withRange));
     const anschrift =
       parsed["xga:alg.gewerbemeldung.0300"]["xga:satz"]["xga:anmeldung"]["xga:gewerbebetrieb"][
         "xga:betriebsstaette"
@@ -511,12 +513,12 @@ describe("xGewerbeanmeldung0300", () => {
   });
 
   it("includes fax, email and website even when phone is missing", () => {
-    const withoutPhone: Anmeldung = {
-      ...anmeldung,
+    const withoutPhone: Gewerbeanmeldung = {
+      ...gewerbeanmeldung,
       gewerbebetrieb: {
-        ...anmeldung.gewerbebetrieb,
+        ...gewerbeanmeldung.gewerbebetrieb,
         betriebsstaette: {
-          ...anmeldung.gewerbebetrieb.betriebsstaette,
+          ...gewerbeanmeldung.gewerbebetrieb.betriebsstaette,
           kommunikation: {
             telefax: "+49 234 555000",
             email: "kontakt@example.de",
@@ -526,7 +528,7 @@ describe("xGewerbeanmeldung0300", () => {
       },
     };
 
-    const generatedXml = xGewerbeanmeldung0300(withoutPhone);
+    const generatedXml = createGewerbeanmeldung0300(withoutPhone);
     const parsed = parser.parse(generatedXml);
     const kommunikation =
       parsed["xga:alg.gewerbemeldung.0300"]["xga:satz"]["xga:anmeldung"]["xga:gewerbebetrieb"][
@@ -539,9 +541,9 @@ describe("xGewerbeanmeldung0300", () => {
   });
 
   it("creates every natuerlichePerson entry when the array contains multiple", () => {
-    const firstPerson = anmeldung.referenzierteSubjekte.natuerlichePerson[0]!;
-    const multiPerson: Anmeldung = {
-      ...anmeldung,
+    const firstPerson = gewerbeanmeldung.referenzierteSubjekte.natuerlichePerson[0]!;
+    const multiPerson: Gewerbeanmeldung = {
+      ...gewerbeanmeldung,
       referenzierteSubjekte: {
         natuerlichePerson: [
           firstPerson,
@@ -554,7 +556,7 @@ describe("xGewerbeanmeldung0300", () => {
       },
     };
 
-    const parsed = parser.parse(xGewerbeanmeldung0300(multiPerson));
+    const parsed = parser.parse(createGewerbeanmeldung0300(multiPerson));
     const personen =
       parsed["xga:alg.gewerbemeldung.0300"]["xga:satz"]["xga:anmeldung"][
         "xga:referenzierteSubjekte"

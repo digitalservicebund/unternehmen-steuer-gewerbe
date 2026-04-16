@@ -1,9 +1,9 @@
-import { xml } from "../escapeXml";
+import { escapeXml } from "../escapeXml";
 
 export function createWirtschaftszweig(wirtschaftszweigschluessel: string) {
   return `
     <wt:wirtschaftszweig>
-      <wt:wirtschaftszweigschluessel>${xml(wirtschaftszweigschluessel)}</wt:wirtschaftszweigschluessel>
+      <wt:wirtschaftszweigschluessel>${escapeXml(wirtschaftszweigschluessel)}</wt:wirtschaftszweigschluessel>
       <wt:versionWirtschaftszweigklassifikation listVersionID="1">
         <code>WZ-2008</code>
       </wt:versionWirtschaftszweigklassifikation>

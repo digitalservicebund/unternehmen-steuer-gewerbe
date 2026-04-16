@@ -1,4 +1,4 @@
-import { xml } from "../escapeXml";
+import { escapeXml } from "../escapeXml";
 import { createAnschrift, type Anschrift } from "./anschrift";
 import { createKommunikation, type Kommunikation } from "./kommunikation";
 
@@ -15,7 +15,7 @@ export function createBetriebsstaette(betriebsstaette: Betriebsstaette) {
   return `
     <xga:betriebsstaette>
       <wt:artBetriebsstaette listVersionID="1">
-        <code>${xml(betriebsstaette.artBetriebsstaette)}</code>
+        <code>${escapeXml(betriebsstaette.artBetriebsstaette)}</code>
       </wt:artBetriebsstaette>
       ${createAnschrift(betriebsstaette.anschrift)}
       ${createKommunikation(betriebsstaette.kommunikation)}

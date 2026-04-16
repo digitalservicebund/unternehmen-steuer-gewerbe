@@ -1,4 +1,4 @@
-import { xml } from "../escapeXml";
+import { escapeXml } from "../escapeXml";
 import { createBehoerde, type Behoerde } from "./behoerde";
 
 export interface Nachrichtenkopf {
@@ -14,13 +14,13 @@ export function createG2gNachrichtenkopf(nachrichtenkopf: Nachrichtenkopf) {
     <bn-g2g:nachrichtenkopf.g2g>
       <bn-g2g:identifikation.nachricht>
         <bn-g2g:nachrichtenUUID>
-          ${xml(nachrichtenkopf.nachrichtenUUID)}
+          ${escapeXml(nachrichtenkopf.nachrichtenUUID)}
         </bn-g2g:nachrichtenUUID>
         <bn-g2g:nachrichtentyp listURI="urn:xoev-de:xgewerbeordnung:codeliste:nachrichtentypen" listVersionID="1.6">
           <code>0300</code>
         </bn-g2g:nachrichtentyp>
         <bn-g2g:erstellungszeitpunkt>
-          ${xml(nachrichtenkopf.erstellungszeitpunkt)}
+          ${escapeXml(nachrichtenkopf.erstellungszeitpunkt)}
         </bn-g2g:erstellungszeitpunkt>
       </bn-g2g:identifikation.nachricht>
       <bn-g2g:leser>

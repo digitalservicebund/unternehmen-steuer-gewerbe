@@ -1,4 +1,4 @@
-import { xml } from "../escapeXml";
+import { escapeXml } from "../escapeXml";
 
 export interface Aufenthaltstitel {
   /** Angabe des Status des Aufenthaltstitels */
@@ -19,11 +19,11 @@ export function createAufenthaltstitel(aufenthaltstitel: Aufenthaltstitel | unde
   return `
     <xga:aufenthaltstitel>
       <xga:status>
-        <code>${xml(aufenthaltstitel.status)}</code>
+        <code>${escapeXml(aufenthaltstitel.status)}</code>
       </xga:status>
-      ${aufenthaltstitel.ausgestelltAm ? `<xga:ausgestelltAm>${xml(aufenthaltstitel.ausgestelltAm)}</xga:ausgestelltAm>` : ""}
-      ${aufenthaltstitel.ausgestelltVonName ? `<xga:ausgestelltVonName>${xml(aufenthaltstitel.ausgestelltVonName)}</xga:ausgestelltVonName>` : ""}
-      ${aufenthaltstitel.ausgestelltVonPLZ ? `<xga:ausgestelltVonPLZ>${xml(aufenthaltstitel.ausgestelltVonPLZ)}</xga:ausgestelltVonPLZ>` : ""}
-      ${aufenthaltstitel.ausgestelltVonOrt ? `<xga:ausgestelltVonOrt>${xml(aufenthaltstitel.ausgestelltVonOrt)}</xga:ausgestelltVonOrt>` : ""}
+      ${aufenthaltstitel.ausgestelltAm ? `<xga:ausgestelltAm>${escapeXml(aufenthaltstitel.ausgestelltAm)}</xga:ausgestelltAm>` : ""}
+      ${aufenthaltstitel.ausgestelltVonName ? `<xga:ausgestelltVonName>${escapeXml(aufenthaltstitel.ausgestelltVonName)}</xga:ausgestelltVonName>` : ""}
+      ${aufenthaltstitel.ausgestelltVonPLZ ? `<xga:ausgestelltVonPLZ>${escapeXml(aufenthaltstitel.ausgestelltVonPLZ)}</xga:ausgestelltVonPLZ>` : ""}
+      ${aufenthaltstitel.ausgestelltVonOrt ? `<xga:ausgestelltVonOrt>${escapeXml(aufenthaltstitel.ausgestelltVonOrt)}</xga:ausgestelltVonOrt>` : ""}
     </xga:aufenthaltstitel>`;
 }

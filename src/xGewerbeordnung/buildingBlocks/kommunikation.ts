@@ -1,4 +1,4 @@
-import { xml } from "../escapeXml";
+import { escapeXml } from "../escapeXml";
 
 export interface Kommunikation {
   /** Telefonnummer, strukturiert gemäß ITU E.123. Beispiel: "+49 421 1234567", "+49 421 123 4567". */
@@ -16,9 +16,9 @@ export function createKommunikation(kommunikation: Kommunikation | undefined) {
 
   return `
     <bk:kommunikation>
-      ${kommunikation.telefon ? `<komm:telefon>${xml(kommunikation.telefon)}</komm:telefon>` : ""}
-      ${kommunikation.telefax ? `<komm:telefax>${xml(kommunikation.telefax)}</komm:telefax>` : ""}
-      ${kommunikation.email ? `<komm:email>${xml(kommunikation.email)}</komm:email>` : ""}
-      ${kommunikation.webseite ? `<komm:webseite>${xml(kommunikation.webseite)}</komm:webseite>` : ""}
+      ${kommunikation.telefon ? `<komm:telefon>${escapeXml(kommunikation.telefon)}</komm:telefon>` : ""}
+      ${kommunikation.telefax ? `<komm:telefax>${escapeXml(kommunikation.telefax)}</komm:telefax>` : ""}
+      ${kommunikation.email ? `<komm:email>${escapeXml(kommunikation.email)}</komm:email>` : ""}
+      ${kommunikation.webseite ? `<komm:webseite>${escapeXml(kommunikation.webseite)}</komm:webseite>` : ""}
     </bk:kommunikation>`;
 }

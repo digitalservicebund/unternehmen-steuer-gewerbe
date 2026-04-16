@@ -9,9 +9,9 @@ import {
   createReferenzierteSubjekte,
   type ReferenzierteSubjekte,
 } from "./buildingBlocks/referenzierteSubjekte";
-import { xml } from "./escapeXml";
+import { escapeXml } from "./escapeXml";
 
-export interface Anmeldung {
+export interface Gewerbeanmeldung {
   nachrichtenkopf: Nachrichtenkopf;
   /** Die die Gewerbeanzeige entgegennehmende Behörde. */
   autor: Behoerde;
@@ -70,38 +70,38 @@ const ROOT_ATTRIBUTES = `
   version="1.6"
   test="100"`;
 
-export const xGewerbeanmeldung0300 = (anmeldung: Anmeldung) => {
-  const natuerlichePerson0 = anmeldung.referenzierteSubjekte.natuerlichePerson[0];
+export function createGewerbeanmeldung0300(gewerbeanmeldung: Gewerbeanmeldung) {
+  const natuerlichePerson0 = gewerbeanmeldung.referenzierteSubjekte.natuerlichePerson[0];
 
   if (!natuerlichePerson0) {
     throw new Error(
-      "Required field anmeldung.referenzierteSubjekte.natuerlichePerson[0] is missing",
+      "Required field gewerbeanmeldung.referenzierteSubjekte.natuerlichePerson[0] is missing",
     );
   }
 
   return `<?xml version="1.0" encoding="UTF-8"?>
     <xga:alg.gewerbemeldung.0300 ${ROOT_ATTRIBUTES}>
-      ${createG2gNachrichtenkopf(anmeldung.nachrichtenkopf)}
+      ${createG2gNachrichtenkopf(gewerbeanmeldung.nachrichtenkopf)}
       <xga:satz>
         <xga:anmeldung>
             <xga:autor>
-              ${createBehoerde(anmeldung.autor)}
+              ${createBehoerde(gewerbeanmeldung.autor)}
             </xga:autor>
-            <xga:satzErstellung>${xml(anmeldung.satzErstellung)}</xga:satzErstellung>
-            <xga:ereigniszeitpunkt>${xml(anmeldung.ereigniszeitpunkt)}</xga:ereigniszeitpunkt>
-            <xga:istStorno>${xml(anmeldung.istStorno)}</xga:istStorno>
+            <xga:satzErstellung>${escapeXml(gewerbeanmeldung.satzErstellung)}</xga:satzErstellung>
+            <xga:ereigniszeitpunkt>${escapeXml(gewerbeanmeldung.ereigniszeitpunkt)}</xga:ereigniszeitpunkt>
+            <xga:istStorno>${escapeXml(gewerbeanmeldung.istStorno)}</xga:istStorno>
             <xga:gemeindeSchluessel listVersionID="2020-03-31">
-              <code>${xml(anmeldung.gemeindeSchluessel)}</code>
+              <code>${escapeXml(gewerbeanmeldung.gemeindeSchluessel)}</code>
             </xga:gemeindeSchluessel>
-            <xga:uuid>${xml(anmeldung.uuid)}</xga:uuid>
-            <xga:gueltigAb>${xml(anmeldung.gueltigAb)}</xga:gueltigAb>
-            <xga:datumMeldung>${xml(anmeldung.datumMeldung)}</xga:datumMeldung>
-            ${createGewerbebetrieb(anmeldung.gewerbebetrieb, natuerlichePerson0.id)}
-            ${createReferenzierteSubjekte(anmeldung.referenzierteSubjekte)}
+            <xga:uuid>${escapeXml(gewerbeanmeldung.uuid)}</xga:uuid>
+            <xga:gueltigAb>${escapeXml(gewerbeanmeldung.gueltigAb)}</xga:gueltigAb>
+            <xga:datumMeldung>${escapeXml(gewerbeanmeldung.datumMeldung)}</xga:datumMeldung>
+            ${createGewerbebetrieb(gewerbeanmeldung.gewerbebetrieb, natuerlichePerson0.id)}
+            ${createReferenzierteSubjekte(gewerbeanmeldung.referenzierteSubjekte)}
             <xga:grundAnmeldungSchluessel>
-              <code>${xml(anmeldung.grundAnmeldungSchluessel)}</code>
+              <code>${escapeXml(gewerbeanmeldung.grundAnmeldungSchluessel)}</code>
             </xga:grundAnmeldungSchluessel>
         </xga:anmeldung>
       </xga:satz>
     </xga:alg.gewerbemeldung.0300>`;
-};
+}

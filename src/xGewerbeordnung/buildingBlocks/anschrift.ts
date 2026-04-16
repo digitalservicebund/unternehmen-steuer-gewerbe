@@ -1,4 +1,4 @@
-import { xml } from "../escapeXml";
+import { escapeXml } from "../escapeXml";
 
 export interface Anschrift {
   /** Falls die Anschrift unbekannt ist (z. B. bei Abmeldung von Amts wegen), so ist hier der Wert "unbekannt" zu übermitteln. */
@@ -21,13 +21,13 @@ export function createAnschrift(strassenanschriftInland: Anschrift) {
   return `
     <bk:anschrift>
       <bk:strassenanschriftInland>
-        <adr:strasse>${xml(strassenanschriftInland.strasse)}</adr:strasse>
-        ${strassenanschriftInland.strassenschluessel ? `<bk:strassenschluessel>${xml(strassenanschriftInland.strassenschluessel)}</bk:strassenschluessel>` : ""}
-        <bk:hausnummerVon>${xml(strassenanschriftInland.hausnummerVon)}</bk:hausnummerVon>
-        ${strassenanschriftInland.hausnummerBis ? `<bk:hausnummerBis>${xml(strassenanschriftInland.hausnummerBis)}</bk:hausnummerBis>` : ""}
-        ${strassenanschriftInland.hausnummernzusatz ? `<bk:hausnummernzusatz>${xml(strassenanschriftInland.hausnummernzusatz)}</bk:hausnummernzusatz>` : ""}
-        <adr:postleitzahl>${xml(strassenanschriftInland.postleitzahl)}</adr:postleitzahl>
-        <adr:ort>${xml(strassenanschriftInland.ort)}</adr:ort>
+        <adr:strasse>${escapeXml(strassenanschriftInland.strasse)}</adr:strasse>
+        ${strassenanschriftInland.strassenschluessel ? `<bk:strassenschluessel>${escapeXml(strassenanschriftInland.strassenschluessel)}</bk:strassenschluessel>` : ""}
+        <bk:hausnummerVon>${escapeXml(strassenanschriftInland.hausnummerVon)}</bk:hausnummerVon>
+        ${strassenanschriftInland.hausnummerBis ? `<bk:hausnummerBis>${escapeXml(strassenanschriftInland.hausnummerBis)}</bk:hausnummerBis>` : ""}
+        ${strassenanschriftInland.hausnummernzusatz ? `<bk:hausnummernzusatz>${escapeXml(strassenanschriftInland.hausnummernzusatz)}</bk:hausnummernzusatz>` : ""}
+        <adr:postleitzahl>${escapeXml(strassenanschriftInland.postleitzahl)}</adr:postleitzahl>
+        <adr:ort>${escapeXml(strassenanschriftInland.ort)}</adr:ort>
       </bk:strassenanschriftInland>
     </bk:anschrift>`;
 }

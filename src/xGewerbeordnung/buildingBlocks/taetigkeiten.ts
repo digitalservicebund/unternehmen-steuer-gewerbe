@@ -1,4 +1,4 @@
-import { xml } from "../escapeXml";
+import { escapeXml } from "../escapeXml";
 import { createWirtschaftszweig } from "./wirtschaftszweig";
 
 export interface Taetigkeit {
@@ -36,9 +36,9 @@ export interface TaetigkeitenGesamt {
 function createTaetigkeitEinzeln(taetigkeitEinzeln: TaetigkeitEinzeln) {
   return `
     <xga:taetigkeit>
-      <xga:taetigkeitEinzeln>${xml(taetigkeitEinzeln.taetigkeitEinzeln)}</xga:taetigkeitEinzeln>
+      <xga:taetigkeitEinzeln>${escapeXml(taetigkeitEinzeln.taetigkeitEinzeln)}</xga:taetigkeitEinzeln>
       ${createWirtschaftszweig(taetigkeitEinzeln.wirtschaftszweigschluessel)}
-      <xga:stichwort>${xml(taetigkeitEinzeln.stichwort)}</xga:stichwort>
+      <xga:stichwort>${escapeXml(taetigkeitEinzeln.stichwort)}</xga:stichwort>
     </xga:taetigkeit>`;
 }
 
@@ -47,7 +47,7 @@ function createWeitereTaetigkeiten(weitereTaetigkeiten: WeitereTaetigkeiten | un
 
   return `
     <xga:weitereTaetigkeiten>
-      <xga:taetigkeitenZusammengefasst>${xml(weitereTaetigkeiten.taetigkeitenZusammengefasst)}</xga:taetigkeitenZusammengefasst>
+      <xga:taetigkeitenZusammengefasst>${escapeXml(weitereTaetigkeiten.taetigkeitenZusammengefasst)}</xga:taetigkeitenZusammengefasst>
       ${weitereTaetigkeiten.taetigkeit.map(createTaetigkeitEinzeln).join("\n")}
     </xga:weitereTaetigkeiten>`;
 }
@@ -57,9 +57,9 @@ export function createTaetigkeiten(taetigkeitenGesamt: TaetigkeitenGesamt) {
   return `
     <xga:taetigkeitenGesamt>
       <xga:schwerpunkt>
-        <xga:taetigkeitSchwerpunkt>${xml(schwerpunkt.taetigkeitSchwerpunkt)}</xga:taetigkeitSchwerpunkt>
+        <xga:taetigkeitSchwerpunkt>${escapeXml(schwerpunkt.taetigkeitSchwerpunkt)}</xga:taetigkeitSchwerpunkt>
         ${createWirtschaftszweig(schwerpunkt.wirtschaftszweigschluessel)}
-        <xga:stichwort>${xml(schwerpunkt.stichwort)}</xga:stichwort>
+        <xga:stichwort>${escapeXml(schwerpunkt.stichwort)}</xga:stichwort>
       </xga:schwerpunkt>
       ${createWeitereTaetigkeiten(weitereTaetigkeiten)}
     </xga:taetigkeitenGesamt>`;
