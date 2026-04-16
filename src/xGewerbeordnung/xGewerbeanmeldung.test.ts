@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { XMLParser, XMLBuilder } from "fast-xml-parser";
-import { xGewerbeanmeldung0300, type Anmeldung } from "./gewerbeanmeldung";
+import { xGewerbeanmeldung0300, type Anmeldung } from "./xGewerbeanmeldung";
 
 // Make sure that both XMLs are equally formatted
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
