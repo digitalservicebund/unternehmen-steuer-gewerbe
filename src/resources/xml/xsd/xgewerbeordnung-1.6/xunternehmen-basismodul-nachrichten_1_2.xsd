@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:nachr="urn:xoev-de:xunternehmen:standard:basismodul:nachrichtenstruktur_1.2"
+           xmlns:bdt="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.2"
+           xmlns:jp="urn:xoev-de:xunternehmen:standard:basismodul:juristischeperson_1.2"
+           xmlns:np="urn:xoev-de:xunternehmen:standard:basismodul:natuerlicheperson_1.2"
+           xmlns:rpg="urn:xoev-de:xunternehmen:standard:basismodul:rechtsfaehigepersonengesellschaft_1.2"
+           xmlns:spv="urn:xoev-de:xunternehmen:standard:basismodul:sonstigepersonenvereinigung_1.2"
+           xmlns:wt="urn:xoev-de:xunternehmen:standard:basismodul:wirtschaftlichetaetigkeit_1.2"
+           targetNamespace="urn:xoev-de:xunternehmen:standard:basismodul:nachrichtenstruktur_1.2"
+           version="1.2"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XUnternehmen.Basismodul</nameLang>
+            <nameKurz>XUnternehmen.Basismodul</nameKurz>
+            <nameTechnisch>basismodul</nameTechnisch>
+            <kennung>urn:xoev-de:xunternehmen:standard:basismodul</kennung>
+            <beschreibung>Basismodul des Standards XUnternehmen.</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>1.2</version>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVHandbuch>2.5</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP 2</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:import schemaLocation="xunternehmen-basismodul-basisdatentypen_1_2.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.2"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-juristischeperson_1_2.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:juristischeperson_1.2"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-natuerlicheperson_1_2.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:natuerlicheperson_1.2"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-rechtsfaehigepersonengesellschaft_1_2.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:rechtsfaehigepersonengesellschaft_1.2"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-sonstigepersonenvereinigung_1_2.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:sonstigepersonenvereinigung_1.2"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-wirtschaftlichetaetigkeit_1_2.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:wirtschaftlichetaetigkeit_1.2"/>
+   <xs:complexType name="NachweisdokumentRef">
+      <xs:annotation>
+         <xs:documentation>Dieser Typ enthält einen Verweis auf ein Nachweisdokument.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="dokumentid" type="bdt:String.DIN91379.C">
+            <xs:annotation>
+               <xs:documentation>Verweis auf eine Dokumenten-ID, welche in nachr:nachweisdokument.upload oder nachr:nachweisdokument.onlinedienst vorhanden sein muss.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="NachweisdokumentType">
+      <xs:annotation>
+         <xs:documentation>Metainformationen zu einem zugehörigen Nachweisdokument in Dateiform.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="dokumentid" type="bdt:String.DIN91379.C">
+            <xs:annotation>
+               <xs:documentation>Innerhalb des Transport-Kontextes eindeutige Kennung des Dokuments (z. B. als Verweis auf einen separaten Content in einem OSCI-Container).</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="dateiname" type="bdt:String.DIN91379.C">
+            <xs:annotation>
+               <xs:documentation>Der Dateiname des Dokuments.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="mimetype" type="bdt:String.DIN91379.C">
+            <xs:annotation>
+               <xs:documentation>Der Mime-Type des Dokuments.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="kategorie" type="bdt:String.DIN91379.C">
+            <xs:annotation>
+               <xs:documentation>Die Kategorie des Dokuments. Beispiel: "Antrag im Original".</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:element name="nachweisdokument.onlinedienst" type="nachr:NachweisdokumentType">
+      <xs:annotation>
+         <xs:documentation>Vom Online-Dienst selbst erstellte Nachweisdokumente zur Ablage in der Akte der fachlich zuständigen Stelle. Beispiel: Die Willenserklärung eines oder der Antragstellenden "im Original".</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="nachweisdokument.upload" type="nachr:NachweisdokumentType">
+      <xs:annotation>
+         <xs:documentation>Vom Anwender hochgeladene Nachweisdokumente (hochgeladene Fotos, Scans, etc.).</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="referenzen">
+      <xs:annotation>
+         <xs:documentation>Container für innerhalb eines fachlichen Kontextes über ihre ID referenzierte Instanzen der Kerndatenobjekte Natürliche Person , Juristische Person , Rechtsfähige Personengesellschaft und/oder Sonstige Personenvereinigung .</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="np:natuerlichePerson" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Dieses Datenobjekt umfasst die allgemeinen Angaben zu einer natürlichen Person (Mensch), welche im fachlichen Kontext (Antrag eines wirtschaftlich Tätigen, Anzeige eines wirtschaftlich Tätigen, ...) in mindestens einer und gegebenenfalls mehreren Rollen auftritt. Der (Stamm-) Datenkranz zur natürlichen Person entspricht der Strukturierung des § 3 Abs. 1 BMG Konkret: Gemäß § 3 Abs. 1 Nrn. 1, 3, 4, 6, 7, 10 und 12 BMG für die Einwohnermelderegister, des § 139b Abs. 3 AO Konkret: § 139b AO Abs. 3 Nrn. 3, 5, 6, 8, 9 und 10 für die Steueridentifikationsnummer, des § 8 Abs. 1 Nr. 1 OZG Konkret: § 8 OZG Abs. 1 Nr. 1 Buchstaben a, b, c, d, e, f, g, h und i .</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="jp:juristischePerson" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Dieses Kerndatenobjekt umfasst die allgemeinen Angaben zu einer juristischen Person des privaten oder öffentlichen Rechts. Unter juristischen Personen werden sowohl die Körperschaften des Privatrechts (Gesellschaft mit beschränkter Haftung, Aktiengesellschaft, Kommanditgesellschaft auf Aktien, eingetragener Verein, Genossenschaft) als auch öffentlich-rechtliche Körperschaften (Gebietskörperschaften, Selbstverwaltungskörperschaften, sonstige Körperschaften des öffentlichen Rechts) erfasst. Die konkrete Rechtsform der juristischen Person kann mittels einer Codeliste angegeben werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="rpg:rechtsfaehigePersonengesellschaft"
+                        minOccurs="0"
+                        maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Dieses Kerndatenobjekt umfasst die allgemeinen Angaben zu einer rechtsfähigen Personengesellschaft. Die rechtsfähige Personengesellschaft in diesem Sinne umfasst sowohl die rechtsfähige Gesellschaft des Bürgerlichen Rechts (GbR), als auch Personenhandelsgesellschaften wie die Offene Handelsgesellschaft (oHG), die Kommanditgesellschaft (KG) und die Kapitalgesellschaft ampamp; Co. KG oder die Partnergesellschaft (für freie Berufe). Entsprechend sind rechtsfähige Personengesellschaften nach ausländischem und supranationalem Recht zu berücksichtigen. Die konkrete Rechtsform der rechtsfähigen Personengesellschaft kann mittels einer Codeliste angegeben werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="spv:sonstigePersonenvereinigung"
+                        minOccurs="0"
+                        maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Das Kerndatenobjekt umfasst die allgemeinen Angaben zu einer sonstigen Personenvereinigung. Unter diesem Kerndatenobjekt werden alle Personenvereinigungen gefasst, die weder unter juristische Personen noch unter rechtsfähige Personengesellschaften fallen. Die sonstigen Personenvereinigungen (z. B. die Erbengemeinschaft) werden in der Regel nicht wirtschaftlich tätig. Die konkrete Rechtsform der sonstigen Personenvereinigung kann mittels einer Codeliste angegeben werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="spezifischeInformation">
+      <xs:annotation>
+         <xs:documentation>In diesem Element kann ergänzend zu den Elementen der jeweiligen Nachricht eine spezifische ergänzende Information übermittelt werden, die in der aktuellen Version des Fachmoduls (noch) nicht vorgesehen ist. Die Verwendung dieses Elements ist nur aufgrund einer Handlungsanweisung oder nach einer bilateralen Abstimmung zwischen Online-Dienst und zuständiger Stelle zulässig.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="begriff" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Die Bezeichnung der Information ("Key").</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="inhalt" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Die Information selbst ("Value").</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="stammdaten">
+      <xs:annotation>
+         <xs:documentation>Container für ein oder mehrere wirtschaftliche Tätigkeiten eines oder mehrerer wirtschaftlich Tätiger.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="wt:wirtschaftlicheTaetigkeit"
+                        minOccurs="0"
+                        maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Das Kerndatenobjekt Wirtschaftliche Tätigkeit umfasst in generischer Weise eine planmäßige, für eine gewisse Dauer bestimmte, selbstständige wirtschaftliche Tätigkeit eines wirtschaftlich Tätigen. Im Sinne des Kerndatenmodells ist dieses Kerndatenobjekt nicht auf eine gewerbliche Tätigkeit beschränkt. Auch eine freiberufliche Tätigkeit einer natürlichen Person oder Partnergesellschaft sowie Betriebe der Urproduktion fallen darunter. Das Kerndatenobjekt generalisiert in sehr weitgehender und nicht abschließender Weise die Begriffe Unternehmen, Betrieb, Betriebstätte und Gewerbe in ihren vielfältigen fachlichen Bedeutungen und Ausprägungen und ist insofern im Allgemeinen nicht ohne weiteres interoperabel zwischen verschiedenen fachlichen Kontexten, da jeweils unterschiedlich abgrenzt wird, was als (eine) wirtschaftliche Tätigkeit zu fassen ist. Trotz der aus semantischer Sicht offenen Definition definiert dieses Kerndatenobjekt einen Nukleus einheitlicher Eigenschaften, die übergreifend anwendbar sind. Diese umfassen insbesondere den wirtschaftlich Tätigen, die ausgeübte Tätigkeit (Benennung, WZ-Schlüssel), die Geschäftsbezeichnung bzw. den vom Rechtsträger abweichenden Namen (z. B. bei Einzelunternehmen und Zweigniederlassungen), und ggf. die Betriebsstätte(n), an welchen die wirtschaftliche Tätigkeit ausgeübt wird.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="nachr:referenzen">
+               <xs:annotation>
+                  <xs:documentation>Container für innerhalb eines fachlichen Kontextes über ihre ID referenzierte Instanzen der Kerndatenobjekte Natürliche Person , Juristische Person , Rechtsfähige Personengesellschaft und/oder Sonstige Personenvereinigung .</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+</xs:schema>
