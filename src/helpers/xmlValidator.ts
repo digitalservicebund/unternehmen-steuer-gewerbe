@@ -1,3 +1,3 @@
-export function isValidXml(xml: string) {
-  return;
+export function isValidXml(xml: string): boolean {
+  return false;
 }
