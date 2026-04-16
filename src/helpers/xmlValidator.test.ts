@@ -3,22 +3,22 @@ import { describe, expect, it } from "vitest";
 import { isValidXml } from "./xmlValidator";
 
 describe("XML validator", () => {
-  it("should return false for invalid XML", () => {
+  it("should return false for invalid XML", async () => {
     const xml = fs.readFileSync(
       "src/resources/xml/xml-samples/xgewerbeordnung-1.6-validator/xgewo-1.6-invalid.xml",
       "utf8",
     );
-    const result = isValidXml(xml);
+    const result = await isValidXml(xml);
 
     expect(result).to.equal(false);
   });
 
-  it("should return true for valid XML", () => {
+  it("should return true for valid XML", async () => {
     const xml = fs.readFileSync(
       "src/resources/xml/xml-samples/xgewerbeordnung-1.6-validator/xgewo-1.6-valid.xml",
       "utf8",
     );
-    const result = isValidXml(xml);
+    const result = await isValidXml(xml);
 
     expect(result).to.equal(true);
   });
