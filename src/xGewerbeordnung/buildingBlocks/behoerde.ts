@@ -1,0 +1,17 @@
+import { escapeXml } from "../escapeXml";
+
+export interface Behoerde {
+  /** Dieses Element enthält die eindeutige Kennzeichnung der Behörde / öffentlichen Stelle innerhalb des angegebenen Verzeichnisdienstes. Die Behördenkennung des Autors muss das Präfix MELDID oder xga haben. */
+  kennung: string;
+  /** Dieses Element enthält den Namen der Behörde / öffentlichen Stelle. */
+  name: string;
+}
+
+export function createBehoerde(behoerde: Behoerde) {
+  return `
+    <bn-beh:verzeichnisdienst listVersionID="1">
+      <code>DVDV</code>
+    </bn-beh:verzeichnisdienst>
+    <bn-beh:kennung>${escapeXml(behoerde.kennung)}</bn-beh:kennung>
+    <bn-beh:name>${escapeXml(behoerde.name)}</bn-beh:name>`;
+}
