@@ -4,7 +4,7 @@ import { HonoAppType } from "../../app";
 export function addOpenApiEndpoints(app: HonoAppType): HonoAppType {
   // OpenAPI Documentation
   // 1) Serve the JSON file
-  app.doc("/api/v1/doc", {
+  app.doc("/doc", {
     openapi: "3.0.0",
     info: {
       version: "1.0.0",
@@ -16,7 +16,7 @@ export function addOpenApiEndpoints(app: HonoAppType): HonoAppType {
     },
   });
   // 2) Serve the Swagger UI
-  app.get("/api/v1/ui", swaggerUI({ url: "/api/v1/doc" }));
+  app.get("/ui", swaggerUI({ url: "/doc" }));
 
   return app;
 }

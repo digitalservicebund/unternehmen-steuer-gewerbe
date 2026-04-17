@@ -16,7 +16,7 @@ const PersönlicheDatenSchema = z.object({
   geburtsdatum: z.iso.date(),
   geburtsort: z.string(),
   geburtsland: z.string(),
-  staatsangehoerigkeitDeutsch: z.boolean(),
+  staatsangehörigkeitDeutsch: z.literal(true),
   adresse: AdresseSchema,
   telefon: z.string(),
   email: z.string(),
@@ -25,7 +25,9 @@ const PersönlicheDatenSchema = z.object({
 const UnternehmensDatenSchema = z.object({
   adresseAbweichend: AdresseSchema.optional(),
   tätigkeitsbeschreibung: z.string(),
-  artDesUnternehmens: z.string(),
+  tätigkeitsbereich: z.string(),
+  tätigkeitsbeginn: z.iso.date(),
+  gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]),
 });
 
 const RegisterGewerbeRequestSchema = z
