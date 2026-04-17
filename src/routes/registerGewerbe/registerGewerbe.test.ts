@@ -1,12 +1,17 @@
-import { describe, test, expect, vi } from "vitest";
+import { describe, test, expect, vi, afterEach } from "vitest";
 import app from "../../app";
 
 describe("Route /api/v1/register-gewerbe", () => {
+  afterEach(() => vi.restoreAllMocks());
+
   const requestData = {
     persönlicheDaten: {
       vorname: "Erika",
       nachname: "Mustermann",
-      geburtsdatum: "1985-08-12",
+      geburtsdatum: "1988-09-10",
+      geburtsort: "Musterstadt",
+      geburtsland: "Deutschland",
+      staatsangehoerigkeitDeutsch: true,
       adresse: {
         strasseUndHausnummer: "Musterstraße 1",
         postleitzahl: "12345",
@@ -29,6 +34,7 @@ describe("Route /api/v1/register-gewerbe", () => {
   test("Returns 200 OK and JSON with success=true and non-empty submissionId on POST", async () => {
     const response = await app.request("/api/v1/register-gewerbe", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(requestData),
     });
     const json = await response.json();
@@ -43,12 +49,12 @@ describe("Route /api/v1/register-gewerbe", () => {
     const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(JSON.stringify({ message: "Server Down" }), {
         status: 500,
-        headers: { "Content-Type": "application/json" },
       }),
     );
 
     const response = await app.request("/api/v1/register-gewerbe", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(requestData),
     });
     const json = await response.json();

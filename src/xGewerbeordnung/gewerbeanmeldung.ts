@@ -70,7 +70,7 @@ const ROOT_ATTRIBUTES = `
   version="1.6"
   test="100"`;
 
-export function createGewerbeanmeldung0300(gewerbeanmeldung: Gewerbeanmeldung) {
+export function createGewerbeanmeldungXml(gewerbeanmeldung: Gewerbeanmeldung) {
   const natuerlichePerson0 = gewerbeanmeldung.referenzierteSubjekte.natuerlichePerson[0];
 
   if (!natuerlichePerson0) {

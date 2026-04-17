@@ -35,6 +35,8 @@ const RegisterGewerbeRequestSchema = z
   })
   .openapi("RegisterGewerbeRequest");
 
+export type RegisterGewerbeRequest = z.infer<typeof RegisterGewerbeRequestSchema>;
+
 const RegisterGewerbeResponseSchema = z
   .object({
     success: z.boolean(),
