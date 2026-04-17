@@ -13,7 +13,7 @@ const app: OpenAPIHono<Env> = new OpenAPIHono();
 
 export type HonoAppType = typeof app;
 
-// add basic JSON logging in not in test
+// add basic JSON logging when not in test
 if (process.env.NODE_ENV !== "test") {
   app.use("*", async (c, next) => {
     const start = Date.now();
