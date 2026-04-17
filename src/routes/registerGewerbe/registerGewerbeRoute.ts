@@ -16,7 +16,7 @@ const PersönlicheDatenSchema = z.object({
   geburtsdatum: z.iso.date(),
   geburtsort: z.string(),
   geburtsland: z.string(),
-  staatsangehoerigkeitDeutsch: z.boolean(),
+  staatsangehörigkeitDeutsch: z.literal(true),
   adresse: AdresseSchema,
   telefon: z.string(),
   email: z.string(),
