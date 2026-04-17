@@ -3,8 +3,9 @@ import { getConnInfo } from "@hono/node-server/conninfo";
 
 export function addRequestLogging(app: HonoAppType): HonoAppType {
   // add basic JSON logging when not in test
+  // ignore requests on / (health-check)
   if (process.env.NODE_ENV !== "test") {
-    app.use("*", async (c, next) => {
+    app.use("/api/*", async (c, next) => {
       const start = Date.now();
 
       // Wait for the actual request to process
