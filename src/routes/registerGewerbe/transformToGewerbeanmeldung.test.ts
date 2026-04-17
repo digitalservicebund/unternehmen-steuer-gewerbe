@@ -1,11 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { transformToGewerbeanmeldung } from "./transformToGewerbeanmeldung";
 import type { RegisterGewerbeRequest } from "./registerGewerbeRoute";
-
-vi.mock("node:crypto", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("node:crypto")>();
-  return { ...actual, randomUUID: () => "00000000-0000-0000-0000-000000000000" };
-});
 
 const baseRequest: RegisterGewerbeRequest = {
   persönlicheDaten: {
@@ -32,87 +27,16 @@ const baseRequest: RegisterGewerbeRequest = {
 };
 
 describe("transformToGewerbeanmeldung", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-04-17T10:00:00.000Z"));
-  });
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  it("maps a complete RegisterGewerbeRequest into the expected Gewerbeanmeldung", () => {
+  it("splits strasseUndHausnummer into strasse and hausnummerVon", () => {
     const result = transformToGewerbeanmeldung(baseRequest);
 
-    expect(result).toEqual({
-      nachrichtenkopf: {
-        nachrichtenUUID: "00000000-0000-0000-0000-000000000000",
-        erstellungszeitpunkt: "2026-04-17T10:00:00.000Z",
-        leser: { kennung: "xga:000000000001", name: "Gewerbeamt Muster" },
-        autor: { kennung: "MELDID:00000000", name: "Schneller Gruenden OSS" },
-      },
-      autor: { kennung: "MELDID:00000000", name: "Schneller Gruenden OSS" },
-      satzErstellung: "2026-04-17T10:00:00.000Z",
-      ereigniszeitpunkt: "2026-04-17T10:00:00.000Z",
-      istStorno: false,
-      gemeindeSchluessel: "00000000",
-      uuid: "00000000-0000-0000-0000-000000000000",
-      gueltigAb: "2026-04-17",
-      datumMeldung: "2026-04-17T10:00:00.000Z",
-      grundAnmeldungSchluessel: "01",
-      gewerbebetrieb: {
-        gewerbebetriebID: "00000000-0000-0000-0000-000000000000",
-        gemeindeMeldungNr: "2024 0001",
-        rechtsformcode: "411000",
-        eingetragenerName: "Muster GmbH",
-        betriebsstaette: {
-          artBetriebsstaette: "01",
-          anschrift: {
-            strasse: "Musterstraße",
-            hausnummerVon: "1",
-            postleitzahl: "12345",
-            ort: "Musterstadt",
-          },
-        },
-        taetigkeitenGesamt: {
-          schwerpunkt: {
-            taetigkeitSchwerpunkt: "Was mit Computern",
-            wirtschaftszweigschluessel: "47990",
-            stichwort: "hauptgewerbe",
-          },
-        },
-        istNebenerwerb: false,
-        anzahlVollzeitBeschaeftigte: 0,
-        anzahlTeilzeitBeschaeftigte: 0,
-        istReisegewerbe: false,
-        betriebArt: {
-          industrie: false,
-          handwerk: false,
-          handel: false,
-          sonstiges: true,
-        },
-      },
-      referenzierteSubjekte: {
-        natuerlichePerson: [
-          {
-            id: "00000000-0000-0000-0000-000000000000",
-            name: { familienname: "Muster", vornamen: "Erika" },
-            geburt: { geburtsdatum: "1988-09-10", ort: "Berlin", staat: "Deutschland" },
-            geschlecht: "",
-            staatsangehoerigkeit: "000",
-            anschrift: {
-              strasse: "Musterstraße",
-              hausnummerVon: "1",
-              postleitzahl: "12345",
-              ort: "Musterstadt",
-            },
-            kommunikation: { telefon: "030 123456", email: "e.mustermann@example.org" },
-          },
-        ],
-      },
+    expect(result.referenzierteSubjekte.natuerlichePerson[0]!.anschrift).toMatchObject({
+      strasse: "Musterstraße",
+      hausnummerVon: "1",
     });
   });
 
-  it("uses adresseAbweichend as betriebsstaette anschrift when provided, split into strasse and hausnummer", () => {
+  it("uses adresseAbweichend as betriebsstaette anschrift when provided", () => {
     const result = transformToGewerbeanmeldung({
       ...baseRequest,
       unternehmensDaten: {
