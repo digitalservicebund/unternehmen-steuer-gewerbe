@@ -4,9 +4,9 @@ import type { RegisterGewerbeRequest } from "./registerGewerbeRoute";
 
 // Helper to split street and number "Straße 123" in ["Straße", "123"]
 function splitStrasseHausnummer(strasseUndHausnummer: string) {
-  const match = strasseUndHausnummer.match(/^(.+?)\s+(\d+.*)$/);
+  const match = strasseUndHausnummer.match(/^(\D+?)(\d.*)$/);
   return {
-    strasse: match?.[1] ?? "",
+    strasse: match?.[1]?.trimEnd() ?? "",
     hausnummer: match?.[2] ?? "",
   };
 }
