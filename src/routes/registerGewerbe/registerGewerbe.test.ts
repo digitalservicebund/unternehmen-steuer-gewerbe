@@ -11,7 +11,7 @@ describe("Route /api/v1/register-gewerbe", () => {
       geburtsdatum: "1988-09-10",
       geburtsort: "Musterstadt",
       geburtsland: "Deutschland",
-      staatsangehoerigkeitDeutsch: true,
+      staatsangehörigkeitDeutsch: true,
       adresse: {
         strasseUndHausnummer: "Musterstraße 1",
         postleitzahl: "12345",
@@ -22,7 +22,9 @@ describe("Route /api/v1/register-gewerbe", () => {
     },
     unternehmensDaten: {
       tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
-      artDesUnternehmens: "Handwerksbetrieb",
+      tätigkeitsbereich: "Handwerksbetrieb",
+      tätigkeitsbeginn: "2026-04-17",
+      gewerbeart: "hauptgewerbe",
       adresseAbweichend: {
         strasseUndHausnummer: "Musterstraße 2",
         postleitzahl: "67890",

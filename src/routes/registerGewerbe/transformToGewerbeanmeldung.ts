@@ -14,9 +14,11 @@ function splitStrasseHausnummer(strasseUndHausnummer: string) {
 // Transforms a RegisterGewerbeRequest into a complete Gewerbeanmeldung structure.
 // NOTE: several values are hardcoded placeholders and will be generated / fetched from other sources later.
 export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewerbeanmeldung {
-  const betriebsAdresseRaw =
-    data.unternehmensDaten.adresseAbweichend ?? data.persönlicheDaten.adresse;
-  const betriebsStrasseHausnummer = splitStrasseHausnummer(betriebsAdresseRaw.strasseUndHausnummer);
+  const adresseAbweichend = data.unternehmensDaten.adresseAbweichend;
+
+  const betriebsStrasseHausnummer = splitStrasseHausnummer(
+    adresseAbweichend?.strasseUndHausnummer || data.persönlicheDaten.adresse.strasseUndHausnummer,
+  );
   const personStrasseHausnummer = splitStrasseHausnummer(
     data.persönlicheDaten.adresse.strasseUndHausnummer,
   );
@@ -47,15 +49,16 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
         anschrift: {
           strasse: betriebsStrasseHausnummer.strasse,
           hausnummerVon: betriebsStrasseHausnummer.hausnummer,
-          postleitzahl: betriebsAdresseRaw.postleitzahl,
-          ort: betriebsAdresseRaw.ort,
+          postleitzahl:
+            adresseAbweichend?.postleitzahl || data.persönlicheDaten.adresse.postleitzahl,
+          ort: adresseAbweichend?.ort || data.persönlicheDaten.adresse.ort,
         },
       },
       taetigkeitenGesamt: {
         schwerpunkt: {
           taetigkeitSchwerpunkt: data.unternehmensDaten.tätigkeitsbeschreibung,
           wirtschaftszweigschluessel: "47990",
-          stichwort: data.unternehmensDaten.artDesUnternehmens,
+          stichwort: data.unternehmensDaten.gewerbeart,
         },
       },
       istNebenerwerb: false,
@@ -92,6 +95,7 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
           },
           kommunikation: {
             telefon: data.persönlicheDaten.telefon,
+            email: data.persönlicheDaten.email,
           },
         },
       ],

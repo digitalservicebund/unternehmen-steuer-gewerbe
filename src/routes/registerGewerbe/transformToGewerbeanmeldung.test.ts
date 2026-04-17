@@ -10,22 +10,24 @@ vi.mock("node:crypto", async (importOriginal) => {
 const baseRequest: RegisterGewerbeRequest = {
   persönlicheDaten: {
     vorname: "Erika",
-    nachname: "Mustermann",
+    nachname: "Muster",
     geburtsdatum: "1988-09-10",
     geburtsort: "Berlin",
     geburtsland: "Deutschland",
-    staatsangehoerigkeitDeutsch: true,
+    staatsangehörigkeitDeutsch: true,
     adresse: {
       strasseUndHausnummer: "Musterstraße 1",
       postleitzahl: "12345",
       ort: "Musterstadt",
     },
-    telefon: "007",
+    telefon: "030 123456",
     email: "e.mustermann@example.org",
   },
   unternehmensDaten: {
     tätigkeitsbeschreibung: "Was mit Computern",
-    artDesUnternehmens: "Softwarebude",
+    tätigkeitsbereich: "IT",
+    tätigkeitsbeginn: "2026-04-17",
+    gewerbeart: "hauptgewerbe",
   },
 };
 
@@ -75,7 +77,7 @@ describe("transformToGewerbeanmeldung", () => {
           schwerpunkt: {
             taetigkeitSchwerpunkt: "Was mit Computern",
             wirtschaftszweigschluessel: "47990",
-            stichwort: "Softwarebude",
+            stichwort: "hauptgewerbe",
           },
         },
         istNebenerwerb: false,
@@ -93,7 +95,7 @@ describe("transformToGewerbeanmeldung", () => {
         natuerlichePerson: [
           {
             id: "00000000-0000-0000-0000-000000000000",
-            name: { familienname: "Mustermann", vornamen: "Erika" },
+            name: { familienname: "Muster", vornamen: "Erika" },
             geburt: { geburtsdatum: "1988-09-10", ort: "Berlin", staat: "Deutschland" },
             geschlecht: "",
             staatsangehoerigkeit: "000",
@@ -103,7 +105,7 @@ describe("transformToGewerbeanmeldung", () => {
               postleitzahl: "12345",
               ort: "Musterstadt",
             },
-            kommunikation: { telefon: "007" },
+            kommunikation: { telefon: "030 123456", email: "e.mustermann@example.org" },
           },
         ],
       },
