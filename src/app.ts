@@ -1,45 +1,19 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import type { Env } from "hono";
-import { getConnInfo } from "@hono/node-server/conninfo";
 
 import { addHealthCheckEndpoint } from "./routes/rootHealthCheck/rootHealthCheck";
 import { addRegisterSteuernummerEndpoint } from "./routes/registerSteuernummer/registerSteuernummer";
 import { addRegisterGewerbeEndpoint } from "./routes/registerGewerbe/registerGewerbe";
 import { addGetEventsEndpoint } from "./routes/getEvents/getEvents";
 import { addOpenApiEndpoints } from "./routes/openApiDocs/openApi";
+import { addRequestLogging } from "./routes/logging/requestLogging";
 
 const app: OpenAPIHono<Env> = new OpenAPIHono();
 
 export type HonoAppType = typeof app;
 
-// add basic JSON logging when not in test
-if (process.env.NODE_ENV !== "test") {
-  app.use("*", async (c, next) => {
-    const start = Date.now();
-
-    // Wait for the actual request to process
-    await next();
-
-    // Now we have the response details and the Context 'c'
-    const ms = Date.now() - start;
-    const now = new Date().toISOString();
-
-    // Get IP
-    const info = getConnInfo(c);
-    const ip = c.req.header("x-forwarded-for")?.split(",")[0] || info.remote.address; // handle forwanding in kubernetes
-
-    const requestResponseData = {
-      isoDatetime: now,
-      requestIP: ip,
-      requestMethod: c.req.method,
-      requestPath: c.req.path,
-      responseStatus: c.res.status,
-      responseTimeMs: ms,
-    };
-
-    console.log(JSON.stringify(requestResponseData));
-  });
-}
+// add simple loggin in JSON format
+addRequestLogging(app);
 
 // add business routes/endpoints
 addRegisterGewerbeEndpoint(app);
