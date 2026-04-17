@@ -11,6 +11,7 @@ import { type Environment, getEnvironmentUrls } from "./environments";
 import type { FetchFn } from "./http";
 import { createMetadata, type DataSchema } from "./metadata";
 import { getSecret } from "../../secrets";
+
 export type { PublicService } from "./apis/submissionApi";
 export interface FitConnectClientConfig {
   environment: Environment;

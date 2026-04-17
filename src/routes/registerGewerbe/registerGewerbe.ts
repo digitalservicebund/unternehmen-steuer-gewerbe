@@ -1,12 +1,17 @@
 import { HonoAppType } from "../../app";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
+import { createGewerbeanmeldungXml } from "../../xGewerbeordnung/gewerbeanmeldung";
 import { registerGewerbeRoute } from "./registerGewerbeRoute";
+import { transformToGewerbeanmeldung } from "./transformToGewerbeanmeldung";
 
 export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
   app.openapi(registerGewerbeRoute, async (c) => {
     try {
       // With OpenAPIHono, the body is already validated against your schema
       const data = c.req.valid("json");
+
+      const gewerbeanmeldung = transformToGewerbeanmeldung(data);
+      const gewerbeanmeldungXml = createGewerbeanmeldungXml(gewerbeanmeldung);
 
       const fitConnectClient = getFitConnectClient();
 
@@ -20,10 +25,10 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
           name: "Gewerbe Anmeldung",
         },
         dataSchema: {
-          schemaUri: "https://schema.fitko.de/demo/muster-fachdaten.schema.json",
-          mimeType: "application/json",
+          schemaUri: "urn:xoev-de:kosit:standard:xgewerbeordnung",
+          mimeType: "application/xml",
         },
-        data: JSON.stringify(data),
+        data: gewerbeanmeldungXml,
       });
 
       return c.json(
