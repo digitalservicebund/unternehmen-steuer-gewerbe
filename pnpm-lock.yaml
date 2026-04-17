@@ -41,6 +41,9 @@ importers:
       vite:
         specifier: 8.0.5
         version: 8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.1)(@types/node@25.6.0)(yaml@2.8.3)
+      xmllint-wasm:
+        specifier: ^5.2.0
+        version: 5.2.0(@types/node@25.6.0)
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -1405,6 +1408,12 @@ packages:
     engines: {node: '>=8'}
     hasBin: true
 
+  xmllint-wasm@5.2.0:
+    resolution: {integrity: sha512-GVMuR3ViU8R7sakcVm/4GClMtCV8p7xgjXZlc6GmvPpInIz4V41lmRnjSd4uKhVkf5MZj97wEZkPM4RMAhojuQ==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      '@types/node': '>=16'
+
   yaml@2.8.3:
     resolution: {integrity: sha512-AvbaCLOO2Otw/lW5bmh9d/WEdcDFdQp2Z2ZUH3pX9U2ihyUY0nvLv7J6TrWowklRGPYbB/IuIMfYgxaCPg5Bpg==}
     engines: {node: '>= 14.6'}
@@ -2452,6 +2461,10 @@ snapshots:
     dependencies:
       siginfo: 2.0.0
       stackback: 0.0.2
+
+  xmllint-wasm@5.2.0(@types/node@25.6.0):
+    dependencies:
+      '@types/node': 25.6.0
 
   yaml@2.8.3: {}
 

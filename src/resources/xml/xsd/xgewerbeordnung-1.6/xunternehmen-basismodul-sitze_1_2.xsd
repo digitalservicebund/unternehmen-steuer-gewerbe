@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:sitze="urn:xoev-de:xunternehmen:standard:basismodul:sitze_1.2"
+           xmlns:adr="urn:xoev-de:xunternehmen:standard:basismodul:adressen_1.2"
+           targetNamespace="urn:xoev-de:xunternehmen:standard:basismodul:sitze_1.2"
+           version="1.2"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XUnternehmen.Basismodul</nameLang>
+            <nameKurz>XUnternehmen.Basismodul</nameKurz>
+            <nameTechnisch>basismodul</nameTechnisch>
+            <kennung>urn:xoev-de:xunternehmen:standard:basismodul</kennung>
+            <beschreibung>Basismodul des Standards XUnternehmen.</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>1.2</version>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVHandbuch>2.5</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP 2</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:import schemaLocation="xunternehmen-basismodul-adressen_1_2.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:adressen_1.2"/>
+   <xs:element name="effektiverVerwaltungssitz">
+      <xs:annotation>
+         <xs:documentation>Der effektiver Verwaltungssitz ist - im Unterschied zum Sitz - der Ort, an dem sich die Hauptverwaltung befindet und die Geschäfte tatsächlich geführt werden.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="adr:ort" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Der Name des Ortes (Gemeinde, Ortschaft oder Stadt).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="adr:staat" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Angabe eines Staats oder eines Staatsgebiets. Je nach fachlichem und rechtlichem Kontext bzw. dem jeweiligen Ziel der Datenerhebung kann diese Angabe mit unterschiedlich umfangreichen und unterschiedlich fein aufgelösten Codelisten codiert werden. Der Standard XUnternehmen.Kerndatenmodell gibt entsprechend keine einheitliche Codeliste vor, sondern lässt die Verwendung unterschiedlicher Codelisten, im Wesentlichen aus der Staats- und Gebietssystematik (BEV) des Statistischen Bundesamts, zu: Verzeichnis der Staaten aus der Staats- und Gebietssystematik (BEV) Verzeichnis der Staatsangehörigkeiten der Staats- und Gebietssystematik (BEV) Verzeichnis der Staatsgebiete und deren unselbständigen Teile der Staats- und Gebietssystematik (BEV) Country Codes der ISO 3166-1:2013 Das Verhältnis dieser Codelisten zueinander und die Mapping-Möglichkeiten können der tabellarischen Synopse der Staats- und Gebietssystematik entnommen werden. Im Sinne einer einfachen Anwendbarkeit des Standards sieht dieser zudem vor, dass Angaben zu Staaten immer (auch) in unkodierter Form, als Freitext übermittelt werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="sitz">
+      <xs:annotation>
+         <xs:documentation>Der Sitz einer Körperschaft, Personenvereinigung oder Vermögensmasse ist der Ort, der durch Gesetz, Gesellschaftsvertrag, Satzung, Stiftungsgeschäft oder dergleichen bestimmt ist.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="adr:ort" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Der Name des Ortes (Gemeinde, Ortschaft oder Stadt).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="adr:staat" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>(siehe Dokumentation von Staat).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+</xs:schema>

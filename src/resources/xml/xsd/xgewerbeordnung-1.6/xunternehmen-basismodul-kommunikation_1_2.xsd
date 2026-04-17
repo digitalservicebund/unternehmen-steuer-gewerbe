@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:kom="urn:xoev-de:xunternehmen:standard:basismodul:kommunikation_1.2"
+           xmlns:bdt="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.2"
+           xmlns:xoev-code="http://xoev.de/schemata/code/1_0"
+           targetNamespace="urn:xoev-de:xunternehmen:standard:basismodul:kommunikation_1.2"
+           version="1.2"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XUnternehmen.Basismodul</nameLang>
+            <nameKurz>XUnternehmen.Basismodul</nameKurz>
+            <nameTechnisch>basismodul</nameTechnisch>
+            <kennung>urn:xoev-de:xunternehmen:standard:basismodul</kennung>
+            <beschreibung>Basismodul des Standards XUnternehmen.</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>1.2</version>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVHandbuch>2.5</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP 2</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:import schemaLocation="xoev-code.xsd"
+              namespace="http://xoev.de/schemata/code/1_0"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-basisdatentypen_1_2.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.2"/>
+   <xs:complexType name="Code.KlassifikationKommunikation">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Klassifikation Kommunikation</nameLang>
+               <nameKurz>Klassifikation Kommunikation</nameKurz>
+               <nameTechnisch>klassifikationkommunikation</nameTechnisch>
+               <kennung>urn:xoev-de:xunternehmen:codeliste:klassifikationkommunikation</kennung>
+               <beschreibung>Eine Klassifikation einer Kommunikationsangabe (privat, geschäftlich, ...)</beschreibung>
+               <herausgebernameLang>XUnternehmen</herausgebernameLang>
+               <herausgebernameKurz>XUnternehmen</herausgebernameKurz>
+            </codeliste>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token" form="unqualified"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xunternehmen:codeliste:klassifikationkommunikation"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="KommunikationBasisType">
+      <xs:annotation>
+         <xs:documentation>Basisklasse für alle Kommunikationstypen.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element ref="kom:klassifikationKommunikation" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Eine Klassifikation der Kommunikationsangabe (privat, geschäftlich, ...).</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="kom:hinweis" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Ein ergänzender Hinweis zur Verwendung dieser Kommunikationsangabe.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:element name="deMail" type="bdt:String.DIN91379.C">
+      <xs:annotation>
+         <xs:documentation>De-Mail-Adresse, strukturiert gemäß BSI TR-01201 De-Mail. Beispiel: erika.mustermann@mustermann.de-mail.de.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="eMail" type="bdt:String.DIN91379.C">
+      <xs:annotation>
+         <xs:documentation>E-Mail-Adresse.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="hinweis" type="bdt:String.DIN91379.C">
+      <xs:annotation>
+         <xs:documentation>Ein ergänzender Hinweis zur Verwendung dieser Kommunikationsangabe.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="klassifikationKommunikation"
+               type="kom:Code.KlassifikationKommunikation">
+      <xs:annotation>
+         <xs:documentation>Eine Klassifikation der Kommunikationsangabe (privat, geschäftlich, ...).</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="kommunikation">
+      <xs:annotation>
+         <xs:documentation>Angaben zu Telefon, Telefax, Email-Adresse oder Webseite.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="kom:KommunikationBasisType">
+               <xs:choice>
+                  <xs:element ref="kom:telefon">
+                     <xs:annotation>
+                        <xs:documentation>Telefonnummer, strukturiert gemäß ITU E.123. Beispiel: "+49  421 1234567", "+49  421 123 4567", "(0421) 1234567". Die Angabe soll möglichst gemäß DIN 5008 aufgebaut sein.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element ref="kom:telefax">
+                     <xs:annotation>
+                        <xs:documentation>Telefaxnummer, strukturiert gemäß ITU E.123. Beispiel: "+49  421 1234567", "+49  421 123 4567", "(0421) 1234567". Die Angabe soll möglichst gemäß DIN 5008 aufgebaut sein.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element ref="kom:eMail">
+                     <xs:annotation>
+                        <xs:documentation>E-Mail-Adresse.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element ref="kom:deMail">
+                     <xs:annotation>
+                        <xs:documentation>De-Mail-Adresse, strukturiert gemäß BSI TR-01201 De-Mail. Beispiel: erika.mustermann@mustermann.de-mail.de.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element ref="kom:webAdresse">
+                     <xs:annotation>
+                        <xs:documentation>Web-Adresse.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:choice>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="telefax" type="bdt:String.DIN91379.C">
+      <xs:annotation>
+         <xs:documentation>Telefaxnummer, strukturiert gemäß ITU E.123. Beispiel: "+49  421 1234567", "+49  421 123 4567", "(0421) 1234567". Die Angabe soll möglichst gemäß DIN 5008 aufgebaut sein.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="telefon" type="bdt:String.DIN91379.C">
+      <xs:annotation>
+         <xs:documentation>Telefonnummer, strukturiert gemäß ITU E.123. Beispiel: "+49  421 1234567", "+49  421 123 4567", "(0421) 1234567". Die Angabe soll möglichst gemäß DIN 5008 aufgebaut sein.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="webAdresse" type="bdt:String.DIN91379.C">
+      <xs:annotation>
+         <xs:documentation>Web-Adresse.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+</xs:schema>
