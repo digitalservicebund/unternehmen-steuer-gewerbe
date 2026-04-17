@@ -21,6 +21,7 @@ export function addRequestLogging(app: HonoAppType): HonoAppType {
 
       const requestResponseData = {
         isoDatetime: now,
+        event: "request received",
         requestIP: ip,
         requestMethod: c.req.method,
         requestPath: c.req.path,
