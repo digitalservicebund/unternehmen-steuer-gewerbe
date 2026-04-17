@@ -5,7 +5,7 @@ import { isValidXml } from "./xmlValidator";
 describe("XML validator", () => {
   const invalidXmlFilenames = [
     "xgewo-1.6-invalid.xml",
-    // "xgewo-1.6-invalid-sch.xml" // requires schematron check
+    "xgewo-1.6-invalid-sch.xml", // schematron validation is required, here
   ];
   test.each(invalidXmlFilenames)(
     "should return false and a non-empty list of errors for invalid XML",
