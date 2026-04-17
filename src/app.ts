@@ -1,6 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import type { Env } from "hono";
-import { logger } from "hono/logger";
 import { getConnInfo } from "@hono/node-server/conninfo";
 
 import { addHealthCheckEndpoint } from "./routes/rootHealthCheck/rootHealthCheck";
