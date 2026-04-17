@@ -25,7 +25,9 @@ const PersönlicheDatenSchema = z.object({
 const UnternehmensDatenSchema = z.object({
   adresseAbweichend: AdresseSchema.optional(),
   tätigkeitsbeschreibung: z.string(),
-  artDesUnternehmens: z.string(),
+  tätigkeitsbereich: z.string(),
+  tätigkeitsbeginn: z.iso.date(),
+  gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]),
 });
 
 const RegisterGewerbeRequestSchema = z
