@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:rf="urn:xoev-de:xunternehmen:standard:basismodul:rechtsform_1.2"
+           xmlns:xoev-code="http://xoev.de/schemata/code/1_0"
+           targetNamespace="urn:xoev-de:xunternehmen:standard:basismodul:rechtsform_1.2"
+           version="1.2"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XUnternehmen.Basismodul</nameLang>
+            <nameKurz>XUnternehmen.Basismodul</nameKurz>
+            <nameTechnisch>basismodul</nameTechnisch>
+            <kennung>urn:xoev-de:xunternehmen:standard:basismodul</kennung>
+            <beschreibung>Basismodul des Standards XUnternehmen.</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>1.2</version>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVHandbuch>2.5</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP 2</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:import schemaLocation="xoev-code.xsd"
+              namespace="http://xoev.de/schemata/code/1_0"/>
+   <xs:complexType name="Code.Rechtsformen">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Rechtsformen</nameLang>
+               <nameKurz>Rechtsformen</nameKurz>
+               <nameTechnisch>rechtsformen</nameTechnisch>
+               <kennung>urn:xoev-de:xunternehmen:codeliste:rechtsformen</kennung>
+               <beschreibung>Die Codeliste urn:xoev-de:xunternehmen:codeliste:rechtsformen bildet ab Version 2 fachbereichsübergreifend Anforderungen an die Codierung von Rechtsforminformationen ab und ermöglicht deren bereichsübergreifend einheitliche Codierung und Übermittlung. Aktuell werden die Anforderungen aus dem Grundinformationsdienst GINSTER der Steuerverwaltung und damit auch der Codierung im ELSTER-Unternehmenskonto, aus dem Registerportal der Handels-, Genossenschafts-, Partnerschafts- und Vereinsregister, dem Standard XGewerbeanzeige / XGewerbeordnung und damit auch dem Unternehmerverzeichnis der gesetzlichen Unfallversicherung umgesetzt. Auf diese Weise können beispielweise Rechtsforminformationen ohne semantische Brüche aus dem ELSTER-Unternehmenskonto über einen Online-Dienst zur Gewerbeanmeldung an die zuständige Gewerbebehörde übermittelt werden und dort mit Daten aus dem Registerportal der Justiz und (perspektivisch) mit dem Basisregister gemäß UBRegG zusammengeführt werden. Seit Version 2 sind die Codes sechsstellig und hierarchisch gegliedert, um unterschiedliche Granularitäten der Rechtsformdifferenzierung zu unterstützen und Codes einfacher zueinander in Bezug setzen zu können. Die Version 2 der Rechtsformcodierung ist vollständig rückwärtskompatibel zur Version 1 in dem Sinne, dass eine Eins-zu-eins-Umschlüsselung der bisherigen Codes erfolgen kann.</beschreibung>
+               <herausgebernameLang>XUnternehmen</herausgebernameLang>
+               <herausgebernameKurz>XUnternehmen</herausgebernameKurz>
+            </codeliste>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token" form="unqualified"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xunternehmen:codeliste:rechtsformen"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="rechtsform">
+      <xs:annotation>
+         <xs:documentation>Die Rechtsform einer wirtschaftlichen Tätigkeit, einer juristischen Person, einer rechtsfähigen Personengesellschaft oder einer sonstigen Personenvereinigung im Sinne der Rechtsform-Codierung.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="rf:rechtsformcode" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Code dieser Rechtsform. Es ist die Rechtsformen-Codeliste in der Major-Version 2 (bspw. 2.2) zu verwenden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="rechtsformcode" type="rf:Code.Rechtsformen">
+      <xs:annotation>
+         <xs:documentation>Code dieser Rechtsform. Es ist die Rechtsformen-Codeliste in der Major-Version 2 (bspw. 2.2) zu verwenden.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+</xs:schema>

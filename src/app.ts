@@ -6,10 +6,14 @@ import { addRegisterSteuernummerEndpoint } from "./routes/registerSteuernummer/r
 import { addRegisterGewerbeEndpoint } from "./routes/registerGewerbe/registerGewerbe";
 import { addGetEventsEndpoint } from "./routes/getEvents/getEvents";
 import { addOpenApiEndpoints } from "./routes/openApiDocs/openApi";
+import { addRequestLogging } from "./routes/logging/requestLogging";
 
 const app: OpenAPIHono<Env> = new OpenAPIHono();
 
 export type HonoAppType = typeof app;
+
+// add simple loggin in JSON format
+addRequestLogging(app);
 
 // add business routes/endpoints
 addRegisterGewerbeEndpoint(app);
