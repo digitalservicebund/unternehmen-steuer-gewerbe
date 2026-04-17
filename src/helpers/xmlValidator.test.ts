@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { isValidXml } from "./xmlValidator";
 
 describe("XML validator", () => {
-  it("should return false for invalid XML", async () => {
+  it("should return false and a non-empty list of errors for invalid XML", async () => {
     const xml = fs.readFileSync(
       "src/resources/xml/xml-samples/xgewerbeordnung-1.6-validator/xgewo-1.6-invalid.xml",
       "utf8",
@@ -11,6 +11,7 @@ describe("XML validator", () => {
     const result = await isValidXml(xml);
 
     expect(result.valid).to.equal(false);
+    expect(result.errors.length).toBeGreaterThan(0);
   });
 
   it("should return true for valid XML", async () => {
