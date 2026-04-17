@@ -11,7 +11,7 @@ describe("XML validator", () => {
     const result = await isValidXml(xml);
 
     expect(result.valid).to.equal(false);
-    expect(result.schemaValidationResult.errors.length).toBeGreaterThan(0);
+    expect(result.errors.length).toBeGreaterThan(0);
   });
 
   it("should return false and a non-empty list of errors for rules-invalid XML (schematron check)", async () => {
@@ -22,7 +22,7 @@ describe("XML validator", () => {
     const result = await isValidXml(xml);
 
     expect(result.valid).to.equal(false);
-    expect(result.schematronValidationResults.length).toBeGreaterThan(0);
+    expect(result.errors.length).toBeGreaterThan(0);
   });
 
   it("should return true for valid XML", async () => {
