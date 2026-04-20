@@ -37,7 +37,7 @@ export async function validateXml(xml: string): Promise<XmlValidationResult> {
         contents: await fs.readFile(path.join(schemaDir, fileName), "utf8"),
       })),
   );
-  // reading the main XSD
+  // reading the main XSD schema
   const mainXsd = await fs.readFile(
     path.join(schemaDir, "xgewerbeordnung-gewerbeanzeige.xsd"),
     "utf8",
@@ -49,6 +49,7 @@ export async function validateXml(xml: string): Promise<XmlValidationResult> {
     preload: preloadedXsds,
   });
 
+  // validating against schematron
   const schematronValidationResult: SaxonTransformResult = SaxonJS.transform(
     {
       stylesheetFileName:
@@ -58,14 +59,8 @@ export async function validateXml(xml: string): Promise<XmlValidationResult> {
     },
     "sync",
   );
-
-  console.log(schematronValidationResult.principalResult);
-  // console.log(JSON.stringify(result))
-
   const isValidSchematron =
     !schematronValidationResult.principalResult.includes("<svrl:failed-assert");
-
-  console.log(`isValid: ${isValidSchematron}`);
 
   return {
     isValid: schemaValidationResult.valid && isValidSchematron,
