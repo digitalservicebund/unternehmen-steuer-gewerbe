@@ -68,6 +68,14 @@ or in watch mode, restarting on changes
 pnpm run test:watch
 ```
 
+### Running Tests in VSCode
+
+The test runner is not able to "decode" required secrets stored in 1Password.
+
+As a workaround:
+
+- Set `"vitest.nodeExecutable": "vitest.wrapper.sh",` to call the wrapper script that's included in the code base.
+
 ## Using Git Hooks
 
 We're using [lefthook](https://lefthook.dev/) for Git hook configuration. After installing `lefthook`, run the following once:
