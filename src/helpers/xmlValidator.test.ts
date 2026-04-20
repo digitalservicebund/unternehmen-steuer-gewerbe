@@ -24,7 +24,7 @@ describe("XML validator", () => {
     expect(result.isValid).to.equal(true);
   });
 
-  it("should return false for rules-invalid XML (schematron check)", async () => {
+  it("should return false and errors for rules-invalid XML (schematron check)", async () => {
     const xml = fs.readFileSync(
       `src/resources/xml/xml-samples/xgewerbeordnung-1.6-validator/xgewo-1.6-invalid-sch.xml`,
       "utf8",
@@ -32,5 +32,6 @@ describe("XML validator", () => {
     const result = await validateXml(xml);
 
     expect(result.isValid).to.equal(false);
+    expect(result.schematronValidationResult.principalResult).toContain("svrl:failed-assert");
   });
 });

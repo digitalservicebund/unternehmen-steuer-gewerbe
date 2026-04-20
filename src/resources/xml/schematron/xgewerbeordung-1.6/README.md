@@ -12,6 +12,7 @@
     pnpm xslt3 -xsl:src/resources/xml/schematron/xgewerbeordung-1.6/spezifikation.xsl -export:src/resources/xml/schematron/xgewerbeordung-1.6/generated.spezifikation.sef.json
      -t  -nogo
     ```
+
   ```
 
   ```
