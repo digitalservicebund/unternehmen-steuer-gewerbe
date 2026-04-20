@@ -68,6 +68,12 @@ or in watch mode, restarting on changes
 pnpm run test:watch
 ```
 
+### Running Tests in VSCode while secrets are stored in 1Password
+
+The test runner is not able to read required secrets from 1Password. As a workaround add the following to your VSCode settings; this will make the test runner use a (1password aware) wrapper script instead of plain `node`:
+
+`"vitest.nodeExecutable": "vitest.wrapper.sh",`
+
 ## Using Git Hooks
 
 We're using [lefthook](https://lefthook.dev/) for Git hook configuration. After installing `lefthook`, run the following once:
