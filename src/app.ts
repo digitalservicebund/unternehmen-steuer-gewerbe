@@ -12,7 +12,7 @@ const app: OpenAPIHono<Env> = new OpenAPIHono();
 
 export type HonoAppType = typeof app;
 
-// add simple loggin in JSON format
+// add simple logging in JSON format
 addRequestLogging(app);
 
 // add business routes/endpoints
