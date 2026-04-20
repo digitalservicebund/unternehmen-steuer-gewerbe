@@ -1,9 +1,30 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import SaxonJS from "saxon-js"; // no types provided, relies on /src/declarations.d.ts
 
 import { validateXML, XMLValidationResult } from "xmllint-wasm";
 
-export async function isValidXml(xml: string): Promise<XMLValidationResult> {
+interface SaxonTransformResult {
+  /** The serialized SVRL string */
+  principalResult: string;
+
+  /** The parsed DOM of your input XML */
+  masterDocument: Document;
+
+  /** Map of additional result documents, if any */
+  resultDocuments: Record<string, string | Document>;
+
+  /** The internal compiled stylesheet object */
+  stylesheetInternal: object;
+}
+
+interface XmlValidationResult {
+  isValid: boolean;
+  schemaValidationResult: XMLValidationResult;
+  schematronValidationResult: SaxonTransformResult;
+}
+
+export async function validateXml(xml: string): Promise<XmlValidationResult> {
   const schemaDir = "./src/resources/xml/xsd/xgewerbeordnung-1.6";
 
   // pre-loading all XSD "dependencies"
@@ -21,10 +42,34 @@ export async function isValidXml(xml: string): Promise<XMLValidationResult> {
     path.join(schemaDir, "xgewerbeordnung-gewerbeanzeige.xsd"),
     "utf8",
   );
-
-  return await validateXML({
+  // validating against schema
+  const schemaValidationResult = await validateXML({
     xml,
     schema: [mainXsd],
     preload: preloadedXsds,
   });
+
+  const schematronValidationResult: SaxonTransformResult = SaxonJS.transform(
+    {
+      stylesheetFileName:
+        "src/resources/xml/schematron/xgewerbeordung-1.6/generated.spezifikation.sef.json",
+      sourceText: xml,
+      destination: "serialized",
+    },
+    "sync",
+  );
+
+  console.log(schematronValidationResult.principalResult);
+  // console.log(JSON.stringify(result))
+
+  const isValidSchematron =
+    !schematronValidationResult.principalResult.includes("<svrl:failed-assert");
+
+  console.log(`isValid: ${isValidSchematron}`);
+
+  return {
+    isValid: schemaValidationResult.valid && isValidSchematron,
+    schemaValidationResult,
+    schematronValidationResult,
+  };
 }
