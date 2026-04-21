@@ -78,7 +78,9 @@ describe("Route /api/v1/register-gewerbe/:submissionId/events", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(registerGewerbeRequestData),
     });
+    expect(response.status).toEqual(200);
     submissionId = (await response.json()).submissionId;
+    expect(submissionId).toBeDefined();
   });
 
   test("Returns 200 OK on GET with /:submissionId/events", async () => {
