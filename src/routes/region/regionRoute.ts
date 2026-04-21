@@ -27,12 +27,12 @@ export const regionRoute = createRoute({
           schema: SupportedRegionResponseSchema,
         },
       },
-      description: "Check whether a given PLZ is currently supported",
+      description: "Check whether a region with the given PLZ is currently supported",
     },
     400: {
       description: "Invalid PLZ format — must be a 5-digit number",
     },
   },
   tags: ["Active Development"],
-  summary: "Check whether a given PLZ is currently supported",
+  summary: "Check whether a region with the given PLZ is currently supported",
 });
