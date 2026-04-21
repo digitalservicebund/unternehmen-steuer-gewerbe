@@ -1,33 +1,47 @@
 import fs from "node:fs";
-import { describe, expect, it, test } from "vitest";
-import { isValidXml } from "./xmlValidator";
+import { describe, expect, it } from "vitest";
+import { validateXml } from "./xmlValidator";
 
 describe("XML validator", () => {
-  const invalidXmlFilenames = [
-    "xgewo-1.6-invalid.xml",
-    // "xgewo-1.6-invalid-sch.xml" // requires schematron check
-  ];
-  test.each(invalidXmlFilenames)(
-    "should return false and a non-empty list of errors for invalid XML",
-    async (invalidXmlFilename) => {
-      const xml = fs.readFileSync(
-        `src/resources/xml/xml-samples/xgewerbeordnung-1.6-validator/${invalidXmlFilename}`,
-        "utf8",
-      );
-      const result = await isValidXml(xml);
+  it("should return false and a non-empty list of schema errors for schema-invalid XML", async () => {
+    const xml = fs.readFileSync(
+      `src/resources/xml/xml-samples/xgewerbeordnung-1.6-validator/xgewo-1.6-invalid.xml`,
+      "utf8",
+    );
+    const result = await validateXml(xml);
 
-      expect(result.valid).to.equal(false);
-      expect(result.errors.length).toBeGreaterThan(0);
-    },
-  );
+    expect(result.isValid).to.equal(false);
+    expect(result.schemaValidationResult.errors.length).toBeGreaterThan(0);
+  });
 
   it("should return true for valid XML", async () => {
     const xml = fs.readFileSync(
       "src/resources/xml/xml-samples/xgewerbeordnung-1.6-validator/xgewo-1.6-valid.xml",
       "utf8",
     );
-    const result = await isValidXml(xml);
+    const result = await validateXml(xml);
 
-    expect(result.valid).to.equal(true);
+    expect(result.isValid).to.equal(true);
+  });
+
+  it("should return false and rules errors for schematron-invalid XML", async () => {
+    const xml = fs.readFileSync(
+      `src/resources/xml/xml-samples/xgewerbeordnung-1.6-validator/xgewo-1.6-invalid-sch.xml`,
+      "utf8",
+    );
+    const result = await validateXml(xml);
+
+    expect(result.isValid).to.equal(false);
+    expect(result.schematronValidationResult.principalResult).toContain("svrl:failed-assert");
+  });
+
+  it("should return false for completely broken XML", async () => {
+    const xml = fs.readFileSync(
+      `src/resources/xml/xml-samples/xgewerbeordnung-1.6-validator/xy-unknown.xml`,
+      "utf8",
+    );
+    const result = await validateXml(xml);
+
+    expect(result.isValid).to.equal(false);
   });
 });
