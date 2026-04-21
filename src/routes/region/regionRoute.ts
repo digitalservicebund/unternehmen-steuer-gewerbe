@@ -1,10 +1,13 @@
 import { createRoute, z } from "@hono/zod-openapi";
 
 const SupportedRegionParamsSchema = z.object({
-  plz: z.string().openapi({
-    param: { name: "plz", in: "path" },
-    example: "10969",
-  }),
+  plz: z
+    .string()
+    .regex(/^[0-9]{5}$/, "plz must be a 5-digit number")
+    .openapi({
+      param: { name: "plz", in: "path" },
+      example: "10969",
+    }),
 });
 
 const SupportedRegionResponseSchema = z
@@ -25,6 +28,9 @@ export const regionRoute = createRoute({
         },
       },
       description: "Check whether a given PLZ is currently supported",
+    },
+    400: {
+      description: "Invalid PLZ format — must be a 5-digit number",
     },
   },
   tags: ["Active Development"],

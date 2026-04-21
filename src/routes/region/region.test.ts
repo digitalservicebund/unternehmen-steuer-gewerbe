@@ -15,9 +15,13 @@ describe("Route /api/v1/region/{plz}", () => {
     expect(await response.json()).toEqual({ supported: false });
   });
 
-  test("Returns supported:false for an invalid PLZ format", async () => {
+  test("Returns 400 for an invalid PLZ format", async () => {
     const response = await app.request("/api/v1/region/abc");
-    expect(response.status).toEqual(200);
-    expect(await response.json()).toEqual({ supported: false });
+    expect(response.status).toEqual(400);
+  });
+
+  test("Returns 400 for a 4-digit PLZ (too short)", async () => {
+    const response = await app.request("/api/v1/region/1234");
+    expect(response.status).toEqual(400);
   });
 });
