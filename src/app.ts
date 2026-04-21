@@ -2,6 +2,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import type { Env } from "hono";
 
 import { addHealthCheckEndpoint } from "./routes/rootHealthCheck/rootHealthCheck";
+import { addRegionEndpoint } from "./routes/region/region";
 import { addRegisterSteuernummerEndpoint } from "./routes/registerSteuernummer/registerSteuernummer";
 import { addRegisterGewerbeEndpoint } from "./routes/registerGewerbe/registerGewerbe";
 import { addGetEventsEndpoint } from "./routes/getEvents/getEvents";
@@ -16,6 +17,7 @@ export type HonoAppType = typeof app;
 addRequestLogging(app);
 
 // add business routes/endpoints
+addRegionEndpoint(app);
 addRegisterGewerbeEndpoint(app);
 addHealthCheckEndpoint(app);
 addRegisterSteuernummerEndpoint(app);
