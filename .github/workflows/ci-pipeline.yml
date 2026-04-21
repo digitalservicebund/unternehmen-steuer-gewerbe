@@ -245,9 +245,9 @@ jobs:
 
   deploy-development:
     name: Deploy to development environment
-    runs-on: ubuntu-latest
     needs: [check-format-and-lint, test-and-scan-with-sonarcloud, build-and-push-image]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
     steps:
       - name: Deploy to development
         uses: digitalservicebund/argocd-deploy@6033da861398e0d7fcffe1b195f8d58f10b62c4e # auth-token branch
@@ -271,10 +271,9 @@ jobs:
 
   deploy-production:
     name: Deploy to production environment
-    runs-on: ubuntu-latest
     needs: deploy-development
-    if: false
-    # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
     steps:
       - name: Deploy to production
         uses: digitalservicebund/argocd-deploy@6033da861398e0d7fcffe1b195f8d58f10b62c4e # auth-token branch
@@ -306,10 +305,10 @@ jobs:
     runs-on: ubuntu-latest
     # the ${{ success() }} is required for the "if" not to override the "needs" below
     # (we did run into this problem and saw auto-merges even as "frontend-checks" failed)
-    if: ${{ github.event_name != 'schedule' && success() && github.actor == 'dependabot[bot]' && !cancelled() && github.ref != 'refs/heads/main' && github.repository == 'digitalservicebund/unternehmen-steuer-gewerbe'}}
     needs:
       - check-format-and-lint
       - test-and-scan-with-sonarcloud
+    if: ${{ github.event_name != 'schedule' && success() && github.actor == 'dependabot[bot]' && !cancelled() && github.ref != 'refs/heads/main' && github.repository == 'digitalservicebund/unternehmen-steuer-gewerbe'}}
     permissions:
       contents: write
       pull-requests: write
