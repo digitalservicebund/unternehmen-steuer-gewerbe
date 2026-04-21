@@ -1,7 +1,7 @@
 import { describe, test, expect, vi, afterEach, beforeAll } from "vitest";
 import app from "../../app";
 
-const requestData = {
+const registerGewerbeRequestData = {
   persönlicheDaten: {
     vorname: "Erika",
     nachname: "Mustermann",
@@ -37,7 +37,7 @@ describe("Route /api/v1/register-gewerbe", () => {
     const response = await app.request("/api/v1/register-gewerbe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestData),
+      body: JSON.stringify(registerGewerbeRequestData),
     });
     const json = await response.json();
     expect(response.status).toEqual(200);
@@ -57,7 +57,7 @@ describe("Route /api/v1/register-gewerbe", () => {
     const response = await app.request("/api/v1/register-gewerbe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestData),
+      body: JSON.stringify(registerGewerbeRequestData),
     });
     const json = await response.json();
     expect(response.status).toEqual(500);
@@ -76,7 +76,7 @@ describe("Route /api/v1/register-gewerbe/:submissionId/events", () => {
     const response = await app.request("/api/v1/register-gewerbe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestData),
+      body: JSON.stringify(registerGewerbeRequestData),
     });
     submissionId = (await response.json()).submissionId;
   });
