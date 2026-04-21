@@ -21,7 +21,7 @@ interface SaxonTransformResult {
 }
 
 export async function validateXml(xml: string): Promise<XmlValidationResult> {
-  const schemaDir = "./src/resources/xml/xsd/xgewerbeordnung-1.6";
+  const schemaDir = "./src/resources/xml/schemaXsd/xgewerbeordnung-1.6";
   const schemaValidationResult = await validateAgainstSchema(xml, schemaDir);
 
   const schematronRulesSefJsonFile =
