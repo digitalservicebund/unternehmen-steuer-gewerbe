@@ -38,12 +38,18 @@ importers:
       saxon-js:
         specifier: ^2.7.0
         version: 2.7.0
+      saxonjs-he:
+        specifier: 3.0.0-beta2
+        version: 3.0.0-beta2
       vite:
         specifier: 8.0.5
         version: 8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.1)(@types/node@25.6.0)(yaml@2.8.3)
       xmllint-wasm:
         specifier: ^5.2.0
         version: 5.2.0(@types/node@25.6.0)
+      xslt3-he:
+        specifier: 3.0.0-beta2
+        version: 3.0.0-beta2
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -1229,6 +1235,9 @@ packages:
   saxon-js@2.7.0:
     resolution: {integrity: sha512-uGAv7H85EuWtAyyXVezXBg3/j2UvhEfT3N9+sqkGwCJVW33KlkadllDCdES/asCDklUo0UlM6178tZ0n3GPZjQ==}
 
+  saxonjs-he@3.0.0-beta2:
+    resolution: {integrity: sha512-ZoxMP1BzQ6qGv9oJIDRFh87D1G1wOJysuHqW7PrxF+5MMvYxv2gApIdQ87mxpAQb42fmZlLnT4AvcIC7d+hgpQ==}
+
   semver@7.7.4:
     resolution: {integrity: sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA==}
     engines: {node: '>=10'}
@@ -1408,6 +1417,10 @@ packages:
     engines: {node: '>=16'}
     peerDependencies:
       '@types/node': '>=16'
+
+  xslt3-he@3.0.0-beta2:
+    resolution: {integrity: sha512-Kj+ICegvwaj9qzdeC2VvL+4S35pqbYzR+A7VkLu2eTijJRGKhRgY/mbOsim/nJOV6Hs3QyNs6ibyxYAlcmd1OA==}
+    hasBin: true
 
   xslt3@2.7.0:
     resolution: {integrity: sha512-Vt32LhCt4CQULtGPWlGW++PhS+o3LA6z3PDvig9lDfbo2cIHcaEnyrRYDTilw4N0EbAyxCaw5E0B+DICZEYktQ==}
@@ -2323,6 +2336,8 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
+  saxonjs-he@3.0.0-beta2: {}
+
   semver@7.7.4: {}
 
   siginfo@2.0.0: {}
@@ -2445,6 +2460,10 @@ snapshots:
   xmllint-wasm@5.2.0(@types/node@25.6.0):
     dependencies:
       '@types/node': 25.6.0
+
+  xslt3-he@3.0.0-beta2:
+    dependencies:
+      saxonjs-he: 3.0.0-beta2
 
   xslt3@2.7.0:
     dependencies:

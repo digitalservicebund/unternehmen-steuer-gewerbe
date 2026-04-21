@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 // no types exist for saxon-js; we have defined a placeholder in /src/declarations.d.ts, so the compiler does not complain
-import SaxonJS from "saxon-js";
+import SaxonJS from "saxonjs-he";
 import { validateXML, XMLValidationResult } from "xmllint-wasm";
 
 interface XmlValidationResult {
