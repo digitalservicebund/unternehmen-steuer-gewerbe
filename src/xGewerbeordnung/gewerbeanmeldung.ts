@@ -1,4 +1,5 @@
 // https://www.xrepository.de/details/urn:xoev-de:kosit:standard:xgewerbeordnung_1.6#version
+import { validateXml } from "../helpers/xmlValidator";
 import { createBehoerde, type Behoerde } from "./buildingBlocks/behoerde";
 import {
   createG2gNachrichtenkopf,
@@ -70,7 +71,9 @@ const ROOT_ATTRIBUTES = `
   version="1.6"
   test="100"`;
 
-export function createGewerbeanmeldungXml(gewerbeanmeldung: Gewerbeanmeldung) {
+export async function createGewerbeanmeldungXml(
+  gewerbeanmeldung: Gewerbeanmeldung,
+): Promise<string> {
   const natuerlichePerson0 = gewerbeanmeldung.referenzierteSubjekte.natuerlichePerson[0];
 
   if (!natuerlichePerson0) {
@@ -79,7 +82,7 @@ export function createGewerbeanmeldungXml(gewerbeanmeldung: Gewerbeanmeldung) {
     );
   }
 
-  return `<?xml version="1.0" encoding="UTF-8"?>
+  const gewerbeanmeldungXml = `<?xml version="1.0" encoding="UTF-8"?>
     <xga:alg.gewerbemeldung.0300 ${ROOT_ATTRIBUTES}>
       ${createG2gNachrichtenkopf(gewerbeanmeldung.nachrichtenkopf)}
       <xga:satz>
@@ -104,4 +107,17 @@ export function createGewerbeanmeldungXml(gewerbeanmeldung: Gewerbeanmeldung) {
         </xga:anmeldung>
       </xga:satz>
     </xga:alg.gewerbemeldung.0300>`;
+
+  const xmlValidationResult = await validateXml(gewerbeanmeldungXml);
+
+  if (!xmlValidationResult.isValid) {
+    const errorText = `
+        Generated XGewerbeanmeldung is invalid.
+        Schema related errors: ${JSON.stringify(xmlValidationResult.schemaValidationResult.errors)}.
+        Schematron related errors: ${JSON.stringify(xmlValidationResult.schematronValidationResult.resultDocuments)}.
+      `;
+    throw new Error(errorText);
+  }
+
+  return gewerbeanmeldungXml;
 }

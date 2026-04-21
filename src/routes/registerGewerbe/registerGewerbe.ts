@@ -11,7 +11,7 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
       const data = c.req.valid("json");
 
       const gewerbeanmeldung = transformToGewerbeanmeldung(data);
-      const gewerbeanmeldungXml = createGewerbeanmeldungXml(gewerbeanmeldung);
+      const gewerbeanmeldungXml = await createGewerbeanmeldungXml(gewerbeanmeldung);
 
       const fitConnectClient = getFitConnectClient();
 

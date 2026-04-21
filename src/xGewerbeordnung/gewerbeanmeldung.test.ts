@@ -367,8 +367,8 @@ const gewerbeanmeldung: Gewerbeanmeldung = {
 };
 
 describe("createGewerbeanmeldungXml", () => {
-  it("maps Gewerbeanmeldung data to the correct xGewerbeordnung 1.6 XML structure", () => {
-    expect(normalizeXml(createGewerbeanmeldungXml(gewerbeanmeldung))).toBe(
+  it("maps Gewerbeanmeldung data to the correct xGewerbeordnung 1.6 XML structure", async () => {
+    expect(normalizeXml(await createGewerbeanmeldungXml(gewerbeanmeldung))).toBe(
       normalizeXml(xgewo_1_6_valid),
     );
   });
@@ -475,7 +475,7 @@ describe("createGewerbeanmeldungXml", () => {
     expect(() => createGewerbeanmeldungXml(withoutPerson)).toThrow(/natuerlichePerson\[0\]/);
   });
 
-  it("includes housenumber range and suffix in the business address", () => {
+  it("includes housenumber range and suffix in the business address", async () => {
     const withRange: Gewerbeanmeldung = {
       ...gewerbeanmeldung,
       gewerbebetrieb: {
@@ -492,7 +492,7 @@ describe("createGewerbeanmeldungXml", () => {
       },
     };
 
-    const parsed = parser.parse(createGewerbeanmeldungXml(withRange));
+    const parsed = parser.parse(await createGewerbeanmeldungXml(withRange));
     const anschrift =
       parsed["xga:alg.gewerbemeldung.0300"]["xga:satz"]["xga:anmeldung"]["xga:gewerbebetrieb"][
         "xga:betriebsstaette"
@@ -502,7 +502,7 @@ describe("createGewerbeanmeldungXml", () => {
     expect(anschrift["bk:hausnummernzusatz"]).toBe("a");
   });
 
-  it("includes fax, email and website even when phone is missing", () => {
+  it("includes fax, email and website even when phone is missing", async () => {
     const withoutPhone: Gewerbeanmeldung = {
       ...gewerbeanmeldung,
       gewerbebetrieb: {
@@ -518,7 +518,7 @@ describe("createGewerbeanmeldungXml", () => {
       },
     };
 
-    const generatedXml = createGewerbeanmeldungXml(withoutPhone);
+    const generatedXml = await createGewerbeanmeldungXml(withoutPhone);
     const parsed = parser.parse(generatedXml);
     const kommunikation =
       parsed["xga:alg.gewerbemeldung.0300"]["xga:satz"]["xga:anmeldung"]["xga:gewerbebetrieb"][
@@ -530,7 +530,7 @@ describe("createGewerbeanmeldungXml", () => {
     expect(kommunikation["komm:telefon"]).toBeUndefined();
   });
 
-  it("creates every natuerlichePerson entry when the array contains multiple", () => {
+  it("creates every natuerlichePerson entry when the array contains multiple", async () => {
     const firstPerson = gewerbeanmeldung.referenzierteSubjekte.natuerlichePerson[0]!;
     const multiPerson: Gewerbeanmeldung = {
       ...gewerbeanmeldung,
@@ -546,7 +546,7 @@ describe("createGewerbeanmeldungXml", () => {
       },
     };
 
-    const parsed = parser.parse(createGewerbeanmeldungXml(multiPerson));
+    const parsed = parser.parse(await createGewerbeanmeldungXml(multiPerson));
     const personen =
       parsed["xga:alg.gewerbemeldung.0300"]["xga:satz"]["xga:anmeldung"][
         "xga:referenzierteSubjekte"
