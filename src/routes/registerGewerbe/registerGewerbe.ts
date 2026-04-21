@@ -17,9 +17,9 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
 
       const fitConnectResponse = await fitConnectClient.submitData({
         // The destination varies from commune to commune.
-        // We can hard‑code it here for the demo, but in the future we need to
+        // We can hard‑code it here for the first iterations, but in the future we need to
         // use the Fit‑Connect routing API to determine the destination ID.
-        destinationId: "dbc4efa5-58e7-4527-8898-00d58450c68e",
+        destinationId: "fa63ede0-0ef6-4ca6-abd2-6bd16729ddc1",
         publicService: {
           identifier: "urn:de:fim:leika:leistung:99050012104000",
           name: "Gewerbe Anmeldung",

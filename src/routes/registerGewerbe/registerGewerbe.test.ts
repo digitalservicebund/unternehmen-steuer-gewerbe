@@ -1,43 +1,43 @@
-import { describe, test, expect, vi, afterEach } from "vitest";
+import { describe, test, expect, vi, afterEach, beforeAll } from "vitest";
 import app from "../../app";
+
+const registerGewerbeRequestData = {
+  persönlicheDaten: {
+    vorname: "Erika",
+    nachname: "Mustermann",
+    geburtsdatum: "1988-09-10",
+    geburtsort: "Musterstadt",
+    geburtsland: "Deutschland",
+    staatsangehörigkeitDeutsch: true,
+    adresse: {
+      strasseUndHausnummer: "Musterstraße 1",
+      postleitzahl: "12345",
+      ort: "Musterstadt",
+    },
+    telefon: "007",
+    email: "e.mustermann@example.org",
+  },
+  unternehmensDaten: {
+    tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
+    tätigkeitsbereich: "Handwerksbetrieb",
+    tätigkeitsbeginn: "2026-04-17",
+    gewerbeart: "hauptgewerbe",
+    adresseAbweichend: {
+      strasseUndHausnummer: "Musterstraße 2",
+      postleitzahl: "67890",
+      ort: "Musterstadt",
+    },
+  },
+};
 
 describe("Route /api/v1/register-gewerbe", () => {
   afterEach(() => vi.restoreAllMocks());
-
-  const requestData = {
-    persönlicheDaten: {
-      vorname: "Erika",
-      nachname: "Mustermann",
-      geburtsdatum: "1988-09-10",
-      geburtsort: "Musterstadt",
-      geburtsland: "Deutschland",
-      staatsangehörigkeitDeutsch: true,
-      adresse: {
-        strasseUndHausnummer: "Musterstraße 1",
-        postleitzahl: "12345",
-        ort: "Musterstadt",
-      },
-      telefon: "007",
-      email: "e.mustermann@example.org",
-    },
-    unternehmensDaten: {
-      tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
-      tätigkeitsbereich: "Handwerksbetrieb",
-      tätigkeitsbeginn: "2026-04-17",
-      gewerbeart: "hauptgewerbe",
-      adresseAbweichend: {
-        strasseUndHausnummer: "Musterstraße 2",
-        postleitzahl: "67890",
-        ort: "Musterstadt",
-      },
-    },
-  };
 
   test("Returns 200 OK and JSON with success=true and non-empty submissionId on POST", async () => {
     const response = await app.request("/api/v1/register-gewerbe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestData),
+      body: JSON.stringify(registerGewerbeRequestData),
     });
     const json = await response.json();
     expect(response.status).toEqual(200);
@@ -57,7 +57,7 @@ describe("Route /api/v1/register-gewerbe", () => {
     const response = await app.request("/api/v1/register-gewerbe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestData),
+      body: JSON.stringify(registerGewerbeRequestData),
     });
     const json = await response.json();
     expect(response.status).toEqual(500);
@@ -70,10 +70,21 @@ describe("Route /api/v1/register-gewerbe", () => {
 });
 
 describe("Route /api/v1/register-gewerbe/:submissionId/events", () => {
+  let submissionId: string;
+
+  beforeAll(async () => {
+    const response = await app.request("/api/v1/register-gewerbe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(registerGewerbeRequestData),
+    });
+    expect(response.status).toEqual(200);
+    submissionId = (await response.json()).submissionId;
+    expect(submissionId).toBeDefined();
+  });
+
   test("Returns 200 OK on GET with /:submissionId/events", async () => {
-    const response = await app.request(
-      "/api/v1/register-gewerbe/0b0dd73c-2379-4ba6-a02b-385f7c23102c/events",
-    );
+    const response = await app.request(`/api/v1/register-gewerbe/${submissionId}/events`);
     expect(response.status).toEqual(200);
   });
 });
