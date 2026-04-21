@@ -3,7 +3,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 const SupportedRegionParamsSchema = z.object({
   plz: z
     .string()
-    .regex(/^[0-9]{5}$/, "plz must be a 5-digit number")
+    .regex(/^\d{5}$/, "plz must be a 5-digit number")
     .openapi({
       param: { name: "plz", in: "path" },
       example: "10969",
