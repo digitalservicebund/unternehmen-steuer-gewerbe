@@ -23,9 +23,6 @@ importers:
       dotenv:
         specifier: ^17.3.1
         version: 17.4.0
-      helmet:
-        specifier: ^8.1.0
-        version: 8.1.0
       hono:
         specifier: ^4.12.14
         version: 4.12.14
@@ -35,9 +32,6 @@ importers:
       jose:
         specifier: ^6.2.2
         version: 6.2.2
-      saxon-js:
-        specifier: ^2.7.0
-        version: 2.7.0
       saxonjs-he:
         specifier: 3.0.0-beta2
         version: 3.0.0-beta2
@@ -47,9 +41,6 @@ importers:
       xmllint-wasm:
         specifier: ^5.2.0
         version: 5.2.0(@types/node@25.6.0)
-      xslt3-he:
-        specifier: 3.0.0-beta2
-        version: 3.0.0-beta2
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -87,9 +78,9 @@ importers:
       vitest:
         specifier: ^4.1.2
         version: 4.1.2(@types/node@25.6.0)(vite@8.0.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.1)(@types/node@25.6.0)(yaml@2.8.3))
-      xslt3:
-        specifier: ^2.7.0
-        version: 2.7.0
+      xslt3-he:
+        specifier: 3.0.0-beta2
+        version: 3.0.0-beta2
 
 packages:
 
@@ -806,9 +797,6 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  axios@1.15.1:
-    resolution: {integrity: sha512-WOG+Jj8ZOvR0a3rAn+Tuf1UQJRxw5venr6DgdbJzngJE3qG7X0kL83CZGpdHMxEm+ZK3seAbvFsw4FfOfP9vxg==}
-
   balanced-match@4.0.4:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
@@ -922,15 +910,6 @@ packages:
     resolution: {integrity: sha512-YsGpe3WHLK8ZYi4tWDg2Jy3ebRz2rXowDxnld4bkQB00cc/1Zw9AWnC0i9ztDJitivtQvaI9KaLyKrc+hBW0yg==}
     engines: {node: '>=8'}
 
-  follow-redirects@1.16.0:
-    resolution: {integrity: sha512-y5rN/uOsadFT/JfYwhxRS5R7Qce+g3zG97+JrtFZlC9klX/W5hD7iiLzScI4nZqUS7DNUdhPgw4xI8W2LuXlUw==}
-    engines: {node: '>=4.0'}
-    peerDependencies:
-      debug: '*'
-    peerDependenciesMeta:
-      debug:
-        optional: true
-
   form-data@4.0.5:
     resolution: {integrity: sha512-8RipRLol37bNs2bhoV67fiTEvdTrbMUYcFTiy3+wuuOnUog2QBHCZWXDRijWQfAkhBj2Uf5UnVaiWwA5vdd82w==}
     engines: {node: '>= 6'}
@@ -978,10 +957,6 @@ packages:
   hasown@2.0.2:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
-
-  helmet@8.1.0:
-    resolution: {integrity: sha512-jOiHyAZsmnr8LqoPGmCjYAaiuWwjAPLgY8ZX2XrmHawt99/u1y6RgrZMTeoPfpUbV96HOalYgz1qzkRbw54Pmg==}
-    engines: {node: '>=18.0.0'}
 
   hono-openapi@1.3.0:
     resolution: {integrity: sha512-xDvCWpWEIv0weEmnl3EjRQzqbHIO8LnfzMuYOCmbuyE5aes6aXxLg4vM3ybnoZD5TiTUkA6PuRQPJs3R7WRBig==}
@@ -1208,10 +1183,6 @@ packages:
     resolution: {integrity: sha512-OW/rX8O/jXnm82Ey1k44pObPtdblfiuWnrd8X7GJ7emImCOstunGbXUpp7HdBrFQX6rJzn3sPT397Wp5aCwCHg==}
     engines: {node: ^10 || ^12 || >=14}
 
-  proxy-from-env@2.1.0:
-    resolution: {integrity: sha512-cJ+oHTW1VAEa8cJslgmUZrc+sjRKgAKl3Zyse6+PV38hZe/V6Z14TbCuXcan9F9ghlz4QrFr2c92TNF82UkYHA==}
-    engines: {node: '>=10'}
-
   pstree.remy@1.1.8:
     resolution: {integrity: sha512-77DZwxQmxKnu3aR542U+X8FypNzbfJ+C5XQDk3uWjWxn6151aIMGthWYRXTqT1E5oJvg+ljaa2OJi+VfvCOQ8w==}
 
@@ -1231,9 +1202,6 @@ packages:
     resolution: {integrity: sha512-bvVj8YJmf0rq4pSFmH7laLa6pYrhghv3PRzrCdRAr23g66zOKVJ4wkvFtgohtPLWmthgg8/rkaqRHrpUEh0Zbw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
-
-  saxon-js@2.7.0:
-    resolution: {integrity: sha512-uGAv7H85EuWtAyyXVezXBg3/j2UvhEfT3N9+sqkGwCJVW33KlkadllDCdES/asCDklUo0UlM6178tZ0n3GPZjQ==}
 
   saxonjs-he@3.0.0-beta2:
     resolution: {integrity: sha512-ZoxMP1BzQ6qGv9oJIDRFh87D1G1wOJysuHqW7PrxF+5MMvYxv2gApIdQ87mxpAQb42fmZlLnT4AvcIC7d+hgpQ==}
@@ -1420,10 +1388,6 @@ packages:
 
   xslt3-he@3.0.0-beta2:
     resolution: {integrity: sha512-Kj+ICegvwaj9qzdeC2VvL+4S35pqbYzR+A7VkLu2eTijJRGKhRgY/mbOsim/nJOV6Hs3QyNs6ibyxYAlcmd1OA==}
-    hasBin: true
-
-  xslt3@2.7.0:
-    resolution: {integrity: sha512-Vt32LhCt4CQULtGPWlGW++PhS+o3LA6z3PDvig9lDfbo2cIHcaEnyrRYDTilw4N0EbAyxCaw5E0B+DICZEYktQ==}
     hasBin: true
 
   yaml@2.8.3:
@@ -1900,14 +1864,6 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios@1.15.1:
-    dependencies:
-      follow-redirects: 1.16.0
-      form-data: 4.0.5
-      proxy-from-env: 2.1.0
-    transitivePeerDependencies:
-      - debug
-
   balanced-match@4.0.4: {}
 
   binary-extensions@2.3.0: {}
@@ -2009,8 +1965,6 @@ snapshots:
     dependencies:
       to-regex-range: 5.0.1
 
-  follow-redirects@1.16.0: {}
-
   form-data@4.0.5:
     dependencies:
       asynckit: 0.4.0
@@ -2061,8 +2015,6 @@ snapshots:
   hasown@2.0.2:
     dependencies:
       function-bind: 1.1.2
-
-  helmet@8.1.0: {}
 
   hono-openapi@1.3.0(@hono/standard-validator@0.2.2(@standard-schema/spec@1.1.0)(hono@4.12.14))(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod@4.3.6))(@standard-community/standard-openapi@0.2.9(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod@4.3.6))(@standard-schema/spec@1.1.0)(openapi-types@12.1.3)(zod@4.3.6))(@types/json-schema@7.0.15)(hono@4.12.14)(openapi-types@12.1.3):
     dependencies:
@@ -2275,8 +2227,6 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  proxy-from-env@2.1.0: {}
-
   pstree.remy@1.1.8: {}
 
   quansync@0.2.11: {}
@@ -2329,12 +2279,6 @@ snapshots:
       '@rolldown/binding-wasm32-wasi': 1.0.0-rc.13
       '@rolldown/binding-win32-arm64-msvc': 1.0.0-rc.13
       '@rolldown/binding-win32-x64-msvc': 1.0.0-rc.13
-
-  saxon-js@2.7.0:
-    dependencies:
-      axios: 1.15.1
-    transitivePeerDependencies:
-      - debug
 
   saxonjs-he@3.0.0-beta2: {}
 
@@ -2464,13 +2408,6 @@ snapshots:
   xslt3-he@3.0.0-beta2:
     dependencies:
       saxonjs-he: 3.0.0-beta2
-
-  xslt3@2.7.0:
-    dependencies:
-      axios: 1.15.1
-      saxon-js: 2.7.0
-    transitivePeerDependencies:
-      - debug
 
   yaml@2.8.3: {}
 
