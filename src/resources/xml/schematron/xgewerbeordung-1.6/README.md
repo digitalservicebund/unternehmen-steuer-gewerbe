@@ -10,6 +10,7 @@
 - `generated.spezifikation.sef.json`
   - Json file that our library [SaxonJS](https://www.saxonica.com/saxonjs/index.xml) requires as input.
   - It has been generated from the Schematron rules (`spezifikation.xsl`, cf. above) using [xslt3](https://www.npmjs.com/package/xslt3?activeTab=readme), a command line interface for SaxonJS by running
+
   ```bash
     pnpm xslt3 -xsl:src/resources/xml/schematron/xgewerbeordung-1.6/spezifikation.xsl -export:src/resources/xml/schematron/xgewerbeordung-1.6/generated.spezifikation.sef.json -t -nogo
   ```
