@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { validateXml } from "./xmlValidator";
 
 describe("XML validator", () => {
-  it("should return false and a non-empty list of errors for schema-invalid XML", async () => {
+  it("should return false and a non-empty list of schema errors for schema-invalid XML", async () => {
     const xml = fs.readFileSync(
       `src/resources/xml/xml-samples/xgewerbeordnung-1.6-validator/xgewo-1.6-invalid.xml`,
       "utf8",
@@ -24,7 +24,7 @@ describe("XML validator", () => {
     expect(result.isValid).to.equal(true);
   });
 
-  it("should return false and errors for rules-invalid XML (schematron check)", async () => {
+  it("should return false and rules errors for schematron-invalid XML", async () => {
     const xml = fs.readFileSync(
       `src/resources/xml/xml-samples/xgewerbeordnung-1.6-validator/xgewo-1.6-invalid-sch.xml`,
       "utf8",
@@ -33,5 +33,15 @@ describe("XML validator", () => {
 
     expect(result.isValid).to.equal(false);
     expect(result.schematronValidationResult.principalResult).toContain("svrl:failed-assert");
+  });
+
+  it("should return false for completely broken XML", async () => {
+    const xml = fs.readFileSync(
+      `src/resources/xml/xml-samples/xgewerbeordnung-1.6-validator/xy-unknown.xml`,
+      "utf8",
+    );
+    const result = await validateXml(xml);
+
+    expect(result.isValid).to.equal(false);
   });
 });
