@@ -1,8 +1,7 @@
 import fs from "node:fs";
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { XMLParser, XMLBuilder } from "fast-xml-parser";
 import { createGewerbeanmeldungXml, type Gewerbeanmeldung } from "./gewerbeanmeldung";
-import * as xmlValidator from "../helpers/xmlValidator";
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
 const builder = new XMLBuilder({
