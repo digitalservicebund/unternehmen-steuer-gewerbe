@@ -1,6 +1,7 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { XMLParser, XMLBuilder } from "fast-xml-parser";
 import { createGewerbeanmeldungXml, type Gewerbeanmeldung } from "./gewerbeanmeldung";
+import * as xmlValidator from "../helpers/xmlValidator";
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
 const builder = new XMLBuilder({
@@ -367,6 +368,17 @@ const gewerbeanmeldung: Gewerbeanmeldung = {
 };
 
 describe("createGewerbeanmeldungXml", () => {
+  it("throws when the generated XML is invalid", async () => {
+    const withoutPerson: Gewerbeanmeldung = {
+      ...gewerbeanmeldung,
+      referenzierteSubjekte: { natuerlichePerson: [] },
+    };
+
+    await expect(createGewerbeanmeldungXml(withoutPerson)).rejects.toThrow(
+      "Generated XGewerbeanmeldung is invalid.",
+    );
+  });
+
   it("maps Gewerbeanmeldung data to the correct xGewerbeordnung 1.6 XML structure", async () => {
     expect(normalizeXml(await createGewerbeanmeldungXml(gewerbeanmeldung))).toBe(
       normalizeXml(xgewo_1_6_valid),
