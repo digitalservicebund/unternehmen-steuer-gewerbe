@@ -14,7 +14,7 @@ const registerGewerbeRequestData = {
       postleitzahl: "12345",
       ort: "Musterstadt",
     },
-    telefon: "007",
+    telefon: "+49 234 121314",
     email: "e.mustermann@example.org",
   },
   unternehmensDaten: {

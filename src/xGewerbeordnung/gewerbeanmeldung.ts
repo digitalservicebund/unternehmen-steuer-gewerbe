@@ -1,4 +1,5 @@
 // https://www.xrepository.de/details/urn:xoev-de:kosit:standard:xgewerbeordnung_1.6#version
+import { validateXml } from "../helpers/xmlValidator";
 import { createBehoerde, type Behoerde } from "./buildingBlocks/behoerde";
 import {
   createG2gNachrichtenkopf,
@@ -70,16 +71,12 @@ const ROOT_ATTRIBUTES = `
   version="1.6"
   test="100"`;
 
-export function createGewerbeanmeldungXml(gewerbeanmeldung: Gewerbeanmeldung) {
-  const natuerlichePerson0 = gewerbeanmeldung.referenzierteSubjekte.natuerlichePerson[0];
+export async function createGewerbeanmeldungXml(
+  gewerbeanmeldung: Gewerbeanmeldung,
+): Promise<string> {
+  const natuerlichePerson0 = gewerbeanmeldung.referenzierteSubjekte.natuerlichePerson?.[0];
 
-  if (!natuerlichePerson0) {
-    throw new Error(
-      "Required field gewerbeanmeldung.referenzierteSubjekte.natuerlichePerson[0] is missing",
-    );
-  }
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
+  const gewerbeanmeldungXml = `<?xml version="1.0" encoding="UTF-8"?>
     <xga:alg.gewerbemeldung.0300 ${ROOT_ATTRIBUTES}>
       ${createG2gNachrichtenkopf(gewerbeanmeldung.nachrichtenkopf)}
       <xga:satz>
@@ -96,7 +93,7 @@ export function createGewerbeanmeldungXml(gewerbeanmeldung: Gewerbeanmeldung) {
             <xga:uuid>${escapeXml(gewerbeanmeldung.uuid)}</xga:uuid>
             <xga:gueltigAb>${escapeXml(gewerbeanmeldung.gueltigAb)}</xga:gueltigAb>
             <xga:datumMeldung>${escapeXml(gewerbeanmeldung.datumMeldung)}</xga:datumMeldung>
-            ${createGewerbebetrieb(gewerbeanmeldung.gewerbebetrieb, natuerlichePerson0.id)}
+            ${createGewerbebetrieb(gewerbeanmeldung.gewerbebetrieb, natuerlichePerson0 ? natuerlichePerson0.id : "")}
             ${createReferenzierteSubjekte(gewerbeanmeldung.referenzierteSubjekte)}
             <xga:grundAnmeldungSchluessel>
               <code>${escapeXml(gewerbeanmeldung.grundAnmeldungSchluessel)}</code>
@@ -104,4 +101,19 @@ export function createGewerbeanmeldungXml(gewerbeanmeldung: Gewerbeanmeldung) {
         </xga:anmeldung>
       </xga:satz>
     </xga:alg.gewerbemeldung.0300>`;
+
+  const xmlValidationResult = await validateXml(gewerbeanmeldungXml);
+
+  if (!xmlValidationResult.isValid) {
+    const errorText = `
+        Generated XGewerbeanmeldung is invalid.
+        Schema related errors: ${JSON.stringify(xmlValidationResult.schemaValidationResult.errors)}.
+        Principle Result: ${JSON.stringify(xmlValidationResult.schematronValidationResult.principalResult)}.
+      `;
+
+    //Schematron related errors: ${JSON.stringify(xmlValidationResult.schematronValidationResult)}.
+    throw new Error(errorText);
+  }
+
+  return gewerbeanmeldungXml;
 }
