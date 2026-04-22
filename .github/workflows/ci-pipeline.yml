@@ -106,7 +106,6 @@ jobs:
 
       # Break pipeline on Sonar quality gate
       - name: SonarQube Quality Gate check
-        if: false
         id: sonarqube-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b
         with:
