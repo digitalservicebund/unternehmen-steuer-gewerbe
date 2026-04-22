@@ -99,7 +99,6 @@ export async function createGewerbeanmeldungXml(
             <xga:uuid>${escapeXml(gewerbeanmeldung.uuid)}</xga:uuid>
             <xga:gueltigAb>${escapeXml(gewerbeanmeldung.gueltigAb)}</xga:gueltigAb>
             <xga:datumMeldung>${escapeXml(gewerbeanmeldung.datumMeldung)}</xga:datumMeldung>
-            ${createBisherigeUnfallversicherung(gewerbeanmeldung.bisherigeUnfallversicherung)}
             ${createGewerbebetrieb(gewerbeanmeldung.gewerbebetrieb, natuerlichePerson0 ? natuerlichePerson0.id : "")}
             ${createReferenzierteSubjekte(gewerbeanmeldung.referenzierteSubjekte)}
             <xga:grundAnmeldungSchluessel>

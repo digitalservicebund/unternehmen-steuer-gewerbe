@@ -38,8 +38,7 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
     uuid: randomUUID(),
     gueltigAb: new Date().toISOString().split("T")[0]!,
     datumMeldung: new Date().toISOString().split("T")[0]!,
-    grundAnmeldungSchluessel: "01", // 01 = Neugründung. See https://www.xrepository.de/api/xrepository/urn:xoev-de:xgewerbeordnung:codeliste:grundfueranmeldung_3:technischerBestandteilGenericode
-    bisherigeUnfallversicherung: undefined, // Not used as long as we only support 'grundAnmeldungSchluessel: "01"' (Neugründung)
+    grundAnmeldungSchluessel: "01",
     gewerbebetrieb: {
       gewerbebetriebID: randomUUID(),
       gemeindeMeldungNr: "2024 0001",
