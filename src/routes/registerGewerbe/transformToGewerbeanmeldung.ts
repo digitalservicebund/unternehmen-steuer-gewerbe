@@ -36,8 +36,8 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
     istStorno: false,
     gemeindeSchluessel: "00000000",
     uuid: randomUUID(),
-    gueltigAb: new Date().toISOString().substring(0, 10),
-    datumMeldung: new Date().toISOString(),
+    gueltigAb: new Date().toISOString().split("T")[0]!,
+    datumMeldung: new Date().toISOString().split("T")[0]!,
     grundAnmeldungSchluessel: "01",
     gewerbebetrieb: {
       gewerbebetriebID: randomUUID(),

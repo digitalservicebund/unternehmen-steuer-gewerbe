@@ -8,7 +8,7 @@ export interface Kommunikation {
   /** E-Mail-Adresse. */
   email?: string;
   /** Web-Adresse. */
-  webseite?: string;
+  webAdresse?: string;
 }
 
 export function createKommunikation(kommunikation: Kommunikation | undefined) {
@@ -18,7 +18,7 @@ export function createKommunikation(kommunikation: Kommunikation | undefined) {
     <bk:kommunikation>
       ${kommunikation.telefon ? `<komm:telefon>${escapeXml(kommunikation.telefon)}</komm:telefon>` : ""}
       ${kommunikation.telefax ? `<komm:telefax>${escapeXml(kommunikation.telefax)}</komm:telefax>` : ""}
-      ${kommunikation.email ? `<komm:email>${escapeXml(kommunikation.email)}</komm:email>` : ""}
-      ${kommunikation.webseite ? `<komm:webseite>${escapeXml(kommunikation.webseite)}</komm:webseite>` : ""}
+      ${kommunikation.email ? `<komm:eMail>${escapeXml(kommunikation.email)}</komm:eMail>` : ""}
+      ${kommunikation.webAdresse ? `<komm:webAdresse>${escapeXml(kommunikation.webAdresse)}</komm:webAdresse>` : ""}
     </bk:kommunikation>`;
 }

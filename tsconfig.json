@@ -1,5 +1,9 @@
 {
   // Visit https://aka.ms/tsconfig to read more about this file
+  "ts-node": {
+    // Include all project files so ambient declarations (e.g. src/declarations.d.ts) are loaded
+    "files": true
+  },
   "compilerOptions": {
     // File Layout
     "rootDir": "./",

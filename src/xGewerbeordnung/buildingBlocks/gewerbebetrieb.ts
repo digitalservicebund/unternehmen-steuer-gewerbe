@@ -29,11 +29,21 @@ export interface Gewerbebetrieb {
   /** Mit diesem Element kann übermittelt werden, ob es sich bei dem Gewerbe um eine Reisegewerbe handelt */
   istReisegewerbe: boolean;
   /** Angabe, ob und in welcher Höhe eine Beteiligung der öffentlichen Hand am Gewerbebetrieb besteht. */
-  beteiligungOeffentlicheHand?: string;
+  beteiligungOeffentlicheHand?: boolean;
   /** Gibt die Art eine Betriebes (Handels-, Handwerks-, Industrie oder sonstiger Betrieb) an. */
   betriebArt: BetriebArt;
   /** Angaben zur Handwerkskarte – nur relevant, wenn betriebArt.handwerk = true. */
   handwerkskarte?: Handwerkskarte;
+}
+
+function mapBeteiligungÖffentlicheHand(beteiligungOeffentlicheHand: boolean | undefined) {
+  if (beteiligungOeffentlicheHand === false) {
+    return "0";
+  }
+  if (beteiligungOeffentlicheHand) {
+    return "1";
+  }
+  return "2";
 }
 
 export function createGewerbebetrieb(
@@ -61,7 +71,7 @@ export function createGewerbebetrieb(
       <xga:anzahlVollzeitBeschaeftigte>${escapeXml(gewerbebetrieb.anzahlVollzeitBeschaeftigte)}</xga:anzahlVollzeitBeschaeftigte>
       <xga:anzahlTeilzeitBeschaeftigte>${escapeXml(gewerbebetrieb.anzahlTeilzeitBeschaeftigte)}</xga:anzahlTeilzeitBeschaeftigte>
       <xga:istReisegewerbe>${escapeXml(gewerbebetrieb.istReisegewerbe)}</xga:istReisegewerbe>
-      ${gewerbebetrieb.beteiligungOeffentlicheHand ? `<xga:beteiligungOeffentlicheHand><code>${escapeXml(gewerbebetrieb.beteiligungOeffentlicheHand)}</code></xga:beteiligungOeffentlicheHand>` : ""}
+      <xga:beteiligungOeffentlicheHand><code>${mapBeteiligungÖffentlicheHand(gewerbebetrieb.beteiligungOeffentlicheHand)}</code></xga:beteiligungOeffentlicheHand>
       ${createBetriebArt(gewerbebetrieb.betriebArt)}
       ${createHandwerkskarte(gewerbebetrieb.handwerkskarte)}
     </xga:gewerbebetrieb>`;
