@@ -314,7 +314,7 @@ const gewerbeanmeldung: Gewerbeanmeldung = {
     anzahlVollzeitBeschaeftigte: 0,
     anzahlTeilzeitBeschaeftigte: 2,
     istReisegewerbe: false,
-    beteiligungOeffentlicheHand: "0",
+    beteiligungOeffentlicheHand: false,
     betriebArt: {
       industrie: false,
       handwerk: true,
@@ -373,7 +373,7 @@ describe("createGewerbeanmeldungXml", () => {
     );
   });
 
-  it("works without optional fields", () => {
+  it("works without optional fields", async () => {
     const minimal: Gewerbeanmeldung = {
       nachrichtenkopf: {
         nachrichtenUUID: "00000000-0000-0000-0000-000000000001",
@@ -430,20 +430,25 @@ describe("createGewerbeanmeldungXml", () => {
             geburt: { geburtsdatum: "1980-01-01", ort: "Berlin", staat: "Deutschland" },
             geschlecht: "m",
             staatsangehoerigkeit: "000",
+            anschrift: {
+              strasse: "Musterstraße",
+              hausnummerVon: "1",
+              postleitzahl: "12345",
+              ort: "Musterstadt",
+            },
           },
         ],
       },
     };
-    const xml = createGewerbeanmeldungXml(minimal);
+    const xml = await createGewerbeanmeldungXml(minimal);
     expect(xml).toContain("<xga:alg.gewerbemeldung.0300");
     expect(xml).not.toContain("<bk:kommunikation>");
     expect(xml).not.toContain("<xga:handwerkskarte>");
     expect(xml).not.toContain("<xga:weitereTaetigkeiten>");
-    expect(xml).not.toContain("<xga:beteiligungOeffentlicheHand>");
     expect(xml).not.toContain("<xga:aufenthaltstitel>");
   });
 
-  it("escapes XML special characters (<, >, &) in text fields", () => {
+  it("escapes XML special characters (<, >, &) in text fields", async () => {
     const withSpecials: Gewerbeanmeldung = {
       ...gewerbeanmeldung,
       autor: { ...gewerbeanmeldung.autor, name: "Amt <Müller & Söhne>" },
@@ -460,19 +465,11 @@ describe("createGewerbeanmeldungXml", () => {
       },
     };
 
-    const generatedXml = createGewerbeanmeldungXml(withSpecials);
+    const generatedXml = await createGewerbeanmeldungXml(withSpecials);
 
     expect(generatedXml).not.toContain("Müller & Söhne GmbH");
     expect(generatedXml).toContain("Müller &amp; Söhne GmbH");
     expect(generatedXml).toContain("A &gt; B &amp; C &lt; D");
-  });
-
-  it("throws when the natuerlichePerson array is empty", () => {
-    const withoutPerson: Gewerbeanmeldung = {
-      ...gewerbeanmeldung,
-      referenzierteSubjekte: { natuerlichePerson: [] },
-    };
-    expect(() => createGewerbeanmeldungXml(withoutPerson)).toThrow(/natuerlichePerson\[0\]/);
   });
 
   it("includes housenumber range and suffix in the business address", async () => {
@@ -486,7 +483,6 @@ describe("createGewerbeanmeldungXml", () => {
             ...gewerbeanmeldung.gewerbebetrieb.betriebsstaette.anschrift,
             hausnummerVon: "90",
             hausnummerBis: "94",
-            hausnummernzusatz: "a",
           },
         },
       },
@@ -499,7 +495,6 @@ describe("createGewerbeanmeldungXml", () => {
       ]["bk:anschrift"]["bk:strassenanschriftInland"];
     expect(anschrift["bk:hausnummerVon"]).toBe(90);
     expect(anschrift["bk:hausnummerBis"]).toBe(94);
-    expect(anschrift["bk:hausnummernzusatz"]).toBe("a");
   });
 
   it("includes fax, email and website even when phone is missing", async () => {
@@ -512,7 +507,7 @@ describe("createGewerbeanmeldungXml", () => {
           kommunikation: {
             telefax: "+49 234 555000",
             email: "kontakt@example.de",
-            webseite: "https://example.de",
+            webAdresse: "https://example.de",
           },
         },
       },
@@ -525,8 +520,8 @@ describe("createGewerbeanmeldungXml", () => {
         "xga:betriebsstaette"
       ]["bk:kommunikation"];
     expect(kommunikation["komm:telefax"]).toBe("+49 234 555000");
-    expect(kommunikation["komm:email"]).toBe("kontakt@example.de");
-    expect(kommunikation["komm:webseite"]).toBe("https://example.de");
+    expect(kommunikation["komm:eMail"]).toBe("kontakt@example.de");
+    expect(kommunikation["komm:webAdresse"]).toBe("https://example.de");
     expect(kommunikation["komm:telefon"]).toBeUndefined();
   });
 

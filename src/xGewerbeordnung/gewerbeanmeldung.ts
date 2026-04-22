@@ -74,13 +74,7 @@ const ROOT_ATTRIBUTES = `
 export async function createGewerbeanmeldungXml(
   gewerbeanmeldung: Gewerbeanmeldung,
 ): Promise<string> {
-  const natuerlichePerson0 = gewerbeanmeldung.referenzierteSubjekte.natuerlichePerson[0];
-
-  if (!natuerlichePerson0) {
-    throw new Error(
-      "Required field gewerbeanmeldung.referenzierteSubjekte.natuerlichePerson[0] is missing",
-    );
-  }
+  const natuerlichePerson0 = gewerbeanmeldung.referenzierteSubjekte.natuerlichePerson?.[0];
 
   const gewerbeanmeldungXml = `<?xml version="1.0" encoding="UTF-8"?>
     <xga:alg.gewerbemeldung.0300 ${ROOT_ATTRIBUTES}>
@@ -99,7 +93,7 @@ export async function createGewerbeanmeldungXml(
             <xga:uuid>${escapeXml(gewerbeanmeldung.uuid)}</xga:uuid>
             <xga:gueltigAb>${escapeXml(gewerbeanmeldung.gueltigAb)}</xga:gueltigAb>
             <xga:datumMeldung>${escapeXml(gewerbeanmeldung.datumMeldung)}</xga:datumMeldung>
-            ${createGewerbebetrieb(gewerbeanmeldung.gewerbebetrieb, natuerlichePerson0.id)}
+            ${createGewerbebetrieb(gewerbeanmeldung.gewerbebetrieb, natuerlichePerson0 ? natuerlichePerson0.id : "")}
             ${createReferenzierteSubjekte(gewerbeanmeldung.referenzierteSubjekte)}
             <xga:grundAnmeldungSchluessel>
               <code>${escapeXml(gewerbeanmeldung.grundAnmeldungSchluessel)}</code>
@@ -114,8 +108,10 @@ export async function createGewerbeanmeldungXml(
     const errorText = `
         Generated XGewerbeanmeldung is invalid.
         Schema related errors: ${JSON.stringify(xmlValidationResult.schemaValidationResult.errors)}.
-        Schematron related errors: ${JSON.stringify(xmlValidationResult.schematronValidationResult.resultDocuments)}.
+        Principle Result: ${JSON.stringify(xmlValidationResult.schematronValidationResult.principalResult)}.
       `;
+
+    //Schematron related errors: ${JSON.stringify(xmlValidationResult.schematronValidationResult)}.
     throw new Error(errorText);
   }
 

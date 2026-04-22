@@ -9,8 +9,6 @@ export interface Anschrift {
   hausnummerVon: string;
   /** Hausnummer (bis), z.B. "136 C" */
   hausnummerBis?: string;
-  /** Hausnummernzusatz (z.B. "a"). */
-  hausnummernzusatz?: string;
   /** Es ist die Postleitzahl anzugeben. */
   postleitzahl: string;
   /** Der Name des Ortes (Gemeinde, Ortschaft oder Stadt). */
@@ -25,7 +23,6 @@ export function createAnschrift(strassenanschriftInland: Anschrift) {
         ${strassenanschriftInland.strassenschluessel ? `<bk:strassenschluessel>${escapeXml(strassenanschriftInland.strassenschluessel)}</bk:strassenschluessel>` : ""}
         <bk:hausnummerVon>${escapeXml(strassenanschriftInland.hausnummerVon)}</bk:hausnummerVon>
         ${strassenanschriftInland.hausnummerBis ? `<bk:hausnummerBis>${escapeXml(strassenanschriftInland.hausnummerBis)}</bk:hausnummerBis>` : ""}
-        ${strassenanschriftInland.hausnummernzusatz ? `<bk:hausnummernzusatz>${escapeXml(strassenanschriftInland.hausnummernzusatz)}</bk:hausnummernzusatz>` : ""}
         <adr:postleitzahl>${escapeXml(strassenanschriftInland.postleitzahl)}</adr:postleitzahl>
         <adr:ort>${escapeXml(strassenanschriftInland.ort)}</adr:ort>
       </bk:strassenanschriftInland>

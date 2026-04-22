@@ -33,7 +33,7 @@ export interface NatuerlichePerson {
   /** Die Staatsangehörigkeit der natürlichen Person gemäß Codierung des statistischen Bundesamts. */
   staatsangehoerigkeit: string;
   /** Anschrift der natürlichen Person (privater Wohnsitz). */
-  anschrift?: Anschrift;
+  anschrift: Anschrift;
   /** Private Kontaktdaten der natürlichen Person. */
   kommunikation?: Kommunikation;
   /** Mittels dieses Typs werden Angaben zum Aufenthaltstitel ausländischer Betriebsinhaber gemacht. */
@@ -62,7 +62,7 @@ export function createNatuerlichePerson(natuerlichePerson: NatuerlichePerson) {
       <np:staatsangehoerigkeit listVersionID="2020-05-11">
         <code>${escapeXml(natuerlichePerson.staatsangehoerigkeit)}</code>
       </np:staatsangehoerigkeit>
-      ${natuerlichePerson.anschrift ? createAnschrift(natuerlichePerson.anschrift) : ""}
+      ${createAnschrift(natuerlichePerson.anschrift)}
       ${createKommunikation(natuerlichePerson.kommunikation)}
       ${createAufenthaltstitel(natuerlichePerson.aufenthaltstitel)}
     </xga:natuerlichePerson>`;
