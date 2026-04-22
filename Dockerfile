@@ -5,6 +5,8 @@ RUN npm install -g pnpm@10.33.0 \
     && adduser -S nonroot -G nonroot \
     && mkdir -p /app && chown -R nonroot:nonroot /app
 
+USER nonroot
+
 WORKDIR /app
 
 COPY package.json5 pnpm-lock.yaml ./
@@ -12,8 +14,6 @@ RUN pnpm install --prod --frozen-lockfile
 
 # compiled JS from `pnpm run build` (tsc)
 COPY ./dist .
-
-USER nonroot
 
 EXPOSE 3000
 
