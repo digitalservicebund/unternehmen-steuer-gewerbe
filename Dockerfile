@@ -1,6 +1,6 @@
 FROM node:25.9.0-alpine3.23
 
-RUN npm install -g pnpm@10.33.0 \
+RUN npm install -g pnpm@10.33.0 --ignore-scripts \
     && addgroup -S nonroot \
     && adduser -S nonroot -G nonroot \
     && mkdir -p /app && chown -R nonroot:nonroot /app
