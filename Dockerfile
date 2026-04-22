@@ -10,7 +10,7 @@ USER nonroot
 WORKDIR /app
 
 COPY package.json5 pnpm-lock.yaml ./
-RUN pnpm install --prod --frozen-lockfile
+RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
 # compiled JS from `pnpm run build` (tsc)
 COPY ./dist .
