@@ -1,33 +1,36 @@
 import { z, createRoute } from "@hono/zod-openapi";
 
 const AdresseSchema = z.object({
-  strasseUndHausnummer: z.string(),
+  strasseUndHausnummer: z.string().openapi({ example: "Musterstraße 1" }),
   postleitzahl: z
     .string()
     .length(5, "postleitzahl must be 5 characters")
-    .regex(/^\d+$/, "postleitzahl must only contain numbers"),
-  ort: z.string(),
+    .regex(/^\d+$/, "postleitzahl must only contain numbers")
+    .openapi({ example: "12345" }),
+  ort: z.string().openapi({ example: "Musterstadt" }),
 });
 
 const PersönlicheDatenSchema = z.object({
-  vorname: z.string(),
-  nachname: z.string(),
+  vorname: z.string().openapi({ example: "Erika" }),
+  nachname: z.string().openapi({ example: "Mustermann" }),
   geburtsname: z.string().optional(),
-  geburtsdatum: z.iso.date(),
-  geburtsort: z.string(),
-  geburtsland: z.string(),
+  geburtsdatum: z.iso.date().openapi({ example: "1988-09-10" }),
+  geburtsort: z.string().openapi({ example: "Musterstadt" }),
+  geburtsland: z.string().openapi({ example: "Deutschland" }),
   staatsangehörigkeitDeutsch: z.literal(true),
   adresse: AdresseSchema,
-  telefon: z.string(),
-  email: z.string(),
+  telefon: z.string().openapi({ example: "+49 234 121314" }),
+  email: z.string().openapi({ example: "e.mustermann@example.org" }),
 });
 
 const UnternehmensDatenSchema = z.object({
-  adresseAbweichend: AdresseSchema.optional(),
-  tätigkeitsbeschreibung: z.string(),
-  tätigkeitsbereich: z.string(),
-  tätigkeitsbeginn: z.iso.date(),
-  gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]),
+  adresseAbweichend: AdresseSchema.openapi({
+    example: { strasseUndHausnummer: "Musterstraße 2", postleitzahl: "67890", ort: "Musterstadt" },
+  }).optional(),
+  tätigkeitsbeschreibung: z.string().openapi({ example: "Vertrieb von Vertriebsmustern" }),
+  tätigkeitsbereich: z.string().openapi({ example: "Handwerksbetrieb" }),
+  tätigkeitsbeginn: z.iso.date().openapi({ example: "2026-04-17" }),
+  gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
 });
 
 const RegisterGewerbeRequestSchema = z
