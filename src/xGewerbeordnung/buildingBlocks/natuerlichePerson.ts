@@ -28,8 +28,8 @@ export interface NatuerlichePerson {
   name: Name;
   /** Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Angabe zum Staat als Freitext statt Code. */
   geburt: Geburt;
-  /** Als Geschlechtsangabe zulässig sind: "männlich", "weiblich", "divers", "keine Angabe". */
-  geschlecht: string;
+  /** Als Geschlechtsangabe zulässig sind: "x" (keine Angabe), "d" (divers), "w" (weiblich), "m" (männlich). */
+  geschlecht: "x" | "d" | "w" | "m";
   /** Die Staatsangehörigkeit der natürlichen Person gemäß Codierung des statistischen Bundesamts. */
   staatsangehoerigkeit: string;
   /** Anschrift der natürlichen Person (privater Wohnsitz). */
