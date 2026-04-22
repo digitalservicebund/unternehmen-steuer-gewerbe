@@ -78,5 +78,5 @@ export const registerGewerbeRoute = createRoute({
     },
   },
   tags: ["Active Development"],
-  summary: "Feature under active development",
+  summary: "Register Gewerbe via FIT-Connect",
 });
