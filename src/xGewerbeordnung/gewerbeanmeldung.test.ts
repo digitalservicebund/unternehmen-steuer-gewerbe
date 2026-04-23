@@ -238,6 +238,7 @@ describe("createGewerbeanmeldungXml", () => {
     expect(xml).not.toContain("<xga:handwerkskarte>");
     expect(xml).not.toContain("<xga:weitereTaetigkeiten>");
     expect(xml).not.toContain("<xga:aufenthaltstitel>");
+    expect(xml).not.toContain("<bk:bisherigeUnfallversicherung>");
   });
 
   it("escapes XML special characters (<, >, &) in text fields", async () => {
@@ -343,5 +344,18 @@ describe("createGewerbeanmeldungXml", () => {
     expect(personen[0]["np:natuerlichePerson.id"]).toBe("np-1");
     expect(personen[1]["np:natuerlichePerson.id"]).toBe("np-2");
     expect(personen[1]["np:name"]["np:familienname"]).toBe("Zweitperson");
+  });
+
+  it("includes bisherigeUnfallversicherung element when provided", async () => {
+    const withUV: Gewerbeanmeldung = {
+      ...gewerbeanmeldung,
+      grundAnmeldungSchluessel: "02", // Verlegung des Betriebs aus einem anderen Meldebezirk
+      bisherigeUnfallversicherung: { traeger: "08", unternehmensnummer: "123456789012345" },
+    };
+
+    const xml = await createGewerbeanmeldungXml(withUV);
+    expect(xml).toContain("<bk:bisherigeUnfallversicherung>");
+    expect(xml).toContain("<code>08</code>");
+    expect(xml).toContain("<bk:unternehmensnummer>123456789012345</bk:unternehmensnummer>");
   });
 });
