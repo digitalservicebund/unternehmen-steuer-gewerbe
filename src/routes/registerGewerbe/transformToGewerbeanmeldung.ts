@@ -39,6 +39,7 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
     gueltigAb: new Date().toISOString().split("T")[0]!,
     datumMeldung: new Date().toISOString().split("T")[0]!,
     grundAnmeldungSchluessel: "01",
+    bisherigeUnfallversicherung: data.bisherigeUnfallversicherung,
     gewerbebetrieb: {
       gewerbebetriebID: randomUUID(),
       gemeindeMeldungNr: "2024 0001",

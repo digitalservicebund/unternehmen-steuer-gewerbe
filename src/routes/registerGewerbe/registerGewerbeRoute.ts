@@ -1,4 +1,8 @@
 import { z, createRoute } from "@hono/zod-openapi";
+import {
+  UNFALLVERSICHERUNGSTRAEGER,
+  UNFALLVERSICHERUNGSTRAEGER_CODES,
+} from "../../xGewerbeordnung/buildingBlocks/bisherigeUnfallversicherung";
 
 const AdresseSchema = z.object({
   strasseUndHausnummer: z
@@ -51,10 +55,32 @@ const UnternehmensDatenSchema = z.object({
   gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
 });
 
+const unfallversicherungstraegerCodesDescription = Object.entries(UNFALLVERSICHERUNGSTRAEGER)
+  .map(([code, name]) => `- \`${code}\`: ${name}`)
+  .join("\n");
+
+const BisherigeUnfallversicherungSchema = z
+  .object({
+    traeger: z.enum(UNFALLVERSICHERUNGSTRAEGER_CODES).openapi({
+      example: "08",
+      description: `Schlüssel des Trägers der bisherigen gesetzlichen Unfallversicherung. Mögliche Werte: ${unfallversicherungstraegerCodesDescription},`,
+    }),
+    unternehmensnummer: z.string().optional().openapi({
+      example: "123456789",
+      description:
+        "Unternehmensnummer bei der bisherigen Unfallversicherung (früher Mitgliedsnummer).",
+    }),
+  })
+  .openapi("BisherigeUnfallversicherung");
+
 const RegisterGewerbeRequestSchema = z
   .object({
     persönlicheDaten: PersönlicheDatenSchema,
     unternehmensDaten: UnternehmensDatenSchema,
+    bisherigeUnfallversicherung: BisherigeUnfallversicherungSchema.optional().openapi({
+      description:
+        "Angaben zur bisherigen Unfallversicherung bei Übernahme, Verschmelzung oder Spaltung. Darf bei Neugründung einer Hauptniederlassung, Reisegewerbe oder technischer Anmeldung nicht angegeben werden (siehe SCH-0094).",
+    }),
   })
   .openapi("RegisterGewerbeRequest");
 
