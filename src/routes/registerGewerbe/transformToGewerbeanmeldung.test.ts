@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { transformToGewerbeanmeldung } from "./transformToGewerbeanmeldung";
-import type { RegisterGewerbeRequest } from "./registerGewerbeRoute";
+import { RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 
 const baseRequest: RegisterGewerbeRequest = {
   persönlicheDaten: {

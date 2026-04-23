@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { Gewerbeanmeldung } from "../../xGewerbeordnung/gewerbeanmeldung";
-import type { RegisterGewerbeRequest } from "./registerGewerbeRoute";
+import { RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 
 // Helper to split street and number "Straße 123" in ["Straße", "123"]
 function splitStrasseHausnummer(strasseUndHausnummer: string) {
