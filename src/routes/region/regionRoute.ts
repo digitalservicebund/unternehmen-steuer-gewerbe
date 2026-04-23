@@ -1,4 +1,4 @@
-import { createRoute, z } from "@hono/zod-openapi";
+import { createRoute } from "@hono/zod-openapi";
 import { SupportedRegionParamsSchema, SupportedRegionResponseSchema } from "./regionInterfaces";
 
 export const regionRoute = createRoute({
