@@ -1,4 +1,9 @@
 import { z } from "@hono/zod-openapi";
+import {
+  UNFALLVERSICHERUNGSTRAEGER,
+  UNFALLVERSICHERUNGSTRAEGER_CODES,
+} from "../../xGewerbeordnung/buildingBlocks/bisherigeUnfallversicherung";
+
 const AdresseSchema = z.object({
   strasseUndHausnummer: z
     .string()
@@ -49,6 +54,25 @@ const UnternehmensDatenSchema = z.object({
   tätigkeitsbeginn: z.iso.date().openapi({ example: "2026-04-17" }),
   gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
 });
+
+const unfallversicherungstraegerCodesDescription = Object.entries(UNFALLVERSICHERUNGSTRAEGER)
+  .map(([code, name]) => `- \`${code}\`: ${name}`)
+  .join("\n");
+
+// Not used as long as we only support 'grundAnmeldungSchluessel: "01"' ("Neugründung")
+const _BisherigeUnfallversicherungSchema = z
+  .object({
+    traeger: z.enum(UNFALLVERSICHERUNGSTRAEGER_CODES).openapi({
+      example: "08",
+      description: `Schlüssel des Trägers der bisherigen gesetzlichen Unfallversicherung. Mögliche Werte: ${unfallversicherungstraegerCodesDescription},`,
+    }),
+    unternehmensnummer: z.string().length(15).optional().openapi({
+      example: "123456789012345",
+      description:
+        "Unternehmensnummer bei der bisherigen Unfallversicherung (früher Mitgliedsnummer). Muss genau 15 Zeichen lang sein.",
+    }),
+  })
+  .openapi("BisherigeUnfallversicherung");
 
 export const RegisterGewerbeRequestSchema = z
   .object({
