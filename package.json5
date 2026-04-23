@@ -7,8 +7,8 @@
   author: "",
   type: "module",
   scripts: {
-    // Build and bundle to./dist/bundle.js
-    build: "rolldown -c rolldown.config.js",
+    // Compile TypeScript to ./dist/
+    build: "tsc",
     // Build app and docker image
     "build:image": "pnpm build; docker build . --tag unternehmen-steuer-gewerbe",
     // Check format, fail on error (used in CI)
@@ -22,9 +22,9 @@
     // Start API locally via ts-node (no building involved)
     start: "op run --env-file .env -- ts-node src/index.ts",
     // Start API via docker (built via "npm run build:image")
-    "start:image": "docker run unternehmen-steuer-gewerbe",
+    "start:image": "docker run -p 3000:3000 unternehmen-steuer-gewerbe",
     // Start API locally via ts-node (no building involved), restart on changes to files of type TS, JS, JSON, JSON5, YAML, MD
-    "start:watch": "op run --env-file .env -- nodemon --watch . --ext ts,json,json5,yml,md --exec pnpm run start",
+    "start:watch": "op run --env-file .env -- nodemon --watch . --ignore dist --ext ts,json,json5,yml,md --exec pnpm run start",
     // Run tests once
     test: "op run --env-file .env -- vitest run",
     // Run tests once, report coverage on console and in ./coverage. Format is HTML and lconv (in pipeline, lconv is consumed by SonarCloud)
@@ -56,7 +56,6 @@
     nodemon: "^3.1.14",
     oxfmt: "^0.42.0",
     oxlint: "^1.58.0",
-    rolldown: "1.0.0-rc.13",
     "ts-node": "^10.9.2",
     typescript: "^6.0.2",
     vitest: "^4.1.2",

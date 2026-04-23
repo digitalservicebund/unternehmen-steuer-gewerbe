@@ -1,33 +1,53 @@
-import { z, createRoute } from "@hono/zod-openapi";
-
+import { z } from "@hono/zod-openapi";
 const AdresseSchema = z.object({
-  strasseUndHausnummer: z.string(),
+  strasseUndHausnummer: z
+    .string()
+    .regex(/^(?=.*\d).+$/)
+    .openapi({
+      example: "Musterstraße 1",
+      description: "Must contain at least one character and one number",
+    }),
   postleitzahl: z
     .string()
-    .length(5, "postleitzahl must be 5 characters")
-    .regex(/^\d+$/, "postleitzahl must only contain numbers"),
-  ort: z.string(),
+    .length(5)
+    .regex(/^\d+$/)
+    .openapi({ example: "12345", description: "postleitzahl must only contain a 5-digit-number" }),
+  ort: z.string().openapi({ example: "Musterstadt" }),
 });
 
 const PersönlicheDatenSchema = z.object({
-  vorname: z.string(),
-  nachname: z.string(),
-  geburtsname: z.string().optional(),
-  geburtsdatum: z.iso.date(),
-  geburtsort: z.string(),
-  geburtsland: z.string(),
+  vorname: z.string().openapi({ example: "Erika" }),
+  nachname: z.string().openapi({ example: "Mustermann" }),
+  geburtsname: z.string().openapi({ example: "Muster" }).optional(),
+  geburtsdatum: z.iso.date().openapi({ example: "1988-09-10" }),
+  geschlecht: z.enum(["d", "w", "m"]).openapi({ example: "d" }).optional(),
+  geburtsort: z.string().openapi({ example: "Musterstadt" }),
+  geburtsland: z.string().openapi({ example: "Deutschland" }),
   staatsangehörigkeitDeutsch: z.literal(true),
   adresse: AdresseSchema,
-  telefon: z.string(),
-  email: z.string(),
+  telefon: z
+    .string()
+    .regex(/^\+\d{1,5}\s\d{1,5}\s\d{1,13}(-\d{1,5})?$/)
+    .openapi({
+      example: "+49 234 121314",
+      description:
+        "Telefonnummern nach DIN 5008 kodiert werden: +[Ländervorwahl] (bis zu 5 Zeichen) [Lokale Vorwahl] (bis zu 5 Zeichen) [Rufnummer] (bis zu 13 Zeichen) [-Durchwahl] (optional, bis zu 5 Zeichen)",
+    }),
+  email: z.string().openapi({ example: "e.mustermann@example.org" }),
 });
 
 const UnternehmensDatenSchema = z.object({
-  adresseAbweichend: AdresseSchema.optional(),
-  tätigkeitsbeschreibung: z.string(),
-  tätigkeitsbereich: z.string(),
-  tätigkeitsbeginn: z.iso.date(),
-  gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]),
+  adresseAbweichend: AdresseSchema.openapi({
+    example: {
+      strasseUndHausnummer: "Musterstraße 2",
+      postleitzahl: "67890",
+      ort: "Musterstadt",
+    },
+  }).optional(),
+  tätigkeitsbeschreibung: z.string().openapi({ example: "Vertrieb von Vertriebsmustern" }),
+  tätigkeitsbereich: z.string().openapi({ example: "Handwerksbetrieb" }),
+  tätigkeitsbeginn: z.iso.date().openapi({ example: "2026-04-17" }),
+  gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
 });
 
 export const RegisterGewerbeRequestSchema = z

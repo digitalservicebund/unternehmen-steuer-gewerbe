@@ -1,6 +1,7 @@
 FROM node:25.9.0-alpine3.23
 
-RUN addgroup -S nonroot \
+RUN npm install -g pnpm@10.33.0 --ignore-scripts \
+    && addgroup -S nonroot \
     && adduser -S nonroot -G nonroot \
     && mkdir -p /app && chown -R nonroot:nonroot /app
 
@@ -8,9 +9,13 @@ USER nonroot
 
 WORKDIR /app
 
-# bundle created by `npm run build`, which uses rolldown for bundling
-COPY --chown=root:root --chmod=755 ./dist/bundle.js .
+COPY package.json5 pnpm-lock.yaml ./
+RUN pnpm install --prod --frozen-lockfile --ignore-scripts
+
+# compiled JS from `pnpm run build` (tsc)
+COPY ./dist .
+COPY ./src/resources ./src/resources
 
 EXPOSE 3000
 
-CMD [ "node", "bundle.js" ]
+CMD [ "node", "index.js" ]

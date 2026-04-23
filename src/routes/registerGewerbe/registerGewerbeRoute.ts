@@ -1,4 +1,4 @@
-import { z, createRoute } from "@hono/zod-openapi";
+import { createRoute } from "@hono/zod-openapi";
 import {
   RegisterGewerbeRequestSchema,
   RegisterGewerbeResponseSchema,
