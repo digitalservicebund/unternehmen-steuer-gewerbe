@@ -1,18 +1,5 @@
-import { createRoute, z } from "@hono/zod-openapi";
-
-const SupportedRegionParamsSchema = z.object({
-  plz: z
-    .string()
-    .regex(/^\d{5}$/, "plz must be a 5-digit number")
-    .openapi({
-      param: { name: "plz", in: "path" },
-      example: "10969",
-    }),
-});
-
-const SupportedRegionResponseSchema = z
-  .object({ supported: z.boolean() })
-  .openapi("SupportedRegionResponse");
+import { createRoute } from "@hono/zod-openapi";
+import { SupportedRegionParamsSchema, SupportedRegionResponseSchema } from "./regionInterfaces";
 
 export const regionRoute = createRoute({
   method: "get",
