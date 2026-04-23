@@ -1,12 +1,9 @@
 import { z } from "@hono/zod-openapi";
-<<<<<<< HEAD
 import {
   UNFALLVERSICHERUNGSTRAEGER,
   UNFALLVERSICHERUNGSTRAEGER_CODES,
 } from "../../xGewerbeordnung/buildingBlocks/bisherigeUnfallversicherung";
 
-=======
->>>>>>> b462b53 (Extract interfaces, rename endpoint file names (#43))
 const AdresseSchema = z.object({
   strasseUndHausnummer: z
     .string()
@@ -58,7 +55,6 @@ const UnternehmensDatenSchema = z.object({
   gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
 });
 
-<<<<<<< HEAD
 const unfallversicherungstraegerCodesDescription = Object.entries(UNFALLVERSICHERUNGSTRAEGER)
   .map(([code, name]) => `- \`${code}\`: ${name}`)
   .join("\n");
@@ -78,8 +74,6 @@ const _BisherigeUnfallversicherungSchema = z
   })
   .openapi("BisherigeUnfallversicherung");
 
-=======
->>>>>>> b462b53 (Extract interfaces, rename endpoint file names (#43))
 export const RegisterGewerbeRequestSchema = z
   .object({
     persönlicheDaten: PersönlicheDatenSchema,
