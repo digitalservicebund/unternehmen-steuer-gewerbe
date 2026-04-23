@@ -59,16 +59,17 @@ const unfallversicherungstraegerCodesDescription = Object.entries(UNFALLVERSICHE
   .map(([code, name]) => `- \`${code}\`: ${name}`)
   .join("\n");
 
-const BisherigeUnfallversicherungSchema = z
+// Not used as long as we only support 'grundAnmeldungSchluessel: "01"' ("Neugründung")
+const _BisherigeUnfallversicherungSchema = z
   .object({
     traeger: z.enum(UNFALLVERSICHERUNGSTRAEGER_CODES).openapi({
       example: "08",
       description: `Schlüssel des Trägers der bisherigen gesetzlichen Unfallversicherung. Mögliche Werte: ${unfallversicherungstraegerCodesDescription},`,
     }),
-    unternehmensnummer: z.string().optional().openapi({
-      example: "123456789",
+    unternehmensnummer: z.string().length(15).optional().openapi({
+      example: "123456789012345",
       description:
-        "Unternehmensnummer bei der bisherigen Unfallversicherung (früher Mitgliedsnummer).",
+        "Unternehmensnummer bei der bisherigen Unfallversicherung (früher Mitgliedsnummer). Muss genau 15 Zeichen lang sein.",
     }),
   })
   .openapi("BisherigeUnfallversicherung");
@@ -77,10 +78,6 @@ export const RegisterGewerbeRequestSchema = z
   .object({
     persönlicheDaten: PersönlicheDatenSchema,
     unternehmensDaten: UnternehmensDatenSchema,
-    bisherigeUnfallversicherung: BisherigeUnfallversicherungSchema.optional().openapi({
-      description:
-        "Angaben zur bisherigen Unfallversicherung bei Übernahme, Verschmelzung oder Spaltung. Darf bei Neugründung einer Hauptniederlassung, Reisegewerbe oder technischer Anmeldung nicht angegeben werden (siehe SCH-0094).",
-    }),
   })
   .openapi("RegisterGewerbeRequest");
 
