@@ -347,15 +347,27 @@ describe("createGewerbeanmeldungXml", () => {
   });
 
   it("includes bisherigeUnfallversicherung element when provided", async () => {
-    const withUV: Gewerbeanmeldung = {
+    const withUnfallversicherung: Gewerbeanmeldung = {
       ...gewerbeanmeldung,
       grundAnmeldungSchluessel: "02", // Verlegung des Betriebs aus einem anderen Meldebezirk
       bisherigeUnfallversicherung: { traeger: "08", unternehmensnummer: "123456789012345" },
     };
 
-    const xml = await createGewerbeanmeldungXml(withUV);
+    const xml = await createGewerbeanmeldungXml(withUnfallversicherung);
     expect(xml).toContain("<bk:bisherigeUnfallversicherung>");
     expect(xml).toContain("<code>08</code>");
     expect(xml).toContain("<bk:unternehmensnummer>123456789012345</bk:unternehmensnummer>");
+  });
+
+  it("includes bisherigeUnfallversicherung without unternehmensnummer when omitted", async () => {
+    const withUnfallversicherungButNoUnternehmensummer: Gewerbeanmeldung = {
+      ...gewerbeanmeldung,
+      grundAnmeldungSchluessel: "02",
+      bisherigeUnfallversicherung: { traeger: "08" },
+    };
+
+    const xml = await createGewerbeanmeldungXml(withUnfallversicherungButNoUnternehmensummer);
+    expect(xml).toContain("<bk:bisherigeUnfallversicherung>");
+    expect(xml).not.toContain("bk:unternehmensnummer");
   });
 });
