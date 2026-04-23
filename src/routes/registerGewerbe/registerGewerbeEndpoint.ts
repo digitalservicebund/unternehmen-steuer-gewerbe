@@ -1,6 +1,6 @@
 import { HonoAppType } from "../../app";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
-import { createGewerbeanmeldungXml } from "../../xGewerbeordnung/gewerbeanmeldung";
+import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { registerGewerbeRoute } from "./registerGewerbeRoute";
 import { transformToGewerbeanmeldung } from "./transformToGewerbeanmeldung";
 

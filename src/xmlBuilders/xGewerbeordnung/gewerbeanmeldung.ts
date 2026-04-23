@@ -1,5 +1,5 @@
 // https://www.xrepository.de/details/urn:xoev-de:kosit:standard:xgewerbeordnung_1.6#version
-import { validateXml } from "../helpers/xmlValidator";
+import { validateXml } from "../../helpers/xmlValidator";
 import { createBehoerde, type Behoerde } from "./buildingBlocks/behoerde";
 import {
   createBisherigeUnfallversicherung,
@@ -14,7 +14,7 @@ import {
   createReferenzierteSubjekte,
   type ReferenzierteSubjekte,
 } from "./buildingBlocks/referenzierteSubjekte";
-import { escapeXml } from "./escapeXml";
+import { escapeXml } from "../../helpers/escapeXml";
 
 export interface Gewerbeanmeldung {
   nachrichtenkopf: Nachrichtenkopf;

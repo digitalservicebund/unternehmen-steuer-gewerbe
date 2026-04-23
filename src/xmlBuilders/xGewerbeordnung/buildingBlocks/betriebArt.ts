@@ -1,4 +1,4 @@
-import { escapeXml } from "../escapeXml";
+import { escapeXml } from "../../../helpers/escapeXml";
 
 export interface BetriebArt {
   /** In diesem Element wird angegeben, ob es sich um einen Industriebetrieb handelt. */

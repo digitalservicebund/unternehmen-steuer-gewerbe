@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { Gewerbeanmeldung } from "../../xGewerbeordnung/gewerbeanmeldung";
+import type { Gewerbeanmeldung } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 
 // Helper to split street and number "Straße 123" in ["Straße", "123"]

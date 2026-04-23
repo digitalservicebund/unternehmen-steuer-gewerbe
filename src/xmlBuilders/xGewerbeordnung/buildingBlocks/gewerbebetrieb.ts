@@ -1,4 +1,4 @@
-import { escapeXml } from "../escapeXml";
+import { escapeXml } from "../../../helpers/escapeXml";
 import { createBetriebArt, type BetriebArt } from "./betriebArt";
 import { createBetriebsstaette, type Betriebsstaette } from "./betriebsstaette";
 import { createEintragung, type Eintragung } from "./eintragung";

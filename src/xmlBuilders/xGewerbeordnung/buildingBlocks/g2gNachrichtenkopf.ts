@@ -1,4 +1,4 @@
-import { escapeXml } from "../escapeXml";
+import { escapeXml } from "../../../helpers/escapeXml";
 import { createBehoerde, type Behoerde } from "./behoerde";
 
 export interface Nachrichtenkopf {
