@@ -1,5 +1,21 @@
 # Developing
 
+## Getting All the Code
+
+Parts of this code base are not public (e.g. the wrapper around the ELSTER [ERiC](https://www.elster.de/eportal/infoseite/entwickler) library). They have been added to this repository as Git submodules.
+
+Fetching all the repository including the submodules' content can be done like this (assuming you have access to the submodules' repositories):
+
+```bash
+  git clone --recurse-submodules git@github.com:digitalservicebund/unternehmen-steuer-gewerbe.git
+```
+
+If the repository was cloned as usual, the following command will fetch the content of the submodules:
+
+```bash
+  git submodule update --init --recursive
+```
+
 ## Environment Variables
 
 > **Local development and testing only!** `.env.example` is a template that contains no real secrets. For anything beyond test values, load secrets at runtime from [1Password](https://developer.1password.com/docs/cli/secrets-environment-variables/) (or a similar secrets manager) and never commit them to git.
