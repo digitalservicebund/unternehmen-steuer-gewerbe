@@ -10,7 +10,7 @@ describe("Route /api/v1/region/{plz}", () => {
   });
 
   test("Returns supported:false for an unsupported 5-digit PLZ", async () => {
-    const response = await app.request("/api/v1/region/99999");
+    const response = await app.request("/api/v1/region/00000");
     expect(response.status).toEqual(200);
     expect(await response.json()).toEqual({ supported: false });
   });
