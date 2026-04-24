@@ -1,4 +1,4 @@
-import { escapeXml } from "../escapeXml";
+import { escapeXml } from "../../../helpers/escapeXml";
 
 export function createWirtschaftszweig(wirtschaftszweigschluessel: string) {
   return `

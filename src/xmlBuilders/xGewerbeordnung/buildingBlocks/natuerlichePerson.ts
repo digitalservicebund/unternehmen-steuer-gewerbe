@@ -1,7 +1,7 @@
 import { createAnschrift, type Anschrift } from "./anschrift";
 import { createKommunikation, type Kommunikation } from "./kommunikation";
 import { createAufenthaltstitel, type Aufenthaltstitel } from "./aufenthaltstitel";
-import { escapeXml } from "../escapeXml";
+import { escapeXml } from "../../../helpers/escapeXml";
 
 export interface Name {
   /** Familienname einer natürlichen Person bestehend aus Nachname, Zuname bzw. Familienname. */

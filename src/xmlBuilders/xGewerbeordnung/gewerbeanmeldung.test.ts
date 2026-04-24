@@ -241,13 +241,13 @@ describe("createGewerbeanmeldungXml", () => {
     expect(xml).not.toContain("<bk:bisherigeUnfallversicherung>");
   });
 
-  it("escapes XML special characters (<, >, &) in text fields", async () => {
+  it(`escapes XML special characters (<, >, &, ', ") in text fields`, async () => {
     const withSpecials: Gewerbeanmeldung = {
       ...gewerbeanmeldung,
       autor: { ...gewerbeanmeldung.autor, name: "Amt <Müller & Söhne>" },
       gewerbebetrieb: {
         ...gewerbeanmeldung.gewerbebetrieb,
-        eingetragenerName: "Müller & Söhne GmbH",
+        eingetragenerName: `Müller & <Söhne> "GmbH" 'Co.'`,
         taetigkeitenGesamt: {
           ...gewerbeanmeldung.gewerbebetrieb.taetigkeitenGesamt,
           schwerpunkt: {
@@ -260,8 +260,8 @@ describe("createGewerbeanmeldungXml", () => {
 
     const generatedXml = await createGewerbeanmeldungXml(withSpecials);
 
-    expect(generatedXml).not.toContain("Müller & Söhne GmbH");
-    expect(generatedXml).toContain("Müller &amp; Söhne GmbH");
+    expect(generatedXml).not.toContain(`Müller & <Söhne> "GmbH" 'Co.'`);
+    expect(generatedXml).toContain("Müller &amp; &lt;Söhne&gt; &quot;GmbH&quot; &apos;Co.&apos;");
     expect(generatedXml).toContain("A &gt; B &amp; C &lt; D");
   });
 

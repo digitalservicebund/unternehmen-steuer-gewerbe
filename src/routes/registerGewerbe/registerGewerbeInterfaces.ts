@@ -2,7 +2,7 @@ import { z } from "@hono/zod-openapi";
 import {
   UNFALLVERSICHERUNGSTRAEGER,
   UNFALLVERSICHERUNGSTRAEGER_CODES,
-} from "../../xGewerbeordnung/buildingBlocks/bisherigeUnfallversicherung";
+} from "../../xmlBuilders/xGewerbeordnung/buildingBlocks/bisherigeUnfallversicherung";
 
 const AdresseSchema = z.object({
   strasseUndHausnummer: z
