@@ -31,7 +31,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
-      - uses: pnpm/action-setup@08c4be7e2e672a47d11bd04269e27e5f3e8529cb
+      - uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e
         name: Install pnpm
         with:
           version: 10.33.0
@@ -65,7 +65,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@08c4be7e2e672a47d11bd04269e27e5f3e8529cb
+      - uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e
         name: Install pnpm
         with:
           version: 10.33.0
@@ -130,7 +130,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
-      - uses: pnpm/action-setup@08c4be7e2e672a47d11bd04269e27e5f3e8529cb
+      - uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e
         name: Install pnpm
         with:
           version: 10.33.0
@@ -157,7 +157,7 @@ jobs:
         #       cf. step "Upload Trivy scan results to GitHub Security tab"
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
         env:
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
           TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
@@ -191,7 +191,7 @@ jobs:
       # - name: Fail build on High/Criticial Vulnerabilities (on branches)
       #   # ignore on `main`
       #   if: ${{ github.ref != 'refs/heads/main' }}
-      #   uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+      #   uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
       #   env:
       #     TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
       #     TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
@@ -210,7 +210,7 @@ jobs:
       #     skip-setup-trivy: true
 
       - name: Generate cosign vulnerability scan record
-        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
         env:
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
         with:
@@ -316,7 +316,7 @@ jobs:
       - name: Dependabot metadata
         continue-on-error: true
         id: metadata
-        uses: dependabot/fetch-metadata@ffa630c65fa7e0ecfa0625b5ceda64399aea1b36
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
       - name: Auto-merge Dependabot PRs except major version updates
