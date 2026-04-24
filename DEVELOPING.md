@@ -7,7 +7,7 @@ Parts of this code base are not public (e.g. the wrapper around the ELSTER [ERiC
 Fetching all the repository including the submodules' content can be done like this (assuming you have access to the submodules' repositories):
 
 ```bash
-  git clone --recurse-submodules git@github.com:digitalservicebund/unternehmen-steuer-gewerbe-privat.git
+  git clone --recurse-submodules git@github.com:digitalservicebund/unternehmen-steuer-gewerbe.git
 ```
 
 If the repository was cloned as usual, the following command will fetch the content of the submodules:
