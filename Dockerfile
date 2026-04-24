@@ -14,7 +14,6 @@ RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
 # compiled JS from `pnpm run build` (tsc)
 COPY ./dist .
-COPY ./src/resources ./src/resources
 
 EXPOSE 3000
 
