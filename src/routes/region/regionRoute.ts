@@ -14,12 +14,12 @@ export const regionRoute = createRoute({
           schema: SupportedRegionResponseSchema,
         },
       },
-      description: "Check whether a region with the given PLZ is currently supported",
+      description: "Lookup successful (may still be unsupported by Schneller Gründen)",
     },
     400: {
       description: "Invalid PLZ format — must be a 5-digit number",
     },
   },
   tags: ["Active Development"],
-  summary: "Check whether a region with the given PLZ is currently supported",
+  summary: "Get information on whether a region with the given PLZ is currently supported",
 });

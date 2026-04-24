@@ -1,8 +1,8 @@
-const supportedPLZs: ReadonlySet<string> = new Set([
+const supportedPLZs: number[] = [
   // sample PLZ
-  "10969",
-]);
+  10969,
+] as const;
 
-export function isSupportedRegion(plz: string): boolean {
-  return supportedPLZs.has(plz);
+export function isSupportedRegion(plz: number): boolean {
+  return supportedPLZs.includes(plz);
 }

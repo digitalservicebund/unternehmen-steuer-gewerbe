@@ -9,18 +9,18 @@ describe("Route /api/v1/region/{plz}", () => {
     expect(await response.json()).toEqual({ supported: true });
   });
 
-  test("Returns supported:false for an unsupported 5-digit PLZ", async () => {
-    const response = await app.request("/api/v1/region/99999");
+  test("Returns supported:false for unsupported 00000 PLZ", async () => {
+    const response = await app.request("/api/v1/region/00000");
     expect(response.status).toEqual(200);
     expect(await response.json()).toEqual({ supported: false });
   });
 
-  test("Returns 400 for an invalid PLZ format", async () => {
+  test('Returns 400 for an invalid PLZ "abc"', async () => {
     const response = await app.request("/api/v1/region/abc");
     expect(response.status).toEqual(400);
   });
 
-  test("Returns 400 for a 4-digit PLZ (too short)", async () => {
+  test("Returns 400 for PLZ 1234 (too short)", async () => {
     const response = await app.request("/api/v1/region/1234");
     expect(response.status).toEqual(400);
   });
