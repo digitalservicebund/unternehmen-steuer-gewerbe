@@ -3,7 +3,6 @@ import type { Env } from "hono";
 
 import { addHealthCheckEndpoint } from "./routes/rootHealthCheck/rootHealthCheck";
 import { addRegionEndpoint } from "./routes/region/regionEndpoint";
-import { addRegisterSteuernummerEndpoint } from "./routes/registerSteuernummer/registerSteuernummer";
 import { addRegisterGewerbeEndpoint } from "./routes/registerGewerbe/registerGewerbeEndpoint";
 import { addGetEventsEndpoint } from "./routes/getEvents/getEventsEndpoint";
 import { addOpenApiEndpoints } from "./routes/openApiDocs/openApiEndpoint";
@@ -20,7 +19,6 @@ addRequestLogging(app);
 addRegionEndpoint(app);
 addRegisterGewerbeEndpoint(app);
 addHealthCheckEndpoint(app);
-addRegisterSteuernummerEndpoint(app);
 addGetEventsEndpoint(app);
 
 // add documentation endpoints
