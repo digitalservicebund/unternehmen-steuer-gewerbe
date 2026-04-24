@@ -7,6 +7,7 @@ export const SupportedRegionParamsSchema = z.object({
     .openapi({
       param: { name: "plz", in: "path" },
       example: "10969",
+      type: "number",
     }),
 });
 
