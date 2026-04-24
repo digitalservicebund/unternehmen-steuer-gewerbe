@@ -1,4 +1,4 @@
-import { escapeXml } from "../escapeXml";
+import { escapeXml } from "../../../helpers/escapeXml";
 
 // https://www.xrepository.de/details/urn:xoev-de:xgewerbeordnung:codeliste:unfallversicherungstraeger_1
 export const UNFALLVERSICHERUNGSTRAEGER = {

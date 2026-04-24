@@ -1,4 +1,4 @@
-import { escapeXml } from "../escapeXml";
+import { escapeXml } from "../../../helpers/escapeXml";
 
 export interface Eintragung {
   /** Angabe der Art des Registers, in welchem der wirtschaftlich Tätige bzw. die wirtschaftliche Tätigkeit (z. B. Zweigniederlassung) geführt wird. */

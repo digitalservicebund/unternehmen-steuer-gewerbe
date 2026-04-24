@@ -1,4 +1,4 @@
-import { escapeXml } from "../escapeXml";
+import { escapeXml } from "../../../helpers/escapeXml";
 
 export interface Kommunikation {
   /** Telefonnummer, strukturiert gemäß ITU E.123. Beispiel: "+49 421 1234567", "+49 421 123 4567". */

@@ -1,4 +1,4 @@
-import { escapeXml } from "../escapeXml";
+import { escapeXml } from "../../../helpers/escapeXml";
 import { createAnschrift, type Anschrift } from "./anschrift";
 import { createKommunikation, type Kommunikation } from "./kommunikation";
 
