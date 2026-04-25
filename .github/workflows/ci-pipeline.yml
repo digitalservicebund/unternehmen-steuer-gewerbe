@@ -30,6 +30,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          submodules: true
+          token: ${{ secrets.SUBMODULE_TOKEN }}
 
       - uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e
         name: Install pnpm
@@ -64,6 +67,8 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
+          submodules: true
+          token: ${{ secrets.SUBMODULE_TOKEN }}
 
       - uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e
         name: Install pnpm
@@ -129,6 +134,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          submodules: true
+          token: ${{ secrets.SUBMODULE_TOKEN }}
 
       - uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e
         name: Install pnpm
