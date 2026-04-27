@@ -165,6 +165,37 @@ describe("createGewerbeanmeldungXml", () => {
     );
   });
 
+  it("does not crash when all nested objects are present but all fields are undefined", async () => {
+    await expect(
+      createGewerbeanmeldungXml({
+        nachrichtenkopf: { leser: {}, autor: {} },
+        autor: {},
+        bisherigeUnfallversicherung: {},
+        gewerbebetrieb: {
+          eintragung: { registergericht: {} },
+          betriebsstaette: { anschrift: {}, kommunikation: {} },
+          taetigkeitenGesamt: {
+            schwerpunkt: {},
+            weitereTaetigkeiten: { taetigkeit: [{}] },
+          },
+          betriebArt: {},
+          handwerkskarte: {},
+        },
+        referenzierteSubjekte: {
+          natuerlichePerson: [
+            {
+              name: {},
+              geburt: {},
+              anschrift: {},
+              kommunikation: {},
+              aufenthaltstitel: {},
+            },
+          ],
+        },
+      }),
+    ).rejects.toThrow("Generated XGewerbeanmeldung is invalid.");
+  });
+
   it("maps Gewerbeanmeldung data to the correct xGewerbeordnung 1.6 XML structure", async () => {
     expect(normalizeXml(await createGewerbeanmeldungXml(gewerbeanmeldung))).toBe(
       normalizeXml(xgewo_1_6_valid),
