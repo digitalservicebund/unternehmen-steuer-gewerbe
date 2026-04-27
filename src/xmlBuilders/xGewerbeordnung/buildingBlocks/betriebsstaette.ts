@@ -15,9 +15,7 @@ export function createBetriebsstaette(betriebsstaette: Betriebsstaette | undefin
   if (!betriebsstaette) return "";
   return `
     <xga:betriebsstaette>
-      <wt:artBetriebsstaette listVersionID="1">
-        <code>${escapeXml(betriebsstaette.artBetriebsstaette)}</code>
-      </wt:artBetriebsstaette>
+      ${betriebsstaette.artBetriebsstaette ? `<wt:artBetriebsstaette listVersionID="1"><code>${escapeXml(betriebsstaette.artBetriebsstaette)}</code></wt:artBetriebsstaette>` : ""}
       ${createAnschrift(betriebsstaette.anschrift)}
       ${createKommunikation(betriebsstaette.kommunikation)}
     </xga:betriebsstaette>`;

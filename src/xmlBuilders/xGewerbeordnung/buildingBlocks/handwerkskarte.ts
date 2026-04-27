@@ -17,9 +17,7 @@ export function createHandwerkskarte(handwerkskarte: Handwerkskarte | undefined)
   if (!handwerkskarte) return "";
   return `
     <xga:handwerkskarte>
-      <xga:status>
-        <code>${escapeXml(handwerkskarte.status)}</code>
-      </xga:status>
+      ${handwerkskarte.status ? `<xga:status><code>${escapeXml(handwerkskarte.status)}</code></xga:status>` : ""}
       ${handwerkskarte.ausgestelltAm ? `<xga:ausgestelltAm>${escapeXml(handwerkskarte.ausgestelltAm)}</xga:ausgestelltAm>` : ""}
       ${handwerkskarte.ausgestelltVonPLZ ? `<xga:ausgestelltVonPLZ>${escapeXml(handwerkskarte.ausgestelltVonPLZ)}</xga:ausgestelltVonPLZ>` : ""}
       ${handwerkskarte.ausgestelltVonOrt ? `<xga:ausgestelltVonOrt>${escapeXml(handwerkskarte.ausgestelltVonOrt)}</xga:ausgestelltVonOrt>` : ""}

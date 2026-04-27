@@ -44,25 +44,19 @@ export function createNatuerlichePerson(natuerlichePerson: NatuerlichePerson | u
   if (!natuerlichePerson) return "";
   return `
     <xga:natuerlichePerson>
-      <np:natuerlichePerson.id>${escapeXml(natuerlichePerson.id)}</np:natuerlichePerson.id>
-      <np:name>
-        <np:familienname>${escapeXml(natuerlichePerson.name?.familienname)}</np:familienname>
-        ${natuerlichePerson.name?.geburtsname ? `<np:geburtsname>${escapeXml(natuerlichePerson.name.geburtsname)}</np:geburtsname>` : ""}
-        <np:vornamen>${escapeXml(natuerlichePerson.name?.vornamen)}</np:vornamen>
-      </np:name>
-      <bk:geburt>
-        <np:geburtsdatum>
-          <dat:datum>${escapeXml(natuerlichePerson.geburt?.geburtsdatum)}</dat:datum>
-        </np:geburtsdatum>
-        <adr:ort>${escapeXml(natuerlichePerson.geburt?.ort)}</adr:ort>
-        <bk:staat>${escapeXml(natuerlichePerson.geburt?.staat)}</bk:staat>
-      </bk:geburt>
-      <np:geschlecht listVersionID="1">
-        <code>${escapeXml(natuerlichePerson.geschlecht)}</code>
-      </np:geschlecht>
-      <np:staatsangehoerigkeit listVersionID="2020-05-11">
-        <code>${escapeXml(natuerlichePerson.staatsangehoerigkeit)}</code>
-      </np:staatsangehoerigkeit>
+      ${natuerlichePerson.id ? `<np:natuerlichePerson.id>${escapeXml(natuerlichePerson.id)}</np:natuerlichePerson.id>` : ""}
+      ${natuerlichePerson.name ? `<np:name>
+        ${natuerlichePerson.name.familienname ? `<np:familienname>${escapeXml(natuerlichePerson.name.familienname)}</np:familienname>` : ""}
+        ${natuerlichePerson.name.geburtsname ? `<np:geburtsname>${escapeXml(natuerlichePerson.name.geburtsname)}</np:geburtsname>` : ""}
+        ${natuerlichePerson.name.vornamen ? `<np:vornamen>${escapeXml(natuerlichePerson.name.vornamen)}</np:vornamen>` : ""}
+      </np:name>` : ""}
+      ${natuerlichePerson.geburt ? `<bk:geburt>
+        ${natuerlichePerson.geburt.geburtsdatum ? `<np:geburtsdatum><dat:datum>${escapeXml(natuerlichePerson.geburt.geburtsdatum)}</dat:datum></np:geburtsdatum>` : ""}
+        ${natuerlichePerson.geburt.ort ? `<adr:ort>${escapeXml(natuerlichePerson.geburt.ort)}</adr:ort>` : ""}
+        ${natuerlichePerson.geburt.staat ? `<bk:staat>${escapeXml(natuerlichePerson.geburt.staat)}</bk:staat>` : ""}
+      </bk:geburt>` : ""}
+      ${natuerlichePerson.geschlecht ? `<np:geschlecht listVersionID="1"><code>${escapeXml(natuerlichePerson.geschlecht)}</code></np:geschlecht>` : ""}
+      ${natuerlichePerson.staatsangehoerigkeit ? `<np:staatsangehoerigkeit listVersionID="2020-05-11"><code>${escapeXml(natuerlichePerson.staatsangehoerigkeit)}</code></np:staatsangehoerigkeit>` : ""}
       ${createAnschrift(natuerlichePerson.anschrift)}
       ${createKommunikation(natuerlichePerson.kommunikation)}
       ${createAufenthaltstitel(natuerlichePerson.aufenthaltstitel)}

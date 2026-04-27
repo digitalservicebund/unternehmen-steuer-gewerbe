@@ -88,24 +88,18 @@ export async function createGewerbeanmeldungXml(
       ${createG2gNachrichtenkopf(gewerbeanmeldung.nachrichtenkopf)}
       <xga:satz>
         <xga:anmeldung>
-            <xga:autor>
-              ${createBehoerde(gewerbeanmeldung.autor)}
-            </xga:autor>
-            <xga:satzErstellung>${escapeXml(gewerbeanmeldung.satzErstellung)}</xga:satzErstellung>
-            <xga:ereigniszeitpunkt>${escapeXml(gewerbeanmeldung.ereigniszeitpunkt)}</xga:ereigniszeitpunkt>
-            <xga:istStorno>${escapeXml(gewerbeanmeldung.istStorno)}</xga:istStorno>
-            <xga:gemeindeSchluessel listVersionID="2020-03-31">
-              <code>${escapeXml(gewerbeanmeldung.gemeindeSchluessel)}</code>
-            </xga:gemeindeSchluessel>
-            <xga:uuid>${escapeXml(gewerbeanmeldung.uuid)}</xga:uuid>
-            <xga:gueltigAb>${escapeXml(gewerbeanmeldung.gueltigAb)}</xga:gueltigAb>
-            <xga:datumMeldung>${escapeXml(gewerbeanmeldung.datumMeldung)}</xga:datumMeldung>
+            ${gewerbeanmeldung.autor ? `<xga:autor>${createBehoerde(gewerbeanmeldung.autor)}</xga:autor>` : ""}
+            ${gewerbeanmeldung.satzErstellung ? `<xga:satzErstellung>${escapeXml(gewerbeanmeldung.satzErstellung)}</xga:satzErstellung>` : ""}
+            ${gewerbeanmeldung.ereigniszeitpunkt ? `<xga:ereigniszeitpunkt>${escapeXml(gewerbeanmeldung.ereigniszeitpunkt)}</xga:ereigniszeitpunkt>` : ""}
+            ${gewerbeanmeldung.istStorno !== undefined ? `<xga:istStorno>${escapeXml(gewerbeanmeldung.istStorno)}</xga:istStorno>` : ""}
+            ${gewerbeanmeldung.gemeindeSchluessel ? `<xga:gemeindeSchluessel listVersionID="2020-03-31"><code>${escapeXml(gewerbeanmeldung.gemeindeSchluessel)}</code></xga:gemeindeSchluessel>` : ""}
+            ${gewerbeanmeldung.uuid ? `<xga:uuid>${escapeXml(gewerbeanmeldung.uuid)}</xga:uuid>` : ""}
+            ${gewerbeanmeldung.gueltigAb ? `<xga:gueltigAb>${escapeXml(gewerbeanmeldung.gueltigAb)}</xga:gueltigAb>` : ""}
+            ${gewerbeanmeldung.datumMeldung ? `<xga:datumMeldung>${escapeXml(gewerbeanmeldung.datumMeldung)}</xga:datumMeldung>` : ""}
             ${createBisherigeUnfallversicherung(gewerbeanmeldung.bisherigeUnfallversicherung)}
             ${createGewerbebetrieb(gewerbeanmeldung.gewerbebetrieb, natuerlichePerson0?.id ?? "")}
             ${createReferenzierteSubjekte(gewerbeanmeldung.referenzierteSubjekte)}
-            <xga:grundAnmeldungSchluessel>
-              <code>${escapeXml(gewerbeanmeldung.grundAnmeldungSchluessel)}</code>
-            </xga:grundAnmeldungSchluessel>
+            ${gewerbeanmeldung.grundAnmeldungSchluessel ? `<xga:grundAnmeldungSchluessel><code>${escapeXml(gewerbeanmeldung.grundAnmeldungSchluessel)}</code></xga:grundAnmeldungSchluessel>` : ""}
         </xga:anmeldung>
       </xga:satz>
     </xga:alg.gewerbemeldung.0300>`;

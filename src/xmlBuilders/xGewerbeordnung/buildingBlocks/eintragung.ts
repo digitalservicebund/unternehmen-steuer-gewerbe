@@ -15,12 +15,8 @@ export function createEintragung(eintragung: Eintragung | undefined) {
   if (!eintragung) return "";
   return `
     <bk:eintragung>
-      <eintragung:artEintragung listVersionID="1">
-        <code>${escapeXml(eintragung.artEintragung)}</code>
-      </eintragung:artEintragung>
-      <eintragung:registergericht.code listVersionID="12">
-        <code>${escapeXml(eintragung.registergericht?.code)}</code>
-      </eintragung:registergericht.code>
-      <eintragung:eintragungsnummer>${escapeXml(eintragung.eintragungsnummer)}</eintragung:eintragungsnummer>
+      ${eintragung.artEintragung ? `<eintragung:artEintragung listVersionID="1"><code>${escapeXml(eintragung.artEintragung)}</code></eintragung:artEintragung>` : ""}
+      ${eintragung.registergericht?.code ? `<eintragung:registergericht.code listVersionID="12"><code>${escapeXml(eintragung.registergericht.code)}</code></eintragung:registergericht.code>` : ""}
+      ${eintragung.eintragungsnummer !== undefined ? `<eintragung:eintragungsnummer>${escapeXml(eintragung.eintragungsnummer)}</eintragung:eintragungsnummer>` : ""}
     </bk:eintragung>`;
 }

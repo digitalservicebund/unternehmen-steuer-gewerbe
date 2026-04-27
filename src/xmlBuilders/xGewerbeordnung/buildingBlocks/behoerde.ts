@@ -13,6 +13,6 @@ export function createBehoerde(behoerde: Behoerde | undefined) {
     <bn-beh:verzeichnisdienst listVersionID="1">
       <code>DVDV</code>
     </bn-beh:verzeichnisdienst>
-    <bn-beh:kennung>${escapeXml(behoerde.kennung)}</bn-beh:kennung>
-    <bn-beh:name>${escapeXml(behoerde.name)}</bn-beh:name>`;
+    ${behoerde.kennung ? `<bn-beh:kennung>${escapeXml(behoerde.kennung)}</bn-beh:kennung>` : ""}
+    ${behoerde.name ? `<bn-beh:name>${escapeXml(behoerde.name)}</bn-beh:name>` : ""}`;
 }
