@@ -91,7 +91,7 @@ export async function createGewerbeanmeldungXml(
             ${gewerbeanmeldung.autor ? `<xga:autor>${createBehoerde(gewerbeanmeldung.autor)}</xga:autor>` : ""}
             ${gewerbeanmeldung.satzErstellung ? `<xga:satzErstellung>${escapeXml(gewerbeanmeldung.satzErstellung)}</xga:satzErstellung>` : ""}
             ${gewerbeanmeldung.ereigniszeitpunkt ? `<xga:ereigniszeitpunkt>${escapeXml(gewerbeanmeldung.ereigniszeitpunkt)}</xga:ereigniszeitpunkt>` : ""}
-            ${gewerbeanmeldung.istStorno !== undefined ? `<xga:istStorno>${escapeXml(gewerbeanmeldung.istStorno)}</xga:istStorno>` : ""}
+            ${gewerbeanmeldung.istStorno === undefined ? "" : `<xga:istStorno>${escapeXml(gewerbeanmeldung.istStorno)}</xga:istStorno>`}
             ${gewerbeanmeldung.gemeindeSchluessel ? `<xga:gemeindeSchluessel listVersionID="2020-03-31"><code>${escapeXml(gewerbeanmeldung.gemeindeSchluessel)}</code></xga:gemeindeSchluessel>` : ""}
             ${gewerbeanmeldung.uuid ? `<xga:uuid>${escapeXml(gewerbeanmeldung.uuid)}</xga:uuid>` : ""}
             ${gewerbeanmeldung.gueltigAb ? `<xga:gueltigAb>${escapeXml(gewerbeanmeldung.gueltigAb)}</xga:gueltigAb>` : ""}

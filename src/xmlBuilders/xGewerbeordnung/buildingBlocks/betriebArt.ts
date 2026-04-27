@@ -15,9 +15,9 @@ export function createBetriebArt(betriebArt: BetriebArt | undefined) {
   if (!betriebArt) return "";
   return `
     <xga:betriebArt>
-      ${betriebArt.industrie !== undefined ? `<xga:industrie>${escapeXml(betriebArt.industrie)}</xga:industrie>` : ""}
-      ${betriebArt.handwerk !== undefined ? `<xga:handwerk>${escapeXml(betriebArt.handwerk)}</xga:handwerk>` : ""}
-      ${betriebArt.handel !== undefined ? `<xga:handel>${escapeXml(betriebArt.handel)}</xga:handel>` : ""}
-      ${betriebArt.sonstiges !== undefined ? `<xga:sonstiges>${escapeXml(betriebArt.sonstiges)}</xga:sonstiges>` : ""}
+      ${betriebArt.industrie === undefined ? "" : `<xga:industrie>${escapeXml(betriebArt.industrie)}</xga:industrie>`}
+      ${betriebArt.handwerk === undefined ? "" : `<xga:handwerk>${escapeXml(betriebArt.handwerk)}</xga:handwerk>`}
+      ${betriebArt.handel === undefined ? "" : `<xga:handel>${escapeXml(betriebArt.handel)}</xga:handel>`}
+      ${betriebArt.sonstiges === undefined ? "" : `<xga:sonstiges>${escapeXml(betriebArt.sonstiges)}</xga:sonstiges>`}
     </xga:betriebArt>`;
 }

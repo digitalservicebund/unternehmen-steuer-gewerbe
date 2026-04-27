@@ -159,6 +159,12 @@ describe("createGewerbeanmeldungXml", () => {
     );
   });
 
+  it("does not crash with an empty input but fails only on XML validation", async () => {
+    await expect(createGewerbeanmeldungXml({})).rejects.toThrow(
+      "Generated XGewerbeanmeldung is invalid.",
+    );
+  });
+
   it("maps Gewerbeanmeldung data to the correct xGewerbeordnung 1.6 XML structure", async () => {
     expect(normalizeXml(await createGewerbeanmeldungXml(gewerbeanmeldung))).toBe(
       normalizeXml(xgewo_1_6_valid),
