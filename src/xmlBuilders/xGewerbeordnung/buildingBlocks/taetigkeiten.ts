@@ -57,11 +57,15 @@ export function createTaetigkeiten(taetigkeitenGesamt: TaetigkeitenGesamt | unde
   const { schwerpunkt, weitereTaetigkeiten } = taetigkeitenGesamt;
   return `
     <xga:taetigkeitenGesamt>
-      ${schwerpunkt ? `<xga:schwerpunkt>
+      ${
+        schwerpunkt
+          ? `<xga:schwerpunkt>
         ${schwerpunkt.taetigkeitSchwerpunkt ? `<xga:taetigkeitSchwerpunkt>${escapeXml(schwerpunkt.taetigkeitSchwerpunkt)}</xga:taetigkeitSchwerpunkt>` : ""}
         ${createWirtschaftszweig(schwerpunkt.wirtschaftszweigschluessel)}
         ${schwerpunkt.stichwort ? `<xga:stichwort>${escapeXml(schwerpunkt.stichwort)}</xga:stichwort>` : ""}
-      </xga:schwerpunkt>` : ""}
+      </xga:schwerpunkt>`
+          : ""
+      }
       ${createWeitereTaetigkeiten(weitereTaetigkeiten)}
     </xga:taetigkeitenGesamt>`;
 }
