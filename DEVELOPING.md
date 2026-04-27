@@ -62,14 +62,7 @@ pnpm run build:image
 start, mapping local port to container port
 
 ```bash
-docker run -p 3000:3000 \
-  -e FIT_CONNECT_ENV="test" \
-  -e FIT_CONNECT_CLIENT_ID="fit_connect_client_id_from_env_file" \
-  -e FIT_CONNECT_CLIENT_SECRET="fit_connect_client_secret_from_env_file" \
-  -e FIT_CONNECT_DESTINATION_ID="fit_connect_destination_id_from_env_file" \
-  -e FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK='fit_connect_public_key_encryption_jwk_from_env_file' \
-  -e FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK='fit_connect_private_key_decryption_jwk_from_env_file' \
-  unternehmen-steuer-gewerbe:latest
+pnpm run start:image
 ```
 
 ## Running the Tests
