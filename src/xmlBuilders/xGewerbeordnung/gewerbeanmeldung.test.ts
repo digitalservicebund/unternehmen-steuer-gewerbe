@@ -159,13 +159,50 @@ describe("createGewerbeanmeldungXml", () => {
     );
   });
 
+  it("does not crash with an empty input but fails only on XML validation", async () => {
+    await expect(createGewerbeanmeldungXml({})).rejects.toThrow(
+      "Generated XGewerbeanmeldung is invalid.",
+    );
+  });
+
+  it("does not crash when all nested objects are present but all fields are undefined", async () => {
+    await expect(
+      createGewerbeanmeldungXml({
+        nachrichtenkopf: { leser: {}, autor: {} },
+        autor: {},
+        bisherigeUnfallversicherung: {},
+        gewerbebetrieb: {
+          eintragung: { registergericht: {} },
+          betriebsstaette: { anschrift: {}, kommunikation: {} },
+          taetigkeitenGesamt: {
+            schwerpunkt: {},
+            weitereTaetigkeiten: { taetigkeit: [{}] },
+          },
+          betriebArt: {},
+          handwerkskarte: {},
+        },
+        referenzierteSubjekte: {
+          natuerlichePerson: [
+            {
+              name: {},
+              geburt: {},
+              anschrift: {},
+              kommunikation: {},
+              aufenthaltstitel: {},
+            },
+          ],
+        },
+      }),
+    ).rejects.toThrow("Generated XGewerbeanmeldung is invalid.");
+  });
+
   it("maps Gewerbeanmeldung data to the correct xGewerbeordnung 1.6 XML structure", async () => {
     expect(normalizeXml(await createGewerbeanmeldungXml(gewerbeanmeldung))).toBe(
       normalizeXml(xgewo_1_6_valid),
     );
   });
 
-  it("works without optional fields", async () => {
+  it("omits optional XML elements when data is not provided", async () => {
     const minimal: Gewerbeanmeldung = {
       nachrichtenkopf: {
         nachrichtenUUID: "00000000-0000-0000-0000-000000000001",
@@ -249,9 +286,9 @@ describe("createGewerbeanmeldungXml", () => {
         ...gewerbeanmeldung.gewerbebetrieb,
         eingetragenerName: `Müller & <Söhne> "GmbH" 'Co.'`,
         taetigkeitenGesamt: {
-          ...gewerbeanmeldung.gewerbebetrieb.taetigkeitenGesamt,
+          ...gewerbeanmeldung.gewerbebetrieb!.taetigkeitenGesamt,
           schwerpunkt: {
-            ...gewerbeanmeldung.gewerbebetrieb.taetigkeitenGesamt.schwerpunkt,
+            ...gewerbeanmeldung.gewerbebetrieb!.taetigkeitenGesamt!.schwerpunkt,
             stichwort: "A > B & C < D",
           },
         },
@@ -271,9 +308,9 @@ describe("createGewerbeanmeldungXml", () => {
       gewerbebetrieb: {
         ...gewerbeanmeldung.gewerbebetrieb,
         betriebsstaette: {
-          ...gewerbeanmeldung.gewerbebetrieb.betriebsstaette,
+          ...gewerbeanmeldung.gewerbebetrieb!.betriebsstaette,
           anschrift: {
-            ...gewerbeanmeldung.gewerbebetrieb.betriebsstaette.anschrift,
+            ...gewerbeanmeldung.gewerbebetrieb!.betriebsstaette!.anschrift,
             hausnummerVon: "90",
             hausnummerBis: "94",
           },
@@ -296,7 +333,7 @@ describe("createGewerbeanmeldungXml", () => {
       gewerbebetrieb: {
         ...gewerbeanmeldung.gewerbebetrieb,
         betriebsstaette: {
-          ...gewerbeanmeldung.gewerbebetrieb.betriebsstaette,
+          ...gewerbeanmeldung.gewerbebetrieb!.betriebsstaette,
           kommunikation: {
             telefax: "+49 234 555000",
             email: "kontakt@example.de",
@@ -319,7 +356,7 @@ describe("createGewerbeanmeldungXml", () => {
   });
 
   it("creates every natuerlichePerson entry when the array contains multiple", async () => {
-    const firstPerson = gewerbeanmeldung.referenzierteSubjekte.natuerlichePerson[0]!;
+    const firstPerson = gewerbeanmeldung.referenzierteSubjekte!.natuerlichePerson![0]!;
     const multiPerson: Gewerbeanmeldung = {
       ...gewerbeanmeldung,
       referenzierteSubjekte: {

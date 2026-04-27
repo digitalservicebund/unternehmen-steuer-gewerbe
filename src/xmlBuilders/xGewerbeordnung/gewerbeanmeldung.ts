@@ -17,31 +17,31 @@ import {
 import { escapeXml } from "../../helpers/escapeXml";
 
 export interface Gewerbeanmeldung {
-  nachrichtenkopf: Nachrichtenkopf;
+  nachrichtenkopf?: Nachrichtenkopf;
   /** Die die Gewerbeanzeige entgegennehmende Behörde. */
-  autor: Behoerde;
+  autor?: Behoerde;
   /** Angabe des Zeitpunkts der Erstellung des XML-Datensatzes für die Übermittlung. */
-  satzErstellung: string;
+  satzErstellung?: string;
   /** Der Zeitpunkt, zu welchem der die Übermittlung auslösende Verwaltungsvorgang (Aufnahme / Änderung / Korrektur eines Datensatzes) im gemeindlichen Gewerbeverzeichnis gespeichert wurde. */
-  ereigniszeitpunkt: string;
+  ereigniszeitpunkt?: string;
   /** Angabe über das Vorliegen einer Stornierung dieser Gewerbemeldung  */
-  istStorno: boolean;
+  istStorno?: boolean;
   /** Amtlicher Gemeindeschlüssel der Sitzgemeinde der Betriebsstätte */
-  gemeindeSchluessel: string;
+  gemeindeSchluessel?: string;
   /** Eindeutige Kennzeichnung der Gewerbeanzeige als UUID. */
-  uuid: string;
+  uuid?: string;
   /** Datum des Beginns, der meldepflichtigen Änderung, der Aufgabe des Gewerbes oder der Datenaktualisierung */
-  gueltigAb: string;
+  gueltigAb?: string;
   /** Datum, an welchem die An-, Um-, Abmeldung bzw. Datenaktualisierung an die Gewerbemeldestelle übergeben wurde. */
-  datumMeldung: string;
+  datumMeldung?: string;
   /** Angaben zur bisherigen Unfallversicherung bei Übernahme, Verschmelzung oder Spaltung. Laut SCH-0094 Pflicht bei Anmeldung, außer bei Neugründung einer Hauptniederlassung, Neugründung einer Zweigniederlassung mit ausländischer Hauptniederlassung, Reisegewerbe oder technischer Anmeldung – in diesen Fällen darf das Feld nicht angegeben werden. */
   bisherigeUnfallversicherung?: BisherigeUnfallversicherung | undefined;
   /** Ein Gewerbebetrieb beschreibt die wirtschaftliche Einheit, unter der ein oder mehrere Gewerbetreibende/r im Außenverhältnis am Wirtschaftsleben teilnehmen. */
-  gewerbebetrieb: Gewerbebetrieb;
+  gewerbebetrieb?: Gewerbebetrieb;
   /** Innerhalb des Elements gewerbebetrieb über ID referenzierte Subjekte. */
-  referenzierteSubjekte: ReferenzierteSubjekte;
+  referenzierteSubjekte?: ReferenzierteSubjekte;
   /** Grund für Anmeldung - code */
-  grundAnmeldungSchluessel: string;
+  grundAnmeldungSchluessel?: string;
 }
 
 const ROOT_ATTRIBUTES = `
@@ -75,36 +75,31 @@ const ROOT_ATTRIBUTES = `
   produktversion="2024"
   standard="XGewerbeordnung"
   version="1.6"
-  test="100"`;
+  test="100"
+` as const;
 
 export async function createGewerbeanmeldungXml(
   gewerbeanmeldung: Gewerbeanmeldung,
 ): Promise<string> {
-  const natuerlichePerson0 = gewerbeanmeldung.referenzierteSubjekte.natuerlichePerson?.[0];
+  const natuerlichePerson0 = gewerbeanmeldung.referenzierteSubjekte?.natuerlichePerson?.[0];
 
   const gewerbeanmeldungXml = `<?xml version="1.0" encoding="UTF-8"?>
     <xga:alg.gewerbemeldung.0300 ${ROOT_ATTRIBUTES}>
       ${createG2gNachrichtenkopf(gewerbeanmeldung.nachrichtenkopf)}
       <xga:satz>
         <xga:anmeldung>
-            <xga:autor>
-              ${createBehoerde(gewerbeanmeldung.autor)}
-            </xga:autor>
-            <xga:satzErstellung>${escapeXml(gewerbeanmeldung.satzErstellung)}</xga:satzErstellung>
-            <xga:ereigniszeitpunkt>${escapeXml(gewerbeanmeldung.ereigniszeitpunkt)}</xga:ereigniszeitpunkt>
-            <xga:istStorno>${escapeXml(gewerbeanmeldung.istStorno)}</xga:istStorno>
-            <xga:gemeindeSchluessel listVersionID="2020-03-31">
-              <code>${escapeXml(gewerbeanmeldung.gemeindeSchluessel)}</code>
-            </xga:gemeindeSchluessel>
-            <xga:uuid>${escapeXml(gewerbeanmeldung.uuid)}</xga:uuid>
-            <xga:gueltigAb>${escapeXml(gewerbeanmeldung.gueltigAb)}</xga:gueltigAb>
-            <xga:datumMeldung>${escapeXml(gewerbeanmeldung.datumMeldung)}</xga:datumMeldung>
+            ${gewerbeanmeldung.autor ? `<xga:autor>${createBehoerde(gewerbeanmeldung.autor)}</xga:autor>` : ""}
+            ${gewerbeanmeldung.satzErstellung ? `<xga:satzErstellung>${escapeXml(gewerbeanmeldung.satzErstellung)}</xga:satzErstellung>` : ""}
+            ${gewerbeanmeldung.ereigniszeitpunkt ? `<xga:ereigniszeitpunkt>${escapeXml(gewerbeanmeldung.ereigniszeitpunkt)}</xga:ereigniszeitpunkt>` : ""}
+            ${gewerbeanmeldung.istStorno === undefined ? "" : `<xga:istStorno>${escapeXml(gewerbeanmeldung.istStorno)}</xga:istStorno>`}
+            ${gewerbeanmeldung.gemeindeSchluessel ? `<xga:gemeindeSchluessel listVersionID="2020-03-31"><code>${escapeXml(gewerbeanmeldung.gemeindeSchluessel)}</code></xga:gemeindeSchluessel>` : ""}
+            ${gewerbeanmeldung.uuid ? `<xga:uuid>${escapeXml(gewerbeanmeldung.uuid)}</xga:uuid>` : ""}
+            ${gewerbeanmeldung.gueltigAb ? `<xga:gueltigAb>${escapeXml(gewerbeanmeldung.gueltigAb)}</xga:gueltigAb>` : ""}
+            ${gewerbeanmeldung.datumMeldung ? `<xga:datumMeldung>${escapeXml(gewerbeanmeldung.datumMeldung)}</xga:datumMeldung>` : ""}
             ${createBisherigeUnfallversicherung(gewerbeanmeldung.bisherigeUnfallversicherung)}
-            ${createGewerbebetrieb(gewerbeanmeldung.gewerbebetrieb, natuerlichePerson0 ? natuerlichePerson0.id : "")}
+            ${createGewerbebetrieb(gewerbeanmeldung.gewerbebetrieb, natuerlichePerson0?.id ?? "")}
             ${createReferenzierteSubjekte(gewerbeanmeldung.referenzierteSubjekte)}
-            <xga:grundAnmeldungSchluessel>
-              <code>${escapeXml(gewerbeanmeldung.grundAnmeldungSchluessel)}</code>
-            </xga:grundAnmeldungSchluessel>
+            ${gewerbeanmeldung.grundAnmeldungSchluessel ? `<xga:grundAnmeldungSchluessel><code>${escapeXml(gewerbeanmeldung.grundAnmeldungSchluessel)}</code></xga:grundAnmeldungSchluessel>` : ""}
         </xga:anmeldung>
       </xga:satz>
     </xga:alg.gewerbemeldung.0300>`;

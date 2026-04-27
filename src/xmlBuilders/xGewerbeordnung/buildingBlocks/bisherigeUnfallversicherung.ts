@@ -48,7 +48,7 @@ export const UNFALLVERSICHERUNGSTRAEGER_CODES = Object.keys(UNFALLVERSICHERUNGST
 
 export interface BisherigeUnfallversicherung {
   /** Schlüssel des Trägers der bisherigen gesetzlichen Unfallversicherung. */
-  traeger: UnfallversicherungstraegerCode;
+  traeger?: UnfallversicherungstraegerCode;
   /** Unternehmensnummer bei der bisherigen Unfallversicherung (früher Mitgliedsnummer). */
   unternehmensnummer?: string | undefined;
 }
@@ -57,7 +57,6 @@ export function createBisherigeUnfallversicherung(
   bisherigeUnfallversicherung: BisherigeUnfallversicherung | undefined,
 ) {
   if (!bisherigeUnfallversicherung) return "";
-
   return `
     <bk:bisherigeUnfallversicherung>
       <bk:traeger listVersionID="1">

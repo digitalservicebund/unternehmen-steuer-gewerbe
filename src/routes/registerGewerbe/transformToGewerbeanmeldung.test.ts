@@ -30,7 +30,7 @@ describe("transformToGewerbeanmeldung", () => {
   it("splits strasseUndHausnummer into strasse and hausnummerVon", () => {
     const result = transformToGewerbeanmeldung(baseRequest);
 
-    expect(result.referenzierteSubjekte.natuerlichePerson[0]!.anschrift).toMatchObject({
+    expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.anschrift).toMatchObject({
       strasse: "Musterstraße",
       hausnummerVon: "1",
     });
@@ -49,7 +49,7 @@ describe("transformToGewerbeanmeldung", () => {
       },
     });
 
-    expect(result.gewerbebetrieb.betriebsstaette.anschrift).toEqual({
+    expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
       strasse: "Betriebsweg",
       hausnummerVon: "42a",
       postleitzahl: "67890",
@@ -60,7 +60,7 @@ describe("transformToGewerbeanmeldung", () => {
   it("falls back to persönliche Adresse for the betriebsstaette when adresseAbweichend is missing", () => {
     const result = transformToGewerbeanmeldung(baseRequest);
 
-    expect(result.gewerbebetrieb.betriebsstaette.anschrift).toEqual({
+    expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
       strasse: "Musterstraße",
       hausnummerVon: "1",
       postleitzahl: "12345",
