@@ -13,7 +13,6 @@ export interface Kommunikation {
 
 export function createKommunikation(kommunikation: Kommunikation | undefined) {
   if (!kommunikation) return "";
-
   return `
     <bk:kommunikation>
       ${kommunikation.telefon ? `<komm:telefon>${escapeXml(kommunikation.telefon)}</komm:telefon>` : ""}

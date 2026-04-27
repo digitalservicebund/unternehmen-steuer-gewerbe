@@ -2,7 +2,7 @@ import { escapeXml } from "../../../helpers/escapeXml";
 
 export interface Handwerkskarte {
   /** Status der Handwerkskarte */
-  status: string;
+  status?: string;
   /** Ausstellungsdatum der Handwerkskarte */
   ausgestelltAm?: string;
   /** Postleitzahl des Sitzes der die Handwerkskarte ausstellenden Handwerkskammer (z.B. "90489"). Das Element sollte nur angegeben werden, wenn kein Schlüssel zu der Handwerkskammer im betreffenden Element angegeben wurde. */
@@ -15,7 +15,6 @@ export interface Handwerkskarte {
 
 export function createHandwerkskarte(handwerkskarte: Handwerkskarte | undefined) {
   if (!handwerkskarte) return "";
-
   return `
     <xga:handwerkskarte>
       <xga:status>

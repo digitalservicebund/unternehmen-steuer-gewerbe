@@ -2,20 +2,21 @@ import { escapeXml } from "../../../helpers/escapeXml";
 
 export interface Anschrift {
   /** Falls die Anschrift unbekannt ist (z. B. bei Abmeldung von Amts wegen), so ist hier der Wert "unbekannt" zu übermitteln. */
-  strasse: string;
+  strasse?: string;
   /** Angabe des Straßenschlüssels in der Gemeinde. */
   strassenschluessel?: string;
   /** Hausnummer (von), z.B. "136 A" */
-  hausnummerVon: string;
+  hausnummerVon?: string;
   /** Hausnummer (bis), z.B. "136 C" */
   hausnummerBis?: string;
   /** Es ist die Postleitzahl anzugeben. */
-  postleitzahl: string;
+  postleitzahl?: string;
   /** Der Name des Ortes (Gemeinde, Ortschaft oder Stadt). */
-  ort: string;
+  ort?: string;
 }
 
-export function createAnschrift(strassenanschriftInland: Anschrift) {
+export function createAnschrift(strassenanschriftInland: Anschrift | undefined) {
+  if (!strassenanschriftInland) return "";
   return `
     <bk:anschrift>
       <bk:strassenanschriftInland>

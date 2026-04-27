@@ -1,6 +1,7 @@
 import { escapeXml } from "../../../helpers/escapeXml";
 
-export function createWirtschaftszweig(wirtschaftszweigschluessel: string) {
+export function createWirtschaftszweig(wirtschaftszweigschluessel: string | undefined) {
+  if (!wirtschaftszweigschluessel) return "";
   return `
     <wt:wirtschaftszweig>
       <wt:wirtschaftszweigschluessel>${escapeXml(wirtschaftszweigschluessel)}</wt:wirtschaftszweigschluessel>

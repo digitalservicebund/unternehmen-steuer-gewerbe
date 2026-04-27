@@ -2,14 +2,15 @@ import { escapeXml } from "../../../helpers/escapeXml";
 import { createBehoerde, type Behoerde } from "./behoerde";
 
 export interface Nachrichtenkopf {
-  nachrichtenUUID: string;
+  nachrichtenUUID?: string;
   /** Dieses Element enthält den Erstellungszeitpunkt der Nachricht - es enthält explizit nicht den Sende- und Empfangszeitpunkt. */
-  erstellungszeitpunkt: string;
-  leser: Behoerde;
-  autor: Behoerde;
+  erstellungszeitpunkt?: string;
+  leser?: Behoerde;
+  autor?: Behoerde;
 }
 
-export function createG2gNachrichtenkopf(nachrichtenkopf: Nachrichtenkopf) {
+export function createG2gNachrichtenkopf(nachrichtenkopf: Nachrichtenkopf | undefined) {
+  if (!nachrichtenkopf) return "";
   return `
     <bn-g2g:nachrichtenkopf.g2g>
       <bn-g2g:identifikation.nachricht>
@@ -25,5 +26,5 @@ export function createG2gNachrichtenkopf(nachrichtenkopf: Nachrichtenkopf) {
       <bn-g2g:autor>
         ${createBehoerde(nachrichtenkopf.autor)}
       </bn-g2g:autor>
-</bn-g2g:nachrichtenkopf.g2g>`;
+    </bn-g2g:nachrichtenkopf.g2g>`;
 }

@@ -5,56 +5,57 @@ import { escapeXml } from "../../../helpers/escapeXml";
 
 export interface Name {
   /** Familienname einer natürlichen Person bestehend aus Nachname, Zuname bzw. Familienname. */
-  familienname: string;
+  familienname?: string;
   /** Der Geburtsname entspricht dem Familiennamen einer natürlichen Person vor der Schließung der ersten Ehe bzw. vor dem Eingehen der ersten Lebenspartnerschaft. */
   geburtsname?: string;
   /** Vornamen einer natürlichen Person. */
-  vornamen: string;
+  vornamen?: string;
 }
 
 export interface Geburt {
   /** Datum der Vollendung der Geburt. */
-  geburtsdatum: string;
+  geburtsdatum?: string;
   /** Der Ort der Geburt. */
-  ort: string;
+  ort?: string;
   /** Der Staat der Geburt. */
-  staat: string;
+  staat?: string;
 }
 
 export interface NatuerlichePerson {
   /** Innerhalb des jeweiligen Kontextes eindeutige ID dieser Instanz des Datentyps Natürliche Person. */
-  id: string;
+  id?: string;
   /** Datenobjekt zur Darstellung des Namens einer natürlichen Person in lateinischer Schrift, entsprechend der Vorgaben aus dem Baukasten des Föderalen Informationsmanagements (FIM). */
-  name: Name;
+  name?: Name;
   /** Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Angabe zum Staat als Freitext statt Code. */
-  geburt: Geburt;
+  geburt?: Geburt;
   /** Als Geschlechtsangabe zulässig sind: "x" (keine Angabe), "d" (divers), "w" (weiblich), "m" (männlich). */
-  geschlecht: "x" | "d" | "w" | "m";
+  geschlecht?: "x" | "d" | "w" | "m";
   /** Die Staatsangehörigkeit der natürlichen Person gemäß Codierung des statistischen Bundesamts. */
-  staatsangehoerigkeit: string;
+  staatsangehoerigkeit?: string;
   /** Anschrift der natürlichen Person (privater Wohnsitz). */
-  anschrift: Anschrift;
+  anschrift?: Anschrift;
   /** Private Kontaktdaten der natürlichen Person. */
   kommunikation?: Kommunikation;
   /** Mittels dieses Typs werden Angaben zum Aufenthaltstitel ausländischer Betriebsinhaber gemacht. */
   aufenthaltstitel?: Aufenthaltstitel;
 }
 
-export function createNatuerlichePerson(natuerlichePerson: NatuerlichePerson) {
+export function createNatuerlichePerson(natuerlichePerson: NatuerlichePerson | undefined) {
+  if (!natuerlichePerson) return "";
   return `
     <xga:natuerlichePerson>
       <np:natuerlichePerson.id>${escapeXml(natuerlichePerson.id)}</np:natuerlichePerson.id>
       <np:name>
-        <np:familienname>${escapeXml(natuerlichePerson.name.familienname)}</np:familienname>
-        ${natuerlichePerson.name.geburtsname ? `<np:geburtsname>${escapeXml(natuerlichePerson.name.geburtsname)}</np:geburtsname>` : ""}
-        <np:vornamen>${escapeXml(natuerlichePerson.name.vornamen)}</np:vornamen>
+        <np:familienname>${escapeXml(natuerlichePerson.name?.familienname)}</np:familienname>
+        ${natuerlichePerson.name?.geburtsname ? `<np:geburtsname>${escapeXml(natuerlichePerson.name.geburtsname)}</np:geburtsname>` : ""}
+        <np:vornamen>${escapeXml(natuerlichePerson.name?.vornamen)}</np:vornamen>
       </np:name>
       <bk:geburt>
         <np:geburtsdatum>
-          <dat:datum>${escapeXml(natuerlichePerson.geburt.geburtsdatum)}</dat:datum>
+          <dat:datum>${escapeXml(natuerlichePerson.geburt?.geburtsdatum)}</dat:datum>
         </np:geburtsdatum>
-        <adr:ort>${escapeXml(natuerlichePerson.geburt.ort)}</adr:ort>
-        <bk:staat>${escapeXml(natuerlichePerson.geburt.staat)}</bk:staat>
+        <adr:ort>${escapeXml(natuerlichePerson.geburt?.ort)}</adr:ort>
+        <bk:staat>${escapeXml(natuerlichePerson.geburt?.staat)}</bk:staat>
       </bk:geburt>
       <np:geschlecht listVersionID="1">
         <code>${escapeXml(natuerlichePerson.geschlecht)}</code>

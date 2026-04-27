@@ -2,7 +2,7 @@ import { escapeXml } from "../../../helpers/escapeXml";
 
 export interface Aufenthaltstitel {
   /** Angabe des Status des Aufenthaltstitels */
-  status: string;
+  status?: string;
   /** Ausstellungsdatum des Aufenthaltstitels */
   ausgestelltAm?: string;
   /** Name der den Aufenthaltstitel ausstellenden Behörde */
@@ -15,7 +15,6 @@ export interface Aufenthaltstitel {
 
 export function createAufenthaltstitel(aufenthaltstitel: Aufenthaltstitel | undefined) {
   if (!aufenthaltstitel) return "";
-
   return `
     <xga:aufenthaltstitel>
       <xga:status>
