@@ -19,7 +19,7 @@ const registerGewerbeRequestData = {
   },
   unternehmensDaten: {
     tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
-    tätigkeitsbereich: "Handwerksbetrieb",
+    tätigkeitsbereich: "handwerk",
     tätigkeitsbeginn: "2026-04-17",
     gewerbeart: "hauptgewerbe",
     adresseAbweichend: {

@@ -20,7 +20,7 @@ const baseRequest: RegisterGewerbeRequest = {
   },
   unternehmensDaten: {
     tätigkeitsbeschreibung: "Was mit Computern",
-    tätigkeitsbereich: "IT",
+    tätigkeitsbereich: "sonstiges",
     tätigkeitsbeginn: "2026-04-17",
     gewerbeart: "hauptgewerbe",
   },

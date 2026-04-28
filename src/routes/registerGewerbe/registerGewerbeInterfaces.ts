@@ -26,8 +26,8 @@ const PersönlicheDatenSchema = z.object({
   geburtsname: z.string().openapi({ example: "Muster" }).optional(),
   geburtsdatum: z.iso.date().openapi({ example: "1988-09-10" }),
   geschlecht: z.enum(["d", "w", "m"]).openapi({ example: "d" }).optional(),
-  geburtsort: z.string().openapi({ example: "Musterstadt" }),
-  geburtsland: z.string().openapi({ example: "Deutschland" }),
+  geburtsort: z.string().openapi({ example: "Musterstadt" }).optional(),
+  geburtsland: z.string().openapi({ example: "Deutschland" }).optional(),
   staatsangehörigkeitDeutsch: z.literal(true),
   adresse: AdresseSchema,
   telefon: z
@@ -38,7 +38,7 @@ const PersönlicheDatenSchema = z.object({
       description:
         "Telefonnummern nach DIN 5008 kodiert werden: +[Ländervorwahl] (bis zu 5 Zeichen) [Lokale Vorwahl] (bis zu 5 Zeichen) [Rufnummer] (bis zu 13 Zeichen) [-Durchwahl] (optional, bis zu 5 Zeichen)",
     }),
-  email: z.string().openapi({ example: "e.mustermann@example.org" }),
+  email: z.string().email().openapi({ example: "e.mustermann@example.org" }),
 });
 
 const UnternehmensDatenSchema = z.object({
@@ -50,7 +50,9 @@ const UnternehmensDatenSchema = z.object({
     },
   }).optional(),
   tätigkeitsbeschreibung: z.string().openapi({ example: "Vertrieb von Vertriebsmustern" }),
-  tätigkeitsbereich: z.string().openapi({ example: "Handwerksbetrieb" }),
+  tätigkeitsbereich: z
+    .enum(["industrie", "handwerk", "handel", "sonstiges"])
+    .openapi({ example: "handwerk" }),
   tätigkeitsbeginn: z.iso.date().openapi({ example: "2026-04-17" }),
   gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
 });
