@@ -19,7 +19,6 @@ export interface FitConnectClientConfig {
   clientId: string;
   clientSecret: string;
   privateKey: JWK;
-  signatureVerificationKey: JWK;
   fetch?: FetchFn;
 }
 
@@ -37,9 +36,6 @@ export function getFitConnectClient() {
     clientSecret: getSecret("FIT_CONNECT_CLIENT_SECRET"),
     privateKey: getSecret("FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK")
       ? JSON.parse(getSecret("FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK"))
-      : undefined,
-    signatureVerificationKey: getSecret("FIT_CONNECT_SIGNATURE_VERIFICATION_JWK")
-      ? JSON.parse(getSecret("FIT_CONNECT_SIGNATURE_VERIFICATION_JWK"))
       : undefined,
   });
 }
