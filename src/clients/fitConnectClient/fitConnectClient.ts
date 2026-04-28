@@ -146,7 +146,7 @@ class FitConnectClient {
         const jwkKeys = [...wellKnownJWKs.keys, ...destinationKeys];
         const key = jwkKeys.find((jwk) => jwk.kid === header.kid);
         if (!key) {
-          return null;
+          return Promise.resolve(null);
         }
         return verifyEventToken(entry, key);
       }),
