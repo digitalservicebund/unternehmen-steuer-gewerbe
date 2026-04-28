@@ -159,7 +159,7 @@ describe("FitConnectClient", () => {
       const { privateKey, publicKey } = await generateKeyPair("PS512");
       const publicJwk = { ...(await exportJWK(publicKey)), alg: "PS512", kid };
       const token = await new SignJWT({
-        events: { "https://schema.fitko.de/fit-connect/events/submission-received": {} },
+        events: { "https://schema.fitko.de/fit-connect/events/create-submission": {} },
       })
         .setProtectedHeader({ alg: "PS512", kid })
         .setIssuedAt()
@@ -167,11 +167,24 @@ describe("FitConnectClient", () => {
       return { token, publicJwk };
     }
 
-    function mockEventsSequence(eventLog: string[], wellKnownKeys: object[], destinationKeys: object[]) {
+    function mockEventsSequence(
+      eventLog: string[],
+      wellKnownKeys: object[],
+      destinationKeys: object[],
+    ) {
       mockFetch.mockResolvedValueOnce(jsonResponse(tokenResponse));
-      mockFetch.mockResolvedValueOnce(jsonResponse({ count: eventLog.length, offset: 0, totalCount: eventLog.length, eventLog }));
+      mockFetch.mockResolvedValueOnce(
+        jsonResponse({ count: eventLog.length, offset: 0, totalCount: eventLog.length, eventLog }),
+      );
       mockFetch.mockResolvedValueOnce(jsonResponse({ keys: wellKnownKeys }));
-      mockFetch.mockResolvedValueOnce(jsonResponse({ count: destinationKeys.length, offset: 0, totalCount: destinationKeys.length, keys: destinationKeys }));
+      mockFetch.mockResolvedValueOnce(
+        jsonResponse({
+          count: destinationKeys.length,
+          offset: 0,
+          totalCount: destinationKeys.length,
+          keys: destinationKeys,
+        }),
+      );
     }
 
     it("decodes events signed by FIT-Connect using wellKnownJWKs", async () => {
@@ -182,10 +195,12 @@ describe("FitConnectClient", () => {
 
       expect(mockFetch).toHaveBeenCalledWith(
         `https://test.fit-connect.fitko.dev/submission-api/v2/submissions/${SUBMISSION_ID}/events`,
-        expect.objectContaining({ headers: expect.objectContaining({ Authorization: "Bearer test-token" }) }),
+        expect.objectContaining({
+          headers: expect.objectContaining({ Authorization: "Bearer test-token" }),
+        }),
       );
       expect(result.eventLog[0]).toMatchObject({
-        events: { "https://schema.fitko.de/fit-connect/events/submission-received": {} },
+        events: { "https://schema.fitko.de/fit-connect/events/create-submission": {} },
       });
     });
 
@@ -196,7 +211,7 @@ describe("FitConnectClient", () => {
       const result = await client.getSubmissionEvents(SUBMISSION_ID, DESTINATION_ID);
 
       expect(result.eventLog[0]).toMatchObject({
-        events: { "https://schema.fitko.de/fit-connect/events/submission-received": {} },
+        events: { "https://schema.fitko.de/fit-connect/events/create-submission": {} },
       });
     });
 
