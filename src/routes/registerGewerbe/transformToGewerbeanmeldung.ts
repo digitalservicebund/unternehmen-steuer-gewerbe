@@ -79,12 +79,18 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
           name: {
             familienname: data.persönlicheDaten.nachname,
             vornamen: data.persönlicheDaten.vorname,
-            geburtsname: data.persönlicheDaten.geburtsname,
+            ...(data.persönlicheDaten.geburtsname === undefined
+              ? {}
+              : { geburtsname: data.persönlicheDaten.geburtsname }),
           },
           geburt: {
             geburtsdatum: data.persönlicheDaten.geburtsdatum,
-            ort: data.persönlicheDaten.geburtsort,
-            staat: data.persönlicheDaten.geburtsland,
+            ...(data.persönlicheDaten.geburtsort === undefined
+              ? {}
+              : { ort: data.persönlicheDaten.geburtsort }),
+            ...(data.persönlicheDaten.geburtsland === undefined
+              ? {}
+              : { staat: data.persönlicheDaten.geburtsland }),
           },
           geschlecht: data.persönlicheDaten.geschlecht || "x",
           staatsangehoerigkeit: "000",
