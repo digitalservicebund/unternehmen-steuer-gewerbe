@@ -15,6 +15,9 @@ const privateKeyDecryption = process.env.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK
   ? JSON.parse(process.env.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK)
   : undefined;
 
+let mockFetch: ReturnType<typeof vi.fn>;
+let client: FitConnectClient;
+
 function jsonResponse(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
     status,
@@ -29,6 +32,38 @@ function generateTestKeyPair() {
   const { key_ops: _keyOpsPrivate, ...privateKey } = privateKeyDecryption;
 
   return { privateKey, publicJwk };
+}
+
+async function signedToken(kid: string) {
+  const { privateKey, publicKey } = await generateKeyPair("PS512");
+  const publicJwk = { ...(await exportJWK(publicKey)), alg: "PS512", kid };
+  const token = await new SignJWT({
+    events: { "https://schema.fitko.de/fit-connect/events/create-submission": {} },
+  })
+    .setProtectedHeader({ alg: "PS512", kid })
+    .setIssuedAt()
+    .sign(privateKey);
+  return { token, publicJwk };
+}
+
+function mockEventsSequence(
+  eventLog: string[],
+  wellKnownKeys: object[],
+  destinationKeys: object[],
+) {
+  mockFetch.mockResolvedValueOnce(jsonResponse(tokenResponse));
+  mockFetch.mockResolvedValueOnce(
+    jsonResponse({ count: eventLog.length, offset: 0, totalCount: eventLog.length, eventLog }),
+  );
+  mockFetch.mockResolvedValueOnce(jsonResponse({ keys: wellKnownKeys }));
+  mockFetch.mockResolvedValueOnce(
+    jsonResponse({
+      count: destinationKeys.length,
+      offset: 0,
+      totalCount: destinationKeys.length,
+      keys: destinationKeys,
+    }),
+  );
 }
 
 const defaultConfig = {
@@ -64,9 +99,6 @@ const sendSubmissionResponse = {
 };
 
 describe("FitConnectClient", () => {
-  let mockFetch: ReturnType<typeof vi.fn>;
-  let client: FitConnectClient;
-
   beforeEach(() => {
     mockFetch = vi.fn();
     // @ts-expect-error: allow the fetch mock to be any
@@ -155,38 +187,6 @@ describe("FitConnectClient", () => {
   });
 
   describe("getSubmissionEvents", () => {
-    async function signedToken(kid: string) {
-      const { privateKey, publicKey } = await generateKeyPair("PS512");
-      const publicJwk = { ...(await exportJWK(publicKey)), alg: "PS512", kid };
-      const token = await new SignJWT({
-        events: { "https://schema.fitko.de/fit-connect/events/create-submission": {} },
-      })
-        .setProtectedHeader({ alg: "PS512", kid })
-        .setIssuedAt()
-        .sign(privateKey);
-      return { token, publicJwk };
-    }
-
-    function mockEventsSequence(
-      eventLog: string[],
-      wellKnownKeys: object[],
-      destinationKeys: object[],
-    ) {
-      mockFetch.mockResolvedValueOnce(jsonResponse(tokenResponse));
-      mockFetch.mockResolvedValueOnce(
-        jsonResponse({ count: eventLog.length, offset: 0, totalCount: eventLog.length, eventLog }),
-      );
-      mockFetch.mockResolvedValueOnce(jsonResponse({ keys: wellKnownKeys }));
-      mockFetch.mockResolvedValueOnce(
-        jsonResponse({
-          count: destinationKeys.length,
-          offset: 0,
-          totalCount: destinationKeys.length,
-          keys: destinationKeys,
-        }),
-      );
-    }
-
     it("decodes events signed by FIT-Connect using wellKnownJWKs", async () => {
       const { token, publicJwk } = await signedToken("fit-connect-key-1");
       mockEventsSequence([token], [publicJwk], []);
