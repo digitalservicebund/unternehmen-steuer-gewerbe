@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { generateKeyPair, exportJWK, SignJWT } from "jose";
 import FitConnectClient from "./fitConnectClient";
 
 const DESTINATION_ID = "ec0a9e69-dc34-427d-ab82-a5c90e4687c0";
@@ -13,6 +14,9 @@ const publicKeyEncryption = process.env.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK
 const privateKeyDecryption = process.env.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK
   ? JSON.parse(process.env.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK)
   : undefined;
+
+let mockFetch: ReturnType<typeof vi.fn>;
+let client: FitConnectClient;
 
 function jsonResponse(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
@@ -28,6 +32,38 @@ function generateTestKeyPair() {
   const { key_ops: _keyOpsPrivate, ...privateKey } = privateKeyDecryption;
 
   return { privateKey, publicJwk };
+}
+
+async function signedToken(kid: string) {
+  const { privateKey, publicKey } = await generateKeyPair("PS512");
+  const publicJwk = { ...(await exportJWK(publicKey)), alg: "PS512", kid };
+  const token = await new SignJWT({
+    events: { "https://schema.fitko.de/fit-connect/events/create-submission": {} },
+  })
+    .setProtectedHeader({ alg: "PS512", kid })
+    .setIssuedAt()
+    .sign(privateKey);
+  return { token, publicJwk };
+}
+
+function mockEventsSequence(
+  eventLog: string[],
+  wellKnownKeys: object[],
+  destinationKeys: object[],
+) {
+  mockFetch.mockResolvedValueOnce(jsonResponse(tokenResponse));
+  mockFetch.mockResolvedValueOnce(
+    jsonResponse({ count: eventLog.length, offset: 0, totalCount: eventLog.length, eventLog }),
+  );
+  mockFetch.mockResolvedValueOnce(jsonResponse({ keys: wellKnownKeys }));
+  mockFetch.mockResolvedValueOnce(
+    jsonResponse({
+      count: destinationKeys.length,
+      offset: 0,
+      totalCount: destinationKeys.length,
+      keys: destinationKeys,
+    }),
+  );
 }
 
 const defaultConfig = {
@@ -63,9 +99,6 @@ const sendSubmissionResponse = {
 };
 
 describe("FitConnectClient", () => {
-  let mockFetch: ReturnType<typeof vi.fn>;
-  let client: FitConnectClient;
-
   beforeEach(() => {
     mockFetch = vi.fn();
     // @ts-expect-error: allow the fetch mock to be any
@@ -150,6 +183,45 @@ describe("FitConnectClient", () => {
           dataSchema: { schemaUri: "urn:schema", mimeType: "application/json" },
         }),
       ).rejects.toThrow("POST https://auth-testing.fit-connect.fitko.dev/token: Unauthorized");
+    });
+  });
+
+  describe("getSubmissionEvents", () => {
+    it("decodes events signed by FIT-Connect using wellKnownJWKs", async () => {
+      const { token, publicJwk } = await signedToken("fit-connect-key-1");
+      mockEventsSequence([token], [publicJwk], []);
+
+      const result = await client.getSubmissionEvents(SUBMISSION_ID, DESTINATION_ID);
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        `https://test.fit-connect.fitko.dev/submission-api/v2/submissions/${SUBMISSION_ID}/events`,
+        expect.objectContaining({
+          headers: expect.objectContaining({ Authorization: "Bearer test-token" }),
+        }),
+      );
+      expect(result.eventLog[0]).toMatchObject({
+        events: { "https://schema.fitko.de/fit-connect/events/create-submission": {} },
+      });
+    });
+
+    it("decodes events signed by the Fachverfahren using destinationKeys", async () => {
+      const { token, publicJwk } = await signedToken("destination-key-1");
+      mockEventsSequence([token], [], [publicJwk]);
+
+      const result = await client.getSubmissionEvents(SUBMISSION_ID, DESTINATION_ID);
+
+      expect(result.eventLog[0]).toMatchObject({
+        events: { "https://schema.fitko.de/fit-connect/events/create-submission": {} },
+      });
+    });
+
+    it("returns null for events whose kid is not found in any key set", async () => {
+      const { token } = await signedToken("unknown-kid");
+      mockEventsSequence([token], [], []);
+
+      const result = await client.getSubmissionEvents(SUBMISSION_ID, DESTINATION_ID);
+
+      expect(result.eventLog[0]).toBeNull();
     });
   });
 });

@@ -1,4 +1,11 @@
-import { importJWK, CompactEncrypt, compactDecrypt, type JWK } from "jose";
+import {
+  importJWK,
+  CompactEncrypt,
+  compactDecrypt,
+  jwtVerify,
+  type JWK,
+  type JWTPayload,
+} from "jose";
 
 const ALGORITHM = "RSA-OAEP-256";
 const ENCRYPTION_HEADER = "A256GCM";
@@ -27,4 +34,13 @@ export async function decryptData(encryptedData: string, privateKey: JWK): Promi
   const key = await importJWK(jwkForImport, ALGORITHM);
   const { plaintext } = await compactDecrypt(encryptedData, key);
   return new TextDecoder().decode(plaintext);
+}
+
+export async function verifyEventToken(
+  token: string,
+  signatureVerificationKey: JWK,
+): Promise<JWTPayload> {
+  const key = await importJWK(signatureVerificationKey);
+  const { payload } = await jwtVerify(token, key);
+  return payload;
 }

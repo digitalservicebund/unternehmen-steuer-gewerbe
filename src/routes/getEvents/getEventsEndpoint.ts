@@ -1,5 +1,6 @@
 import { HonoAppType } from "../../app";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
+import { getSecret } from "../../secrets";
 import { getEventsRoute } from "./getEventsRoute";
 
 export function addGetEventsEndpoint(app: HonoAppType): HonoAppType {
@@ -7,9 +8,17 @@ export function addGetEventsEndpoint(app: HonoAppType): HonoAppType {
     try {
       // submissionId is automatically extracted and validated as a string/uuid
       const { submissionId } = c.req.valid("param");
+      // The destination varies from commune to commune.
+      // We can hard‑code it here for the first iterations, but in the future we need to
+      // use the Fit‑Connect routing API to determine the destination ID.
+      const destinationId = getSecret("FIT_CONNECT_DESTINATION_ID");
 
       const fitConnectClient = getFitConnectClient();
-      const submissionEvents = await fitConnectClient.getSubmissionEvents(submissionId);
+
+      const submissionEvents = await fitConnectClient.getSubmissionEvents(
+        submissionId,
+        destinationId,
+      );
 
       if (!submissionEvents) {
         return c.json({ message: "Not Found" }, 404);

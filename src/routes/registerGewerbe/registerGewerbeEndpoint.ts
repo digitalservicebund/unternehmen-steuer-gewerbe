@@ -1,5 +1,6 @@
 import { HonoAppType } from "../../app";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
+import { getSecret } from "../../secrets";
 import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { registerGewerbeRoute } from "./registerGewerbeRoute";
 import { transformToGewerbeanmeldung } from "./transformToGewerbeanmeldung";
@@ -19,7 +20,7 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
         // The destination varies from commune to commune.
         // We can hard‑code it here for the first iterations, but in the future we need to
         // use the Fit‑Connect routing API to determine the destination ID.
-        destinationId: "fa63ede0-0ef6-4ca6-abd2-6bd16729ddc1",
+        destinationId: getSecret("FIT_CONNECT_DESTINATION_ID"),
         publicService: {
           identifier: "urn:de:fim:leika:leistung:99050012104000",
           name: "Gewerbe Anmeldung",

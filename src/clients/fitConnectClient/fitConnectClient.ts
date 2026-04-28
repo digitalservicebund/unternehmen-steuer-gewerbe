@@ -1,4 +1,4 @@
-import type { JWK } from "jose";
+import { decodeProtectedHeader, type JWK } from "jose";
 import { AuthenticationApi } from "./apis/authenticationApi";
 import { RoutingApi } from "./apis/routingApi";
 import {
@@ -6,11 +6,12 @@ import {
   type SendSubmissionResponse,
   SubmissionApi,
 } from "./apis/submissionApi";
-import { encryptData } from "./crypto";
+import { encryptData, verifyEventToken } from "./crypto";
 import { type Environment, getEnvironmentUrls } from "./environments";
 import type { FetchFn } from "./http";
 import { createMetadata, type DataSchema } from "./metadata";
 import { getSecret } from "../../secrets";
+import { DestinationApi } from "./apis/destinationApi";
 
 export type { PublicService } from "./apis/submissionApi";
 export interface FitConnectClientConfig {
@@ -48,6 +49,7 @@ class FitConnectClient {
 
   private readonly authenticationApi: AuthenticationApi;
   private readonly submissionApi: SubmissionApi;
+  private readonly destinationApi: DestinationApi;
   readonly routingApi: RoutingApi;
 
   constructor(config: FitConnectClientConfig) {
@@ -64,6 +66,10 @@ class FitConnectClient {
       fetch,
       submissionApiUrl: urls.submissionApiUrl,
       getAccessToken,
+    });
+    this.destinationApi = new DestinationApi({
+      fetch,
+      destinationApiUrl: urls.destinationApiUrl,
     });
     this.routingApi = new RoutingApi({
       fetch,
@@ -121,21 +127,28 @@ class FitConnectClient {
    * @param submissionId
    * @returns A promise that resolves to the decrypted event-log of a submission
    */
-  async getSubmissionEvents(submissionId: string) {
+  async getSubmissionEvents(submissionId: string, destinationId: string) {
     await this.authenticate();
 
     const result = await this.submissionApi.getSubmissionEvents(submissionId);
+    // For events which are signed by FIT-Connect itself
+    const wellKnownJWKs = await this.destinationApi.getWellKnownJWKs();
+    // For the events which are signed by the Fachverfahren
+    const { keys: destinationKeys } = await this.destinationApi.getDestination(destinationId);
 
-    const eventLog = [];
-    for (const entry of result.eventLog) {
-      // the entries should be decrypted
-      eventLog.push(entry);
-    }
+    const eventLog = await Promise.all(
+      result.eventLog.map((entry) => {
+        const header = decodeProtectedHeader(entry);
+        const jwkKeys = [...wellKnownJWKs.keys, ...destinationKeys];
+        const key = jwkKeys.find((jwk) => jwk.kid === header.kid);
+        if (!key) {
+          return Promise.resolve(null);
+        }
+        return verifyEventToken(entry, key);
+      }),
+    );
 
-    return {
-      ...result,
-      eventLog,
-    };
+    return { ...result, eventLog };
   }
 }
 
