@@ -50,7 +50,7 @@ export interface BisherigeUnfallversicherung {
   /** Schlüssel des Trägers der bisherigen gesetzlichen Unfallversicherung. */
   traeger?: UnfallversicherungstraegerCode;
   /** Unternehmensnummer bei der bisherigen Unfallversicherung (früher Mitgliedsnummer). */
-  unternehmensnummer?: string | undefined;
+  unternehmensnummer?: string;
 }
 
 export function createBisherigeUnfallversicherung(
