@@ -10,7 +10,8 @@ const AdresseSchema = z.object({
     .regex(/^\D.*\d/)
     .openapi({
       example: "Musterstraße 1",
-      description: "Street name followed by street number; must start with letters and contain a digit",
+      description:
+        "Street name followed by street number; must start with letters and contain a digit",
     }),
   postleitzahl: z
     .string()
