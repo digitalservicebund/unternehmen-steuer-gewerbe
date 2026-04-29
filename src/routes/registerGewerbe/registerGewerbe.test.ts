@@ -22,6 +22,7 @@ const registerGewerbeRequestData = {
     tätigkeitsbereich: "handwerk",
     tätigkeitsbeginn: "2026-04-17",
     gewerbeart: "hauptgewerbe",
+    istReisegewerbe: false,
     adresseAbweichend: {
       strasseUndHausnummer: "Musterstraße 2",
       postleitzahl: "67890",

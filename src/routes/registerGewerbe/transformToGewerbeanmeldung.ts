@@ -64,7 +64,7 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
       istNebenerwerb: data.unternehmensDaten.gewerbeart === "nebengewerbe",
       anzahlVollzeitBeschaeftigte: 0,
       anzahlTeilzeitBeschaeftigte: 0,
-      istReisegewerbe: false,
+      istReisegewerbe: data.unternehmensDaten.istReisegewerbe,
       betriebArt: {
         industrie: data.unternehmensDaten.tätigkeitsbereich === "industrie",
         handwerk: data.unternehmensDaten.tätigkeitsbereich === "handwerk",

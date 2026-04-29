@@ -15,7 +15,7 @@ const baseRequest: RegisterGewerbeRequest = {
       postleitzahl: "12345",
       ort: "Musterstadt",
     },
-    telefon: "030 123456",
+    telefon: "+49 30 123456",
     email: "e.mustermann@example.org",
   },
   unternehmensDaten: {
@@ -23,6 +23,7 @@ const baseRequest: RegisterGewerbeRequest = {
     tätigkeitsbereich: "sonstiges",
     tätigkeitsbeginn: "2026-04-17",
     gewerbeart: "hauptgewerbe",
+    istReisegewerbe: false,
   },
 };
 
