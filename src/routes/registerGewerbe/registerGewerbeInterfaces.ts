@@ -37,7 +37,7 @@ const PersönlicheDatenSchema = z.object({
       description:
         "Phone numbers are encoded according to the DIN 5008 standard as follows: +[Country code] (up to 5 digits) [Area code] (up to 5 digits) [Phone number] (up to 13 digits) [-Extension] (optional, up to 5 digits).",
     }),
-  email: z.string().email().openapi({ example: "e.mustermann@example.org" }),
+  email: z.email().openapi({ example: "e.mustermann@example.org" }),
 });
 
 const UnternehmensDatenSchema = z.object({
