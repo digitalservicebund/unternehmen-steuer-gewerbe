@@ -57,12 +57,12 @@ describe("transformToGewerbeanmeldung", () => {
       unternehmensDaten: {
         ...baseRequest.unternehmensDaten,
         adresseAbweichend: undefined,
+        istReisegewerbe: undefined,
       },
     };
     const result = transformToGewerbeanmeldung(request);
     const person = result.referenzierteSubjekte!.natuerlichePerson![0]!;
 
-    expect(result.gewerbebetrieb!.istReisegewerbe).toBe(false);
     expect(result.gewerbebetrieb!.istNebenerwerb).toBe(false);
     expect(result.gewerbebetrieb!.betriebArt).toEqual({
       industrie: false,
@@ -70,14 +70,15 @@ describe("transformToGewerbeanmeldung", () => {
       handel: false,
       sonstiges: false,
     });
-    expect(person.geschlecht).toBe("x");
-    expect(person.name!.geburtsname).toBeUndefined();
+    expect(result.gewerbebetrieb!.istReisegewerbe).toBeUndefined();
     expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
       strasse: "Musterstraße",
       hausnummerVon: "1",
       postleitzahl: "12345",
       ort: "Musterstadt",
     });
+    expect(person.geschlecht).toBe("x");
+    expect(person.name!.geburtsname).toBeUndefined();
   });
 
   it("uses adresseAbweichend as betriebsstaette anschrift when provided", () => {
