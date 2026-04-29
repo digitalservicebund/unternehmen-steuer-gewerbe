@@ -37,6 +37,22 @@ describe("transformToGewerbeanmeldung", () => {
     });
   });
 
+  it("maps default flags and applies the geschlecht fallback if the geschlecht is not given", () => {
+    const result = transformToGewerbeanmeldung(baseRequest);
+    const person = result.referenzierteSubjekte!.natuerlichePerson![0]!;
+
+    expect(result.gewerbebetrieb!.istReisegewerbe).toBe(false);
+    expect(result.gewerbebetrieb!.istNebenerwerb).toBe(false);
+    expect(result.gewerbebetrieb!.betriebArt).toEqual({
+      industrie: false,
+      handwerk: false,
+      handel: false,
+      sonstiges: true,
+    });
+    expect(person.geschlecht).toBe("x");
+    expect(person.name!.geburtsname).toBeUndefined();
+  });
+
   it("uses adresseAbweichend as betriebsstaette anschrift when provided", () => {
     const result = transformToGewerbeanmeldung({
       ...baseRequest,
@@ -67,5 +83,38 @@ describe("transformToGewerbeanmeldung", () => {
       postleitzahl: "12345",
       ort: "Musterstadt",
     });
+  });
+
+  it("maps optional persönliche Daten and gewerbe flags, dropping undefined geburt fields", () => {
+    const result = transformToGewerbeanmeldung({
+      ...baseRequest,
+      persönlicheDaten: {
+        ...baseRequest.persönlicheDaten,
+        geschlecht: "d",
+        geburtsname: "Muster",
+        geburtsort: undefined,
+        geburtsland: undefined,
+      },
+      unternehmensDaten: {
+        ...baseRequest.unternehmensDaten,
+        gewerbeart: "nebengewerbe",
+        tätigkeitsbereich: "industrie",
+        istReisegewerbe: true,
+      },
+    });
+    const person = result.referenzierteSubjekte!.natuerlichePerson![0]!;
+
+    expect(result.gewerbebetrieb!.istReisegewerbe).toBe(true);
+    expect(result.gewerbebetrieb!.istNebenerwerb).toBe(true);
+    expect(result.gewerbebetrieb!.betriebArt).toEqual({
+      industrie: true,
+      handwerk: false,
+      handel: false,
+      sonstiges: false,
+    });
+    expect(person.geschlecht).toBe("d");
+    expect(person.name!.geburtsname).toBe("Muster");
+    expect(person.geburt!.ort).toBeUndefined();
+    expect(person.geburt!.staat).toBeUndefined();
   });
 });
