@@ -7,7 +7,7 @@ import {
 const AdresseSchema = z.object({
   strasseUndHausnummer: z
     .string()
-    .regex(/^\D+\s*\d.*$/)
+    .regex(/^\D.*\d/)
     .openapi({
       example: "Musterstraße 1",
       description: "Street followed by house number; must start with letters and contain a digit",
