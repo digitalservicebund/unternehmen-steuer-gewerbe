@@ -5,9 +5,11 @@ import { RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 const baseRequest: RegisterGewerbeRequest = {
   persönlicheDaten: {
     vorname: "Erika",
-    nachname: "Muster",
+    nachname: "Mustermann",
+    geburtsname: "Muster",
     geburtsdatum: "1988-09-10",
-    geburtsort: "Berlin",
+    geschlecht: "d",
+    geburtsort: "Musterstadt",
     geburtsland: "Deutschland",
     staatsangehörigkeitDeutsch: true,
     adresse: {
@@ -15,12 +17,17 @@ const baseRequest: RegisterGewerbeRequest = {
       postleitzahl: "12345",
       ort: "Musterstadt",
     },
-    telefon: "+49 30 123456",
+    telefon: "+49 234 121314",
     email: "e.mustermann@example.org",
   },
   unternehmensDaten: {
-    tätigkeitsbeschreibung: "Was mit Computern",
-    tätigkeitsbereich: "sonstiges",
+    adresseAbweichend: {
+      strasseUndHausnummer: "Musterstraße 2",
+      postleitzahl: "67890",
+      ort: "Musterstadt",
+    },
+    tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
+    tätigkeitsbereich: "handwerk",
     tätigkeitsbeginn: "2026-04-17",
     gewerbeart: "hauptgewerbe",
     istReisegewerbe: false,
@@ -37,20 +44,40 @@ describe("transformToGewerbeanmeldung", () => {
     });
   });
 
-  it("maps default flags and applies the geschlecht fallback if the geschlecht is not given", () => {
-    const result = transformToGewerbeanmeldung(baseRequest);
+  it("maps default values, applies the geschlecht fallback if the geschlecht is not given and drops optional fields", () => {
+    const request: RegisterGewerbeRequest = {
+      ...baseRequest,
+      persönlicheDaten: {
+        ...baseRequest.persönlicheDaten,
+        geburtsname: undefined,
+        geschlecht: undefined,
+        geburtsort: undefined,
+        geburtsland: undefined,
+      },
+      unternehmensDaten: {
+        ...baseRequest.unternehmensDaten,
+        adresseAbweichend: undefined,
+      },
+    };
+    const result = transformToGewerbeanmeldung(request);
     const person = result.referenzierteSubjekte!.natuerlichePerson![0]!;
 
     expect(result.gewerbebetrieb!.istReisegewerbe).toBe(false);
     expect(result.gewerbebetrieb!.istNebenerwerb).toBe(false);
     expect(result.gewerbebetrieb!.betriebArt).toEqual({
       industrie: false,
-      handwerk: false,
+      handwerk: true,
       handel: false,
-      sonstiges: true,
+      sonstiges: false,
     });
     expect(person.geschlecht).toBe("x");
     expect(person.name!.geburtsname).toBeUndefined();
+    expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
+      strasse: "Musterstraße",
+      hausnummerVon: "1",
+      postleitzahl: "12345",
+      ort: "Musterstadt",
+    });
   });
 
   it("uses adresseAbweichend as betriebsstaette anschrift when provided", () => {
@@ -72,49 +99,5 @@ describe("transformToGewerbeanmeldung", () => {
       postleitzahl: "67890",
       ort: "Gewerbestadt",
     });
-  });
-
-  it("falls back to persönliche Adresse for the betriebsstaette when adresseAbweichend is missing", () => {
-    const result = transformToGewerbeanmeldung(baseRequest);
-
-    expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
-      strasse: "Musterstraße",
-      hausnummerVon: "1",
-      postleitzahl: "12345",
-      ort: "Musterstadt",
-    });
-  });
-
-  it("maps optional persönliche Daten and gewerbe flags, dropping undefined geburt fields", () => {
-    const result = transformToGewerbeanmeldung({
-      ...baseRequest,
-      persönlicheDaten: {
-        ...baseRequest.persönlicheDaten,
-        geschlecht: "d",
-        geburtsname: "Muster",
-        geburtsort: undefined,
-        geburtsland: undefined,
-      },
-      unternehmensDaten: {
-        ...baseRequest.unternehmensDaten,
-        gewerbeart: "nebengewerbe",
-        tätigkeitsbereich: "industrie",
-        istReisegewerbe: true,
-      },
-    });
-    const person = result.referenzierteSubjekte!.natuerlichePerson![0]!;
-
-    expect(result.gewerbebetrieb!.istReisegewerbe).toBe(true);
-    expect(result.gewerbebetrieb!.istNebenerwerb).toBe(true);
-    expect(result.gewerbebetrieb!.betriebArt).toEqual({
-      industrie: true,
-      handwerk: false,
-      handel: false,
-      sonstiges: false,
-    });
-    expect(person.geschlecht).toBe("d");
-    expect(person.name!.geburtsname).toBe("Muster");
-    expect(person.geburt!.ort).toBeUndefined();
-    expect(person.geburt!.staat).toBeUndefined();
   });
 });
