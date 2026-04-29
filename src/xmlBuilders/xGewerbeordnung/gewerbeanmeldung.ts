@@ -35,7 +35,7 @@ export interface Gewerbeanmeldung {
   /** Datum, an welchem die An-, Um-, Abmeldung bzw. Datenaktualisierung an die Gewerbemeldestelle übergeben wurde. */
   datumMeldung?: string;
   /** Angaben zur bisherigen Unfallversicherung bei Übernahme, Verschmelzung oder Spaltung. Laut SCH-0094 Pflicht bei Anmeldung, außer bei Neugründung einer Hauptniederlassung, Neugründung einer Zweigniederlassung mit ausländischer Hauptniederlassung, Reisegewerbe oder technischer Anmeldung – in diesen Fällen darf das Feld nicht angegeben werden. */
-  bisherigeUnfallversicherung?: BisherigeUnfallversicherung | undefined;
+  bisherigeUnfallversicherung?: BisherigeUnfallversicherung;
   /** Ein Gewerbebetrieb beschreibt die wirtschaftliche Einheit, unter der ein oder mehrere Gewerbetreibende/r im Außenverhältnis am Wirtschaftsleben teilnehmen. */
   gewerbebetrieb?: Gewerbebetrieb;
   /** Innerhalb des Elements gewerbebetrieb über ID referenzierte Subjekte. */

@@ -36,7 +36,7 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
     istStorno: false,
     gemeindeSchluessel: "00000000",
     uuid: randomUUID(),
-    gueltigAb: new Date().toISOString().split("T")[0]!,
+    gueltigAb: data.unternehmensDaten.tätigkeitsbeginn,
     datumMeldung: new Date().toISOString().split("T")[0]!,
     grundAnmeldungSchluessel: "01", // 01 = Neugründung. See https://www.xrepository.de/api/xrepository/urn:xoev-de:xgewerbeordnung:codeliste:grundfueranmeldung_3:technischerBestandteilGenericode
     bisherigeUnfallversicherung: undefined, // Not used as long as we only support 'grundAnmeldungSchluessel: "01"' (Neugründung)
@@ -59,18 +59,17 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
         schwerpunkt: {
           taetigkeitSchwerpunkt: data.unternehmensDaten.tätigkeitsbeschreibung,
           wirtschaftszweigschluessel: "47990",
-          stichwort: data.unternehmensDaten.gewerbeart,
         },
       },
-      istNebenerwerb: false,
+      istNebenerwerb: data.unternehmensDaten.gewerbeart === "nebengewerbe",
       anzahlVollzeitBeschaeftigte: 0,
       anzahlTeilzeitBeschaeftigte: 0,
-      istReisegewerbe: false,
+      istReisegewerbe: data.unternehmensDaten.istReisegewerbe,
       betriebArt: {
-        industrie: false,
-        handwerk: false,
-        handel: false,
-        sonstiges: true,
+        industrie: data.unternehmensDaten.tätigkeitsbereich === "industrie",
+        handwerk: data.unternehmensDaten.tätigkeitsbereich === "handwerk",
+        handel: data.unternehmensDaten.tätigkeitsbereich === "handel",
+        sonstiges: data.unternehmensDaten.tätigkeitsbereich === "sonstiges",
       },
     },
     referenzierteSubjekte: {
@@ -80,6 +79,7 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
           name: {
             familienname: data.persönlicheDaten.nachname,
             vornamen: data.persönlicheDaten.vorname,
+            geburtsname: data.persönlicheDaten.geburtsname,
           },
           geburt: {
             geburtsdatum: data.persönlicheDaten.geburtsdatum,

@@ -7,16 +7,16 @@ import {
 const AdresseSchema = z.object({
   strasseUndHausnummer: z
     .string()
-    .regex(/^(?=.*\d).+$/)
+    .regex(/^\D.*\d/)
     .openapi({
       example: "Musterstraße 1",
-      description: "Must contain at least one character and one number",
+      description:
+        "Street name followed by street number; must start with letters and contain a digit",
     }),
   postleitzahl: z
     .string()
-    .length(5)
-    .regex(/^\d+$/)
-    .openapi({ example: "12345", description: "postleitzahl must only contain a 5-digit-number" }),
+    .regex(/^\d{5}$/)
+    .openapi({ example: "12345", description: "5-digit German postal code" }),
   ort: z.string().openapi({ example: "Musterstadt" }),
 });
 
@@ -26,19 +26,19 @@ const PersönlicheDatenSchema = z.object({
   geburtsname: z.string().openapi({ example: "Muster" }).optional(),
   geburtsdatum: z.iso.date().openapi({ example: "1988-09-10" }),
   geschlecht: z.enum(["d", "w", "m"]).openapi({ example: "d" }).optional(),
-  geburtsort: z.string().openapi({ example: "Musterstadt" }),
-  geburtsland: z.string().openapi({ example: "Deutschland" }),
+  geburtsort: z.string().openapi({ example: "Musterstadt" }).optional(),
+  geburtsland: z.string().openapi({ example: "Deutschland" }).optional(),
   staatsangehörigkeitDeutsch: z.literal(true),
   adresse: AdresseSchema,
   telefon: z
     .string()
-    .regex(/^\+\d{1,5}\s\d{1,5}\s\d{1,13}(-\d{1,5})?$/)
+    .regex(/^\+[0-9]{1,5}\s[0-9]{1,5}\s[0-9]{1,13}(-[0-9]{1,5})?$/)
     .openapi({
       example: "+49 234 121314",
       description:
-        "Telefonnummern nach DIN 5008 kodiert werden: +[Ländervorwahl] (bis zu 5 Zeichen) [Lokale Vorwahl] (bis zu 5 Zeichen) [Rufnummer] (bis zu 13 Zeichen) [-Durchwahl] (optional, bis zu 5 Zeichen)",
+        "Phone numbers are encoded according to the DIN 5008 standard as follows: +[Country code] (up to 5 digits) [Area code] (up to 5 digits) [Phone number] (up to 13 digits) [-Extension] (optional, up to 5 digits).",
     }),
-  email: z.string().openapi({ example: "e.mustermann@example.org" }),
+  email: z.email().openapi({ example: "e.mustermann@example.org" }),
 });
 
 const UnternehmensDatenSchema = z.object({
@@ -50,9 +50,18 @@ const UnternehmensDatenSchema = z.object({
     },
   }).optional(),
   tätigkeitsbeschreibung: z.string().openapi({ example: "Vertrieb von Vertriebsmustern" }),
-  tätigkeitsbereich: z.string().openapi({ example: "Handwerksbetrieb" }),
+  tätigkeitsbereich: z
+    .enum(["industrie", "handwerk", "handel", "sonstiges"])
+    .openapi({ example: "handwerk" }),
   tätigkeitsbeginn: z.iso.date().openapi({ example: "2026-04-17" }),
   gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
+  istReisegewerbe: z
+    .boolean()
+    .openapi({
+      example: false,
+      description: "Whether the business is an 'Reisegewerbe' with no fixed business location",
+    })
+    .optional(),
 });
 
 const unfallversicherungstraegerCodesDescription = Object.entries(UNFALLVERSICHERUNGSTRAEGER)
@@ -69,7 +78,7 @@ const _BisherigeUnfallversicherungSchema = z
     unternehmensnummer: z.string().length(15).optional().openapi({
       example: "123456789012345",
       description:
-        "Unternehmensnummer bei der bisherigen Unfallversicherung (früher Mitgliedsnummer). Muss genau 15 Zeichen lang sein.",
+        "Company number from the previous 'Unfallversicherung' (formerly membership number). Must be exactly 15 characters long.",
     }),
   })
   .openapi("BisherigeUnfallversicherung");
