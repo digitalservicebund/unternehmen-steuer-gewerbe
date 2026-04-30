@@ -1,6 +1,9 @@
 # Local lefthook config
 lefthook-local.yml
 
+# ERiC library log
+eric.log
+
 # IDE specifics
 .vscode
 
