@@ -10,7 +10,7 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
   const adresseAbweichend = data.unternehmensDaten.adresseAbweichend;
 
   const betriebsStrasseHausnummer = splitStrasseHausnummer(
-    adresseAbweichend?.strasseUndHausnummer || data.persönlicheDaten.adresse.strasseUndHausnummer,
+    adresseAbweichend?.strasseUndHausnummer ?? data.persönlicheDaten.adresse.strasseUndHausnummer,
   );
   const personStrasseHausnummer = splitStrasseHausnummer(
     data.persönlicheDaten.adresse.strasseUndHausnummer,
@@ -45,8 +45,8 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
           hausnummerVon: betriebsStrasseHausnummer.hausnummer,
           hausnummerBis: betriebsStrasseHausnummer.hausnummerBis,
           postleitzahl:
-            adresseAbweichend?.postleitzahl || data.persönlicheDaten.adresse.postleitzahl,
-          ort: adresseAbweichend?.ort || data.persönlicheDaten.adresse.ort,
+            adresseAbweichend?.postleitzahl ?? data.persönlicheDaten.adresse.postleitzahl,
+          ort: adresseAbweichend?.ort ?? data.persönlicheDaten.adresse.ort,
         },
       },
       taetigkeitenGesamt: {
@@ -79,7 +79,7 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
             ort: data.persönlicheDaten.geburtsort,
             staat: data.persönlicheDaten.geburtsland,
           },
-          geschlecht: data.persönlicheDaten.geschlecht || "x",
+          geschlecht: data.persönlicheDaten.geschlecht ?? "x",
           staatsangehoerigkeit: "000",
           anschrift: {
             strasse: personStrasseHausnummer.strasse,

@@ -175,8 +175,7 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
       },
       betrieb: {
         unternehmen: {
-          entsprichtWohnanschrift:
-            data.unternehmensDaten.adresseAbweichend?.strasseUndHausnummer === undefined,
+          entsprichtWohnanschrift: data.unternehmensDaten.adresseAbweichend === undefined,
         },
         betrBeginn: {
           betriebsbeginn: formatDatumDE(data.unternehmensDaten.tätigkeitsbeginn),

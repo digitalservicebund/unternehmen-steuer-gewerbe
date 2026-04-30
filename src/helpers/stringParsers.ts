@@ -11,9 +11,9 @@ export function splitStrasseHausnummer(strasseUndHausnummer: string) {
   const match = /^(\D+?)(\d+[a-zA-Z]?)(?:\s*-\s*(\d+[a-zA-Z]?))?$/.exec(strasseUndHausnummer);
   if (!match) throw new Error("The given address format is not supported");
   return {
-    strasse: match[1].trimEnd(),
-    hausnummer: match[2],
-    hausnummerBis: match[3],
+    strasse: match?.[1]?.trimEnd(),
+    hausnummer: match?.[2],
+    hausnummerBis: match?.[3],
   };
 }
 
