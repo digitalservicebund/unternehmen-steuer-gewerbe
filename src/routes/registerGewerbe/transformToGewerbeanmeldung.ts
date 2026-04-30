@@ -1,15 +1,8 @@
 import { randomUUID } from "node:crypto";
 import type { Gewerbeanmeldung } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
+import { splitStrasseHausnummer } from "../../helpers/data";
 
-// Helper to split street and number "Straße 123" in ["Straße", "123"]
-function splitStrasseHausnummer(strasseUndHausnummer: string) {
-  const match = /^(\D+?)(\d.*)$/.exec(strasseUndHausnummer);
-  return {
-    strasse: match?.[1]?.trimEnd() ?? "",
-    hausnummer: match?.[2] ?? "",
-  };
-}
 
 // Transforms a RegisterGewerbeRequest into a complete Gewerbeanmeldung structure.
 // NOTE: several values are hardcoded placeholders and will be generated / fetched from other sources later.
