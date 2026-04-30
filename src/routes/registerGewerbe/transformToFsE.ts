@@ -1,4 +1,4 @@
-import { formatDatumDE, splitStrasseHausnummer, splitTelefonnummer } from "../../helpers/data";
+import { formatDatumDE, splitStrasseHausnummer, splitTelefonnummer } from "../../helpers/stringParsers";
 import { type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 import { type ElsterFsEEUn } from "../../private/xmlBuilders/elsterFsE/elsterFsEEUn";
 

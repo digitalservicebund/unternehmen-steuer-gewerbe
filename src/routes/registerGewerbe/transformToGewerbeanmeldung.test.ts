@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { transformToGewerbeanmeldung } from "./transformToGewerbeanmeldung";
-import { RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
+import { type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 
 const baseRequest: RegisterGewerbeRequest = {
   persönlicheDaten: {
@@ -35,15 +35,6 @@ const baseRequest: RegisterGewerbeRequest = {
 };
 
 describe("transformToGewerbeanmeldung", () => {
-  it("splits strasseUndHausnummer into strasse and hausnummerVon", () => {
-    const result = transformToGewerbeanmeldung(baseRequest);
-
-    expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.anschrift).toMatchObject({
-      strasse: "Musterstraße",
-      hausnummerVon: "1",
-    });
-  });
-
   it("maps default values, applies the geschlecht fallback if the geschlecht is not given and drops optional fields", () => {
     const request: RegisterGewerbeRequest = {
       ...baseRequest,

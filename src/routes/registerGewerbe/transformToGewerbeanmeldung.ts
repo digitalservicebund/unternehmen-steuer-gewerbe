@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { Gewerbeanmeldung } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
-import { splitStrasseHausnummer } from "../../helpers/data";
+import { splitStrasseHausnummer } from "../../helpers/stringParsers";
 
 
 // Transforms a RegisterGewerbeRequest into a complete Gewerbeanmeldung structure.
@@ -52,7 +52,6 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
       taetigkeitenGesamt: {
         schwerpunkt: {
           taetigkeitSchwerpunkt: data.unternehmensDaten.tätigkeitsbeschreibung,
-          wirtschaftszweigschluessel: "47990",
         },
       },
       istNebenerwerb: data.unternehmensDaten.gewerbeart === "nebengewerbe",
