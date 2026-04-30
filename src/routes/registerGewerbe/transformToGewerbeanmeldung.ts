@@ -43,6 +43,7 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
         anschrift: {
           strasse: betriebsStrasseHausnummer.strasse,
           hausnummerVon: betriebsStrasseHausnummer.hausnummer,
+          hausnummerBis: betriebsStrasseHausnummer.hausnummerBis,
           postleitzahl:
             adresseAbweichend?.postleitzahl || data.persönlicheDaten.adresse.postleitzahl,
           ort: adresseAbweichend?.ort || data.persönlicheDaten.adresse.ort,
@@ -71,8 +72,8 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
           id: randomUUID(),
           name: {
             familienname: data.persönlicheDaten.nachname,
-            vornamen: data.persönlicheDaten.vorname,
             geburtsname: data.persönlicheDaten.geburtsname,
+            vornamen: data.persönlicheDaten.vorname,
           },
           geburt: {
             geburtsdatum: data.persönlicheDaten.geburtsdatum,
@@ -84,6 +85,7 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
           anschrift: {
             strasse: personStrasseHausnummer.strasse,
             hausnummerVon: personStrasseHausnummer.hausnummer,
+            hausnummerBis: personStrasseHausnummer.hausnummerBis,
             postleitzahl: data.persönlicheDaten.adresse.postleitzahl,
             ort: data.persönlicheDaten.adresse.ort,
           },

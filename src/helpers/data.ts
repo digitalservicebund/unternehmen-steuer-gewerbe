@@ -1,16 +1,17 @@
-/** Helper to split street and number "Straße 123" in ["Straße", "123"] */
-export function splitStrasseHausnummer(strasseUndHausnummer: string) {
-  const match = /^(\D+?)(\d.*)$/.exec(strasseUndHausnummer);
-  return {
-    strasse: match?.[1]?.trimEnd() ?? "",
-    hausnummer: match?.[2] ?? "",
-  };
-}
-
 /** Converts an ISO date "YYYY-MM-DD" to German format "DD.MM.YYYY" */
 export function formatDatumDE(isoDate: string): string {
   const [year, month, day] = isoDate.split("-");
   return `${day}.${month}.${year}`;
+}
+
+/** Helper to split street and number "Straße 123" in ["Straße", "123"] */
+export function splitStrasseHausnummer(strasseUndHausnummer: string) {
+  const match = /^(\D+?)(\d+[a-zA-Z]?)(?:\s*-\s*(\d+[a-zA-Z]?))?$/.exec(strasseUndHausnummer);
+  return {
+    strasse: match?.[1]?.trimEnd() ?? "",
+    hausnummer: match?.[2] ?? "",
+    hausnummerBis: match?.[3],
+  };
 }
 
 export function splitTelefonnummer(telefonnummer: string) {
