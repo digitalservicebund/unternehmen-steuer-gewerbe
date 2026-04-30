@@ -1,16 +1,19 @@
 /** Converts an ISO date "YYYY-MM-DD" to German format "DD.MM.YYYY" */
 export function formatDatumDE(isoDate: string): string {
-  const [year, month, day] = isoDate.split("-");
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate);
+  if (!match) throw new Error("The given date format is not supported");
+  const [, year, month, day] = match;
   return `${day}.${month}.${year}`;
 }
 
 /** Helper to split street and number "Straße 123" in ["Straße", "123"] */
 export function splitStrasseHausnummer(strasseUndHausnummer: string) {
   const match = /^(\D+?)(\d+[a-zA-Z]?)(?:\s*-\s*(\d+[a-zA-Z]?))?$/.exec(strasseUndHausnummer);
+  if (!match) throw new Error("The given address format is not supported");
   return {
-    strasse: match?.[1]?.trimEnd() ?? "",
-    hausnummer: match?.[2] ?? "",
-    hausnummerBis: match?.[3],
+    strasse: match[1].trimEnd(),
+    hausnummer: match[2],
+    hausnummerBis: match[3],
   };
 }
 

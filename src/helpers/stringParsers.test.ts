@@ -38,11 +38,21 @@ describe("splitStrasseHausnummer", () => {
       hausnummerBis: "44",
     });
   });
+
+  it("throws for an address without a house number", () => {
+    expect(() => splitStrasseHausnummer("Musterstraße")).toThrow(
+      "The given address format is not supported",
+    );
+  });
 });
 
 describe("formatDatumDE", () => {
   it("converts an ISO date to German format", () => {
     expect(formatDatumDE("1988-09-10")).toBe("10.09.1988");
+  });
+
+  it("throws for a non-ISO date string", () => {
+    expect(() => formatDatumDE("kein-datum")).toThrow("The given date format is not supported");
   });
 });
 
