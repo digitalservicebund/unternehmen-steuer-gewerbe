@@ -94,15 +94,17 @@ export type RegisterGewerbeRequest = z.infer<typeof RegisterGewerbeRequestSchema
 
 export const RegisterGewerbeResponseSchema = z
   .object({
-    gewerbeanmeldung: {
+    gewerbeanmeldung: z.object({
       success: z.boolean(),
       submissionId: z.string().optional(),
       info: z.string().optional(),
-    },
-    steuernummer: {
+      errorType: z.enum(["validation_error", "upstream_error"]).optional(),
+    }),
+    steuernummer: z.object({
       success: z.boolean(),
       submissionId: z.string().optional(),
       info: z.string().optional(),
-    },
+      errorType: z.enum(["validation_error", "upstream_error"]).optional(),
+    }),
   })
   .openapi("RegisterGewerbeResponse");
