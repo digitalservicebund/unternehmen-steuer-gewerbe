@@ -83,6 +83,8 @@ const _BisherigeUnfallversicherungSchema = z
   })
   .openapi("BisherigeUnfallversicherung");
 
+export const ErrorTypeSchema = z.enum(["validation_error", "upstream_error"]);
+
 export const RegisterGewerbeRequestSchema = z
   .object({
     persönlicheDaten: PersönlicheDatenSchema,
@@ -98,13 +100,13 @@ export const RegisterGewerbeResponseSchema = z
       success: z.boolean(),
       submissionId: z.string().optional(),
       info: z.string().optional(),
-      errorType: z.enum(["validation_error", "upstream_error"]).optional(),
+      errorType: ErrorTypeSchema.optional(),
     }),
     steuernummer: z.object({
       success: z.boolean(),
       submissionId: z.string().optional(),
       info: z.string().optional(),
-      errorType: z.enum(["validation_error", "upstream_error"]).optional(),
+      errorType: ErrorTypeSchema.optional(),
     }),
   })
   .openapi("RegisterGewerbeResponse");

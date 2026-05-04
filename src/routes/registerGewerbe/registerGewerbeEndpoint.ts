@@ -4,15 +4,10 @@ import { validateFsE } from "../../private/eric/eric";
 import { createElsterFsEEUnXml } from "../../private/xmlBuilders/elsterFsE/elsterFsEEUn";
 import { getSecret } from "../../secrets";
 import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
-import { RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
+import { ErrorTypeSchema, RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 import { registerGewerbeRoute } from "./registerGewerbeRoute";
 import { transformToEUnFsE } from "./transformToFsE";
 import { transformToGewerbeanmeldung } from "./transformToGewerbeanmeldung";
-
-const ERROR_TYPES = {
-  validationError: "validation_error",
-  upstreamError: "upstream_error",
-} as const;
 
 async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
   let gewerbeanmeldungXml: string;
@@ -22,7 +17,7 @@ async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
     console.error("Gewerbeanmeldung XML validation failed", error);
     return {
       success: false,
-      errorType: ERROR_TYPES.validationError,
+      errorType: ErrorTypeSchema.enum.validation_error,
       info: "XML validation failed",
     };
   }
@@ -48,7 +43,7 @@ async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
     console.error("FIT-Connect submission failed", error);
     return {
       success: false,
-      errorType: ERROR_TYPES.upstreamError,
+      errorType: ErrorTypeSchema.enum.upstream_error,
       info: "Upstream service unavailable",
     };
   }
@@ -65,7 +60,7 @@ async function submitFsE(data: RegisterGewerbeRequest) {
     if (result.isValid === false) {
       return {
         success: false,
-        errorType: ERROR_TYPES.validationError,
+        errorType: ErrorTypeSchema.enum.validation_error,
         info: result.info ?? "FsE validation failed", // we should not return the complete result.info
       };
     }
@@ -75,7 +70,7 @@ async function submitFsE(data: RegisterGewerbeRequest) {
     console.error("FsE submission failed", error);
     return {
       success: false,
-      errorType: ERROR_TYPES.upstreamError,
+      errorType: ErrorTypeSchema.enum.upstream_error,
       info: "Upstream service unavailable",
     };
   }
@@ -100,12 +95,12 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
         {
           gewerbeanmeldung: {
             success: false,
-            errorType: ERROR_TYPES.upstreamError,
+            errorType: ErrorTypeSchema.enum.upstream_error,
             info: "Internal Server Error",
           },
           steuernummer: {
             success: false,
-            errorType: ERROR_TYPES.upstreamError,
+            errorType: ErrorTypeSchema.enum.upstream_error,
             info: "Internal Server Error",
           },
         },
