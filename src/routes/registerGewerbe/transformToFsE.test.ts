@@ -73,7 +73,7 @@ describe("transformToEUnFsE", () => {
   });
 
   it("sets entsprichtWohnanschrift: true when adresseAbweichend is not set", () => {
-    const { adresseAbweichend: undefined, ...unternehmensDatenOhneAbweichung } =
+    const { adresseAbweichend: _, ...unternehmensDatenOhneAbweichung } =
       baseRequest.unternehmensDaten;
     const result = transformToEUnFsE({
       ...baseRequest,
