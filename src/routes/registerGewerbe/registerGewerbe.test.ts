@@ -82,6 +82,27 @@ describe("Route /api/v1/register-gewerbe", () => {
     expect(json.gewerbeanmeldung.errorType).toBe("validation_error");
     expect(json.steuernummer.success).toBe(true);
   });
+
+  test("Returns 200 with steuernummer upstream_error when ERiC service is unavailable, gewerbeanmeldung still succeeds", async () => {
+    vi.spyOn(eric, "validateFsE").mockReturnValue({
+      isValid: undefined,
+      returnCode: undefined,
+      info: undefined,
+    });
+
+    const response = await app.request("/api/v1/register-gewerbe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(registerGewerbeRequestData),
+    });
+    const json = await response.json();
+    expect(response.status).toEqual(200);
+    expect(json.steuernummer.success).toBe(false);
+    expect(json.steuernummer.errorType).toBe("upstream_error");
+    expect(json.gewerbeanmeldung.success).toBe(true);
+    expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
+  });
+
   test("Returns 200 with steuernummer validation_error when FsE validation fails, gewerbeanmeldung still succeeds", async () => {
     vi.spyOn(eric, "validateFsE").mockReturnValue({
       isValid: false,
