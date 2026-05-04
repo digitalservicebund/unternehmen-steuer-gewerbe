@@ -2,38 +2,9 @@ import { describe, test, expect, vi, afterEach, beforeAll } from "vitest";
 import app from "../../app";
 import * as eric from "../../private/eric/eric";
 import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
+import { baseRequest } from "./testHelpers";
 
-const registerGewerbeRequestData = {
-  persönlicheDaten: {
-    vorname: "Erika",
-    nachname: "Mustermann",
-    geburtsdatum: "1988-09-10",
-    geburtsort: "Musterstadt",
-    geburtsland: "Deutschland",
-    staatsangehörigkeitDeutsch: true,
-    adresse: {
-      strasseUndHausnummer: "Musterstraße 1",
-      postleitzahl: "12345",
-      ort: "Musterstadt",
-    },
-    telefon: "+49 234 121314",
-    email: "e.mustermann@example.org",
-  },
-  unternehmensDaten: {
-    tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
-    tätigkeitsbereich: "handwerk",
-    tätigkeitsbeginn: "2026-04-17",
-    gewerbeart: "hauptgewerbe",
-    istReisegewerbe: false,
-    adresseAbweichend: {
-      strasseUndHausnummer: "Musterstraße 2",
-      postleitzahl: "67890",
-      ort: "Musterstadt",
-    },
-  },
-};
-
-function postRegisterGewerbe(data = registerGewerbeRequestData) {
+function postRegisterGewerbe(data = baseRequest) {
   return app.request("/api/v1/register-gewerbe", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
