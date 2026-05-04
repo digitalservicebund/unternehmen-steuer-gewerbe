@@ -23,7 +23,7 @@ export const registerGewerbeRoute = createRoute({
           schema: RegisterGewerbeResponseSchema,
         },
       },
-      description: "Successfully submitted to FIT-Connect",
+      description: "Successfully submitted the Gewerbeanmeldung and Steuernummer request",
     },
     500: {
       content: {
