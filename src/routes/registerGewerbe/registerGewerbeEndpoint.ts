@@ -96,7 +96,10 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
         submitFsE(data),
       ]);
 
-      return c.json({ gewerbeanmeldung, steuernummer }, resolveStatus(gewerbeanmeldung, steuernummer));
+      return c.json(
+        { gewerbeanmeldung, steuernummer },
+        resolveStatus(gewerbeanmeldung, steuernummer),
+      );
     } catch (error) {
       // Unhandled Error
       console.error(error);
