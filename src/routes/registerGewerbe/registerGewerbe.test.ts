@@ -53,33 +53,33 @@ describe("Route /api/v1/register-gewerbe", () => {
     expect(json.steuernummer.success).toBe(true);
   });
 
-  test("Returns 200 with gewerbeanmeldung upstream_error when FIT-Connect fails, steuernummer still succeeds", async () => {
+  test("Returns 207 with gewerbeanmeldung upstream_error when FIT-Connect fails, steuernummer still succeeds", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(JSON.stringify({ message: "Server Down" }), { status: 500 }),
     );
 
     const response = await postRegisterGewerbe();
     const json = await response.json();
-    expect(response.status).toEqual(200);
+    expect(response.status).toEqual(207);
     expect(json.gewerbeanmeldung.success).toBe(false);
     expect(json.gewerbeanmeldung.errorType).toBe("upstream_error");
     expect(json.steuernummer.success).toBe(true);
   });
 
-  test("Returns 200 with gewerbeanmeldung validation_error when XML creation throws, steuernummer still succeeds", async () => {
+  test("Returns 207 with gewerbeanmeldung validation_error when XML creation throws, steuernummer still succeeds", async () => {
     vi.spyOn(gewerbeanmeldung, "createGewerbeanmeldungXml").mockRejectedValue(
       new Error("XML schema mismatch"),
     );
 
     const response = await postRegisterGewerbe();
     const json = await response.json();
-    expect(response.status).toEqual(200);
+    expect(response.status).toEqual(207);
     expect(json.gewerbeanmeldung.success).toBe(false);
     expect(json.gewerbeanmeldung.errorType).toBe("validation_error");
     expect(json.steuernummer.success).toBe(true);
   });
 
-  test("Returns 200 with steuernummer upstream_error when ERiC service is unavailable, gewerbeanmeldung still succeeds", async () => {
+  test("Returns 207 with steuernummer upstream_error when ERiC service is unavailable, gewerbeanmeldung still succeeds", async () => {
     vi.spyOn(eric, "validateFsE").mockReturnValue({
       isValid: undefined,
       returnCode: undefined,
@@ -88,14 +88,14 @@ describe("Route /api/v1/register-gewerbe", () => {
 
     const response = await postRegisterGewerbe();
     const json = await response.json();
-    expect(response.status).toEqual(200);
+    expect(response.status).toEqual(207);
     expect(json.steuernummer.success).toBe(false);
     expect(json.steuernummer.errorType).toBe("upstream_error");
     expect(json.gewerbeanmeldung.success).toBe(true);
     expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
   });
 
-  test("Returns 200 with steuernummer validation_error when FsE validation fails, gewerbeanmeldung still succeeds", async () => {
+  test("Returns 207 with steuernummer validation_error when FsE validation fails, gewerbeanmeldung still succeeds", async () => {
     vi.spyOn(eric, "validateFsE").mockReturnValue({
       isValid: false,
       returnCode: 1,
@@ -104,11 +104,28 @@ describe("Route /api/v1/register-gewerbe", () => {
 
     const response = await postRegisterGewerbe();
     const json = await response.json();
-    expect(response.status).toEqual(200);
+    expect(response.status).toEqual(207);
     expect(json.steuernummer.success).toBe(false);
     expect(json.steuernummer.errorType).toBe("validation_error");
     expect(json.gewerbeanmeldung.success).toBe(true);
     expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
+  });
+
+  test("Returns 500 when both submissions fail", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ message: "Server Down" }), { status: 500 }),
+    );
+    vi.spyOn(eric, "validateFsE").mockReturnValue({
+      isValid: undefined,
+      returnCode: undefined,
+      info: undefined,
+    });
+
+    const response = await postRegisterGewerbe();
+    const json = await response.json();
+    expect(response.status).toEqual(500);
+    expect(json.gewerbeanmeldung.success).toBe(false);
+    expect(json.steuernummer.success).toBe(false);
   });
 });
 

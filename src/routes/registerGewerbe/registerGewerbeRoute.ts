@@ -25,6 +25,14 @@ export const registerGewerbeRoute = createRoute({
       },
       description: "Successfully submitted the Gewerbeanmeldung and Steuernummer request",
     },
+    207: {
+      content: {
+        "application/json": {
+          schema: RegisterGewerbeResponseSchema,
+        },
+      },
+      description: "Partial success: one of the two submissions failed",
+    },
     500: {
       content: {
         "application/json": {

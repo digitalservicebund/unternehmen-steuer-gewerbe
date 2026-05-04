@@ -76,6 +76,15 @@ async function submitFsE(data: RegisterGewerbeRequest) {
   }
 }
 
+function resolveStatus(
+  gewerbeanmeldung: { success: boolean },
+  steuernummer: { success: boolean },
+): 200 | 207 | 500 {
+  if (gewerbeanmeldung.success && steuernummer.success) return 200;
+  if (gewerbeanmeldung.success || steuernummer.success) return 207;
+  return 500;
+}
+
 export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
   app.openapi(registerGewerbeRoute, async (c) => {
     try {
@@ -87,7 +96,7 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
         submitFsE(data),
       ]);
 
-      return c.json({ gewerbeanmeldung, steuernummer }, 200);
+      return c.json({ gewerbeanmeldung, steuernummer }, resolveStatus(gewerbeanmeldung, steuernummer));
     } catch (error) {
       // Unhandled Error
       console.error(error);
