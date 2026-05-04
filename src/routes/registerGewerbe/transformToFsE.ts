@@ -19,6 +19,9 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
   );
   const { intVorw, natVorw, rufNr } = splitTelefonnummer(data.persönlicheDaten.telefon);
 
+  // All the commented-out fields are not required, technically. But I assume some of them
+  // have an impact on taxes, etc., so I am not sure what we can really leave out at the moment.
+  // I wanted to keep them in to have it visible
   return {
     transferHeader: {
       verfahren: "ElsterFSE",
