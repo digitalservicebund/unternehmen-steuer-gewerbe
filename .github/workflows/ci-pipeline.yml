@@ -91,6 +91,7 @@ jobs:
           FIT_CONNECT_CLIENT_ID: ${{ vars.FIT_CONNECT_CLIENT_ID }}
           FIT_CONNECT_CLIENT_SECRET: ${{ secrets.FIT_CONNECT_CLIENT_SECRET }}
           FIT_CONNECT_DESTINATION_ID: ${{ vars.FIT_CONNECT_DESTINATION_ID }}
+          ERIC_HERSTELLERID: ${{ secrets.ERIC_HERSTELLERID }}
 
       ################################
       # SonarCloud for static code and test coverage analyses
@@ -154,7 +155,8 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build project and docker image and Push Docker image to GitHub Container Registry
+      - name: Build project and docker image and Push Docker image to GitHub Container
+          Registry
         run: |
           pnpm build
           docker build . --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
@@ -171,7 +173,8 @@ jobs:
           TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
         with:
           # image-ref: ${{ inputs.image-ref }}
-          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{
+            env.CONTAINER_IMAGE_VERSION }}
           format: "sarif"
           output: "trivy-image-results.sarif"
           exit-code: 0
@@ -222,7 +225,8 @@ jobs:
         env:
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
         with:
-          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{
+            env.CONTAINER_IMAGE_VERSION }}
           format: "cosign-vuln"
           output: "${{ env.PROJECT_NAME }}-vulnerabilities.json"
 
@@ -239,10 +243,13 @@ jobs:
           cosign-release: "v2.6.0" # We need this, because the kyverno policy that is validating the signature is not yet compatible with the newer version of cosign. Cosign switch the bundle format in version 3.
 
       - name: Sign the published Docker image
-        run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+        run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{
+          env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
 
       - name: Attest the vulnerability scan
-        run: cosign attest --yes --replace --predicate ${{ env.PROJECT_NAME }}-vulnerabilities.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+        run: cosign attest --yes --replace --predicate ${{ env.PROJECT_NAME
+          }}-vulnerabilities.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{
+          env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
 
       - name: Send failure to Slack
         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
@@ -316,7 +323,9 @@ jobs:
     needs:
       - check-format-and-lint
       - test-and-scan-with-sonarcloud
-    if: ${{ github.event_name != 'schedule' && success() && github.actor == 'dependabot[bot]' && !cancelled() && github.ref != 'refs/heads/main' && github.repository == 'digitalservicebund/unternehmen-steuer-gewerbe'}}
+    if: ${{ github.event_name != 'schedule' && success() && github.actor ==
+      'dependabot[bot]' && !cancelled() && github.ref != 'refs/heads/main' &&
+      github.repository == 'digitalservicebund/unternehmen-steuer-gewerbe'}}
     permissions:
       contents: write
       pull-requests: write
