@@ -61,7 +61,7 @@ async function submitFsE(data: RegisterGewerbeRequest) {
       return {
         success: false,
         errorType: ErrorTypeSchema.enum.validation_error,
-        info: result.info ?? "FsE validation failed", // we should not return the complete result.info
+        info: result.info ?? "FsE validation failed",
       };
     }
 
