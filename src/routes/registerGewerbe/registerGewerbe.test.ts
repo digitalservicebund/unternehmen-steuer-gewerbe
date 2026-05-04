@@ -33,15 +33,19 @@ const registerGewerbeRequestData = {
   },
 };
 
+function postRegisterGewerbe(data = registerGewerbeRequestData) {
+  return app.request("/api/v1/register-gewerbe", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
 describe("Route /api/v1/register-gewerbe", () => {
   afterEach(() => vi.restoreAllMocks());
 
   test("Returns 200 with success=true for both services on POST", async () => {
-    const response = await app.request("/api/v1/register-gewerbe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(registerGewerbeRequestData),
-    });
+    const response = await postRegisterGewerbe();
     const json = await response.json();
     expect(response.status).toEqual(200);
     expect(json.gewerbeanmeldung.success).toBe(true);
@@ -54,11 +58,7 @@ describe("Route /api/v1/register-gewerbe", () => {
       new Response(JSON.stringify({ message: "Server Down" }), { status: 500 }),
     );
 
-    const response = await app.request("/api/v1/register-gewerbe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(registerGewerbeRequestData),
-    });
+    const response = await postRegisterGewerbe();
     const json = await response.json();
     expect(response.status).toEqual(200);
     expect(json.gewerbeanmeldung.success).toBe(false);
@@ -71,11 +71,7 @@ describe("Route /api/v1/register-gewerbe", () => {
       new Error("XML schema mismatch"),
     );
 
-    const response = await app.request("/api/v1/register-gewerbe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(registerGewerbeRequestData),
-    });
+    const response = await postRegisterGewerbe();
     const json = await response.json();
     expect(response.status).toEqual(200);
     expect(json.gewerbeanmeldung.success).toBe(false);
@@ -90,11 +86,7 @@ describe("Route /api/v1/register-gewerbe", () => {
       info: undefined,
     });
 
-    const response = await app.request("/api/v1/register-gewerbe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(registerGewerbeRequestData),
-    });
+    const response = await postRegisterGewerbe();
     const json = await response.json();
     expect(response.status).toEqual(200);
     expect(json.steuernummer.success).toBe(false);
@@ -110,11 +102,7 @@ describe("Route /api/v1/register-gewerbe", () => {
       info: "FsE validation failed",
     });
 
-    const response = await app.request("/api/v1/register-gewerbe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(registerGewerbeRequestData),
-    });
+    const response = await postRegisterGewerbe();
     const json = await response.json();
     expect(response.status).toEqual(200);
     expect(json.steuernummer.success).toBe(false);
@@ -128,11 +116,7 @@ describe("Route /api/v1/register-gewerbe/:submissionId/events", () => {
   let submissionId: string;
 
   beforeAll(async () => {
-    const response = await app.request("/api/v1/register-gewerbe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(registerGewerbeRequestData),
-    });
+    const response = await postRegisterGewerbe();
     expect(response.status).toEqual(200);
     submissionId = (await response.json()).gewerbeanmeldung.submissionId;
     expect(submissionId).toBeDefined();
