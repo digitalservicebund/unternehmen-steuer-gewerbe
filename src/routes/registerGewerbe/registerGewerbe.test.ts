@@ -1,5 +1,6 @@
 import { describe, test, expect, vi, afterEach, beforeAll } from "vitest";
 import app from "../../app";
+import * as eric from "../../private/eric/eric";
 
 const registerGewerbeRequestData = {
   persönlicheDaten: {
@@ -34,7 +35,7 @@ const registerGewerbeRequestData = {
 describe("Route /api/v1/register-gewerbe", () => {
   afterEach(() => vi.restoreAllMocks());
 
-  test("Returns 200 OK and JSON with success=true and non-empty submissionId on POST", async () => {
+  test("Returns 200 with success=true for both services on POST", async () => {
     const response = await app.request("/api/v1/register-gewerbe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -42,17 +43,14 @@ describe("Route /api/v1/register-gewerbe", () => {
     });
     const json = await response.json();
     expect(response.status).toEqual(200);
-    expect(response.headers.get("content-type")).toMatch(/json/);
-    expect(json.success).to.equal(true);
-    expect(json.submissionId).toBeTruthy();
+    expect(json.gewerbeanmeldung.success).toBe(true);
+    expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
+    expect(json.steuernummer.success).toBe(true);
   });
 
-  test("Returns 500 Internal Server Error and JSON with success=false and info 'Internal Server Error' on POST when fetch (to fitconnect) fails", async () => {
-    // let internal fetch fail with error 500
-    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
-      new Response(JSON.stringify({ message: "Server Down" }), {
-        status: 500,
-      }),
+  test("Returns 200 with gewerbeanmeldung upstream_error when FIT-Connect fails, steuernummer still succeeds", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ message: "Server Down" }), { status: 500 }),
     );
 
     const response = await app.request("/api/v1/register-gewerbe", {
@@ -61,12 +59,30 @@ describe("Route /api/v1/register-gewerbe", () => {
       body: JSON.stringify(registerGewerbeRequestData),
     });
     const json = await response.json();
-    expect(response.status).toEqual(500);
-    expect(response.headers.get("content-type")).toMatch(/json/);
-    expect(json.success).to.equal(false);
-    expect(json.info).to.equal("Internal Server Error");
+    expect(response.status).toEqual(200);
+    expect(json.gewerbeanmeldung.success).toBe(false);
+    expect(json.gewerbeanmeldung.errorType).toBe("upstream_error");
+    expect(json.steuernummer.success).toBe(true);
+  });
 
-    fetchMock.mockRestore();
+  test("Returns 200 with steuernummer validation_error when FsE validation fails, gewerbeanmeldung still succeeds", async () => {
+    vi.spyOn(eric, "validateFsE").mockReturnValue({
+      isValid: false,
+      returnCode: 1,
+      info: "FsE validation failed",
+    });
+
+    const response = await app.request("/api/v1/register-gewerbe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(registerGewerbeRequestData),
+    });
+    const json = await response.json();
+    expect(response.status).toEqual(200);
+    expect(json.steuernummer.success).toBe(false);
+    expect(json.steuernummer.errorType).toBe("validation_error");
+    expect(json.gewerbeanmeldung.success).toBe(true);
+    expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
   });
 });
 
@@ -80,7 +96,7 @@ describe("Route /api/v1/register-gewerbe/:submissionId/events", () => {
       body: JSON.stringify(registerGewerbeRequestData),
     });
     expect(response.status).toEqual(200);
-    submissionId = (await response.json()).submissionId;
+    submissionId = (await response.json()).gewerbeanmeldung.submissionId;
     expect(submissionId).toBeDefined();
   });
 

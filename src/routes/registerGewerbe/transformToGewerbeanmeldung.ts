@@ -3,7 +3,6 @@ import type { Gewerbeanmeldung } from "../../xmlBuilders/xGewerbeordnung/gewerbe
 import { RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 import { splitStrasseHausnummer } from "../../helpers/stringParsers";
 
-
 // Transforms a RegisterGewerbeRequest into a complete Gewerbeanmeldung structure.
 // NOTE: several values are hardcoded placeholders and will be generated / fetched from other sources later.
 export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewerbeanmeldung {
