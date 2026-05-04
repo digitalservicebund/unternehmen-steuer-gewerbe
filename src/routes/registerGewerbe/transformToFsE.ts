@@ -5,6 +5,7 @@ import {
 } from "../../helpers/stringParsers";
 import { type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 import { type ElsterFsEEUn } from "../../private/xmlBuilders/elsterFsE/elsterFsEEUn";
+import { getSecret } from "../../secrets";
 
 function toAnredeId(geschlecht: "d" | "w" | "m" | undefined): string | undefined {
   if (geschlecht === "m") return "1";
@@ -24,7 +25,7 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
       datenArt: "EUn",
       vorgang: "send-Auth",
       testmerker: "700000004",
-      herstellerID: "74931",
+      herstellerID: getSecret("ERIC_HERSTELLERID"),
       datenLieferant: "ERiC Projekt",
       datei: { verschluesselung: "CMSEncryptedData", kompression: "GZIP" },
       versionClient: "ERiC Beispiele",
