@@ -53,7 +53,7 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
               strAdr: {
                 str: persönlicheStrasseHausnummer.strasse,
                 hausNr: persönlicheStrasseHausnummer.hausnummer,
-                // hausNrZu: undefined,
+                hausNrZu: persönlicheStrasseHausnummer.hausnummerBis,
                 // adressErg: undefined,
                 plz: data.persönlicheDaten.adresse.postleitzahl,
                 ort: data.persönlicheDaten.adresse.ort,
