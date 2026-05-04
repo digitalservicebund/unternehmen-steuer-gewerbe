@@ -1,6 +1,7 @@
 import { describe, test, expect, vi, afterEach, beforeAll } from "vitest";
 import app from "../../app";
 import * as eric from "../../private/eric/eric";
+import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 
 const registerGewerbeRequestData = {
   persönlicheDaten: {
@@ -65,6 +66,22 @@ describe("Route /api/v1/register-gewerbe", () => {
     expect(json.steuernummer.success).toBe(true);
   });
 
+  test("Returns 200 with gewerbeanmeldung validation_error when XML creation throws, steuernummer still succeeds", async () => {
+    vi.spyOn(gewerbeanmeldung, "createGewerbeanmeldungXml").mockRejectedValue(
+      new Error("XML schema mismatch"),
+    );
+
+    const response = await app.request("/api/v1/register-gewerbe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(registerGewerbeRequestData),
+    });
+    const json = await response.json();
+    expect(response.status).toEqual(200);
+    expect(json.gewerbeanmeldung.success).toBe(false);
+    expect(json.gewerbeanmeldung.errorType).toBe("validation_error");
+    expect(json.steuernummer.success).toBe(true);
+  });
   test("Returns 200 with steuernummer validation_error when FsE validation fails, gewerbeanmeldung still succeeds", async () => {
     vi.spyOn(eric, "validateFsE").mockReturnValue({
       isValid: false,
