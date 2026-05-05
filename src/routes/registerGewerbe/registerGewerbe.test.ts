@@ -1,7 +1,8 @@
 import { describe, test, expect, vi, afterEach, beforeAll } from "vitest";
 import app from "../../app";
+import { RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 
-const registerGewerbeRequestData = {
+const registerGewerbeRequestData: RegisterGewerbeRequest = {
   persönlicheDaten: {
     vorname: "Erika",
     nachname: "Mustermann",
@@ -22,7 +23,6 @@ const registerGewerbeRequestData = {
     tätigkeitsbereich: "handwerk",
     tätigkeitsbeginn: "2026-04-17",
     gewerbeart: "hauptgewerbe",
-    istReisegewerbe: false,
     adresseAbweichend: {
       strasseUndHausnummer: "Musterstraße 2",
       postleitzahl: "67890",
@@ -67,25 +67,6 @@ describe("Route /api/v1/register-gewerbe", () => {
     expect(json.info).to.equal("Internal Server Error");
 
     fetchMock.mockRestore();
-  });
-
-  test("Returns 200 OK if istReisegewerbe is not set", async () => {
-    // remove istReisegewerbe from "standard" payload
-    const registerGewerbeRequestWithoutIstReisegewerbe = {
-      ...registerGewerbeRequestData,
-      unternehmensDaten: {
-        ...registerGewerbeRequestData.unternehmensDaten,
-        istReisegewerbe: undefined,
-      },
-    };
-
-    const response = await app.request("/api/v1/register-gewerbe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(registerGewerbeRequestWithoutIstReisegewerbe),
-    });
-
-    expect(response.status).toEqual(200);
   });
 });
 
