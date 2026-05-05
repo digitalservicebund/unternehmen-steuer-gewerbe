@@ -94,19 +94,16 @@ export const RegisterGewerbeRequestSchema = z
 
 export type RegisterGewerbeRequest = z.infer<typeof RegisterGewerbeRequestSchema>;
 
+const RegisterGewerbeResponseItemSchema = z.object({
+  success: z.boolean(),
+  submissionId: z.string().optional(),
+  info: z.string().optional(),
+  errorType: ErrorTypeSchema.optional(),
+});
+
 export const RegisterGewerbeResponseSchema = z
   .object({
-    gewerbeanmeldung: z.object({
-      success: z.boolean(),
-      submissionId: z.string().optional(),
-      info: z.string().optional(),
-      errorType: ErrorTypeSchema.optional(),
-    }),
-    steuernummer: z.object({
-      success: z.boolean(),
-      submissionId: z.string().optional(),
-      info: z.string().optional(),
-      errorType: ErrorTypeSchema.optional(),
-    }),
+    gewerbeanmeldung: RegisterGewerbeResponseItemSchema,
+    steuernummer: RegisterGewerbeResponseItemSchema,
   })
   .openapi("RegisterGewerbeResponse");
