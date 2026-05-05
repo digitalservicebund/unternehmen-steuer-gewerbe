@@ -64,7 +64,8 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
       istNebenerwerb: data.unternehmensDaten.gewerbeart === "nebengewerbe",
       anzahlVollzeitBeschaeftigte: 0,
       anzahlTeilzeitBeschaeftigte: 0,
-      istReisegewerbe: data.unternehmensDaten.istReisegewerbe,
+      // For later: this property has a cross-relation to artNiederlassung (which we don't have, right now)
+      istReisegewerbe: false,
       betriebArt: {
         industrie: data.unternehmensDaten.tätigkeitsbereich === "industrie",
         handwerk: data.unternehmensDaten.tätigkeitsbereich === "handwerk",

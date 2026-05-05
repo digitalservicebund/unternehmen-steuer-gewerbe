@@ -1,7 +1,8 @@
 import { describe, test, expect, vi, afterEach, beforeAll } from "vitest";
 import app from "../../app";
+import { RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 
-const registerGewerbeRequestData = {
+const registerGewerbeRequestData: RegisterGewerbeRequest = {
   persönlicheDaten: {
     vorname: "Erika",
     nachname: "Mustermann",
@@ -22,7 +23,6 @@ const registerGewerbeRequestData = {
     tätigkeitsbereich: "handwerk",
     tätigkeitsbeginn: "2026-04-17",
     gewerbeart: "hauptgewerbe",
-    istReisegewerbe: false,
     adresseAbweichend: {
       strasseUndHausnummer: "Musterstraße 2",
       postleitzahl: "67890",
