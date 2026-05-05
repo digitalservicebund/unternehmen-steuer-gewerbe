@@ -70,7 +70,7 @@ describe("transformToGewerbeanmeldung", () => {
       handel: false,
       sonstiges: false,
     });
-    expect(result.gewerbebetrieb!.istReisegewerbe).toBeUndefined();
+    expect(result.gewerbebetrieb!.istReisegewerbe).toBe(false);
     expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
       strasse: "Musterstraße",
       hausnummerVon: "1",
