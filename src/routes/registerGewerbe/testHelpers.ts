@@ -17,12 +17,14 @@ export const baseRequest: RegisterGewerbeRequest = {
     },
     telefon: "+49 234 121314",
     email: "e.mustermann@example.org",
+    religion: "11",
   },
   unternehmensDaten: {
     tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
     tätigkeitsbereich: "handwerk",
     tätigkeitsbeginn: "2026-04-17",
     gewerbeart: "hauptgewerbe",
+    gewinnErmittlung: "01",
     adresseAbweichend: {
       strasseUndHausnummer: "Musterstraße 2",
       postleitzahl: "67890",

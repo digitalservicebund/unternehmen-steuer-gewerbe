@@ -1,5 +1,13 @@
 import { z } from "@hono/zod-openapi";
 import {
+  GEWINN_ERMITTLUNG,
+  GEWINN_ERMITTLUNG_CODES,
+} from "../../private/xmlBuilders/elsterFsE/buildingBlocks/gewinnErmittlgsAngaben";
+import {
+  RELIGIONSSCHLUESSEL,
+  RELIGIONSSCHLUESSEL_CODES,
+} from "../../private/xmlBuilders/elsterFsE/buildingBlocks/person";
+import {
   UNFALLVERSICHERUNGSTRAEGER,
   UNFALLVERSICHERUNGSTRAEGER_CODES,
 } from "../../xmlBuilders/xGewerbeordnung/buildingBlocks/bisherigeUnfallversicherung";
@@ -39,6 +47,23 @@ const PersönlicheDatenSchema = z.object({
         "Phone numbers are encoded according to the DIN 5008 standard as follows: +[Country code] (up to 5 digits) [Area code] (up to 5 digits) [Phone number] (up to 13 digits) [-Extension] (optional, up to 5 digits).",
     }),
   email: z.email().openapi({ example: "e.mustermann@example.org" }),
+  steuernummer: z
+    .string()
+    .regex(/^[0-9]{4}0[0-9]{8}$/)
+    .optional()
+    .openapi({
+      example: "2695002219428",
+      description:
+        "Bestehende Einkommensteuernummer der Person, falls bereits vorhanden (z.B. durch frühere Steuererklärungen als Arbeitnehmer). ELSTER-Format: 4 Ziffern, gefolgt von einer festen 0, gefolgt von 8 Ziffern (13 Zeichen gesamt).",
+    }),
+  religion: z.enum(RELIGIONSSCHLUESSEL_CODES).openapi({
+    example: "11",
+    description: `Religionsschlüssel für die Kirchensteuer. Mögliche Werte:\n${Object.entries(
+      RELIGIONSSCHLUESSEL,
+    )
+      .map(([code, name]) => `- \`${code}\`: ${name}`)
+      .join("\n")}`,
+  }),
 });
 
 const UnternehmensDatenSchema = z.object({
@@ -55,6 +80,26 @@ const UnternehmensDatenSchema = z.object({
     .openapi({ example: "handwerk" }),
   tätigkeitsbeginn: z.iso.date().openapi({ example: "2026-04-17" }),
   gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
+  gewinnErmittlung: z.enum(GEWINN_ERMITTLUNG_CODES).openapi({
+    example: "01",
+    description: `Methode der Gewinnermittlung. Mögliche Werte:\n${Object.entries(GEWINN_ERMITTLUNG)
+      .map(([code, name]) => `- \`${code}\`: ${name}`)
+      .join("\n")}`,
+  }),
+  kleinunternehmerRegelung: z.boolean().default(false).openapi({
+    example: false,
+    description:
+      "Ob die Kleinunternehmer-Regelung (§ 19 UStG) in Anspruch genommen wird. Wenn nicht gesetzt, wird false angenommen (kein Kleinunternehmer).",
+  }),
+  // TBD: tatsächlicher Wert soll noch per API befüllt werden können
+  umsatzGruendungsjahr: z.number().int().min(0).default(1).openapi({
+    example: 25000,
+    description: "Voraussichtlicher Gesamtumsatz (in Euro) im Jahr der Betriebseröffnung.",
+  }),
+  umsatzFolgejahr: z.number().int().min(0).default(1).openapi({
+    example: 26000,
+    description: "Voraussichtlicher Gesamtumsatz (in Euro) im Folgejahr.",
+  }),
 });
 
 const unfallversicherungstraegerCodesDescription = Object.entries(UNFALLVERSICHERUNGSTRAEGER)

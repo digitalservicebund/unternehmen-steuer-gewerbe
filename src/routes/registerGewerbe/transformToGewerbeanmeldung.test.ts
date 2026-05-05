@@ -17,7 +17,6 @@ describe("transformToGewerbeanmeldung", () => {
       unternehmensDaten: {
         ...baseRequest.unternehmensDaten,
         adresseAbweichend: undefined,
-        istReisegewerbe: undefined,
       },
     };
     const result = transformToGewerbeanmeldung(request);
@@ -30,7 +29,6 @@ describe("transformToGewerbeanmeldung", () => {
       handel: false,
       sonstiges: false,
     });
-    expect(result.gewerbebetrieb!.istReisegewerbe).toBeUndefined();
     expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
       strasse: "Musterstraße",
       hausnummerVon: "1",

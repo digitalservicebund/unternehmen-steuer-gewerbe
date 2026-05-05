@@ -18,6 +18,8 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
     data.persönlicheDaten.adresse.strasseUndHausnummer,
   );
   const { intVorw, natVorw, rufNr } = splitTelefonnummer(data.persönlicheDaten.telefon);
+  const betriebsAdresse = data.unternehmensDaten.adresseAbweichend ?? data.persönlicheDaten.adresse;
+  const betriebsStrasseHausnummer = splitStrasseHausnummer(betriebsAdresse.strasseUndHausnummer);
 
   // All the commented-out fields are not required, technically. But I assume some of them
   // have an impact on taxes, etc., so I am not sure what we can really leave out at the moment.
@@ -39,7 +41,9 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
     },
     eUn: {
       fragebogenTyp: "AUFNTAET",
-      ordnungskriterium: { ordNrArt: "S" },
+      ordnungskriterium: {
+        ordNrArt: data.persönlicheDaten.steuernummer ? "S" : "O",
+      },
       allgAngaben: {
         inhaber: {
           natPers: {
@@ -51,8 +55,8 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
             gebDat: formatDatumDE(data.persönlicheDaten.geburtsdatum),
             // berufsbez: undefined,
             // persIdNr: undefined,
-            // stNr: undefined,
-            // religion: undefined,
+            stNr: data.persönlicheDaten.steuernummer,
+            religion: data.persönlicheDaten.religion,
             adrkette: {
               strAdr: {
                 str: persönlicheStrasseHausnummer.strasse,
@@ -184,6 +188,15 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
       betrieb: {
         unternehmen: {
           entsprichtWohnanschrift: data.unternehmensDaten.adresseAbweichend === undefined,
+          adrkette: {
+            strAdr: {
+              str: betriebsStrasseHausnummer.strasse,
+              hausNr: betriebsStrasseHausnummer.hausnummer,
+              hausNrZu: betriebsStrasseHausnummer.hausnummerBis,
+              plz: betriebsAdresse.postleitzahl,
+              ort: betriebsAdresse.ort,
+            },
+          },
         },
         betrBeginn: {
           betriebsbeginn: formatDatumDE(data.unternehmensDaten.tätigkeitsbeginn),
@@ -191,37 +204,41 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
         gruendungsangaben: {
           gruendungsForm: {
             gruendungsArt: "1",
-            uebertrStichtag: undefined,
+            uebertrStichtag: formatDatumDE(data.unternehmensDaten.tätigkeitsbeginn),
           },
         },
       },
-      // festsetzungsAngaben: {
-      //   voraussichtlicheEinkuenfte: {
-      //     einkVermVerp: {
-      //       gruendJahrA: undefined,
-      //       folgeJahrA: undefined,
-      //     },
-      //   },
-      // },
+      festsetzungsAngaben: {
+        voraussichtlicheEinkuenfte: {
+          einkGewBetr: {
+            gruendJahrA: data.unternehmensDaten.umsatzGruendungsjahr,
+            folgeJahrA: data.unternehmensDaten.umsatzFolgejahr,
+          },
+        },
+      },
       gewinnErmittlgsAngaben: {
-        gewinnErmittlung: undefined,
+        gewinnErmittlung: data.unternehmensDaten.gewinnErmittlung,
       },
       umsatzsteuer: {
         gesUmsatz: {
-          gruendJahr: undefined,
-          folgeJahr: undefined,
+          gruendJahr: data.unternehmensDaten.umsatzGruendungsjahr,
+          folgeJahr: data.unternehmensDaten.umsatzFolgejahr,
         },
         kleinunternehmerRegelung: {
-          kleinUnternUSt: undefined,
+          kleinUnternUSt: data.unternehmensDaten.kleinunternehmerRegelung ? true : undefined,
+          kleinUnternUStVerzicht: data.unternehmensDaten.kleinunternehmerRegelung
+            ? undefined
+            : true,
+        },
+        // TODO: Mit Piloten klären!
+        // Wenn auf KleinUN verzichtet wird (GruendJahr <= 25000), sind zusätzlich sollIstVersteuerung
+        // und zahllastUeberschuss Pflicht!
+        sollIstVersteuerung: {
+          auswahlSollIstVerst: "1", // "1" = Sollversteuerung, "2" = Istversteuerung (§ 20 UStG)
         },
         zahllastUeberschuss: {
-          auswahl: undefined,
-          betrag: undefined,
-        },
-        durchschnittssatzbesteuerung: {
-          merkerDurchschnittssatzbesteuerung: undefined,
-          umsatzArt: undefined,
-          inanspruchVerzicht: { anspruchDurchschnitt: undefined },
+          auswahl: "1", // "1" = Zahllast (geschätzt), "2" = Überschuss (geschätzt)
+          betrag: 0,
         },
       },
     },
