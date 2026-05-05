@@ -55,13 +55,6 @@ const UnternehmensDatenSchema = z.object({
     .openapi({ example: "handwerk" }),
   tätigkeitsbeginn: z.iso.date().openapi({ example: "2026-04-17" }),
   gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
-  istReisegewerbe: z
-    .boolean()
-    .openapi({
-      example: false,
-      description: "Whether the business is an 'Reisegewerbe' with no fixed business location",
-    })
-    .optional(),
 });
 
 const unfallversicherungstraegerCodesDescription = Object.entries(UNFALLVERSICHERUNGSTRAEGER)

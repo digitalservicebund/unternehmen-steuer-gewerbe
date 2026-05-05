@@ -19,15 +19,14 @@ export const baseRequest: RegisterGewerbeRequest = {
     email: "e.mustermann@example.org",
   },
   unternehmensDaten: {
+    tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
+    tätigkeitsbereich: "handwerk",
+    tätigkeitsbeginn: "2026-04-17",
+    gewerbeart: "hauptgewerbe",
     adresseAbweichend: {
       strasseUndHausnummer: "Musterstraße 2",
       postleitzahl: "67890",
       ort: "Musterstadt",
     },
-    tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
-    tätigkeitsbereich: "handwerk",
-    tätigkeitsbeginn: "2026-04-17",
-    gewerbeart: "hauptgewerbe",
-    istReisegewerbe: false,
   },
 };
