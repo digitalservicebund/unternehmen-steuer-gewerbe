@@ -30,7 +30,6 @@ const baseRequest: RegisterGewerbeRequest = {
     tätigkeitsbereich: "handwerk",
     tätigkeitsbeginn: "2026-04-17",
     gewerbeart: "hauptgewerbe",
-    istReisegewerbe: false,
   },
 };
 
@@ -57,7 +56,6 @@ describe("transformToGewerbeanmeldung", () => {
       unternehmensDaten: {
         ...baseRequest.unternehmensDaten,
         adresseAbweichend: undefined,
-        istReisegewerbe: undefined,
       },
     };
     const result = transformToGewerbeanmeldung(request);
