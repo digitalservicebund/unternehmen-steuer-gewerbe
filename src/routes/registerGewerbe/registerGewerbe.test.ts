@@ -1,72 +1,122 @@
 import { describe, test, expect, vi, afterEach, beforeAll } from "vitest";
 import app from "../../app";
-import { RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
+import * as eric from "../../private/eric/eric";
+import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
+import { registerGewerbeCompleteRequest } from "./testHelpers";
+import { ErrorTypeSchema } from "./registerGewerbeInterfaces";
 
-const registerGewerbeRequestData: RegisterGewerbeRequest = {
-  persönlicheDaten: {
-    vorname: "Erika",
-    nachname: "Mustermann",
-    geburtsdatum: "1988-09-10",
-    geburtsort: "Musterstadt",
-    geburtsland: "Deutschland",
-    staatsangehörigkeitDeutsch: true,
-    adresse: {
-      strasseUndHausnummer: "Musterstraße 1",
-      postleitzahl: "12345",
-      ort: "Musterstadt",
-    },
-    telefon: "+49 234 121314",
-    email: "e.mustermann@example.org",
-  },
-  unternehmensDaten: {
-    tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
-    tätigkeitsbereich: "handwerk",
-    tätigkeitsbeginn: "2026-04-17",
-    gewerbeart: "hauptgewerbe",
-    adresseAbweichend: {
-      strasseUndHausnummer: "Musterstraße 2",
-      postleitzahl: "67890",
-      ort: "Musterstadt",
-    },
-  },
-};
+function postRegisterGewerbe(data = registerGewerbeCompleteRequest) {
+  return app.request("/api/v1/register-gewerbe", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
 
 describe("Route /api/v1/register-gewerbe", () => {
   afterEach(() => vi.restoreAllMocks());
 
-  test("Returns 200 OK and JSON with success=true and non-empty submissionId on POST", async () => {
-    const response = await app.request("/api/v1/register-gewerbe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(registerGewerbeRequestData),
-    });
+  test("Returns 200 with success=true for both services on POST", async () => {
+    const response = await postRegisterGewerbe();
     const json = await response.json();
     expect(response.status).toEqual(200);
-    expect(response.headers.get("content-type")).toMatch(/json/);
-    expect(json.success).to.equal(true);
-    expect(json.submissionId).toBeTruthy();
+    expect(json.gewerbeanmeldung.success).toBe(true);
+    expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
+    expect(json.steuernummer.success).toBe(true);
   });
 
-  test("Returns 500 Internal Server Error and JSON with success=false and info 'Internal Server Error' on POST when fetch (to fitconnect) fails", async () => {
-    // let internal fetch fail with error 500
-    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
-      new Response(JSON.stringify({ message: "Server Down" }), {
-        status: 500,
-      }),
+  test("Returns 207 with gewerbeanmeldung upstream_error when FIT-Connect fails, steuernummer still succeeds", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ message: "Server Down" }), { status: 500 }),
     );
 
-    const response = await app.request("/api/v1/register-gewerbe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(registerGewerbeRequestData),
+    const response = await postRegisterGewerbe();
+    const json = await response.json();
+    expect(response.status).toEqual(207);
+    expect(json.gewerbeanmeldung.success).toBe(false);
+    expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
+    expect(json.steuernummer.success).toBe(true);
+  });
+
+  test("Returns 207 with gewerbeanmeldung validation_error when XML creation throws, steuernummer still succeeds", async () => {
+    vi.spyOn(gewerbeanmeldung, "createGewerbeanmeldungXml").mockRejectedValue(
+      new Error("XML schema mismatch"),
+    );
+
+    const response = await postRegisterGewerbe();
+    const json = await response.json();
+    expect(response.status).toEqual(207);
+    expect(json.gewerbeanmeldung.success).toBe(false);
+    expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
+    expect(json.steuernummer.success).toBe(true);
+  });
+
+  test("Returns 207 with steuernummer upstream_error when ERiC service is unavailable, gewerbeanmeldung still succeeds", async () => {
+    vi.spyOn(eric, "validateFsE").mockReturnValue({
+      isValid: undefined,
+      returnCode: undefined,
+      info: undefined,
     });
+
+    const response = await postRegisterGewerbe();
+    const json = await response.json();
+    expect(response.status).toEqual(207);
+    expect(json.steuernummer.success).toBe(false);
+    expect(json.steuernummer.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
+    expect(json.gewerbeanmeldung.success).toBe(true);
+    expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
+  });
+
+  test("Returns 207 with steuernummer validation_error when FsE validation fails, gewerbeanmeldung still succeeds", async () => {
+    vi.spyOn(eric, "validateFsE").mockReturnValue({
+      isValid: false,
+      returnCode: 1,
+      info: "FsE validation failed",
+    });
+
+    const response = await postRegisterGewerbe();
+    const json = await response.json();
+    expect(response.status).toEqual(207);
+    expect(json.steuernummer.success).toBe(false);
+    expect(json.steuernummer.errorType).toBe(ErrorTypeSchema.enum.validation_error);
+    expect(json.gewerbeanmeldung.success).toBe(true);
+    expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
+  });
+
+  test("Returns 400 when both submissions fail with validation errors", async () => {
+    vi.spyOn(gewerbeanmeldung, "createGewerbeanmeldungXml").mockRejectedValue(
+      new Error("XML schema mismatch"),
+    );
+    vi.spyOn(eric, "validateFsE").mockReturnValue({
+      isValid: false,
+      returnCode: 1,
+      info: "FsE validation failed",
+    });
+
+    const response = await postRegisterGewerbe();
+    const json = await response.json();
+    expect(response.status).toEqual(400);
+    expect(json.gewerbeanmeldung.success).toBe(false);
+    expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
+    expect(json.steuernummer.success).toBe(false);
+    expect(json.steuernummer.errorType).toBe(ErrorTypeSchema.enum.validation_error);
+  });
+
+  test("Returns 500 when both submissions fail", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ message: "Server Down" }), { status: 500 }),
+    );
+    vi.spyOn(eric, "validateFsE").mockReturnValue({
+      isValid: undefined,
+      returnCode: undefined,
+      info: undefined,
+    });
+
+    const response = await postRegisterGewerbe();
     const json = await response.json();
     expect(response.status).toEqual(500);
-    expect(response.headers.get("content-type")).toMatch(/json/);
-    expect(json.success).to.equal(false);
-    expect(json.info).to.equal("Internal Server Error");
-
-    fetchMock.mockRestore();
+    expect(json.gewerbeanmeldung.success).toBe(false);
+    expect(json.steuernummer.success).toBe(false);
   });
 });
 
@@ -74,13 +124,9 @@ describe("Route /api/v1/register-gewerbe/:submissionId/events", () => {
   let submissionId: string;
 
   beforeAll(async () => {
-    const response = await app.request("/api/v1/register-gewerbe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(registerGewerbeRequestData),
-    });
+    const response = await postRegisterGewerbe();
     expect(response.status).toEqual(200);
-    submissionId = (await response.json()).submissionId;
+    submissionId = (await response.json()).gewerbeanmeldung.submissionId;
     expect(submissionId).toBeDefined();
   });
 

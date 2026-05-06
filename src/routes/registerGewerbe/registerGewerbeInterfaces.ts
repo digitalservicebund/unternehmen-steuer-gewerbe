@@ -3,6 +3,12 @@ import {
   UNFALLVERSICHERUNGSTRAEGER,
   UNFALLVERSICHERUNGSTRAEGER_CODES,
 } from "../../xmlBuilders/xGewerbeordnung/buildingBlocks/bisherigeUnfallversicherung";
+import {
+  RELIGIONSSCHLUESSEL_KEYS,
+  GEWINN_ERMITTLUNG_KEYS,
+  SOLL_IST_VERSTEUERUNG_KEYS,
+  ZAHLLAST_UEBERSCHUSS_KEYS,
+} from "./requestDataTransformer/fsECodes";
 
 const AdresseSchema = z.object({
   strasseUndHausnummer: z
@@ -39,6 +45,18 @@ const PersönlicheDatenSchema = z.object({
         "Phone numbers are encoded according to the DIN 5008 standard as follows: +[Country code] (up to 5 digits) [Area code] (up to 5 digits) [Phone number] (up to 13 digits) [-Extension] (optional, up to 5 digits).",
     }),
   email: z.email().openapi({ example: "e.mustermann@example.org" }),
+  steuernummer: z
+    .string()
+    .regex(/^[0-9]{4}0[0-9]{8}$/)
+    .optional()
+    .openapi({
+      example: "2695002219428",
+      description:
+        "Bestehende Einkommensteuernummer der Person, falls bereits vorhanden (z.B. durch frühere Steuererklärungen als Arbeitnehmer). ELSTER-Format: 4 Ziffern, gefolgt von einer festen 0, gefolgt von 8 Ziffern (13 Zeichen gesamt).",
+    }),
+  religion: z.enum(RELIGIONSSCHLUESSEL_KEYS).openapi({
+    example: "nichtKirchensteuerpflichtig",
+  }),
 });
 
 const UnternehmensDatenSchema = z.object({
@@ -55,6 +73,35 @@ const UnternehmensDatenSchema = z.object({
     .openapi({ example: "handwerk" }),
   tätigkeitsbeginn: z.iso.date().openapi({ example: "2026-04-17" }),
   gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
+  gewinnErmittlung: z.enum(GEWINN_ERMITTLUNG_KEYS).openapi({
+    example: "einnahmenüberschussrechnung",
+  }),
+  kleinunternehmerRegelung: z.boolean().default(false).openapi({
+    example: false,
+    description:
+      "Ob die Kleinunternehmer-Regelung (§ 19 UStG) in Anspruch genommen wird. Wenn nicht gesetzt, wird false angenommen (kein Kleinunternehmer).",
+  }),
+  umsatzGruendungsjahr: z.number().int().min(0).default(1).openapi({
+    example: 25000,
+    description: "Voraussichtlicher Gesamtumsatz (in Euro) im Jahr der Betriebseröffnung.",
+  }),
+  umsatzFolgejahr: z.number().int().min(0).default(1).openapi({
+    example: 26000,
+    description: "Voraussichtlicher Gesamtumsatz (in Euro) im Folgejahr.",
+  }),
+  sollIstVersteuerung: z.enum(SOLL_IST_VERSTEUERUNG_KEYS).default("sollVersteuerung").openapi({
+    example: "sollVersteuerung",
+    description:
+      "Art der Umsatzbesteuerung gemäß § 16 bzw. § 20 UStG. Standard ist Sollversteuerung (nach vereinbarten Entgelten).",
+  }),
+  zahllastUeberschussAuswahl: z.enum(ZAHLLAST_UEBERSCHUSS_KEYS).default("zahllast").openapi({
+    example: "zahllast",
+    description: "Ob voraussichtlich eine Zahllast oder ein Überschuss erwartet wird.",
+  }),
+  zahllastUeberschussBetrag: z.number().int().min(0).default(0).openapi({
+    example: 0,
+    description: "Voraussichtliche Zahllast oder Überschuss in Euro.",
+  }),
 });
 
 const unfallversicherungstraegerCodesDescription = Object.entries(UNFALLVERSICHERUNGSTRAEGER)
@@ -76,6 +123,8 @@ const _BisherigeUnfallversicherungSchema = z
   })
   .openapi("BisherigeUnfallversicherung");
 
+export const ErrorTypeSchema = z.enum(["validation_error", "upstream_error"]);
+
 export const RegisterGewerbeRequestSchema = z
   .object({
     persönlicheDaten: PersönlicheDatenSchema,
@@ -85,10 +134,16 @@ export const RegisterGewerbeRequestSchema = z
 
 export type RegisterGewerbeRequest = z.infer<typeof RegisterGewerbeRequestSchema>;
 
+const RegisterGewerbeResponseItemSchema = z.object({
+  success: z.boolean(),
+  submissionId: z.string().optional(),
+  info: z.string().optional(),
+  errorType: ErrorTypeSchema.optional(),
+});
+
 export const RegisterGewerbeResponseSchema = z
   .object({
-    success: z.boolean(),
-    submissionId: z.string().optional(),
-    info: z.string().optional(),
+    gewerbeanmeldung: RegisterGewerbeResponseItemSchema,
+    steuernummer: RegisterGewerbeResponseItemSchema,
   })
   .openapi("RegisterGewerbeResponse");

@@ -23,7 +23,23 @@ export const registerGewerbeRoute = createRoute({
           schema: RegisterGewerbeResponseSchema,
         },
       },
-      description: "Successfully submitted to FIT-Connect",
+      description: "Successfully submitted the Gewerbeanmeldung and Steuernummer request",
+    },
+    207: {
+      content: {
+        "application/json": {
+          schema: RegisterGewerbeResponseSchema,
+        },
+      },
+      description: "Partial success: one of the two submissions failed",
+    },
+    400: {
+      content: {
+        "application/json": {
+          schema: RegisterGewerbeResponseSchema,
+        },
+      },
+      description: "Both submissions failed due to invalid request data",
     },
     500: {
       content: {

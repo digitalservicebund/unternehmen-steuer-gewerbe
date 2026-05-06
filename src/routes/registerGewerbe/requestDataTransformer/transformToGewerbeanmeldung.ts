@@ -1,15 +1,7 @@
 import { randomUUID } from "node:crypto";
-import type { Gewerbeanmeldung } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
-import { RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
-
-// Helper to split street and number "Straße 123" in ["Straße", "123"]
-function splitStrasseHausnummer(strasseUndHausnummer: string) {
-  const match = /^(\D+?)(\d.*)$/.exec(strasseUndHausnummer);
-  return {
-    strasse: match?.[1]?.trimEnd() ?? "",
-    hausnummer: match?.[2] ?? "",
-  };
-}
+import { type Gewerbeanmeldung } from "../../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
+import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
+import { splitStrasseHausnummer } from "../../../helpers/formFieldTransformations";
 
 // Transforms a RegisterGewerbeRequest into a complete Gewerbeanmeldung structure.
 // NOTE: several values are hardcoded placeholders and will be generated / fetched from other sources later.
@@ -17,7 +9,7 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
   const adresseAbweichend = data.unternehmensDaten.adresseAbweichend;
 
   const betriebsStrasseHausnummer = splitStrasseHausnummer(
-    adresseAbweichend?.strasseUndHausnummer || data.persönlicheDaten.adresse.strasseUndHausnummer,
+    adresseAbweichend?.strasseUndHausnummer ?? data.persönlicheDaten.adresse.strasseUndHausnummer,
   );
   const personStrasseHausnummer = splitStrasseHausnummer(
     data.persönlicheDaten.adresse.strasseUndHausnummer,
@@ -50,15 +42,15 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
         anschrift: {
           strasse: betriebsStrasseHausnummer.strasse,
           hausnummerVon: betriebsStrasseHausnummer.hausnummer,
+          hausnummerBis: betriebsStrasseHausnummer.hausnummerBis,
           postleitzahl:
-            adresseAbweichend?.postleitzahl || data.persönlicheDaten.adresse.postleitzahl,
-          ort: adresseAbweichend?.ort || data.persönlicheDaten.adresse.ort,
+            adresseAbweichend?.postleitzahl ?? data.persönlicheDaten.adresse.postleitzahl,
+          ort: adresseAbweichend?.ort ?? data.persönlicheDaten.adresse.ort,
         },
       },
       taetigkeitenGesamt: {
         schwerpunkt: {
           taetigkeitSchwerpunkt: data.unternehmensDaten.tätigkeitsbeschreibung,
-          wirtschaftszweigschluessel: "47990",
         },
       },
       istNebenerwerb: data.unternehmensDaten.gewerbeart === "nebengewerbe",
@@ -66,6 +58,7 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
       anzahlTeilzeitBeschaeftigte: 0,
       // For later: this property has a cross-relation to artNiederlassung (which we don't have, right now)
       istReisegewerbe: false,
+      beteiligungOeffentlicheHand: "0",
       betriebArt: {
         industrie: data.unternehmensDaten.tätigkeitsbereich === "industrie",
         handwerk: data.unternehmensDaten.tätigkeitsbereich === "handwerk",
@@ -79,19 +72,20 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
           id: randomUUID(),
           name: {
             familienname: data.persönlicheDaten.nachname,
-            vornamen: data.persönlicheDaten.vorname,
             geburtsname: data.persönlicheDaten.geburtsname,
+            vornamen: data.persönlicheDaten.vorname,
           },
           geburt: {
             geburtsdatum: data.persönlicheDaten.geburtsdatum,
             ort: data.persönlicheDaten.geburtsort,
             staat: data.persönlicheDaten.geburtsland,
           },
-          geschlecht: data.persönlicheDaten.geschlecht || "x",
+          geschlecht: data.persönlicheDaten.geschlecht ?? "x",
           staatsangehoerigkeit: "000",
           anschrift: {
             strasse: personStrasseHausnummer.strasse,
             hausnummerVon: personStrasseHausnummer.hausnummer,
+            hausnummerBis: personStrasseHausnummer.hausnummerBis,
             postleitzahl: data.persönlicheDaten.adresse.postleitzahl,
             ort: data.persönlicheDaten.adresse.ort,
           },
