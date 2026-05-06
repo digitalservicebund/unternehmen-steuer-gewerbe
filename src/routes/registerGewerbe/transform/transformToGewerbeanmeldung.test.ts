@@ -1,21 +1,21 @@
 import { describe, it, expect } from "vitest";
 import { transformToGewerbeanmeldung } from "./transformToGewerbeanmeldung";
-import { type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
-import { baseRequest } from "./testHelpers";
+import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
+import { registerGewerbeCompleteRequest } from "../testHelpers";
 
 describe("transformToGewerbeanmeldung", () => {
   it("maps default values, applies the geschlecht fallback if the geschlecht is not given and drops optional fields", () => {
     const request: RegisterGewerbeRequest = {
-      ...baseRequest,
+      ...registerGewerbeCompleteRequest,
       persönlicheDaten: {
-        ...baseRequest.persönlicheDaten,
+        ...registerGewerbeCompleteRequest.persönlicheDaten,
         geburtsname: undefined,
         geschlecht: undefined,
         geburtsort: undefined,
         geburtsland: undefined,
       },
       unternehmensDaten: {
-        ...baseRequest.unternehmensDaten,
+        ...registerGewerbeCompleteRequest.unternehmensDaten,
         adresseAbweichend: undefined,
       },
     };
@@ -41,9 +41,9 @@ describe("transformToGewerbeanmeldung", () => {
 
   it("uses adresseAbweichend as betriebsstaette anschrift when provided", () => {
     const result = transformToGewerbeanmeldung({
-      ...baseRequest,
+      ...registerGewerbeCompleteRequest,
       unternehmensDaten: {
-        ...baseRequest.unternehmensDaten,
+        ...registerGewerbeCompleteRequest.unternehmensDaten,
         adresseAbweichend: {
           strasseUndHausnummer: "Betriebsweg 42a",
           postleitzahl: "67890",

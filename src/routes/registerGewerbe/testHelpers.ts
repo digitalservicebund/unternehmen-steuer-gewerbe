@@ -1,6 +1,6 @@
 import { type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 
-export const baseRequest: RegisterGewerbeRequest = {
+export const registerGewerbeCompleteRequest: RegisterGewerbeRequest = {
   persönlicheDaten: {
     vorname: "Erika",
     nachname: "Mustermann",
@@ -25,6 +25,12 @@ export const baseRequest: RegisterGewerbeRequest = {
     tätigkeitsbeginn: "2026-04-17",
     gewerbeart: "hauptgewerbe",
     gewinnErmittlung: "einnahmenüberschussrechnung",
+    kleinunternehmerRegelung: false,
+    umsatzGruendungsjahr: 1,
+    umsatzFolgejahr: 1,
+    sollIstVersteuerung: "sollVersteuerung",
+    zahllastUeberschussAuswahl: "zahllast",
+    zahllastUeberschussBetrag: 0,
     adresseAbweichend: {
       strasseUndHausnummer: "Musterstraße 2",
       postleitzahl: "67890",

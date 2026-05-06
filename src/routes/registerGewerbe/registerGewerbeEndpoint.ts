@@ -6,8 +6,8 @@ import { getSecret } from "../../secrets";
 import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { ErrorTypeSchema, RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 import { registerGewerbeRoute } from "./registerGewerbeRoute";
-import { transformToEUnFsE } from "./transformToFsE";
-import { transformToGewerbeanmeldung } from "./transformToGewerbeanmeldung";
+import { transformToEUnFsE } from "./transform/transformToFsE";
+import { transformToGewerbeanmeldung } from "./transform/transformToGewerbeanmeldung";
 
 async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
   let gewerbeanmeldungXml: string;
@@ -76,10 +76,10 @@ async function submitFsE(data: RegisterGewerbeRequest) {
   }
 }
 
-function resolveStatus(
+function determineHttpStatus(
   gewerbeanmeldung: { success: boolean },
   steuernummer: { success: boolean },
-): 200 | 207 | 500 {
+) {
   if (gewerbeanmeldung.success && steuernummer.success) return 200;
   if (gewerbeanmeldung.success || steuernummer.success) return 207;
   return 500;
@@ -98,7 +98,7 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
 
       return c.json(
         { gewerbeanmeldung, steuernummer },
-        resolveStatus(gewerbeanmeldung, steuernummer),
+        determineHttpStatus(gewerbeanmeldung, steuernummer),
       );
     } catch (error) {
       // Unhandled Error

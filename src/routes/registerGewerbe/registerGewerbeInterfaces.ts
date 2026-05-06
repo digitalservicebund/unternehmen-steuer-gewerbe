@@ -1,10 +1,14 @@
 import { z } from "@hono/zod-openapi";
-import { GEWINN_ERMITTLUNG_KEYS } from "../../private/xmlBuilders/elsterFsE/buildingBlocks/gewinnErmittlgsAngaben";
-import { RELIGIONSSCHLUESSEL_KEYS } from "../../private/xmlBuilders/elsterFsE/buildingBlocks/person";
 import {
   UNFALLVERSICHERUNGSTRAEGER,
   UNFALLVERSICHERUNGSTRAEGER_CODES,
 } from "../../xmlBuilders/xGewerbeordnung/buildingBlocks/bisherigeUnfallversicherung";
+import {
+  RELIGIONSSCHLUESSEL_KEYS,
+  GEWINN_ERMITTLUNG_KEYS,
+  SOLL_IST_VERSTEUERUNG_KEYS,
+  ZAHLLAST_UEBERSCHUSS_KEYS,
+} from "./transform/fsECodes";
 
 const AdresseSchema = z.object({
   strasseUndHausnummer: z
@@ -77,7 +81,6 @@ const UnternehmensDatenSchema = z.object({
     description:
       "Ob die Kleinunternehmer-Regelung (§ 19 UStG) in Anspruch genommen wird. Wenn nicht gesetzt, wird false angenommen (kein Kleinunternehmer).",
   }),
-  // TBD: tatsächlicher Wert soll noch per API befüllt werden können
   umsatzGruendungsjahr: z.number().int().min(0).default(1).openapi({
     example: 25000,
     description: "Voraussichtlicher Gesamtumsatz (in Euro) im Jahr der Betriebseröffnung.",
@@ -85,6 +88,19 @@ const UnternehmensDatenSchema = z.object({
   umsatzFolgejahr: z.number().int().min(0).default(1).openapi({
     example: 26000,
     description: "Voraussichtlicher Gesamtumsatz (in Euro) im Folgejahr.",
+  }),
+  sollIstVersteuerung: z.enum(SOLL_IST_VERSTEUERUNG_KEYS).default("sollVersteuerung").openapi({
+    example: "sollVersteuerung",
+    description:
+      "Art der Umsatzbesteuerung gemäß § 16 bzw. § 20 UStG. Standard ist Sollversteuerung (nach vereinbarten Entgelten).",
+  }),
+  zahllastUeberschussAuswahl: z.enum(ZAHLLAST_UEBERSCHUSS_KEYS).default("zahllast").openapi({
+    example: "zahllast",
+    description: "Ob voraussichtlich eine Zahllast oder ein Überschuss erwartet wird.",
+  }),
+  zahllastUeberschussBetrag: z.number().int().min(0).default(0).openapi({
+    example: 0,
+    description: "Voraussichtliche Zahllast oder Überschuss in Euro.",
   }),
 });
 

@@ -2,12 +2,16 @@ import {
   formatDatumDE,
   splitStrasseHausnummer,
   splitTelefonnummer,
-} from "../../helpers/formFieldTransformations";
-import { type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
-import { type ElsterFsEEUn } from "../../private/xmlBuilders/elsterFsE/elsterFsEEUn";
-import { getSecret } from "../../secrets";
-import { RELIGIONSSCHLUESSEL } from "../../private/xmlBuilders/elsterFsE/buildingBlocks/person";
-import { GEWINN_ERMITTLUNG } from "../../private/xmlBuilders/elsterFsE/buildingBlocks/gewinnErmittlgsAngaben";
+} from "../../../helpers/formFieldTransformations";
+import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
+import { type ElsterFsEEUn } from "../../../private/xmlBuilders/elsterFsE/elsterFsEEUn";
+import { getSecret } from "../../../secrets";
+import {
+  RELIGIONSSCHLUESSEL,
+  GEWINN_ERMITTLUNG,
+  SOLL_IST_VERSTEUERUNG,
+  ZAHLLAST_UEBERSCHUSS,
+} from "./fsECodes";
 
 function toAnredeId(geschlecht: "d" | "w" | "m" | undefined): string | undefined {
   if (geschlecht === "m") return "1";
@@ -232,15 +236,12 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
             ? undefined
             : true,
         },
-        // TODO: Mit Piloten klären!
-        // Wenn auf KleinUN verzichtet wird (GruendJahr <= 25000), sind zusätzlich sollIstVersteuerung
-        // und zahllastUeberschuss Pflicht!
         sollIstVersteuerung: {
-          auswahlSollIstVerst: "1", // "1" = Sollversteuerung, "2" = Istversteuerung (§ 20 UStG)
+          auswahlSollIstVerst: SOLL_IST_VERSTEUERUNG[data.unternehmensDaten.sollIstVersteuerung],
         },
         zahllastUeberschuss: {
-          auswahl: "1", // "1" = Zahllast (geschätzt), "2" = Überschuss (geschätzt)
-          betrag: 0,
+          auswahl: ZAHLLAST_UEBERSCHUSS[data.unternehmensDaten.zahllastUeberschussAuswahl],
+          betrag: data.unternehmensDaten.zahllastUeberschussBetrag,
         },
       },
     },

@@ -2,9 +2,10 @@ import { describe, test, expect, vi, afterEach, beforeAll } from "vitest";
 import app from "../../app";
 import * as eric from "../../private/eric/eric";
 import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
-import { baseRequest } from "./testHelpers";
+import { registerGewerbeCompleteRequest } from "./testHelpers";
+import { ErrorTypeSchema } from "./registerGewerbeInterfaces";
 
-function postRegisterGewerbe(data = baseRequest) {
+function postRegisterGewerbe(data = registerGewerbeCompleteRequest) {
   return app.request("/api/v1/register-gewerbe", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -33,7 +34,7 @@ describe("Route /api/v1/register-gewerbe", () => {
     const json = await response.json();
     expect(response.status).toEqual(207);
     expect(json.gewerbeanmeldung.success).toBe(false);
-    expect(json.gewerbeanmeldung.errorType).toBe("upstream_error");
+    expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
     expect(json.steuernummer.success).toBe(true);
   });
 
@@ -46,7 +47,7 @@ describe("Route /api/v1/register-gewerbe", () => {
     const json = await response.json();
     expect(response.status).toEqual(207);
     expect(json.gewerbeanmeldung.success).toBe(false);
-    expect(json.gewerbeanmeldung.errorType).toBe("validation_error");
+    expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
     expect(json.steuernummer.success).toBe(true);
   });
 
@@ -61,7 +62,7 @@ describe("Route /api/v1/register-gewerbe", () => {
     const json = await response.json();
     expect(response.status).toEqual(207);
     expect(json.steuernummer.success).toBe(false);
-    expect(json.steuernummer.errorType).toBe("upstream_error");
+    expect(json.steuernummer.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
     expect(json.gewerbeanmeldung.success).toBe(true);
     expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
   });
@@ -77,7 +78,7 @@ describe("Route /api/v1/register-gewerbe", () => {
     const json = await response.json();
     expect(response.status).toEqual(207);
     expect(json.steuernummer.success).toBe(false);
-    expect(json.steuernummer.errorType).toBe("validation_error");
+    expect(json.steuernummer.errorType).toBe(ErrorTypeSchema.enum.validation_error);
     expect(json.gewerbeanmeldung.success).toBe(true);
     expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
   });

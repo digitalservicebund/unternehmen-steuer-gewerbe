@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { transformToEUnFsE } from "./transformToFsE";
-import { baseRequest } from "./testHelpers";
+import { registerGewerbeCompleteRequest } from "../testHelpers";
 
 describe("transformToEUnFsE", () => {
   it("maps output fields from request data", () => {
-    const result = transformToEUnFsE(baseRequest);
+    const result = transformToEUnFsE(registerGewerbeCompleteRequest);
     const natPers = result.eUn?.allgAngaben?.inhaber?.natPers;
 
     expect(natPers?.vorname).toBe("Erika");
@@ -24,27 +24,47 @@ describe("transformToEUnFsE", () => {
     });
     expect(result.eUn?.allgAngaben?.artTaet?.gewerbeArt).toBe("Vertrieb von Vertriebsmustern");
     expect(result.eUn?.betrieb?.betrBeginn?.betriebsbeginn).toBe("17.04.2026");
+    expect(result.eUn?.umsatzsteuer?.sollIstVersteuerung?.auswahlSollIstVerst).toBe("1");
+    expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toBe("1");
   });
 
   it("maps geschlecht 'm' to anredeId '1' and 'w' to '2'", () => {
     const männlich = transformToEUnFsE({
-      ...baseRequest,
-      persönlicheDaten: { ...baseRequest.persönlicheDaten, geschlecht: "m" },
+      ...registerGewerbeCompleteRequest,
+      persönlicheDaten: { ...registerGewerbeCompleteRequest.persönlicheDaten, geschlecht: "m" },
     });
     expect(männlich.eUn?.allgAngaben?.inhaber?.natPers?.anredeId).toBe("1");
 
     const weiblich = transformToEUnFsE({
-      ...baseRequest,
-      persönlicheDaten: { ...baseRequest.persönlicheDaten, geschlecht: "w" },
+      ...registerGewerbeCompleteRequest,
+      persönlicheDaten: { ...registerGewerbeCompleteRequest.persönlicheDaten, geschlecht: "w" },
     });
     expect(weiblich.eUn?.allgAngaben?.inhaber?.natPers?.anredeId).toBe("2");
+
+    const istVersteuerung = transformToEUnFsE({
+      ...registerGewerbeCompleteRequest,
+      unternehmensDaten: {
+        ...registerGewerbeCompleteRequest.unternehmensDaten,
+        sollIstVersteuerung: "istVersteuerung",
+      },
+    });
+    expect(istVersteuerung.eUn?.umsatzsteuer?.sollIstVersteuerung?.auswahlSollIstVerst).toBe("2");
+
+    const ueberschuss = transformToEUnFsE({
+      ...registerGewerbeCompleteRequest,
+      unternehmensDaten: {
+        ...registerGewerbeCompleteRequest.unternehmensDaten,
+        zahllastUeberschussAuswahl: "ueberschuss",
+      },
+    });
+    expect(ueberschuss.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toBe("2");
   });
 
   it("sets entsprichtWohnanschrift: true when adresseAbweichend is not set", () => {
     const { adresseAbweichend: _, ...unternehmensDatenOhneAbweichung } =
-      baseRequest.unternehmensDaten;
+      registerGewerbeCompleteRequest.unternehmensDaten;
     const result = transformToEUnFsE({
-      ...baseRequest,
+      ...registerGewerbeCompleteRequest,
       unternehmensDaten: unternehmensDatenOhneAbweichung,
     });
     expect(result.eUn?.betrieb?.unternehmen?.entsprichtWohnanschrift).toBe(true);
