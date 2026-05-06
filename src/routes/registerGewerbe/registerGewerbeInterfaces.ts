@@ -1,12 +1,6 @@
 import { z } from "@hono/zod-openapi";
-import {
-  GEWINN_ERMITTLUNG,
-  GEWINN_ERMITTLUNG_CODES,
-} from "../../private/xmlBuilders/elsterFsE/buildingBlocks/gewinnErmittlgsAngaben";
-import {
-  RELIGIONSSCHLUESSEL,
-  RELIGIONSSCHLUESSEL_CODES,
-} from "../../private/xmlBuilders/elsterFsE/buildingBlocks/person";
+import { GEWINN_ERMITTLUNG_KEYS } from "../../private/xmlBuilders/elsterFsE/buildingBlocks/gewinnErmittlgsAngaben";
+import { RELIGIONSSCHLUESSEL_KEYS } from "../../private/xmlBuilders/elsterFsE/buildingBlocks/person";
 import {
   UNFALLVERSICHERUNGSTRAEGER,
   UNFALLVERSICHERUNGSTRAEGER_CODES,
@@ -56,13 +50,8 @@ const PersönlicheDatenSchema = z.object({
       description:
         "Bestehende Einkommensteuernummer der Person, falls bereits vorhanden (z.B. durch frühere Steuererklärungen als Arbeitnehmer). ELSTER-Format: 4 Ziffern, gefolgt von einer festen 0, gefolgt von 8 Ziffern (13 Zeichen gesamt).",
     }),
-  religion: z.enum(RELIGIONSSCHLUESSEL_CODES).openapi({
-    example: "11",
-    description: `Religionsschlüssel für die Kirchensteuer. Mögliche Werte:\n${Object.entries(
-      RELIGIONSSCHLUESSEL,
-    )
-      .map(([code, name]) => `- \`${code}\`: ${name}`)
-      .join("\n")}`,
+  religion: z.enum(RELIGIONSSCHLUESSEL_KEYS).openapi({
+    example: "nichtKirchensteuerpflichtig",
   }),
 });
 
@@ -80,11 +69,8 @@ const UnternehmensDatenSchema = z.object({
     .openapi({ example: "handwerk" }),
   tätigkeitsbeginn: z.iso.date().openapi({ example: "2026-04-17" }),
   gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
-  gewinnErmittlung: z.enum(GEWINN_ERMITTLUNG_CODES).openapi({
-    example: "01",
-    description: `Methode der Gewinnermittlung. Mögliche Werte:\n${Object.entries(GEWINN_ERMITTLUNG)
-      .map(([code, name]) => `- \`${code}\`: ${name}`)
-      .join("\n")}`,
+  gewinnErmittlung: z.enum(GEWINN_ERMITTLUNG_KEYS).openapi({
+    example: "einnahmenüberschussrechnung",
   }),
   kleinunternehmerRegelung: z.boolean().default(false).openapi({
     example: false,

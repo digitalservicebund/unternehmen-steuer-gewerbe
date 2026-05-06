@@ -6,6 +6,8 @@ import {
 import { type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 import { type ElsterFsEEUn } from "../../private/xmlBuilders/elsterFsE/elsterFsEEUn";
 import { getSecret } from "../../secrets";
+import { RELIGIONSSCHLUESSEL } from "../../private/xmlBuilders/elsterFsE/buildingBlocks/person";
+import { GEWINN_ERMITTLUNG } from "../../private/xmlBuilders/elsterFsE/buildingBlocks/gewinnErmittlgsAngaben";
 
 function toAnredeId(geschlecht: "d" | "w" | "m" | undefined): string | undefined {
   if (geschlecht === "m") return "1";
@@ -56,7 +58,7 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
             // berufsbez: undefined,
             // persIdNr: undefined,
             stNr: data.persönlicheDaten.steuernummer,
-            religion: data.persönlicheDaten.religion,
+            religion: RELIGIONSSCHLUESSEL[data.persönlicheDaten.religion],
             adrkette: {
               strAdr: {
                 str: persönlicheStrasseHausnummer.strasse,
@@ -217,7 +219,7 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
         },
       },
       gewinnErmittlgsAngaben: {
-        gewinnErmittlung: data.unternehmensDaten.gewinnErmittlung,
+        gewinnErmittlung: GEWINN_ERMITTLUNG[data.unternehmensDaten.gewinnErmittlung],
       },
       umsatzsteuer: {
         gesUmsatz: {
