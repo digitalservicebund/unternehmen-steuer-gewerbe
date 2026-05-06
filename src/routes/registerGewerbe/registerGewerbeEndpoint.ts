@@ -4,7 +4,7 @@ import { validateFsE } from "../../private/eric/eric";
 import { createElsterFsEEUnXml } from "../../private/xmlBuilders/elsterFsE/elsterFsEEUn";
 import { getSecret } from "../../secrets";
 import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
-import { ErrorTypeSchema, RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
+import { ErrorTypeSchema, type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 import { registerGewerbeRoute } from "./registerGewerbeRoute";
 import { transformToEUnFsE } from "./transform/transformToFsE";
 import { transformToGewerbeanmeldung } from "./transform/transformToGewerbeanmeldung";
