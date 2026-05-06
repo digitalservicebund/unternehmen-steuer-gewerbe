@@ -2,7 +2,7 @@ import {
   formatDatumDE,
   splitStrasseHausnummer,
   splitTelefonnummer,
-} from "../../helpers/stringParsers";
+} from "../../helpers/formFieldTransformations";
 import { type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 import { type ElsterFsEEUn } from "../../private/xmlBuilders/elsterFsE/elsterFsEEUn";
 import { getSecret } from "../../secrets";

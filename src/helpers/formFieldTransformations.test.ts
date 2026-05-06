@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { formatDatumDE, splitStrasseHausnummer, splitTelefonnummer } from "./stringParsers";
+import {
+  formatDatumDE,
+  splitStrasseHausnummer,
+  splitTelefonnummer,
+} from "./formFieldTransformations";
 
 describe("splitStrasseHausnummer", () => {
   it("splits a simple street and number", () => {
