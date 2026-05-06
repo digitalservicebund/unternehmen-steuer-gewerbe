@@ -58,6 +58,7 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
       anzahlTeilzeitBeschaeftigte: 0,
       // For later: this property has a cross-relation to artNiederlassung (which we don't have, right now)
       istReisegewerbe: false,
+      beteiligungOeffentlicheHand: "0",
       betriebArt: {
         industrie: data.unternehmensDaten.tätigkeitsbereich === "industrie",
         handwerk: data.unternehmensDaten.tätigkeitsbereich === "handwerk",

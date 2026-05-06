@@ -28,23 +28,14 @@ export interface Gewerbebetrieb {
   anzahlTeilzeitBeschaeftigte?: number;
   /** Mit diesem Element kann übermittelt werden, ob es sich bei dem Gewerbe um eine Reisegewerbe handelt */
   istReisegewerbe?: boolean;
-  /** Angabe, ob und in welcher Höhe eine Beteiligung der öffentlichen Hand am Gewerbebetrieb besteht. */
-  beteiligungOeffentlicheHand?: boolean;
+  /** Angabe, ob und in welcher Höhe eine Beteiligung der öffentlichen Hand am Gewerbebetrieb besteht. Code: "0" = keine, "1" = vorhanden, "2" = unbekannt */
+  beteiligungOeffentlicheHand?: string;
   /** Gibt die Art eine Betriebes (Handels-, Handwerks-, Industrie oder sonstiger Betrieb) an. */
   betriebArt?: BetriebArt;
   /** Angaben zur Handwerkskarte – nur relevant, wenn betriebArt.handwerk = true. */
   handwerkskarte?: Handwerkskarte;
 }
 
-function mapBeteiligungÖffentlicheHand(beteiligungOeffentlicheHand: boolean | undefined) {
-  if (beteiligungOeffentlicheHand === false) {
-    return "0";
-  }
-  if (beteiligungOeffentlicheHand) {
-    return "1";
-  }
-  return "2";
-}
 
 export function createGewerbebetrieb(
   gewerbebetrieb: Gewerbebetrieb | undefined,
@@ -68,7 +59,7 @@ export function createGewerbebetrieb(
       ${gewerbebetrieb.anzahlVollzeitBeschaeftigte === undefined ? "" : `<xga:anzahlVollzeitBeschaeftigte>${escapeXml(gewerbebetrieb.anzahlVollzeitBeschaeftigte)}</xga:anzahlVollzeitBeschaeftigte>`}
       ${gewerbebetrieb.anzahlTeilzeitBeschaeftigte === undefined ? "" : `<xga:anzahlTeilzeitBeschaeftigte>${escapeXml(gewerbebetrieb.anzahlTeilzeitBeschaeftigte)}</xga:anzahlTeilzeitBeschaeftigte>`}
       ${gewerbebetrieb.istReisegewerbe === undefined ? "" : `<xga:istReisegewerbe>${escapeXml(gewerbebetrieb.istReisegewerbe)}</xga:istReisegewerbe>`}
-      <xga:beteiligungOeffentlicheHand><code>${mapBeteiligungÖffentlicheHand(gewerbebetrieb.beteiligungOeffentlicheHand)}</code></xga:beteiligungOeffentlicheHand>
+      ${gewerbebetrieb.beteiligungOeffentlicheHand === undefined ? "" : `<xga:beteiligungOeffentlicheHand><code>${escapeXml(gewerbebetrieb.beteiligungOeffentlicheHand)}</code></xga:beteiligungOeffentlicheHand>`}
       ${createBetriebArt(gewerbebetrieb.betriebArt)}
       ${createHandwerkskarte(gewerbebetrieb.handwerkskarte)}
     </xga:gewerbebetrieb>`;

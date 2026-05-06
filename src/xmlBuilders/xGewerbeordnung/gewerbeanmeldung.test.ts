@@ -96,7 +96,7 @@ const gewerbeanmeldung: Gewerbeanmeldung = {
     anzahlVollzeitBeschaeftigte: 0,
     anzahlTeilzeitBeschaeftigte: 2,
     istReisegewerbe: false,
-    beteiligungOeffentlicheHand: false,
+    beteiligungOeffentlicheHand: "0",
     betriebArt: {
       industrie: false,
       handwerk: true,
@@ -225,6 +225,7 @@ describe("createGewerbeanmeldungXml", () => {
         gemeindeMeldungNr: "2024 0001",
         rechtsformcode: "411000",
         eingetragenerName: "Muster GmbH",
+        beteiligungOeffentlicheHand: "0",
         betriebsstaette: {
           artBetriebsstaette: "01",
           anschrift: {
