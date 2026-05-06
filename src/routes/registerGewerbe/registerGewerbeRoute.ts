@@ -33,6 +33,14 @@ export const registerGewerbeRoute = createRoute({
       },
       description: "Partial success: one of the two submissions failed",
     },
+    400: {
+      content: {
+        "application/json": {
+          schema: RegisterGewerbeResponseSchema,
+        },
+      },
+      description: "Both submissions failed due to invalid request data",
+    },
     500: {
       content: {
         "application/json": {

@@ -77,11 +77,21 @@ async function submitFsE(data: RegisterGewerbeRequest) {
 }
 
 function determineHttpStatus(
-  gewerbeanmeldung: { success: boolean },
-  steuernummer: { success: boolean },
+  gewerbeanmeldung: { success: boolean; errorType?: string },
+  steuernummer: { success: boolean; errorType?: string },
 ) {
-  if (gewerbeanmeldung.success && steuernummer.success) return 200;
-  if (gewerbeanmeldung.success || steuernummer.success) return 207;
+  if (gewerbeanmeldung.success && steuernummer.success) {
+    return 200;
+  }
+  if (gewerbeanmeldung.success || steuernummer.success) {
+    return 207;
+  }
+  if (
+    gewerbeanmeldung.errorType === ErrorTypeSchema.enum.validation_error &&
+    steuernummer.errorType === ErrorTypeSchema.enum.validation_error
+  ) {
+    return 400;
+  }
   return 500;
 }
 
