@@ -83,6 +83,25 @@ describe("Route /api/v1/register-gewerbe", () => {
     expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
   });
 
+  test("Returns 400 when both submissions fail with validation errors", async () => {
+    vi.spyOn(gewerbeanmeldung, "createGewerbeanmeldungXml").mockRejectedValue(
+      new Error("XML schema mismatch"),
+    );
+    vi.spyOn(eric, "validateFsE").mockReturnValue({
+      isValid: false,
+      returnCode: 1,
+      info: "FsE validation failed",
+    });
+
+    const response = await postRegisterGewerbe();
+    const json = await response.json();
+    expect(response.status).toEqual(400);
+    expect(json.gewerbeanmeldung.success).toBe(false);
+    expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
+    expect(json.steuernummer.success).toBe(false);
+    expect(json.steuernummer.errorType).toBe(ErrorTypeSchema.enum.validation_error);
+  });
+
   test("Returns 500 when both submissions fail", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(JSON.stringify({ message: "Server Down" }), { status: 500 }),
