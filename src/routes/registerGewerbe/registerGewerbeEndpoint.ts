@@ -6,8 +6,7 @@ import { getSecret } from "../../secrets";
 import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { ErrorTypeSchema, type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 import { registerGewerbeRoute } from "./registerGewerbeRoute";
-import { transformToEUnFsE } from "./transform/transformToFsE";
-import { transformToGewerbeanmeldung } from "./transform/transformToGewerbeanmeldung";
+import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTransformer";
 
 async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
   let gewerbeanmeldungXml: string;

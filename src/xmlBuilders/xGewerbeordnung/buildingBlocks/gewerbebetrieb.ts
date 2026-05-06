@@ -36,7 +36,6 @@ export interface Gewerbebetrieb {
   handwerkskarte?: Handwerkskarte;
 }
 
-
 export function createGewerbebetrieb(
   gewerbebetrieb: Gewerbebetrieb | undefined,
   wirtschaftlichTaetigerId: string | undefined,

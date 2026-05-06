@@ -8,7 +8,7 @@ import {
   GEWINN_ERMITTLUNG_KEYS,
   SOLL_IST_VERSTEUERUNG_KEYS,
   ZAHLLAST_UEBERSCHUSS_KEYS,
-} from "./transform/fsECodes";
+} from "./requestDataTransformer/fsECodes";
 
 const AdresseSchema = z.object({
   strasseUndHausnummer: z

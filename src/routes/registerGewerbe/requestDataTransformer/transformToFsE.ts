@@ -193,7 +193,8 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
       },
       betrieb: {
         unternehmen: {
-          entsprichtWohnanschrift: data.unternehmensDaten.adresseAbweichend === undefined ? true : undefined,
+          entsprichtWohnanschrift:
+            data.unternehmensDaten.adresseAbweichend === undefined ? true : undefined,
           adrkette: {
             strAdr: {
               str: betriebsStrasseHausnummer.strasse,
