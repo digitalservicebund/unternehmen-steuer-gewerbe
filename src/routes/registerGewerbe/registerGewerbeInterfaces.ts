@@ -1,8 +1,8 @@
 import { z } from "@hono/zod-openapi";
 import {
   UNFALLVERSICHERUNGSTRAEGER,
-  UNFALLVERSICHERUNGSTRAEGER_CODES,
-} from "../../xmlBuilders/xGewerbeordnung/buildingBlocks/bisherigeUnfallversicherung";
+  UNFALLVERSICHERUNGSTRAEGER_KEYS,
+} from "./requestDataTransformer/xGewerbeordnungCodes";
 import {
   RELIGIONSSCHLUESSEL_KEYS,
   GEWINN_ERMITTLUNG_KEYS,
@@ -105,14 +105,14 @@ const UnternehmensDatenSchema = z.object({
 });
 
 const unfallversicherungstraegerCodesDescription = Object.entries(UNFALLVERSICHERUNGSTRAEGER)
-  .map(([code, name]) => `- \`${code}\`: ${name}`)
+  .map(([name, code]) => `- \`${name}\` (${code})`)
   .join("\n");
 
 // Not used as long as we only support 'grundAnmeldungSchluessel: "01"' ("Neugründung")
 const _BisherigeUnfallversicherungSchema = z
   .object({
-    traeger: z.enum(UNFALLVERSICHERUNGSTRAEGER_CODES).openapi({
-      example: "08",
+    traeger: z.enum(UNFALLVERSICHERUNGSTRAEGER_KEYS).openapi({
+      example: "verwaltungsBerufsgenossenschaft",
       description: `Schlüssel des Trägers der bisherigen gesetzlichen Unfallversicherung. Mögliche Werte: ${unfallversicherungstraegerCodesDescription},`,
     }),
     unternehmensnummer: z.string().length(15).optional().openapi({
