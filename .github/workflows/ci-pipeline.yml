@@ -171,6 +171,7 @@ jobs:
           TRIVY_SKIP_FILES: "**/generated.spezifikation.sef.json"
           TRIVY_SEVERITY: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
           TRIVY_JAVA_DB_REPOSITORY: ""
+          TRIVY_SKIP_UPDATE: "true"
         with:
           # image-ref: ${{ inputs.image-ref }}
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{
