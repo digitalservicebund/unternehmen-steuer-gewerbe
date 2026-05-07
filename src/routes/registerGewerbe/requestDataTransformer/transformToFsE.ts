@@ -24,8 +24,6 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
     data.persönlicheDaten.adresse.strasseUndHausnummer,
   );
   const { intVorw, natVorw, rufNr } = splitTelefonnummer(data.persönlicheDaten.telefon);
-  const betriebsAdresse = data.unternehmensDaten.adresseAbweichend ?? data.persönlicheDaten.adresse;
-  const betriebsStrasseHausnummer = splitStrasseHausnummer(betriebsAdresse.strasseUndHausnummer);
 
   // All the commented-out fields are not required, technically. But I assume some of them
   // have an impact on taxes, etc., so I am not sure what we can really leave out at the moment.
@@ -195,15 +193,6 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
         unternehmen: {
           entsprichtWohnanschrift:
             data.unternehmensDaten.adresseAbweichend === undefined ? true : undefined,
-          adrkette: {
-            strAdr: {
-              str: betriebsStrasseHausnummer.strasse,
-              hausNr: betriebsStrasseHausnummer.hausnummer,
-              hausNrZu: betriebsStrasseHausnummer.hausnummerBis,
-              plz: betriebsAdresse.postleitzahl,
-              ort: betriebsAdresse.ort,
-            },
-          },
         },
         betrBeginn: {
           betriebsbeginn: formatDatumDE(data.unternehmensDaten.tätigkeitsbeginn),
@@ -216,12 +205,7 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
         },
       },
       festsetzungsAngaben: {
-        voraussichtlicheEinkuenfte: {
-          einkGewBetr: {
-            gruendJahrA: data.unternehmensDaten.umsatzGruendungsjahr,
-            folgeJahrA: data.unternehmensDaten.umsatzFolgejahr,
-          },
-        },
+        voraussichtlicheEinkuenfte: {},
       },
       gewinnErmittlgsAngaben: {
         gewinnErmittlung: GEWINN_ERMITTLUNG[data.unternehmensDaten.gewinnErmittlung],
@@ -233,9 +217,6 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
         },
         kleinunternehmerRegelung: {
           kleinUnternUSt: data.unternehmensDaten.kleinunternehmerRegelung ? true : undefined,
-          kleinUnternUStVerzicht: data.unternehmensDaten.kleinunternehmerRegelung
-            ? undefined
-            : true,
         },
         sollIstVersteuerung: {
           auswahlSollIstVerst: SOLL_IST_VERSTEUERUNG[data.unternehmensDaten.sollIstVersteuerung],
