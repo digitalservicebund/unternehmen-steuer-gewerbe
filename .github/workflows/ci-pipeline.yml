@@ -155,12 +155,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build project and docker image and Push Docker image to GitHub Container
-          Registry
+      - name: Build project and docker image
         run: |
           pnpm build
           docker build . --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
-          docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
 
       - name: Run Trivy vulnerability image scanner
         # Note: Results are shown in the GitHub Security tab
@@ -172,6 +170,7 @@ jobs:
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
           TRIVY_SKIP_FILES: "**/generated.spezifikation.sef.json"
           TRIVY_SEVERITY: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+          TRIVY_JAVA_DB_REPOSITORY: ""
         with:
           # image-ref: ${{ inputs.image-ref }}
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{
@@ -188,6 +187,9 @@ jobs:
           retention-days: 3
           path: trivy-image-results.sarif
           if-no-files-found: error
+
+      - name: Push Docker image to GitHub Container Registry
+        run: docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
 
       # disabled as we don't have "advanced security" available, being a private repository
       # - name: Upload Trivy scan results to GitHub Security tab (on `main`)
