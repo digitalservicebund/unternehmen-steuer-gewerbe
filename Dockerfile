@@ -1,16 +1,16 @@
-FROM node:26.0.0-alpine3.23
+FROM node:26.0.0-slim
 
 RUN npm install -g pnpm@10.33.0 --ignore-scripts \
-    && addgroup -S nonroot \
-    && adduser -S nonroot -G nonroot \
+    && groupadd -r nonroot \
+    && useradd -r -g nonroot nonroot \
     && mkdir -p /app && chown -R nonroot:nonroot /app
-
-USER nonroot
 
 WORKDIR /app
 
 COPY package.json5 pnpm-lock.yaml ./
 RUN pnpm install --prod --frozen-lockfile --ignore-scripts
+
+USER nonroot
 
 # compiled JS from `pnpm run build` (tsc)
 COPY ./dist .
