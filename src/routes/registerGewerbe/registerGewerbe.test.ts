@@ -5,6 +5,7 @@ import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanme
 import { registerGewerbeCompleteRequest } from "./testHelpers";
 import { ErrorTypeSchema } from "./registerGewerbeInterfaces";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
+import { existsSync } from "node:fs";
 
 function postRegisterGewerbe(data = registerGewerbeCompleteRequest) {
   return app.request("/api/v1/register-gewerbe", {
@@ -25,6 +26,13 @@ describe("Route /api/v1/register-gewerbe", () => {
       expect(json.gewerbeanmeldung.success).toBe(true);
       expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
       expect(json.steuernummer.success).toBe(true);
+    });
+
+    it("does not write the eric log to disk", async () => {
+      const response = await postRegisterGewerbe();
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+
+      expect(existsSync("./eric.log")).toBe(false);
     });
   });
 
