@@ -1,6 +1,7 @@
 export const HttpStatusCode = {
-  Ok: 200,
-  MultiStatus: 207,
   BadRequest: 400,
   InternalServerError: 500,
+  MultiStatus: 207,
+  NotFound: 404,
+  Ok: 200,
 };
