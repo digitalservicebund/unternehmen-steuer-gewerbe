@@ -1,4 +1,4 @@
-FROM node:26.0.0-slim
+FROM node:26.1.0-slim
 
 RUN npm install -g pnpm@10.33.0 --ignore-scripts \
     && groupadd -r nonroot \
