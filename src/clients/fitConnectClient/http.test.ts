@@ -11,10 +11,7 @@ describe("fetchFitConnect", () => {
       }),
     );
 
-    const result = await fetchFitConnect<typeof payload>(
-      mockFetch as unknown as typeof fetch,
-      "https://example.test",
-    );
+    const result = await fetchFitConnect<typeof payload>(mockFetch, "https://example.test");
 
     expect(result).toEqual(payload);
   });
