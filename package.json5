@@ -11,7 +11,7 @@
   },
   scripts: {
     // Compile TypeScript to ./dist/
-    build: "tsc &&       mkdir -p dist/src &&       cp -r src/resources dist/src/resources &&       mkdir -p dist/src/private/eric/ERiC-43.4.6.0 &&       cp -r src/private/eric/ERiC-43.4.6.0/Linux-x86_64 dist/src/private/eric/ERiC-43.4.6.0/",
+    build: "rm -rf dist ; tsc &&       mkdir -p dist/src &&       cp -r src/resources dist/src/resources &&       mkdir -p dist/src/private/eric/ERiC-43.4.6.0 &&       cp -r src/private/eric/ERiC-43.4.6.0/Linux-x86_64 dist/src/private/eric/ERiC-43.4.6.0/",
     // Build app and docker image
     "build:image": "pnpm build; docker build . --tag unternehmen-steuer-gewerbe",
     // Check format, fail on error (used in CI)
