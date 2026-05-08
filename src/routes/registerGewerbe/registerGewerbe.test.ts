@@ -28,6 +28,7 @@ describe("Route /api/v1/register-gewerbe", () => {
       expect(json.steuernummer.success).toBe(true);
     });
 
+    // This test fails if you have created the eric.log beforehand (or in the past). Manually delete the file before running the test.
     it("does not write the eric log to disk", async () => {
       const response = await postRegisterGewerbe();
       expect(response.status).toEqual(HttpStatusCode.Ok);
