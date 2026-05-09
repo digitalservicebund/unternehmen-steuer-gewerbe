@@ -33,6 +33,7 @@ jobs:
         with:
           submodules: true
           token: ${{ secrets.SUBMODULE_TOKEN }}
+          fetch-depth: 1
 
       - uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d
         name: Install pnpm
@@ -138,6 +139,7 @@ jobs:
         with:
           submodules: true
           token: ${{ secrets.SUBMODULE_TOKEN }}
+          fetch-depth: 1
 
       - uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d
         name: Install pnpm
@@ -154,9 +156,6 @@ jobs:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Free disk space by removing unused preinstalled packages
-        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
 
       - name: Build project and docker image
         run: |
@@ -196,7 +195,8 @@ jobs:
         run: cat trivy-image-results.sarif
 
       - name: Push Docker image to GitHub Container Registry
-        run: docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+        run: docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME
+          }}:${{ env.CONTAINER_IMAGE_VERSION }}
 
       # disabled as we don't have "advanced security" available, being a private repository
       # - name: Upload Trivy scan results to GitHub Security tab (on `main`)
