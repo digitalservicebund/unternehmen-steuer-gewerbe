@@ -7,7 +7,7 @@ RUN npm install -g pnpm@10.33.0 --ignore-scripts \
 
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml ./
+COPY package.json5 pnpm-lock.yaml ./
 RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
 USER nonroot

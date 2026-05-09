@@ -10,7 +10,7 @@
     "outDir": "./dist",
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "preserve",
+    "module": "nodenext",
     "target": "esnext",
     "types": ["node"],
     // For nodejs:
@@ -18,7 +18,7 @@
     // "types": ["node"],
     // and npm install -D @types/node
     // Other Outputs
-    "moduleResolution": "bundler",
+    "moduleResolution": "nodenext",
     "sourceMap": true,
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
