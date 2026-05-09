@@ -33,6 +33,7 @@ jobs:
         with:
           submodules: true
           token: ${{ secrets.SUBMODULE_TOKEN }}
+          fetch-depth: 1
 
       - uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d
         name: Install pnpm
@@ -138,6 +139,7 @@ jobs:
         with:
           submodules: true
           token: ${{ secrets.SUBMODULE_TOKEN }}
+          fetch-depth: 1
 
       - uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d
         name: Install pnpm
@@ -154,9 +156,6 @@ jobs:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Free disk space by removing unused preinstalled packages
-        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
 
       - name: Build project and docker image
         run: |
