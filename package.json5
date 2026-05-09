@@ -11,7 +11,12 @@
   },
   scripts: {
     // Compile TypeScript to ./dist/
-    build: "rm -rf dist ; tsc &&       mkdir -p dist/src &&       cp -r src/resources dist/src/resources &&       mkdir -p dist/src/private/eric/ERiC-43.4.6.0 &&       cp -r src/private/eric/ERiC-43.4.6.0/Linux-x86_64 dist/src/private/eric/ERiC-43.4.6.0/",
+    build: "rm -rf dist \
+      ; tsc \
+      && mkdir -p dist/src \
+      && cp -r src/resources dist/src/resources \
+      && mkdir -p dist/src/private/eric/ERiC-43.4.6.0 \
+      && cp -r src/private/eric/ERiC-43.4.6.0/Linux-x86_64 dist/src/private/eric/ERiC-43.4.6.0/",
     // Build app and docker image
     "build:image": "pnpm build; docker build . --tag unternehmen-steuer-gewerbe",
     // Check format, fail on error (used in CI)
@@ -25,7 +30,7 @@
     // Start API locally via ts-node (no building involved)
     start: "op run --env-file .env -- ts-node src/index.ts",
     // Start API via docker (built via "npm run build:image")
-    "start:image": "op run --env-file .env -- docker run -p 3000:3000 -e FIT_CONNECT_ENV -e FIT_CONNECT_CLIENT_ID -e FIT_CONNECT_CLIENT_SECRET -e FIT_CONNECT_DESTINATION_ID -e FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK -e FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK unternehmen-steuer-gewerbe",
+    "start:image": "op run --env-file .env -- docker run -p 3000:3000 -e ERIC_HERSTELLERID -e FIT_CONNECT_ENV -e FIT_CONNECT_CLIENT_ID -e FIT_CONNECT_CLIENT_SECRET -e FIT_CONNECT_DESTINATION_ID -e FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK -e FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK unternehmen-steuer-gewerbe",
     // Start API locally via ts-node (no building involved), restart on changes to files of type TS, JS, JSON, JSON5, YAML, MD
     "start:watch": "op run --env-file .env -- nodemon --watch . --ignore dist --ext ts,json,json5,yml,md --exec pnpm run start",
     // Run tests once
