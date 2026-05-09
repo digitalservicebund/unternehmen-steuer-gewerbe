@@ -195,8 +195,7 @@ jobs:
         run: cat trivy-image-results.sarif
 
       - name: Push Docker image to GitHub Container Registry
-        run: docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME
-          }}:${{ env.CONTAINER_IMAGE_VERSION }}
+        run: docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
 
       # disabled as we don't have "advanced security" available, being a private repository
       # - name: Upload Trivy scan results to GitHub Security tab (on `main`)
