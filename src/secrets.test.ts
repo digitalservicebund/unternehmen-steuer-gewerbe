@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { getSecret } from "./secrets";
 
 vi.mock("node:fs", () => ({
@@ -32,14 +32,14 @@ describe("getSecret", () => {
       process.env.SECRETS_FILE_PATH = "/etc/secrets";
     });
 
-    test("reads value from the configured file path", () => {
+    it("reads value from the configured file path", () => {
       mockedReadFileSync.mockReturnValue("my-secret-value\n");
 
       expect(getSecret("TEST_SECRET")).toBe("my-secret-value");
       expect(mockedReadFileSync).toHaveBeenCalledWith("/etc/secrets/TEST_SECRET", "utf-8");
     });
 
-    test("respects a custom SECRETS_FILE_PATH", () => {
+    it("respects a custom SECRETS_FILE_PATH", () => {
       process.env.SECRETS_FILE_PATH = "/var/run/custom";
       mockedReadFileSync.mockReturnValue("custom-value");
 
@@ -47,13 +47,13 @@ describe("getSecret", () => {
       expect(mockedReadFileSync).toHaveBeenCalledWith("/var/run/custom/TEST_SECRET", "utf-8");
     });
 
-    test("trims whitespace from file content", () => {
+    it("trims whitespace from file content", () => {
       mockedReadFileSync.mockReturnValue(" secret-with-spaces \n\r");
 
       expect(getSecret("TEST_SECRET")).toBe("secret-with-spaces");
     });
 
-    test("does not fallback to process.env when the file is used", () => {
+    it("does not fallback to process.env when the file is used", () => {
       mockedReadFileSync.mockReturnValue("file-value");
       process.env.TEST_SECRET = "env-value";
 
@@ -62,14 +62,14 @@ describe("getSecret", () => {
   });
 
   describe("when SECRETS_FILE_PATH is not set", () => {
-    test("reads from process.env", () => {
+    it("reads from process.env", () => {
       process.env.TEST_SECRET = "env-value";
 
       expect(getSecret("TEST_SECRET")).toBe("env-value");
       expect(mockedReadFileSync).not.toHaveBeenCalled();
     });
 
-    test("returns an empty string when env var is not set", () => {
+    it("returns an empty string when env var is not set", () => {
       expect(getSecret("TEST_SECRET")).toBe("");
       expect(mockedReadFileSync).not.toHaveBeenCalled();
     });
