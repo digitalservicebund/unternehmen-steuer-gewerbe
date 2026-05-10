@@ -198,6 +198,17 @@ jobs:
       - name: Push Docker image to GitHub Container Registry
         run: docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
 
+      - name: Confirm image package visibility is private
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VISIBILITY=$(gh api /orgs/${{ github.repository_owner }}/packages/container/${{ env.PROJECT_NAME }} --jq '.visibility')
+          if [ "$VISIBILITY" != "private" ]; then
+            echo "ERROR: Package visibility is '$VISIBILITY', expected 'private'."
+            exit 1
+          fi
+          echo "Package visibility confirmed: private"
+
       # disabled as we don't have "advanced security" available, being a private repository
       # - name: Upload Trivy scan results to GitHub Security tab (on `main`)
       #   uses: github/codeql-action/upload-sarif@v4
