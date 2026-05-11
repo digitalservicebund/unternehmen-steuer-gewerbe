@@ -1,7 +1,6 @@
 import { HonoAppType } from "../../app";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
-import { validateFsE } from "../../private/eric/eric";
-import { createElsterFsEEUnXml } from "../../private/xmlBuilders/elsterFsE/elsterFsEEUn";
+import { validateFsE, createElsterFsEEUnXml } from "unternehmen-steuer-gewerbe-privat";
 import { getSecret } from "../../secrets";
 import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { ErrorTypeSchema, type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";

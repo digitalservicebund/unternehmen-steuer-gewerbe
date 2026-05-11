@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach, beforeAll } from "vitest";
 import app from "../../app";
-import * as eric from "../../private/eric/eric";
+import * as eric from "unternehmen-steuer-gewerbe-privat";
 import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { registerGewerbeCompleteRequest } from "./testHelpers";
 import { ErrorTypeSchema } from "./registerGewerbeInterfaces";
