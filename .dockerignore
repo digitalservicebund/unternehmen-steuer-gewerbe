@@ -1,0 +1,9 @@
+src/
+*.test.*
+coverage/
+.env*
+*.md
+*.json5
+pnpm-lock.yaml
+.git/
+.github/

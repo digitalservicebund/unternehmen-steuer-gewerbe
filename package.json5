@@ -10,10 +10,14 @@
     node: "26.0.0",
   },
   scripts: {
-    // Compile TypeScript to ./dist/
-    build: "rm -rf dist && tsc && mkdir -p dist/src/resources && cp -r src/resources dist/src/resources",
+    // Type-check only, no output — use build:dev or build:prod to produce dist/
+    build: "tsc --noEmit && echo 'Type check passed. Use build:dev or build:prod to produce dist/'",
+    // Compile TypeScript to ./dist/ (keeps dev dependencies)
+    "build:dev": "rm -rf dist && tsc && mkdir -p dist/src/resources && cp -r src/resources dist/src/resources",
+    // Compile TypeScript to ./dist/ and prune to prod dependencies (restores dev dependencies afterwards)
+    "build:prod": "pnpm build:dev && pnpm install --prod",
     // Build app and docker image
-    "build:image": "pnpm build; docker build . --tag unternehmen-steuer-gewerbe",
+    "build:image": "pnpm build:prod; docker build . --tag unternehmen-steuer-gewerbe; pnpm install",
     // Check format, fail on error (used in CI)
     format: "oxfmt --check",
     // Check format, fix if possible (used in pre-commit GitHook)
