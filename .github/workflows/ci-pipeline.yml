@@ -168,7 +168,7 @@ jobs:
 
       - name: Build project and docker image
         run: |
-          pnpm build
+          pnpm build:prod
           docker build . --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
 
       - name: Run Trivy vulnerability image scanner
