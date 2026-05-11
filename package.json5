@@ -10,14 +10,10 @@
     node: "26.0.0",
   },
   scripts: {
-    // Type-check only, no output — use build:dev or build:prod to produce dist/
-    build: "tsc --noEmit && echo 'Type check passed. Use build:dev or build:prod to produce dist/'",
-    // Compile TypeScript to ./dist/ (keeps dev dependencies)
-    "build:dev": "rm -rf dist && tsc && mkdir -p dist/src/resources && cp -r src/resources dist/src/resources",
-    // Compile TypeScript to ./dist/ and prune to prod dependencies (restores dev dependencies afterwards)
-    "build:prod": "pnpm build:dev && pnpm install --prod",
+    // Compile TypeScript to ./dist/
+    build: "rm -rf dist       ; tsc       && mkdir -p dist/src       && cp -r src/resources dist/src/resources       && mkdir -p dist/src/private/eric/ERiC-43.4.6.0       && cp -r src/private/eric/ERiC-43.4.6.0/Linux-x86_64 dist/src/private/eric/ERiC-43.4.6.0/",
     // Build app and docker image
-    "build:image": "pnpm build:prod; docker build . --tag unternehmen-steuer-gewerbe; pnpm install",
+    "build:image": "pnpm build; docker build . --tag unternehmen-steuer-gewerbe",
     // Check format, fail on error (used in CI)
     format: "oxfmt --check",
     // Check format, fix if possible (used in pre-commit GitHook)
@@ -52,7 +48,6 @@
     jose: "^6.2.2",
     koffi: "^2.16.1",
     "saxonjs-he": "3.0.0-beta2",
-    "unternehmen-steuer-gewerbe-privat": "github:digitalservicebund/unternehmen-steuer-gewerbe-privat#e45c44786fbaf8b3b8489c1413577d90474861cd",
     vite: "8.0.10",
     "xmllint-wasm": "^5.2.0",
     zod: "^4.3.6",
