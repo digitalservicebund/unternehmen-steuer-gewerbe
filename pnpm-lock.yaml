@@ -39,8 +39,8 @@ importers:
         specifier: 3.0.0-beta2
         version: 3.0.0-beta2
       unternehmen-steuer-gewerbe-privat:
-        specifier: github:digitalservicebund/unternehmen-steuer-gewerbe-privat#1610ef55afa60d9ea87b6f7193541e5e33652966
-        version: git+https://git@github.com:digitalservicebund/unternehmen-steuer-gewerbe-privat.git#1610ef55afa60d9ea87b6f7193541e5e33652966(@types/node@25.6.0)
+        specifier: github:digitalservicebund/unternehmen-steuer-gewerbe-privat#0c6c66985402284b8be4b6778a62412c02103e72
+        version: git+https://git@github.com:digitalservicebund/unternehmen-steuer-gewerbe-privat.git#0c6c66985402284b8be4b6778a62412c02103e72(@types/node@25.6.0)
       vite:
         specifier: 8.0.10
         version: 8.0.10(@types/node@25.6.0)(yaml@2.8.3)
@@ -1191,8 +1191,8 @@ packages:
   undici-types@7.19.2:
     resolution: {integrity: sha512-qYVnV5OEm2AW8cJMCpdV20CDyaN3g0AjDlOGf1OW4iaDEx8MwdtChUp4zu4H0VP3nDRF/8RKWH+IPp9uW0YGZg==}
 
-  unternehmen-steuer-gewerbe-privat@git+https://git@github.com:digitalservicebund/unternehmen-steuer-gewerbe-privat.git#1610ef55afa60d9ea87b6f7193541e5e33652966:
-    resolution: {commit: 1610ef55afa60d9ea87b6f7193541e5e33652966, repo: git@github.com:digitalservicebund/unternehmen-steuer-gewerbe-privat.git, type: git}
+  unternehmen-steuer-gewerbe-privat@git+https://git@github.com:digitalservicebund/unternehmen-steuer-gewerbe-privat.git#0c6c66985402284b8be4b6778a62412c02103e72:
+    resolution: {commit: 0c6c66985402284b8be4b6778a62412c02103e72, repo: git@github.com:digitalservicebund/unternehmen-steuer-gewerbe-privat.git, type: git}
     version: 1.0.0
 
   v8-compile-cache-lib@3.0.1:
@@ -2173,7 +2173,7 @@ snapshots:
 
   undici-types@7.19.2: {}
 
-  unternehmen-steuer-gewerbe-privat@git+https://git@github.com:digitalservicebund/unternehmen-steuer-gewerbe-privat.git#1610ef55afa60d9ea87b6f7193541e5e33652966(@types/node@25.6.0):
+  unternehmen-steuer-gewerbe-privat@git+https://git@github.com:digitalservicebund/unternehmen-steuer-gewerbe-privat.git#0c6c66985402284b8be4b6778a62412c02103e72(@types/node@25.6.0):
     dependencies:
       dotenv: 17.4.2
       koffi: 2.16.1
