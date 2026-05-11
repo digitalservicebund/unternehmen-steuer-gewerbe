@@ -52,8 +52,7 @@ describe("Route /api/v1/register-gewerbe", () => {
       expect(json.steuernummer.success).toBe(true);
     });
 
-    // TODO: fix or remove
-    it.skip("Returns 207 MULTI-STATUS with gewerbeanmeldung validation_error when XML creation throws, steuernummer still succeeds", async () => {
+    it("Returns 207 MULTI-STATUS with gewerbeanmeldung validation_error when XML creation throws, steuernummer still succeeds", async () => {
       vi.spyOn(gewerbeanmeldung, "createGewerbeanmeldungXml").mockRejectedValue(
         new Error("XML schema mismatch"),
       );
@@ -67,7 +66,7 @@ describe("Route /api/v1/register-gewerbe", () => {
     });
 
     // TODO: fix or remove
-    it.skip("Returns 207 MULTI-STATUS with steuernummer upstream_error when ERiC service is unavailable, gewerbeanmeldung still succeeds", async () => {
+    it("Returns 207 MULTI-STATUS with steuernummer upstream_error when ERiC service is unavailable, gewerbeanmeldung still succeeds", async () => {
       vi.spyOn(eric, "validateFsE").mockReturnValue({
         isValid: undefined,
         returnCode: undefined,
