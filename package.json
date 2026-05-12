@@ -8,7 +8,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc --noEmit && echo 'Type check passed. Use build:dev or build:prod to produce dist/'",
-    "build:dev": "rm -rf dist && rolldown && mkdir -p dist/resources && cp -r src/resources/. dist/resources/",
+    "build:dev": "rm -rf dist && rolldown -c && mkdir -p dist/resources && cp -r src/resources/. dist/resources/",
     "build:prod": "pnpm build:dev && pnpm install --prod",
     "build:image": "pnpm build:prod; docker build . --tag unternehmen-steuer-gewerbe; pnpm install",
     "format": "oxfmt --check",
