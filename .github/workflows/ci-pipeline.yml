@@ -39,7 +39,7 @@ jobs:
           cache: true
 
       - name: Configure git to use HTTPS for GitHub
-        run: git config --global url."https://x-access-token:${{ secrets.SUBMODULE_TOKEN }}@github.com/".insteadOf "git@github.com:"
+        run: git config --global url."https://x-access-token:${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}@github.com/".insteadOf "git@github.com:"
 
       - name: Install dependencies
         run: pnpm install --ignore-scripts
@@ -75,7 +75,7 @@ jobs:
           cache: true
 
       - name: Configure git to use HTTPS for GitHub
-        run: git config --global url."https://x-access-token:${{ secrets.SUBMODULE_TOKEN }}@github.com/".insteadOf "git@github.com:"
+        run: git config --global url."https://x-access-token:${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}@github.com/".insteadOf "git@github.com:"
 
       - name: Install dependencies
         run: pnpm install --ignore-scripts
@@ -145,7 +145,7 @@ jobs:
           cache: true
 
       - name: Configure git to use HTTPS for GitHub
-        run: git config --global url."https://x-access-token:${{ secrets.SUBMODULE_TOKEN }}@github.com/".insteadOf "git@github.com:"
+        run: git config --global url."https://x-access-token:${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}@github.com/".insteadOf "git@github.com:"
 
       - name: Install dependencies
         run: pnpm install --ignore-scripts
@@ -360,4 +360,4 @@ jobs:
         run: gh pr merge --squash "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
-          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GH_TOKEN: ${{secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN}}
