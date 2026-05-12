@@ -2,19 +2,9 @@
 
 ## Getting All the Code
 
-Parts of this code base are not public (e.g. the wrapper around the ELSTER [ERiC](https://www.elster.de/eportal/infoseite/entwickler) library). They have been added to this repository as Git submodules.
+Parts of this code base are not public (e.g. the wrapper around the ELSTER [ERiC](https://www.elster.de/eportal/infoseite/entwickler) library). They are included as an npm dependency from a private GitHub repository (`unternehmen-steuer-gewerbe-privat`).
 
-Fetching all the repository including the submodules' content can be done like this (assuming you have access to the submodules' repositories):
-
-```bash
-  git clone --recurse-submodules git@github.com:digitalservicebund/unternehmen-steuer-gewerbe.git
-```
-
-If the repository was cloned as usual, the following command will fetch the content of the submodules:
-
-```bash
-  git submodule update --init --recursive
-```
+After cloning, run `pnpm install` as usual. You will need access to the private repository for pnpm to resolve the dependency.
 
 ## Environment Variables
 
@@ -93,4 +83,18 @@ lefthook install
 
 ## NPM Scripts
 
-We have an annotated [package.json5](./package.json5). Please have a look, there.
+- `build` — Type-check only, no output; use `build:dev` or `build:prod` to produce `dist/`
+- `build:dev` — Compile TypeScript to `./dist/` (keeps dev dependencies)
+- `build:prod` — Compile TypeScript to `./dist/` and prune to prod dependencies (restores dev dependencies afterwards)
+- `build:image` — Build app and Docker image
+- `format` — Check format, fail on error (used in CI)
+- `format:fix` — Check format, fix if possible (used in pre-commit Git hook)
+- `lint` — Lint, fail on error (used in CI)
+- `lint:fix` — Lint, fix if possible (used in pre-commit Git hook)
+- `start` — Start API locally via ts-node (no building involved)
+- `start:image` — Start API via Docker (built via `build:image`)
+- `start:watch` — Start API locally via ts-node, restart on changes to TS, JSON, YAML, MD files
+- `test` — Run tests once
+- `test:coverage` — Run tests once, report coverage to console and `./coverage/` (lcov for SonarCloud)
+- `test:ci:coverage` — Same as `test:coverage` but without 1Password secrets injection (for CI)
+- `test:watch` — Run tests, restart on code changes
