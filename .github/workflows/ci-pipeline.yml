@@ -354,13 +354,11 @@ jobs:
       pull-requests: write
     steps:
       - name: Dependabot metadata
-        continue-on-error: true
         id: metadata
         uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
       - name: Auto-merge Dependabot PRs except major version updates
-        continue-on-error: true
         if: steps.metadata.outputs.update-type != 'version-update:semver-major'
         run: gh pr merge --squash "$PR_URL"
         env:
