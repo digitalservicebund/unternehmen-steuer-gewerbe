@@ -10,9 +10,11 @@ COPY node_modules ./node_modules
 
 USER nonroot
 
-# compiled JS from `pnpm run build` (tsc)
+# bundled JS from `pnpm run build:dev` (rolldown)
 COPY ./dist .
+
+ENV RESOURCES_DIR=/app/resources
 
 EXPOSE 3000
 
-CMD [ "node", "index.js" ]
+CMD [ "node", "bundle.js" ]
