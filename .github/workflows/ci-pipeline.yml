@@ -37,7 +37,18 @@ jobs:
         name: Install pnpm
         with:
           version: 10.33.0
-          cache: true
+
+      - name: Get pnpm store path
+        id: pnpm-store
+        run: echo "pnpm-store-path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        with:
+          path: ${{ steps.pnpm-store.outputs.pnpm-store-path }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Configure git to use HTTPS for GitHub
         run: git config --global url."https://x-access-token:${{ secrets.SUBMODULE_TOKEN }}@github.com/".insteadOf "git@github.com:"
@@ -74,7 +85,18 @@ jobs:
         name: Install pnpm
         with:
           version: 10.33.0
-          cache: true
+
+      - name: Get pnpm store path
+        id: pnpm-store
+        run: echo "pnpm-store-path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        with:
+          path: ${{ steps.pnpm-store.outputs.pnpm-store-path }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Configure git to use HTTPS for GitHub
         run: git config --global url."https://x-access-token:${{ secrets.SUBMODULE_TOKEN }}@github.com/".insteadOf "git@github.com:"
@@ -145,7 +167,18 @@ jobs:
         name: Install pnpm
         with:
           version: 10.33.0
-          cache: true
+
+      - name: Get pnpm store path
+        id: pnpm-store
+        run: echo "pnpm-store-path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        with:
+          path: ${{ steps.pnpm-store.outputs.pnpm-store-path }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Configure git to use HTTPS for GitHub
         run: git config --global url."https://x-access-token:${{ secrets.SUBMODULE_TOKEN }}@github.com/".insteadOf "git@github.com:"
