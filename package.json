@@ -46,7 +46,7 @@
     "fast-xml-builder": "^1.1.7",
     "fast-xml-parser": "^5.7.1",
     "nodemon": "^3.1.14",
-    "oxfmt": "^0.47.0",
+    "oxfmt": "^0.48.0",
     "oxlint": "^1.60.0",
     "rolldown": "^1.0.0",
     "ts-node": "^10.9.2",
