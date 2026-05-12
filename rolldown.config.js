@@ -10,6 +10,6 @@ export default defineConfig({
     dir: "dist",
     // ESM output to match "type": "module" in package.json
     format: "esm",
-    entryFileNames: "bundle.js",
+    entryFileNames: "bundle.mjs",
   },
 });

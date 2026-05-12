@@ -17,4 +17,4 @@ ENV RESOURCES_DIR=/app/resources
 
 EXPOSE 3000
 
-CMD [ "node", "bundle.js" ]
+CMD [ "node", "bundle.mjs" ]
