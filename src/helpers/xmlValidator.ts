@@ -20,12 +20,23 @@ interface SaxonTransformResult {
   stylesheetInternal: object;
 }
 
+// In ts-node, resolved relative to this source file (src/helpers/ -> src/resources/).
+// In Docker, overridden via RESOURCES_DIR env var pointing to /app/resources.
+function getResourcesDir(): string {
+  return (
+    process.env["RESOURCES_DIR"] ??
+    path.resolve(new URL(".", import.meta.url).pathname, "../resources")
+  );
+}
+
 export async function validateXml(xml: string): Promise<XmlValidationResult> {
-  const schemaDir = "./resources/xml/schemaXsd/xgewerbeordnung-1.6";
+  const schemaDir = path.join(getResourcesDir(), "xml/schemaXsd/xgewerbeordnung-1.6");
   const schemaValidationResult = await validateAgainstSchema(xml, schemaDir);
 
-  const schematronRulesSefJsonFile =
-    "resources/xml/schematron/xgewerbeordung-1.6/generated.spezifikation.sef.json";
+  const schematronRulesSefJsonFile = path.join(
+    getResourcesDir(),
+    "xml/schematron/xgewerbeordung-1.6/generated.spezifikation.sef.json",
+  );
   const schematronValidationResult = await validateAgainstSchematronRules(
     xml,
     schematronRulesSefJsonFile,

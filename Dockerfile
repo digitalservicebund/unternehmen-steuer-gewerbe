@@ -13,6 +13,8 @@ USER nonroot
 # bundled JS from `pnpm run build:dev` (rolldown)
 COPY ./dist .
 
+ENV RESOURCES_DIR=/app/resources
+
 EXPOSE 3000
 
 CMD [ "node", "bundle.js" ]
