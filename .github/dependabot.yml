@@ -4,6 +4,13 @@
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 
 version: 2
+registries:
+  digitalservicebund-github:
+    type: git
+    url: https://github.com
+    username: x-access-token
+    password: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
+
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -11,6 +18,8 @@ updates:
       interval: "daily"
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/" # Location of package manifests
+    registries:
+      - digitalservicebund-github
     schedule:
       interval: "daily"
     cooldown:

@@ -33,13 +33,13 @@ jobs:
         with:
           fetch-depth: 1
 
-      - uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d
+      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093
         name: Install pnpm
         with:
           cache: true
 
       - name: Configure git to use HTTPS for GitHub
-        run: git config --global url."https://x-access-token:${{ secrets.SUBMODULE_TOKEN }}@github.com/".insteadOf "git@github.com:"
+        run: git config --global url."https://x-access-token:${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}@github.com/".insteadOf "git@github.com:"
 
       - name: Install dependencies
         run: pnpm install --ignore-scripts
@@ -69,13 +69,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d
+      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093
         name: Install pnpm
         with:
           cache: true
 
       - name: Configure git to use HTTPS for GitHub
-        run: git config --global url."https://x-access-token:${{ secrets.SUBMODULE_TOKEN }}@github.com/".insteadOf "git@github.com:"
+        run: git config --global url."https://x-access-token:${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}@github.com/".insteadOf "git@github.com:"
 
       - name: Install dependencies
         run: pnpm install --ignore-scripts
@@ -139,13 +139,13 @@ jobs:
         with:
           fetch-depth: 1
 
-      - uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d
+      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093
         name: Install pnpm
         with:
           cache: true
 
       - name: Configure git to use HTTPS for GitHub
-        run: git config --global url."https://x-access-token:${{ secrets.SUBMODULE_TOKEN }}@github.com/".insteadOf "git@github.com:"
+        run: git config --global url."https://x-access-token:${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}@github.com/".insteadOf "git@github.com:"
 
       - name: Install dependencies
         run: pnpm install --ignore-scripts
@@ -332,6 +332,11 @@ jobs:
   # Automerge if it's a dependabot PR and all tests are passing and it's a non-major version update
   # cf. ../dependabot.yml for details on Dependabot like e.g. the cooldown period we're using
   # Follows this recipe of the GitHub docs: https://docs.github.com/en/code-security/tutorials/secure-your-dependencies/automating-dependabot-with-github-actions#enabling-automerge-on-a-pull-request
+  #
+  # Important: several secrets needed to be explicitly set for Dependabot (not just"Actions") in order to successfully run this job
+  #  - all client secrets FIT_CONNECT_... and ERIC_...
+  #  - a GitHub Personal Access Token for elevated privileges for the actual merge (PRIVATE_REPOSITORY_ACCESS_TOKEN)
+  #  - a Sonar Personal Access Token so the sonar scan works
   #######################################
 
   dependabot-auto-merge:
@@ -349,15 +354,13 @@ jobs:
       pull-requests: write
     steps:
       - name: Dependabot metadata
-        continue-on-error: true
         id: metadata
         uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
       - name: Auto-merge Dependabot PRs except major version updates
-        continue-on-error: true
         if: steps.metadata.outputs.update-type != 'version-update:semver-major'
         run: gh pr merge --squash "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
-          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GH_TOKEN: ${{secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN}}
