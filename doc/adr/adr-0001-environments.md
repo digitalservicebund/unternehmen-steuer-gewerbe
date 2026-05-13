@@ -2,83 +2,79 @@
 
 ## Date
 
-2026-05-11
+2026-05-13
 
 ## Status
 
-Proposed (should become accepted)
+Accepted (one of two authors present)
 
 ## Context
 
-We're running `development` (`dev`) and `production` environments. Here's how we are using them and what expectations they will fulfill.
+We're running our service in two environments: `production` (`prod`) and `development` (`dev`).
+
+Here's what they are used for.
 
 ## Decision
 
+### `production` Environment
+
+- The `production` environment API is _consequential_ in the sense that requests
+  - can trigger messages to real Gewerbeämter or Finanzämter and
+  - can register businesses.
+
+- Access to the `production` environment is _locked down_ and only available to the Unternehmen-One-Stop-Shop (OSS) app.
+
+- `production` is expected to be up "24/7" (SLA tbd.)
+
 ### `development` Environment
 
-- Sending requests to the `development` API
-  - does not trigger messages to real Gewerbeämter or Finanzämter and it
-  - does not register any business.
-- The `development` environment can safely be used for any kind of development work, be it local or in the cluster, like
+- The `development` API is _sandboxed_ in the sense that requests
+  - do not trigger messages to real Gewerbeämter or Finanzämter
+  - do not register any business.
+
+- Access to the `development` API is _public_ and can safely be used for any purpose, like:
   - test-running new code,
   - debugging a problem,
   - testing a pipeline change,
-  - displaying API documentation,
+  - displaying API documentation or
   - offering a point-and-click UI for interacting with the API.
 
-### `production` Environment
+- `development` makes no promise about availability.
 
-- Sending requests to the `production` environment API can have real-world consequences.
-- Access to the `production` environment is limited to the Unternehmen-One-Stop-Shop (OSS) app.
+## Consequences
 
-## Details
+### Simplification
 
-### Simplicity
-
-The clear distinction between "can have real-world consquences" and "can safely be used for any kind of development work" simplifies many decisions the developers have to make. Instead of codifying each of them, we can refer to the `production / development` distinction.
+The clear distinction between "sandboxed" and "consequential" simplifies many decisions that developers or other team members have to make. Instead of codifying each case separately, we can refer to the distinction between `production` and `development`.
 
 For example:
 
 - Will there be a Swagger UI for `production`?
   - No, because nothing but the OSS app may access the API.
 - What certificates need to be set up?
-  - Test certificates in `development` so we can't accidentally cause relevant consequences wrt. tax or business registratin offices.
-  - Real certificaties in `production` as we need to authenticate ourselves when actually registering businesses.
+  - Test certificates in `development` so we can't accidentally cause relevant consequences wrt. tax or business registration offices.
+  - Real certificates in `production` as we need to authenticate ourselves when actually registering businesses.
 - Against which environment should we run local code?
-  - Against `development` as it can safely be used for any development purpose.
+  - Against `development` as it can safely be used for any (development) purpose.
 - Can the Swagger UI for `development` be publicly accessible?
-  - Yes, because it does not lead to any relevant consequence wrt. tax or business registration offices. (We may consider rate limiting though.)
+  - Yes, because it does not lead to any relevant consequence wrt. tax or business registration offices.
+  - We may consider rate limiting.
 
-### Expectations (security, availability etc.)
+### Continuous Testing (CI) and Continuous Deployment (CD) Setup
 
-`production`
-
-- must prevent any access other than by the OSS
-- must be highly available
-- must be highly reliable in performing its services
-
-`development`
-
-- can be open to the public
-- may be down at times
-
-### Continuous Testing and Deployment Setup
-
-Our continuous integration pipeline has three sequential stages each of which depends on the successful execution of the previous one:
+Our CI/CD pipeline has three sequential stages, each of which depends on the successful execution of the previous one:
 
 1. Ensuring code and engineering quality
 
 2. Deploying to `development`
 
-3. Deploying to `staging`
+3. Deploying to `production`
 
-## Consequences
-
-### Limited Use Cases
+### Limited Number of Use Cases
 
 In terms of use cases, we do not reliably support anything but what the OSS is built for.
 
 As a consequence, e.g. _product demos_ or _user tests_ are not supported by using some other particular set of security or convenience measures. They either
 
-- take place in `development` with no expectation at all that tax and business registration offices should notice , or they
-- take place in `production` where users face all (legal, procedural etc.) consequences of actually registering businesses.
+- take place in `production` where users face all (legal, procedural etc.) consequences of actually registering businesses; or they
+- take place in `development` with no expectation at all that tax and business registration offices should notice.
