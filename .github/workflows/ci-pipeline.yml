@@ -160,7 +160,7 @@ jobs:
       - name: Build project and docker image
         run: |
           pnpm build:prod
-          docker build . --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+          docker build . --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }} --build-arg COMMIT_SHA=${{ github.sha }}
 
       - name: Run Trivy vulnerability image scanner
         # Note: Results are shown in the GitHub Security tab
@@ -304,8 +304,6 @@ jobs:
 
   smoke-test-development:
     name: Smoke test development environment
-    # are we sure that developmen is running the lastest when
-    # performing this test?
     needs: deploy-development
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -313,6 +311,21 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: Wait for development to serve the correct commit
+        run: |
+          echo "Waiting for ${{ vars.DEVELOPMENT_BASE_URL }} to serve commit ${{ github.sha }}..."
+          for i in $(seq 1 30); do
+            SHA=$(curl --silent --fail "${{ vars.DEVELOPMENT_BASE_URL }}" | jq -r '.gitCommitSHA // empty')
+            if [ "$SHA" = "${{ github.sha }}" ]; then
+              echo "Development is running the correct commit."
+              exit 0
+            fi
+            echo "Attempt $i: got '$SHA', retrying in 5s..."
+            sleep 5
+          done
+          echo "Timed out waiting for development to serve commit ${{ github.sha }}"
+          exit 1
+
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
