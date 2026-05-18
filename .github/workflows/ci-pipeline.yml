@@ -315,12 +315,13 @@ jobs:
         run: |
           echo "Waiting for ${{ vars.DEVELOPMENT_BASE_URL }} to serve commit ${{ github.sha }}..."
           for i in $(seq 1 30); do
-            SHA=$(curl --silent --fail "${{ vars.DEVELOPMENT_BASE_URL }}" | jq -r '.gitCommitSHA // empty')
+            RESPONSE=$(curl --silent "${{ vars.DEVELOPMENT_BASE_URL }}")
+            SHA=$(echo "$RESPONSE" | jq -r '.gitCommitSHA // empty')
             if [ "$SHA" = "${{ github.sha }}" ]; then
-              echo "Development is running the correct commit."
+              echo "Attempt $i: Development is running the correct commit."
               exit 0
             fi
-            echo "Attempt $i: got '$SHA', retrying in 5s..."
+            echo "Attempt $i: got response '$RESPONSE', retrying in 5s..."
             sleep 5
           done
           echo "Timed out waiting for development to serve commit ${{ github.sha }}"
