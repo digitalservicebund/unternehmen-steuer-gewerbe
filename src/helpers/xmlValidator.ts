@@ -29,9 +29,33 @@ function getResourcesDir(): string {
   );
 }
 
-export async function validateXml(xml: string): Promise<XmlValidationResult> {
+let cachedXsdFiles:
+  | { mainXsd: string; dependencies: { fileName: string; contents: string }[] }
+  | undefined;
+let cachedStylesheetInternal: object | undefined;
+
+async function getXsdFiles() {
+  if (cachedXsdFiles) return cachedXsdFiles;
   const schemaDir = path.join(getResourcesDir(), "xml/schemaXsd/xgewerbeordnung-1.6");
-  const schemaValidationResult = await validateAgainstSchema(xml, schemaDir);
+  const mainXsd = await fs.readFile(
+    path.join(schemaDir, "xgewerbeordnung-gewerbeanzeige.xsd"),
+    "utf8",
+  );
+  const filesInSchemaDir = await fs.readdir(schemaDir);
+  const dependencies = await Promise.all(
+    filesInSchemaDir
+      .filter((fileName) => fileName.endsWith(".xsd"))
+      .map(async (fileName) => ({
+        fileName,
+        contents: await fs.readFile(path.join(schemaDir, fileName), "utf8"),
+      })),
+  );
+  cachedXsdFiles = { mainXsd, dependencies };
+  return cachedXsdFiles;
+}
+
+export async function validateXml(xml: string): Promise<XmlValidationResult> {
+  const schemaValidationResult = await validateAgainstSchema(xml);
 
   const schematronRulesSefJsonFile = path.join(
     getResourcesDir(),
@@ -49,30 +73,13 @@ export async function validateXml(xml: string): Promise<XmlValidationResult> {
   };
 }
 
-async function validateAgainstSchema(xml: string, schemaDir: string): Promise<XMLValidationResult> {
-  // reading the main XSD schema
-  const mainXsd = await fs.readFile(
-    path.join(schemaDir, "xgewerbeordnung-gewerbeanzeige.xsd"),
-    "utf8",
-  );
-
-  // loading all XSD "dependencies"
-  const filesInSchemaDir = await fs.readdir(schemaDir);
-  const xsdDependencies = await Promise.all(
-    filesInSchemaDir
-      .filter((fileName) => fileName.endsWith(".xsd"))
-      .map(async (fileName) => ({
-        fileName,
-        contents: await fs.readFile(path.join(schemaDir, fileName), "utf8"),
-      })),
-  );
-
-  const schemaValidationResult = await validateXML({
+async function validateAgainstSchema(xml: string): Promise<XMLValidationResult> {
+  const { mainXsd, dependencies } = await getXsdFiles();
+  return validateXML({
     xml,
     schema: [mainXsd],
-    preload: xsdDependencies,
+    preload: dependencies,
   });
-  return schemaValidationResult;
 }
 
 async function validateAgainstSchematronRules(
@@ -84,14 +91,17 @@ async function validateAgainstSchematronRules(
 }> {
   const schematronValidationResult: SaxonTransformResult = await SaxonJS.transform(
     {
-      stylesheetFileName: schematronRulesSefJsonFilePath,
+      ...(cachedStylesheetInternal
+        ? { stylesheetInternal: cachedStylesheetInternal }
+        : { stylesheetFileName: schematronRulesSefJsonFilePath }),
       sourceText: xml,
       destination: "serialized",
     },
     "async",
   );
-  // valid if no failure reported
-  const isValid = !schematronValidationResult.principalResult.includes("<svrl:failed-assert");
 
+  cachedStylesheetInternal = schematronValidationResult.stylesheetInternal;
+
+  const isValid = !schematronValidationResult.principalResult.includes("<svrl:failed-assert");
   return { isValid, result: schematronValidationResult };
 }
