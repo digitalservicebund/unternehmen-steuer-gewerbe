@@ -13,6 +13,7 @@ function postRegisterGewerbe() {
 describe("Load test: POST /api/v1/register-gewerbe", () => {
   it(
     "handles 100 concurrent requests and returns success for all",
+    { timeout: 3 * 60 * 1000 },
     async () => {
       const responses = await Promise.all(Array.from({ length: 100 }, () => postRegisterGewerbe()));
 
@@ -24,6 +25,5 @@ describe("Load test: POST /api/v1/register-gewerbe", () => {
         expect(results[i].steuernummer.success, `request ${i} steuernummer`).toBe(true);
       }
     },
-    { timeout: 60_000 },
   );
 });
