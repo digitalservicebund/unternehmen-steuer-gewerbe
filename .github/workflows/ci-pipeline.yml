@@ -304,8 +304,8 @@ jobs:
 
   smoke-test-development:
     name: Smoke test development environment
-    needs: deploy-development
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # needs: deploy-development
+    # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: development
     permissions:
