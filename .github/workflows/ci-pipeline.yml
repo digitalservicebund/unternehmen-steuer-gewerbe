@@ -304,7 +304,8 @@ jobs:
 
   smoke-test-development:
     name: Smoke test development environment
-    # are we sure that developmen is u
+    # are we sure that developmen is running the lastest when
+    # performing this test?
     needs: deploy-development
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
