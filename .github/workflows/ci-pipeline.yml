@@ -178,10 +178,16 @@ jobs:
           # image-ref: ${{ inputs.image-ref }}
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{
             env.CONTAINER_IMAGE_VERSION }}
-          format: "sarif"
-          output: "trivy-image-results.sarif"
+          format: "json"
+          output: "trivy-image-results.json"
           exit-code: 0
           scanners: "vuln,config,secret"
+
+      - name: Convert Trivy results to sarif
+        run: trivy convert --format sarif --output trivy-image-results.sarif trivy-image-results.json
+
+      - name: Convert Trivy results to cosign-vuln
+        run: trivy convert --format cosign-vuln --output ${{ env.PROJECT_NAME }}-vulnerabilities.json trivy-image-results.json
 
       - name: Upload trivy results as artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -237,16 +243,6 @@ jobs:
       #     exit-code: 1
       #     # On a subsequent call to the action we know trivy is already installed so can skip this
       #     skip-setup-trivy: true
-
-      - name: Generate cosign vulnerability scan record
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
-        env:
-          TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
-        with:
-          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{
-            env.CONTAINER_IMAGE_VERSION }}
-          format: "cosign-vuln"
-          output: "${{ env.PROJECT_NAME }}-vulnerabilities.json"
 
       - name: Upload cosign vulnerability scan record
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
