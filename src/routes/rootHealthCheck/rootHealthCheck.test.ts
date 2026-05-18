@@ -18,4 +18,12 @@ describe("Route / for Kubernetes Health Check", () => {
       fitConnectEnvironment: expect.any(String),
     });
   });
+
+  it("Returns gitCommitSHA when COMMIT_SHA is set", async () => {
+    process.env.COMMIT_SHA = "abc123";
+    const response = await app.request("/");
+    delete process.env.COMMIT_SHA;
+
+    expect(await response.json()).toEqual({ status: "ok", gitCommitSHA: "abc123" });
+  });
 });

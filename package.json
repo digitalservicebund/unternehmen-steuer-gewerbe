@@ -10,7 +10,7 @@
     "build": "tsc --noEmit && echo 'Type check passed. Use build:dev or build:prod to produce dist/'",
     "build:dev": "rm -rf dist && rolldown -c && mkdir -p dist/resources && cp -r src/resources/. dist/resources/",
     "build:prod": "pnpm build:dev && pnpm install --prod",
-    "build:image": "pnpm build:prod; docker build . --tag unternehmen-steuer-gewerbe; pnpm install",
+    "build:image": "pnpm build:prod; docker build . --tag unternehmen-steuer-gewerbe --build-arg COMMIT_SHA=$(git rev-parse HEAD); pnpm install",
     "format": "oxfmt --check",
     "format:fix": "oxfmt",
     "lint": "oxlint",
@@ -21,6 +21,7 @@
     "test": "op run --env-file .env -- vitest run",
     "test:load": "op run --env-file .env -- vitest run --config vitest.load.config.ts",
     "test:load:ci": "vitest run --config vitest.load.config.ts",
+    "test:smoke:ci": "vitest run --config vitest.smoke.config.ts",
     "test:coverage": "op run --env-file .env -- vitest run --coverage",
     "test:coverage:ci": "vitest run --coverage",
     "test:watch": "op run --env-file .env -- vitest"

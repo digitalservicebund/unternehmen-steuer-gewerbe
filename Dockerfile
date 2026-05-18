@@ -13,6 +13,8 @@ USER nonroot
 # bundled JS from `pnpm run build:dev` (rolldown)
 COPY ./dist .
 
+ARG COMMIT_SHA
+ENV COMMIT_SHA=$COMMIT_SHA
 ENV RESOURCES_DIR=/app/resources
 ENV LD_LIBRARY_PATH=/app/node_modules/unternehmen-steuer-gewerbe-privat/dist/ERiC-43.4.6.0/Linux-x86_64/lib
 
