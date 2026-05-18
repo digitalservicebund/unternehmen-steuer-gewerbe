@@ -22,7 +22,7 @@
     "test:load": "op run --env-file .env -- vitest run --config vitest.load.config.ts",
     "test:load:ci": "vitest run --config vitest.load.config.ts",
     "test:coverage": "op run --env-file .env -- vitest run --coverage",
-    "test:ci:coverage": "vitest run --coverage",
+    "test:coverage:ci": "vitest run --coverage",
     "test:watch": "op run --env-file .env -- vitest"
   },
   "dependencies": {
