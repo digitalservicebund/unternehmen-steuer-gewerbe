@@ -1,14 +1,8 @@
-FROM node:26.1.0-slim
-
-RUN groupadd -r nonroot \
-    && useradd -r -g nonroot nonroot \
-    && mkdir -p /app && chown -R nonroot:nonroot /app
+FROM cgr.dev/chainguard/node@sha256:a43b3727ec02182f0e8034a63a6643fa56086e18610859abc3968596a4d12582
 
 WORKDIR /app
 
 COPY node_modules ./node_modules
-
-USER nonroot
 
 # bundled JS from `pnpm run build:dev` (rolldown)
 COPY ./dist .
@@ -20,4 +14,4 @@ ENV LD_LIBRARY_PATH=/app/node_modules/unternehmen-steuer-gewerbe-privat/dist/ERi
 
 EXPOSE 3000
 
-CMD [ "node", "bundle.mjs" ]
+CMD [ "bundle.mjs" ]
