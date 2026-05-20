@@ -1,19 +1,31 @@
-According to [ADR 0001](./doc/adr/adr-0001-environments.md), there are two main environments that we deploy our service to in the infrastructure: 
-* `development` and 
-* `production`.
+According to [ADR 0001](./doc/adr/adr-0001-environments.md), there are two main environments that we deploy our service to in the infrastructure:
 
-However, if we include development, we also have:
+- `development` and
+- `production`.
 
-* `local development`
-* `GitHub actions`
-* `GitHub Dependabot`
+However, there are more places where our code is run:
 
-It may result in another ADR, but for now, let's collect what differences we want these environments to have:
+- `local development`
+- `GitHub actions`
+- `GitHub Dependabot`
 
-| Environment       | ELSTER_CERTIFICATE_BASE64 and _PIN    | ELSTER_CERTIFICATE_PIN |
-|-------------------|---------------------------------------|------------|
-| local development | Test Cert                    | Engineer   |
-| GH actions        | Test Cert                    | Designer   |
-| GH Dependabot     | Test Cert                    | Product Manager |
-| development       | Test Cert                    |            |
-| production        | Cert for Schneller Gründen   |            |
+The latter, however, do not differ from `development`.
+
+# Environment Variables
+
+Here's the configuration that's set through environment variables:
+
+- FIT_CONNECT_ENV=test
+- FIT_CONNECT_CLIENT_ID=6b267aff-...
+- FIT_CONNECT_DESTINATION_ID=fa63ede0-...
+- ERIC_HERSTELLERID=49420
+- FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK={...}
+
+# Secrets
+
+Here's the configuration that's set through environment secrets:
+
+- FIT_CONNECT_CLIENT_SECRET
+- FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK
+- ERIC_CERTIFICATE_BASE64
+- ERIC_CERTIFICATE_PIN
