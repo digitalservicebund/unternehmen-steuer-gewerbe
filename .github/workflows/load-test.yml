@@ -30,12 +30,12 @@ jobs:
       - name: Run load tests
         run: pnpm run test:load:ci
         env:
-          FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK: ${{ secrets.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK }}
+          FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK: ${{ vars.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK }}
           FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK: ${{ secrets.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK }}
           FIT_CONNECT_CLIENT_ID: ${{ vars.FIT_CONNECT_CLIENT_ID }}
           FIT_CONNECT_CLIENT_SECRET: ${{ secrets.FIT_CONNECT_CLIENT_SECRET }}
           FIT_CONNECT_DESTINATION_ID: ${{ vars.FIT_CONNECT_DESTINATION_ID }}
-          ERIC_HERSTELLERID: ${{ secrets.ERIC_HERSTELLERID }}
+          ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
 
       - name: Send failure to Slack
         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
