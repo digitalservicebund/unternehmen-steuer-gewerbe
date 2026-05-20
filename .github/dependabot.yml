@@ -27,7 +27,8 @@ updates:
       semver-major-days: 14
       semver-minor-days: 7
       semver-patch-days: 3
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "daily"
+  # Docker is handled by separate flow and a DigitalService action
+  # - package-ecosystem: "docker"
+  #   directory: "/"
+  #   schedule:
+  #     interval: "daily"
