@@ -272,9 +272,36 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
+  secret-scanning:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Install Trivy
+        env:
+          TRIVY_INSTALL_SCRIPT_SHA256: "e00df553be558995b994758bc8995956554a16937f456dc6615b0cc411bfec7a"
+        run: |
+          curl --proto '=https' --tlsv1.2 -sfLo trivy-install.sh https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh
+          echo "$TRIVY_INSTALL_SCRIPT_SHA256  trivy-install.sh" | sha256sum --check --status
+          sh trivy-install.sh -b /usr/local/bin
+
+      - name: Run Trivy secret scan
+        run: trivy fs --scanners secret --exit-code 1 .
+
+      - name: Send failure to Slack
+        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+        if: ${{ failure() && github.ref == 'refs/heads/main' }}
+        with:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
+
   deploy-development:
     name: Deploy to development environment
-    needs: [check-format-and-lint, test-and-scan-with-sonarcloud, build-and-push-image]
+    needs:
+      [check-format-and-lint, test-and-scan-with-sonarcloud, build-and-push-image, secret-scanning]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
