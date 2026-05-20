@@ -37,7 +37,7 @@
     "jose": "^6.2.3",
     "koffi": "^2.16.2",
     "saxonjs-he": "3.0.0-beta2",
-    "unternehmen-steuer-gewerbe-privat": "github:digitalservicebund/unternehmen-steuer-gewerbe-privat#099a7d0cca06f5cb5f8fff62bcc9749b68ee165f",
+    "unternehmen-steuer-gewerbe-privat": "github:digitalservicebund/unternehmen-steuer-gewerbe-privat#f8ca6ba752d85ab0ecdeeb44da60d0a1e7a2df38",
     "vite": "8.0.13",
     "xmllint-wasm": "^5.2.0",
     "zod": "^4.4.3"
