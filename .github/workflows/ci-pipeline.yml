@@ -279,7 +279,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to development
-        uses: digitalservicebund/argocd-deploy@6033da861398e0d7fcffe1b195f8d58f10b62c4e # auth-token branch
+        uses: digitalservicebund/argocd-deploy@d13e85a7c5d6ba7cfa3db5a1a254c328a281ba35
         with:
           environment: development/unternehmen-steuer-gewerbe
           version: ${{ github.sha }}
@@ -364,7 +364,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to production
-        uses: digitalservicebund/argocd-deploy@6033da861398e0d7fcffe1b195f8d58f10b62c4e # auth-token branch
+        uses: digitalservicebund/argocd-deploy@d13e85a7c5d6ba7cfa3db5a1a254c328a281ba35
         with:
           environment: production/unternehmen-steuer-gewerbe
           version: ${{ github.sha }}
