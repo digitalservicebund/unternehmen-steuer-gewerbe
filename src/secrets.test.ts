@@ -59,6 +59,23 @@ describe("getSecret", () => {
 
       expect(getSecret("TEST_SECRET")).toBe("file-value");
     });
+
+    it("falls back to process.env when the secret file does not exist", () => {
+      mockedReadFileSync.mockImplementation(() => {
+        throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
+      });
+      process.env.TEST_SECRET = "env-fallback-value";
+
+      expect(getSecret("TEST_SECRET")).toBe("env-fallback-value");
+    });
+
+    it("returns empty string when file is missing and env var is not set", () => {
+      mockedReadFileSync.mockImplementation(() => {
+        throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
+      });
+
+      expect(getSecret("TEST_SECRET")).toBe("");
+    });
   });
 
   describe("when SECRETS_FILE_PATH is not set", () => {
