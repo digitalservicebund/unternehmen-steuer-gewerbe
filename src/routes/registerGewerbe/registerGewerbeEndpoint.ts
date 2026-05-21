@@ -131,6 +131,11 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
             errorType: ErrorTypeSchema.enum.upstream_error,
             info: "Internal Server Error",
           },
+          fseÜbermittlung: {
+            success: false,
+            errorType: ErrorTypeSchema.enum.upstream_error,
+            info: "Internal Server Error",
+          },
         },
         500,
       );
