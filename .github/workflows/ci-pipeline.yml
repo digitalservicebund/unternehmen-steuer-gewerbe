@@ -127,7 +127,84 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
-  build-and-push-image:
+  build-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          fetch-depth: 1
+
+      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093
+        name: Install pnpm
+        with:
+          cache: true
+
+      - name: Configure git to use HTTPS for GitHub
+        run: git config --global url."https://x-access-token:${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}@github.com/".insteadOf "git@github.com:"
+
+      - name: Install dependencies
+        run: pnpm install --ignore-scripts
+
+      - name: Build project and docker image
+        run: pnpm build:image
+
+      - name: Run Trivy vulnerability image scanner
+        # Note: Results are shown in the GitHub Security tab
+        #       cf. step "Upload Trivy scan results to GitHub Security tab"
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+        env:
+          TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
+          TRIVY_SKIP_FILES: "**/generated.spezifikation.sef.json"
+          TRIVY_SEVERITY: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+          TRIVY_JAVA_DB_REPOSITORY: ""
+          TRIVY_SKIP_UPDATE: "true"
+        with:
+          image-ref: unternehmen-steuer-gewerbe
+          format: "json"
+          output: "trivy-image-results.json"
+          exit-code: 0
+          scanners: "vuln,config,secret"
+
+      - name: Convert Trivy results to sarif
+        run: trivy convert --format sarif --output trivy-image-results.sarif trivy-image-results.json
+
+      - name: Convert Trivy results to cosign-vuln
+        run: trivy convert --format cosign-vuln --output ${{ env.PROJECT_NAME }}-vulnerabilities.json trivy-image-results.json
+
+      - name: Upload trivy results as artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: backend-trivy-image-results.sarif
+          retention-days: 3
+          path: trivy-image-results.sarif
+          if-no-files-found: error
+
+      - name: Print trivy results (sarif format)
+        run: cat trivy-image-results.sarif
+
+      - name: Upload cosign vulnerability scan record
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: "${{ env.PROJECT_NAME }}-vulnerabilities.json"
+          path: "${{ env.PROJECT_NAME }}-vulnerabilities.json"
+          if-no-files-found: error
+
+      - name: Send failure to Slack
+        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+        if: ${{ failure() && github.ref == 'refs/heads/main' }}
+        with:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
+
+  publish-image:
+    name: Publish image to registry
+    needs: [check-format-and-lint, test-and-scan-with-sonarcloud, build-image, secret-scanning]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -157,51 +234,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build project and docker image
+      - name: Build and push Docker image
         run: pnpm build:image
         env:
           IMAGE_TAG: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
-
-      - name: Run Trivy vulnerability image scanner
-        # Note: Results are shown in the GitHub Security tab
-        #       cf. step "Upload Trivy scan results to GitHub Security tab"
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
-        env:
-          TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
-          TRIVY_SKIP_FILES: "**/generated.spezifikation.sef.json"
-          TRIVY_SEVERITY: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
-          TRIVY_JAVA_DB_REPOSITORY: ""
-          TRIVY_SKIP_UPDATE: "true"
-        with:
-          # image-ref: ${{ inputs.image-ref }}
-          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{
-            env.CONTAINER_IMAGE_VERSION }}
-          format: "json"
-          output: "trivy-image-results.json"
-          exit-code: 0
-          scanners: "vuln,config,secret"
-
-      - name: Convert Trivy results to sarif
-        run: trivy convert --format sarif --output trivy-image-results.sarif trivy-image-results.json
-
-      - name: Convert Trivy results to cosign-vuln
-        run: trivy convert --format cosign-vuln --output ${{ env.PROJECT_NAME }}-vulnerabilities.json trivy-image-results.json
-
-      - name: Upload trivy results as artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: backend-trivy-image-results.sarif
-          retention-days: 3
-          path: trivy-image-results.sarif
-          if-no-files-found: error
-
-      - name: Print trivy results (sarif format)
-        run: cat trivy-image-results.sarif
-
-      - name: Push Docker image to GitHub Container Registry
-        run: docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
 
       - name: Confirm image package visibility is private
         env:
@@ -214,42 +250,10 @@ jobs:
           fi
           echo "Package visibility confirmed: private"
 
-      # disabled as we don't have "advanced security" available, being a private repository
-      # - name: Upload Trivy scan results to GitHub Security tab (on `main`)
-      #   uses: github/codeql-action/upload-sarif@v4
-      #   # only on `main`
-      #   if: ${{ github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
-      #   with:
-      #     sarif_file: "trivy-image-results.sarif"
-
-      # disabled as we don't have "advanced security" available
-      # - name: Fail build on High/Criticial Vulnerabilities (on branches)
-      #   # ignore on `main`
-      #   if: ${{ github.ref != 'refs/heads/main' }}
-      #   uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
-      #   env:
-      #     TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
-      #     TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
-      #     TRIVY_FORMAT: table
-      #     TRIVY_SEVERITY: HIGH,CRITICAL
-      #     TRIVY_EXIT_CODE: 1
-      #   with:
-      #     # image-ref: ${{ inputs.image-ref }}
-      #     image-ref: unternehmen-steuer-gewerbe
-      #     # following three are ignored unfortunately -> therefore using ENV vars directly
-      #     # https://github.com/aquasecurity/trivy-action/issues/435
-      #     format: table
-      #     severity: HIGH,CRITICAL
-      #     exit-code: 1
-      #     # On a subsequent call to the action we know trivy is already installed so can skip this
-      #     skip-setup-trivy: true
-
-      - name: Upload cosign vulnerability scan record
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - name: Download cosign vulnerability scan record
+        uses: actions/download-artifact@v4
         with:
           name: "${{ env.PROJECT_NAME }}-vulnerabilities.json"
-          path: "${{ env.PROJECT_NAME }}-vulnerabilities.json"
-          if-no-files-found: error
 
       - name: Install cosign
         uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6
@@ -257,13 +261,10 @@ jobs:
           cosign-release: "v2.6.0" # We need this, because the kyverno policy that is validating the signature is not yet compatible with the newer version of cosign. Cosign switch the bundle format in version 3.
 
       - name: Sign the published Docker image
-        run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{
-          env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+        run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
 
       - name: Attest the vulnerability scan
-        run: cosign attest --yes --replace --predicate ${{ env.PROJECT_NAME
-          }}-vulnerabilities.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{
-          env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+        run: cosign attest --yes --replace --predicate ${{ env.PROJECT_NAME }}-vulnerabilities.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
 
       - name: Send failure to Slack
         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
@@ -300,8 +301,7 @@ jobs:
 
   deploy-development:
     name: Deploy to development environment
-    needs:
-      [check-format-and-lint, test-and-scan-with-sonarcloud, build-and-push-image, secret-scanning]
+    needs: [publish-image]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -428,6 +428,7 @@ jobs:
     needs:
       - check-format-and-lint
       - test-and-scan-with-sonarcloud
+      - build-image
       - secret-scanning
     if: ${{ github.event_name != 'schedule' && success() && github.actor ==
       'dependabot[bot]' && !cancelled() && github.ref != 'refs/heads/main' &&
