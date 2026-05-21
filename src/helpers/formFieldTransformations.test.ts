@@ -6,40 +6,19 @@ import {
 } from "./formFieldTransformations";
 
 describe("splitStrasseHausnummer", () => {
-  it("splits a simple street and number", () => {
-    expect(splitStrasseHausnummer("Musterstraße 1")).toEqual({
-      strasse: "Musterstraße",
-      hausnummer: "1",
-    });
-  });
-
-  it("splits a hausnummer with a letter suffix", () => {
-    expect(splitStrasseHausnummer("Betriebsweg 42a")).toEqual({
-      strasse: "Betriebsweg",
-      hausnummer: "42a",
-    });
-  });
-
-  it("splits a multi-word street name", () => {
-    expect(splitStrasseHausnummer("Am Stadtpark 5")).toEqual({
-      strasse: "Am Stadtpark",
-      hausnummer: "5",
-    });
-  });
-
-  it("splits a hausnummer range into hausnummer and hausnummerBis", () => {
-    expect(splitStrasseHausnummer("Prinzessinnenstraße 8-14")).toEqual({
-      strasse: "Prinzessinnenstraße",
-      hausnummer: "8",
-      hausnummerBis: "14",
-    });
-  });
-
-  it("splits a hausnummer range with spaces around the hyphen", () => {
-    expect(splitStrasseHausnummer("Teststr. 4 - 44")).toEqual({
-      strasse: "Teststr.",
-      hausnummer: "4",
-      hausnummerBis: "44",
+  it.each([
+    ["Musterstraße 1", "Musterstraße", "1", undefined],
+    ["Betriebsweg 42a", "Betriebsweg", "42a", undefined],
+    ["Am Stadtpark 5", "Am Stadtpark", "5", undefined],
+    ["Prinzessinnenstraße 8-14", "Prinzessinnenstraße", "8", "14"],
+    ["straße des 17 juni 135", "straße des 17 juni", "135", undefined],
+    ["straße des 17 juni 1 2/5 b", "straße des 17 juni", "1 2/5 b", undefined],
+    ["Teststr. 4 - 44", "Teststr.", "4", "44"],
+  ])("splits '%s' correctly", (input, strasse, hausnummer, hausnummerBis) => {
+    expect(splitStrasseHausnummer(input)).toEqual({
+      strasse,
+      hausnummer,
+      hausnummerBis,
     });
   });
 
