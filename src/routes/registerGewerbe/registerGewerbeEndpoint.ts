@@ -105,7 +105,14 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
       ]);
 
       return c.json(
-        { gewerbeanmeldung, steuernummer },
+        {
+          gewerbeanmeldung,
+          steuernummer,
+          fseÜbermittlung: {
+            success: steuernummer.success,
+            submissionId: steuernummer.submissionId,
+          },
+        },
         determineHttpStatus(gewerbeanmeldung, steuernummer),
       );
     } catch (error) {
