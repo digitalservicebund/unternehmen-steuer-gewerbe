@@ -9,6 +9,8 @@ eric.log
 
 .claude
 
+ignored
+
 # Logs
 logs
 *.log
