@@ -173,6 +173,35 @@ jobs:
       - name: Convert Trivy results to sarif
         run: trivy convert --format sarif --output trivy-image-results.sarif trivy-image-results.json
 
+      # disabled as we don't have "advanced security" available, being a private repository
+      # - name: Upload Trivy scan results to GitHub Security tab (on `main`)
+      #   uses: github/codeql-action/upload-sarif@v4
+      #   # only on `main`
+      #   if: ${{ github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
+      #   with:
+      #     sarif_file: "trivy-image-results.sarif"
+
+      # disabled as we don't have "advanced security" available
+      # - name: Fail build on High/Criticial Vulnerabilities (on branches)
+      #   # ignore on `main`
+      #   if: ${{ github.ref != 'refs/heads/main' }}
+      #   uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+      #   env:
+      #     TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
+      #     TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
+      #     TRIVY_FORMAT: table
+      #     TRIVY_SEVERITY: HIGH,CRITICAL
+      #     TRIVY_EXIT_CODE: 1
+      #   with:
+      #     image-ref: unternehmen-steuer-gewerbe
+      #     # following three are ignored unfortunately -> therefore using ENV vars directly
+      #     # https://github.com/aquasecurity/trivy-action/issues/435
+      #     format: table
+      #     severity: HIGH,CRITICAL
+      #     exit-code: 1
+      #     # On a subsequent call to the action we know trivy is already installed so can skip this
+      #     skip-setup-trivy: true
+
       - name: Convert Trivy results to cosign-vuln
         run: trivy convert --format cosign-vuln --output ${{ env.PROJECT_NAME }}-vulnerabilities.json trivy-image-results.json
 
