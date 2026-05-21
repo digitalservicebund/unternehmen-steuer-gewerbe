@@ -35,6 +35,20 @@ describe("splitStrasseHausnummer", () => {
     });
   });
 
+  it("splits 'straße des 17 juni 135' correctly", () => {
+    expect(splitStrasseHausnummer("straße des 17 juni 135")).toEqual({
+      strasse: "straße des 17 juni",
+      hausnummer: "135",
+    });
+  });
+
+  it("splits 'straße des 17 juni 1 2/5 b' correctly", () => {
+    expect(splitStrasseHausnummer("straße des 17 juni 1 2/5 b")).toEqual({
+      strasse: "straße des 17 juni",
+      hausnummer: "1 2/5 b",
+    });
+  });
+
   it("splits a hausnummer range with spaces around the hyphen", () => {
     expect(splitStrasseHausnummer("Teststr. 4 - 44")).toEqual({
       strasse: "Teststr.",
