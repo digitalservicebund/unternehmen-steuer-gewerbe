@@ -127,11 +127,12 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
-  build-and-push-image:
+  build-and-publish-image:
+    name: Build image and - on main, only - publish to registry
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write # Required for identity challenge with sigstore/fulcio
+      id-token: write # Required for cosign to authenticate when signing the image
       packages: write
     steps:
       - name: Checkout
@@ -150,17 +151,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --ignore-scripts
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
-        with:
-          registry: ${{ env.CONTAINER_REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build project and docker image
-        run: |
-          pnpm build:prod
-          docker build . --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }} --build-arg COMMIT_SHA=${{ github.sha }}
+        run: pnpm build:image
 
       - name: Run Trivy vulnerability image scanner
         # Note: Results are shown in the GitHub Security tab
@@ -175,9 +167,7 @@ jobs:
           TRIVY_JAVA_DB_REPOSITORY: ""
           TRIVY_SKIP_UPDATE: "true"
         with:
-          # image-ref: ${{ inputs.image-ref }}
-          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{
-            env.CONTAINER_IMAGE_VERSION }}
+          image-ref: unternehmen-steuer-gewerbe
           format: "json"
           output: "trivy-image-results.json"
           exit-code: 0
@@ -185,34 +175,6 @@ jobs:
 
       - name: Convert Trivy results to sarif
         run: trivy convert --format sarif --output trivy-image-results.sarif trivy-image-results.json
-
-      - name: Convert Trivy results to cosign-vuln
-        run: trivy convert --format cosign-vuln --output ${{ env.PROJECT_NAME }}-vulnerabilities.json trivy-image-results.json
-
-      - name: Upload trivy results as artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: backend-trivy-image-results.sarif
-          retention-days: 3
-          path: trivy-image-results.sarif
-          if-no-files-found: error
-
-      - name: Print trivy results (sarif format)
-        run: cat trivy-image-results.sarif
-
-      - name: Push Docker image to GitHub Container Registry
-        run: docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
-
-      - name: Confirm image package visibility is private
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          VISIBILITY=$(gh api /orgs/${{ github.repository_owner }}/packages/container/${{ env.PROJECT_NAME }} --jq '.visibility')
-          if [ "$VISIBILITY" != "private" ]; then
-            echo "ERROR: Package visibility is '$VISIBILITY', expected 'private'."
-            exit 1
-          fi
-          echo "Package visibility confirmed: private"
 
       # disabled as we don't have "advanced security" available, being a private repository
       # - name: Upload Trivy scan results to GitHub Security tab (on `main`)
@@ -234,7 +196,6 @@ jobs:
       #     TRIVY_SEVERITY: HIGH,CRITICAL
       #     TRIVY_EXIT_CODE: 1
       #   with:
-      #     # image-ref: ${{ inputs.image-ref }}
       #     image-ref: unternehmen-steuer-gewerbe
       #     # following three are ignored unfortunately -> therefore using ENV vars directly
       #     # https://github.com/aquasecurity/trivy-action/issues/435
@@ -244,26 +205,59 @@ jobs:
       #     # On a subsequent call to the action we know trivy is already installed so can skip this
       #     skip-setup-trivy: true
 
-      - name: Upload cosign vulnerability scan record
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - name: Convert Trivy results to cosign-vuln
+        run: trivy convert --format cosign-vuln --output ${{ env.PROJECT_NAME }}-vulnerabilities.json trivy-image-results.json
+
+      - name: Upload trivy results as artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: "${{ env.PROJECT_NAME }}-vulnerabilities.json"
-          path: "${{ env.PROJECT_NAME }}-vulnerabilities.json"
+          name: backend-trivy-image-results.sarif
+          retention-days: 3
+          path: trivy-image-results.sarif
           if-no-files-found: error
 
+      - name: Print trivy results (sarif format)
+        run: cat trivy-image-results.sarif
+
+      - name: Login to GitHub Container Registry
+        if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
+        with:
+          registry: ${{ env.CONTAINER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag and push Docker image
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker tag unternehmen-steuer-gewerbe ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+          docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+
+      - name: Confirm image package visibility is private
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VISIBILITY=$(gh api /orgs/${{ github.repository_owner }}/packages/container/${{ env.PROJECT_NAME }} --jq '.visibility')
+          if [ "$VISIBILITY" != "private" ]; then
+            echo "ERROR: Package visibility is '$VISIBILITY', expected 'private'."
+            exit 1
+          fi
+          echo "Package visibility confirmed: private"
+
       - name: Install cosign
+        if: github.ref == 'refs/heads/main'
         uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6
         with:
           cosign-release: "v2.6.0" # We need this, because the kyverno policy that is validating the signature is not yet compatible with the newer version of cosign. Cosign switch the bundle format in version 3.
 
       - name: Sign the published Docker image
-        run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{
-          env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+        if: github.ref == 'refs/heads/main'
+        run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
 
       - name: Attest the vulnerability scan
-        run: cosign attest --yes --replace --predicate ${{ env.PROJECT_NAME
-          }}-vulnerabilities.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{
-          env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+        if: github.ref == 'refs/heads/main'
+        run: cosign attest --yes --replace --predicate ${{ env.PROJECT_NAME }}-vulnerabilities.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
 
       - name: Send failure to Slack
         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
@@ -300,8 +294,7 @@ jobs:
 
   deploy-development:
     name: Deploy to development environment
-    needs:
-      [check-format-and-lint, test-and-scan-with-sonarcloud, build-and-push-image, secret-scanning]
+    needs: [build-and-publish-image]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -428,6 +421,8 @@ jobs:
     needs:
       - check-format-and-lint
       - test-and-scan-with-sonarcloud
+      - build-and-publish-image
+      - secret-scanning
     if: ${{ github.event_name != 'schedule' && success() && github.actor ==
       'dependabot[bot]' && !cancelled() && github.ref != 'refs/heads/main' &&
       github.repository == 'digitalservicebund/unternehmen-steuer-gewerbe'}}
