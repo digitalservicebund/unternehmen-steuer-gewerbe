@@ -21,7 +21,7 @@
     "test": "op run --env-file .env -- vitest run",
     "test:load": "op run --env-file .env -- vitest run --config vitest.load.config.ts",
     "test:load:ci": "vitest run --config vitest.load.config.ts",
-    "test:contract": "op run --env-file .env -- sh -c 'NODE_TLS_REJECT_UNAUTHORIZED=0 vitest run --config vitest.contract.config.ts'",
+    "test:contract": "op run --env-file .env -- sh -c 'NODE_EXTRA_CA_CERTS=akdb-ca.pem vitest run --config vitest.contract.config.ts'",
     "test:smoke:ci": "vitest run --config vitest.smoke.config.ts",
     "test:coverage": "op run --env-file .env -- vitest run --coverage",
     "test:coverage:ci": "vitest run --coverage",
