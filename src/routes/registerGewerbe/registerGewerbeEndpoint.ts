@@ -111,6 +111,7 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
           fseÜbermittlung: {
             success: steuernummer.success,
             submissionId: steuernummer.submissionId,
+            errorType: steuernummer.errorType,
           },
         },
         determineHttpStatus(gewerbeanmeldung, steuernummer),
