@@ -105,7 +105,15 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
       ]);
 
       return c.json(
-        { gewerbeanmeldung, steuernummer },
+        {
+          gewerbeanmeldung,
+          steuernummer,
+          fseÜbermittlung: {
+            success: steuernummer.success,
+            submissionId: steuernummer.submissionId,
+            errorType: steuernummer.errorType,
+          },
+        },
         determineHttpStatus(gewerbeanmeldung, steuernummer),
       );
     } catch (error) {
@@ -119,6 +127,11 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
             info: "Internal Server Error",
           },
           steuernummer: {
+            success: false,
+            errorType: ErrorTypeSchema.enum.upstream_error,
+            info: "Internal Server Error",
+          },
+          fseÜbermittlung: {
             success: false,
             errorType: ErrorTypeSchema.enum.upstream_error,
             info: "Internal Server Error",

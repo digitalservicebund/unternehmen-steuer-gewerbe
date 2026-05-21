@@ -39,6 +39,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(json.gewerbeanmeldung.success).toBe(false);
       expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
       expect(json.steuernummer.success).toBe(true);
+      expect(json.fseÜbermittlung.success).toBe(true);
     });
 
     it("Returns 207 MULTI-STATUS with gewerbeanmeldung validation_error when XML creation throws, steuernummer still succeeds", async () => {
@@ -52,6 +53,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(json.gewerbeanmeldung.success).toBe(false);
       expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
       expect(json.steuernummer.success).toBe(true);
+      expect(json.fseÜbermittlung.success).toBe(true);
     });
 
     it("Returns 207 MULTI-STATUS with steuernummer upstream_error when ERiC service is unavailable, gewerbeanmeldung still succeeds", async () => {
@@ -66,6 +68,8 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(response.status).toEqual(HttpStatusCode.MultiStatus);
       expect(json.steuernummer.success).toBe(false);
       expect(json.steuernummer.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
+      expect(json.fseÜbermittlung.success).toBe(false);
+      expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
       expect(json.gewerbeanmeldung.success).toBe(true);
       expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
     });
@@ -82,6 +86,8 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(response.status).toEqual(HttpStatusCode.MultiStatus);
       expect(json.steuernummer.success).toBe(false);
       expect(json.steuernummer.errorType).toBe(ErrorTypeSchema.enum.validation_error);
+      expect(json.fseÜbermittlung.success).toBe(false);
+      expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
       expect(json.gewerbeanmeldung.success).toBe(true);
       expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
     });
@@ -105,6 +111,8 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
       expect(json.steuernummer.success).toBe(false);
       expect(json.steuernummer.errorType).toBe(ErrorTypeSchema.enum.validation_error);
+      expect(json.fseÜbermittlung.success).toBe(false);
+      expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
     });
 
     it("Returns 500 INTERNAL SERVER ERROR when both submissions fail", async () => {
@@ -122,6 +130,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(response.status).toEqual(HttpStatusCode.InternalServerError);
       expect(json.gewerbeanmeldung.success).toBe(false);
       expect(json.steuernummer.success).toBe(false);
+      expect(json.fseÜbermittlung.success).toBe(false);
     });
   });
 });
