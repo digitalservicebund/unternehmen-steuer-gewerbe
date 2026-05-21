@@ -127,10 +127,13 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
-  build-image:
+  build-and-publish-image:
+    name: Build image and - on main, only - publish to registry
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: write # Required for cosign to authenticate when signing the image
+      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -216,59 +219,22 @@ jobs:
       - name: Print trivy results (sarif format)
         run: cat trivy-image-results.sarif
 
-      - name: Upload cosign vulnerability scan record
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: "${{ env.PROJECT_NAME }}-vulnerabilities.json"
-          path: "${{ env.PROJECT_NAME }}-vulnerabilities.json"
-          if-no-files-found: error
-
-      - name: Send failure to Slack
-        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
-
-  publish-image:
-    name: Publish image to registry
-    needs: [check-format-and-lint, test-and-scan-with-sonarcloud, build-image, secret-scanning]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write # Required for identity challenge with sigstore/fulcio
-      packages: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          fetch-depth: 1
-
-      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093
-        name: Install pnpm
-        with:
-          cache: true
-
-      - name: Configure git to use HTTPS for GitHub
-        run: git config --global url."https://x-access-token:${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}@github.com/".insteadOf "git@github.com:"
-
-      - name: Install dependencies
-        run: pnpm install --ignore-scripts
-
       - name: Login to GitHub Container Registry
+        if: github.ref == 'refs/heads/main'
         uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
-        run: pnpm build:image
-        env:
-          IMAGE_TAG: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+      - name: Tag and push Docker image
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker tag unternehmen-steuer-gewerbe ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+          docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
 
       - name: Confirm image package visibility is private
+        if: github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -279,20 +245,18 @@ jobs:
           fi
           echo "Package visibility confirmed: private"
 
-      - name: Download cosign vulnerability scan record
-        uses: actions/download-artifact@v4
-        with:
-          name: "${{ env.PROJECT_NAME }}-vulnerabilities.json"
-
       - name: Install cosign
+        if: github.ref == 'refs/heads/main'
         uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6
         with:
           cosign-release: "v2.6.0" # We need this, because the kyverno policy that is validating the signature is not yet compatible with the newer version of cosign. Cosign switch the bundle format in version 3.
 
       - name: Sign the published Docker image
+        if: github.ref == 'refs/heads/main'
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
 
       - name: Attest the vulnerability scan
+        if: github.ref == 'refs/heads/main'
         run: cosign attest --yes --replace --predicate ${{ env.PROJECT_NAME }}-vulnerabilities.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
 
       - name: Send failure to Slack
@@ -330,7 +294,7 @@ jobs:
 
   deploy-development:
     name: Deploy to development environment
-    needs: [publish-image]
+    needs: [build-and-publish-image]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -457,7 +421,7 @@ jobs:
     needs:
       - check-format-and-lint
       - test-and-scan-with-sonarcloud
-      - build-image
+      - build-and-publish-image
       - secret-scanning
     if: ${{ github.event_name != 'schedule' && success() && github.actor ==
       'dependabot[bot]' && !cancelled() && github.ref != 'refs/heads/main' &&
