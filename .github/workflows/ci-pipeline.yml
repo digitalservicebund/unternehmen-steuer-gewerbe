@@ -38,10 +38,11 @@ jobs:
         with:
           cache: true
 
+      - name: Configure git to use HTTPS for GitHub
+        run: git config --global url."https://x-access-token:${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}@github.com/".insteadOf "git@github.com:"
+
       - name: Install dependencies
         run: pnpm install --ignore-scripts
-        env:
-          GITHUB_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
       - name: Check format
         run: pnpm run format
@@ -73,10 +74,11 @@ jobs:
         with:
           cache: true
 
+      - name: Configure git to use HTTPS for GitHub
+        run: git config --global url."https://x-access-token:${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}@github.com/".insteadOf "git@github.com:"
+
       - name: Install dependencies
         run: pnpm install --ignore-scripts
-        env:
-          GITHUB_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
       ##################################
       # Tests run here
@@ -142,10 +144,11 @@ jobs:
         with:
           cache: true
 
+      - name: Configure git to use HTTPS for GitHub
+        run: git config --global url."https://x-access-token:${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}@github.com/".insteadOf "git@github.com:"
+
       - name: Install dependencies
         run: pnpm install --ignore-scripts
-        env:
-          GITHUB_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
@@ -357,10 +360,11 @@ jobs:
         with:
           cache: true
 
+      - name: Configure git to use HTTPS for GitHub
+        run: git config --global url."https://x-access-token:${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}@github.com/".insteadOf "git@github.com:"
+
       - name: Install dependencies
         run: pnpm install --ignore-scripts
-        env:
-          GITHUB_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
       - name: Run smoke tests against development
         run: pnpm run test:smoke:ci
