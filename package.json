@@ -15,7 +15,7 @@
     "format:fix": "oxfmt",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
-    "start": "op run --env-file .env -- ts-node src/index.ts",
+    "start": "op run --env-file .env -- tsx src/index.ts",
     "start:image": "op run --env-file .env -- docker run -p 3000:3000 -e ERIC_HERSTELLERID -e FIT_CONNECT_ENV -e FIT_CONNECT_CLIENT_ID -e FIT_CONNECT_CLIENT_SECRET -e FIT_CONNECT_DESTINATION_ID -e FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK -e FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK unternehmen-steuer-gewerbe",
     "start:watch": "op run --env-file .env -- nodemon --watch . --ignore dist --ext ts,json,yml,md --exec pnpm run start",
     "test": "op run --env-file .env -- vitest run",
@@ -52,7 +52,7 @@
     "oxfmt": "^0.49.0",
     "oxlint": "^1.64.0",
     "rolldown": "^1.0.1",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.22.3",
     "typescript": "^6.0.3",
     "vitest": "^4.1.5",
     "xslt3-he": "3.0.0-beta2"
