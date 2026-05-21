@@ -428,6 +428,7 @@ jobs:
     needs:
       - check-format-and-lint
       - test-and-scan-with-sonarcloud
+      - secret-scanning
     if: ${{ github.event_name != 'schedule' && success() && github.actor ==
       'dependabot[bot]' && !cancelled() && github.ref != 'refs/heads/main' &&
       github.repository == 'digitalservicebund/unternehmen-steuer-gewerbe'}}
