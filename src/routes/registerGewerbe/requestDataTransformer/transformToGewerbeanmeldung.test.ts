@@ -59,4 +59,19 @@ describe("transformToGewerbeanmeldung", () => {
       ort: "Gewerbestadt",
     });
   });
+
+  it("uses AGS (Amtlicher Gemeindeschlüssel) 110000000000 if ZIP is 10969", () => {
+    const result = transformToGewerbeanmeldung({
+      ...registerGewerbeCompleteRequest,
+      unternehmensDaten: {
+        ...registerGewerbeCompleteRequest.unternehmensDaten,
+        adresseAbweichend: {
+          ...registerGewerbeCompleteRequest.unternehmensDaten.adresseAbweichend!,
+          postleitzahl: "10969",
+        },
+      },
+    });
+
+    expect(result.gemeindeSchluessel).toBe("110000000000");
+  });
 });
