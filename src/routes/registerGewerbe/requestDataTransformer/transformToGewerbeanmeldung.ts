@@ -20,14 +20,16 @@ export async function transformToGewerbeanmeldung(
 
   const gemeindeSchluessel = await getAgsFromRegisterGewerbeRequestData(data);
 
+  const autorKennung = `MELDID:${gemeindeSchluessel}`;
+
   return {
     nachrichtenkopf: {
       nachrichtenUUID: randomUUID(),
       erstellungszeitpunkt: new Date().toISOString(),
       leser: { kennung: "xga:000000000001", name: "Gewerbeamt Muster" },
-      autor: { kennung: "MELDID:00000000", name: "Schneller Gruenden OSS" },
+      autor: { kennung: autorKennung, name: "Schneller Gruenden OSS" },
     },
-    autor: { kennung: "MELDID:00000000", name: "Schneller Gruenden OSS" },
+    autor: { kennung: autorKennung, name: "Schneller Gruenden OSS" },
     satzErstellung: new Date().toISOString(),
     ereigniszeitpunkt: new Date().toISOString(),
     istStorno: false,
