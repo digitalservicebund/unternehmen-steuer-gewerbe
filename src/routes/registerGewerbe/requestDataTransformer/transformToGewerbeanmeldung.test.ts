@@ -60,7 +60,7 @@ describe("transformToGewerbeanmeldung", () => {
     });
   });
 
-  it("uses AGS (Amtlicher Gemeindeschlüssel) 110000000000 if ZIP is 10969", () => {
+  it("returns AGS (Amtlicher Gemeindeschlüssel) 110000000000 if ZIP is 10969", () => {
     const result = transformToGewerbeanmeldung({
       ...registerGewerbeCompleteRequest,
       unternehmensDaten: {
