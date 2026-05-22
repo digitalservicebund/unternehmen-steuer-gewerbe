@@ -8,4 +8,8 @@ describe("PVOG client", () => {
     expect(result.ags).toBe("08421000");
     expect(result.ars).toBe("084210000000");
   });
+
+  it("should throw if nothing was found for ZIP 00000", async () => {
+    await expect(getAGSandARS("00000")).rejects.toThrow("No location found for zip code 00000");
+  });
 });
