@@ -32,8 +32,8 @@ describe("transformToGewerbeanmeldung", () => {
     expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
       strasse: "Musterstraße",
       hausnummerVon: "1",
-      postleitzahl: "12345",
-      ort: "Musterstadt",
+      postleitzahl: "03046",
+      ort: "Cottbus",
     });
     expect(person.geschlecht).toBe("x");
     expect(person.name!.geburtsname).toBeUndefined();
