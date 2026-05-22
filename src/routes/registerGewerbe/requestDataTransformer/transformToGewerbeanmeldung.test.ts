@@ -4,7 +4,7 @@ import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { registerGewerbeCompleteRequest } from "../testHelpers";
 
 describe("transformToGewerbeanmeldung", () => {
-  it("maps default values, applies the geschlecht fallback if the geschlecht is not given and drops optional fields", () => {
+  it("maps default values, applies the geschlecht fallback if the geschlecht is not given and drops optional fields", async () => {
     const request: RegisterGewerbeRequest = {
       ...registerGewerbeCompleteRequest,
       persönlicheDaten: {
@@ -19,7 +19,7 @@ describe("transformToGewerbeanmeldung", () => {
         adresseAbweichend: undefined,
       },
     };
-    const result = transformToGewerbeanmeldung(request);
+    const result = await transformToGewerbeanmeldung(request);
     const person = result.referenzierteSubjekte!.natuerlichePerson![0]!;
 
     expect(result.gewerbebetrieb!.istNebenerwerb).toBe(false);
@@ -39,8 +39,8 @@ describe("transformToGewerbeanmeldung", () => {
     expect(person.name!.geburtsname).toBeUndefined();
   });
 
-  it("uses adresseAbweichend as betriebsstaette anschrift when provided", () => {
-    const result = transformToGewerbeanmeldung({
+  it("uses adresseAbweichend as betriebsstaette anschrift when provided", async () => {
+    const result = await transformToGewerbeanmeldung({
       ...registerGewerbeCompleteRequest,
       unternehmensDaten: {
         ...registerGewerbeCompleteRequest.unternehmensDaten,
@@ -60,8 +60,8 @@ describe("transformToGewerbeanmeldung", () => {
     });
   });
 
-  it("returns AGS (Amtlicher Gemeindeschlüssel) 110000000000 if ZIP is 10969", () => {
-    const result = transformToGewerbeanmeldung({
+  it("returns AGS (Amtlicher Gemeindeschlüssel) 11000000 if company ZIP is 10969", async () => {
+    const result = await transformToGewerbeanmeldung({
       ...registerGewerbeCompleteRequest,
       unternehmensDaten: {
         ...registerGewerbeCompleteRequest.unternehmensDaten,
@@ -72,6 +72,6 @@ describe("transformToGewerbeanmeldung", () => {
       },
     });
 
-    expect(result.gemeindeSchluessel).toBe("110000000000");
+    expect(result.gemeindeSchluessel).toBe("11000000");
   });
 });

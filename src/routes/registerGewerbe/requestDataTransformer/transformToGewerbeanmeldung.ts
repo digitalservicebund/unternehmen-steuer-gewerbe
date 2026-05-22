@@ -2,12 +2,13 @@ import { randomUUID } from "node:crypto";
 import { type CreateGewerbeanmeldungXmlData } from "../../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { splitStrasseHausnummer } from "../../../helpers/formFieldTransformations";
+import { getAGSandARS } from "../../../clients/pvogClient/pvogClient";
 
 // Transforms a RegisterGewerbeRequest into a complete Gewerbeanmeldung structure.
 // NOTE: several values are hardcoded placeholders and will be generated / fetched from other sources later.
-export function transformToGewerbeanmeldung(
+export async function transformToGewerbeanmeldung(
   data: RegisterGewerbeRequest,
-): CreateGewerbeanmeldungXmlData {
+): Promise<CreateGewerbeanmeldungXmlData> {
   const adresseAbweichend = data.unternehmensDaten.adresseAbweichend;
 
   const betriebsStrasseHausnummer = splitStrasseHausnummer(
@@ -16,6 +17,11 @@ export function transformToGewerbeanmeldung(
   const personStrasseHausnummer = splitStrasseHausnummer(
     data.persönlicheDaten.adresse.strasseUndHausnummer,
   );
+
+  // TODO: which zip to use? The person's or the company's? Or one over the other?
+  const gemeindeSchluessel = data.unternehmensDaten.adresseAbweichend?.postleitzahl
+    ? (await getAGSandARS(data.unternehmensDaten.adresseAbweichend?.postleitzahl)).ags
+    : "00000000";
 
   return {
     nachrichtenkopf: {
@@ -28,7 +34,7 @@ export function transformToGewerbeanmeldung(
     satzErstellung: new Date().toISOString(),
     ereigniszeitpunkt: new Date().toISOString(),
     istStorno: false,
-    gemeindeSchluessel: "00000000",
+    gemeindeSchluessel,
     uuid: randomUUID(),
     gueltigAb: data.unternehmensDaten.tätigkeitsbeginn,
     datumMeldung: new Date().toISOString().split("T")[0]!,
