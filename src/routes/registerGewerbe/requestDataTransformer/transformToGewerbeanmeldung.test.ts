@@ -60,18 +60,39 @@ describe("transformToGewerbeanmeldung", () => {
     });
   });
 
-  it("returns AGS (Amtlicher Gemeindeschlüssel) 11000000 if company ZIP is 10969", async () => {
-    const result = await transformToGewerbeanmeldung({
-      ...registerGewerbeCompleteRequest,
-      unternehmensDaten: {
-        ...registerGewerbeCompleteRequest.unternehmensDaten,
-        adresseAbweichend: {
-          ...registerGewerbeCompleteRequest.unternehmensDaten.adresseAbweichend!,
-          postleitzahl: "10969",
+  describe("AGS (Amtlicher Gemeindeschlüssel)", () => {
+    it("returns AGS 11000000 if company has adresseAbweichend and ZIP is 10969", async () => {
+      const result = await transformToGewerbeanmeldung({
+        ...registerGewerbeCompleteRequest,
+        unternehmensDaten: {
+          ...registerGewerbeCompleteRequest.unternehmensDaten,
+          adresseAbweichend: {
+            ...registerGewerbeCompleteRequest.unternehmensDaten.adresseAbweichend!,
+            postleitzahl: "10969",
+          },
         },
-      },
+      });
+
+      expect(result.gemeindeSchluessel).toBe("11000000");
     });
 
-    expect(result.gemeindeSchluessel).toBe("11000000");
+    it("returns AGS 02000000 if persönlicheDaten.adresse is 21149 and there is no adresseAbweichend of the company", async () => {
+      const result = await transformToGewerbeanmeldung({
+        ...registerGewerbeCompleteRequest,
+        persönlicheDaten: {
+          ...registerGewerbeCompleteRequest.persönlicheDaten,
+          adresse: {
+            ...registerGewerbeCompleteRequest.persönlicheDaten.adresse,
+            postleitzahl: "21149",
+          },
+        },
+        unternehmensDaten: {
+          ...registerGewerbeCompleteRequest.unternehmensDaten,
+          adresseAbweichend: undefined,
+        },
+      });
+
+      expect(result.gemeindeSchluessel).toBe("02000000");
+    });
   });
 });
