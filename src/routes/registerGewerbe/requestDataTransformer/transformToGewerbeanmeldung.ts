@@ -18,7 +18,6 @@ export async function transformToGewerbeanmeldung(
     data.persönlicheDaten.adresse.strasseUndHausnummer,
   );
 
-  // TODO: which zip to use? The person's or the company's? Or one over the other?
   const gemeindeSchluessel = await getAgsFromRegisterGewerbeRequestData(data);
 
   return {
