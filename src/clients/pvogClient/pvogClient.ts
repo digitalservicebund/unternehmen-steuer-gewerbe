@@ -1,8 +1,8 @@
 import axios from "axios";
 
 interface PvogResult {
-  ags?: string;
-  ars?: string;
+  ags: string;
+  ars: string;
 }
 
 export async function getAGSandARS(zipCode: string): Promise<PvogResult> {

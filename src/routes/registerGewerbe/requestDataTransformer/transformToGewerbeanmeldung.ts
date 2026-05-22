@@ -19,9 +19,7 @@ export async function transformToGewerbeanmeldung(
   );
 
   // TODO: which zip to use? The person's or the company's? Or one over the other?
-  const gemeindeSchluessel = data.unternehmensDaten.adresseAbweichend?.postleitzahl
-    ? (await getAGSandARS(data.unternehmensDaten.adresseAbweichend?.postleitzahl)).ags
-    : "00000000";
+  const gemeindeSchluessel = await getAgsFromRegisterGewerbeRequestData(data);
 
   return {
     nachrichtenkopf: {
@@ -105,4 +103,10 @@ export async function transformToGewerbeanmeldung(
       ],
     },
   };
+}
+
+async function getAgsFromRegisterGewerbeRequestData(data: RegisterGewerbeRequest): Promise<string> {
+  if (data.unternehmensDaten.adresseAbweichend?.postleitzahl)
+    return (await getAGSandARS(data.unternehmensDaten.adresseAbweichend.postleitzahl)).ags;
+  else return (await getAGSandARS(data.persönlicheDaten.adresse.postleitzahl)).ags;
 }
