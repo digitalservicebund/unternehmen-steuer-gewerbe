@@ -157,6 +157,7 @@ jobs:
 
   build-and-publish-image:
     name: Build image and - on main, only - publish to registry
+    needs: [scan-with-sonarcloud]
     runs-on: ubuntu-latest
     permissions:
       contents: read
