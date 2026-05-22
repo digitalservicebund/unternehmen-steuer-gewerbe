@@ -477,7 +477,7 @@ jobs:
   # Follows this recipe of the GitHub docs: https://docs.github.com/en/code-security/tutorials/secure-your-dependencies/automating-dependabot-with-github-actions#enabling-automerge-on-a-pull-request
   #
   # Important: several secrets needed to be explicitly set for Dependabot (not just"Actions") in order to successfully run this job
-  #  - all client secrets FIT_CONNECT_... and ERIC_...
+  #  - all client secrets and env vars FIT_CONNECT_... and ERIC_...
   #  - a GitHub Personal Access Token for elevated privileges for the actual merge (PRIVATE_REPOSITORY_ACCESS_TOKEN)
   #  - a Sonar Personal Access Token so the sonar scan works
   #######################################
