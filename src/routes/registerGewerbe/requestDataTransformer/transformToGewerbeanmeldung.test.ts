@@ -46,8 +46,8 @@ describe("transformToGewerbeanmeldung", () => {
         ...registerGewerbeCompleteRequest.unternehmensDaten,
         adresseAbweichend: {
           strasseUndHausnummer: "Betriebsweg 42a",
-          postleitzahl: "67890",
-          ort: "Gewerbestadt",
+          postleitzahl: "23936",
+          ort: "Testorf-Steinfort",
         },
       },
     });
@@ -55,8 +55,8 @@ describe("transformToGewerbeanmeldung", () => {
     expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
       strasse: "Betriebsweg",
       hausnummerVon: "42a",
-      postleitzahl: "67890",
-      ort: "Gewerbestadt",
+      postleitzahl: "23936",
+      ort: "Testorf-Steinfort",
     });
   });
 
