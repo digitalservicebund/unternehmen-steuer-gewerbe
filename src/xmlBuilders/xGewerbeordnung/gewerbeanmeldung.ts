@@ -16,7 +16,7 @@ import {
 } from "./buildingBlocks/referenzierteSubjekte";
 import { escapeXml } from "../../helpers/escapeXml";
 
-export interface Gewerbeanmeldung {
+export interface CreateGewerbeanmeldungXmlData {
   nachrichtenkopf?: Nachrichtenkopf;
   /** Die die Gewerbeanzeige entgegennehmende Behörde. */
   autor?: Behoerde;
@@ -79,7 +79,7 @@ const ROOT_ATTRIBUTES = `
 ` as const;
 
 export async function createGewerbeanmeldungXml(
-  gewerbeanmeldung: Gewerbeanmeldung,
+  gewerbeanmeldung: CreateGewerbeanmeldungXmlData,
 ): Promise<string> {
   const natuerlichePerson0 = gewerbeanmeldung.referenzierteSubjekte?.natuerlichePerson?.[0];
 

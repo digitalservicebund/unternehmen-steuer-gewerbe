@@ -1,11 +1,13 @@
 import { randomUUID } from "node:crypto";
-import { type Gewerbeanmeldung } from "../../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
+import { type CreateGewerbeanmeldungXmlData } from "../../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { splitStrasseHausnummer } from "../../../helpers/formFieldTransformations";
 
 // Transforms a RegisterGewerbeRequest into a complete Gewerbeanmeldung structure.
 // NOTE: several values are hardcoded placeholders and will be generated / fetched from other sources later.
-export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewerbeanmeldung {
+export function transformToGewerbeanmeldung(
+  data: RegisterGewerbeRequest,
+): CreateGewerbeanmeldungXmlData {
   const adresseAbweichend = data.unternehmensDaten.adresseAbweichend;
 
   const betriebsStrasseHausnummer = splitStrasseHausnummer(
