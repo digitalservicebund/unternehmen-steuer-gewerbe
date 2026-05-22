@@ -491,7 +491,6 @@ jobs:
       - test
       - scan-with-sonarcloud
       - build-image
-      - publish-image
       - secret-scanning
     if: ${{ github.event_name != 'schedule' && success() && github.actor ==
       'dependabot[bot]' && !cancelled() && github.ref != 'refs/heads/main' &&
