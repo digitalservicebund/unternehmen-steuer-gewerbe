@@ -5,7 +5,7 @@ import { type Environment, getEnvironmentUrls } from "./environments";
 import { createMetadata, type DataSchema } from "./metadata";
 import { getSecret } from "../../secrets";
 
-export interface FitConnectClientConfig {
+interface FitConnectClientConfig {
   environment: Environment;
   clientId: string;
   clientSecret: string;
@@ -18,21 +18,21 @@ export interface PublicService {
   description?: string | null;
 }
 
-export interface SubmitDataOptions {
+interface SubmitDataOptions {
   destinationId: string;
   publicService: PublicService;
   data: string;
   dataSchema: DataSchema;
 }
 
-export interface SubmissionEventsResponse {
+interface SubmissionEventsResponse {
   count: number;
   offset: number;
   totalCount: number;
   eventLog: (JWTPayload | null)[];
 }
 
-export interface SubmitDataResponse {
+interface SubmitDataResponse {
   caseId: string;
   destinationId: string;
   submissionId: string;
