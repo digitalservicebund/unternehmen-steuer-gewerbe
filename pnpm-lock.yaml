@@ -79,8 +79,8 @@ importers:
         specifier: ^1.65.0
         version: 1.65.0
       rolldown:
-        specifier: ^1.0.1
-        version: 1.0.1
+        specifier: ^1.0.2
+        version: 1.0.2
       tsx:
         specifier: ^4.22.3
         version: 4.22.3
