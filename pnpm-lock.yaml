@@ -43,20 +43,20 @@ importers:
         version: 3.0.0-beta2
       unternehmen-steuer-gewerbe-privat:
         specifier: github:digitalservicebund/unternehmen-steuer-gewerbe-privat#v1.0.0-105
-        version: git+https://git@github.com:digitalservicebund/unternehmen-steuer-gewerbe-privat.git#e284a35f6718f33238bd15aba61d023c7bc40d09(@types/node@25.8.0)
+        version: git+https://git@github.com:digitalservicebund/unternehmen-steuer-gewerbe-privat.git#e284a35f6718f33238bd15aba61d023c7bc40d09(@types/node@25.9.0)
       vite:
         specifier: 8.0.13
-        version: 8.0.13(@types/node@25.8.0)(esbuild@0.28.0)(tsx@4.22.3)(yaml@2.9.0)
+        version: 8.0.13(@types/node@25.9.0)(esbuild@0.28.0)(tsx@4.22.3)(yaml@2.9.0)
       xmllint-wasm:
         specifier: ^5.2.0
-        version: 5.2.0(@types/node@25.8.0)
+        version: 5.2.0(@types/node@25.9.0)
       zod:
         specifier: ^4.4.3
         version: 4.4.3
     devDependencies:
       '@types/node':
-        specifier: ^25.8.0
-        version: 25.8.0
+        specifier: ^25.9.0
+        version: 25.9.0
       '@types/supertest':
         specifier: ^7.2.0
         version: 7.2.0
@@ -89,7 +89,7 @@ importers:
         version: 6.0.3
       vitest:
         specifier: ^4.1.5
-        version: 4.1.5(@types/node@25.8.0)(@vitest/coverage-v8@4.1.5)(vite@8.0.13(@types/node@25.8.0)(esbuild@0.28.0)(tsx@4.22.3)(yaml@2.9.0))
+        version: 4.1.5(@types/node@25.9.0)(@vitest/coverage-v8@4.1.5)(vite@8.0.13(@types/node@25.9.0)(esbuild@0.28.0)(tsx@4.22.3)(yaml@2.9.0))
       xslt3-he:
         specifier: 3.0.0-beta2
         version: 3.0.0-beta2
@@ -766,8 +766,8 @@ packages:
   '@types/methods@1.1.4':
     resolution: {integrity: sha512-ymXWVrDiCxTBE3+RIrrP533E70eA+9qu7zdWoHuOmGujkYtzf4HQF96b8nwHLqhuf4ykX61IGRIB38CC6/sImQ==}
 
-  '@types/node@25.8.0':
-    resolution: {integrity: sha512-TCFSk8IZh+iLX1xtksoBVtdmgL+1IX0fC9BeU4QqFSuNdN/K+HUlhqOzEmSYYpZUVsLYcPqc9KX+60iDuninSQ==}
+  '@types/node@25.9.0':
+    resolution: {integrity: sha512-AOQwYUNolgy3VosiRqXrACUXTN8nJUtPl7FJXMqZVyxiiCLhQuG3jXKvCS1ALr+Y2OmZhzzLVlYPEqJaiqkaJQ==}
 
   '@types/superagent@8.1.9':
     resolution: {integrity: sha512-pTVjI73witn+9ILmoJdajHGW2jkSaOzhiFYF1Rd3EQ94kymLqB9PjD9ISg7WaALC7+dCHT0FGe9T2LktLq/3GQ==}
@@ -1817,7 +1817,7 @@ snapshots:
 
   '@types/methods@1.1.4': {}
 
-  '@types/node@25.8.0':
+  '@types/node@25.9.0':
     dependencies:
       undici-types: 7.24.6
 
@@ -1825,7 +1825,7 @@ snapshots:
     dependencies:
       '@types/cookiejar': 2.1.5
       '@types/methods': 1.1.4
-      '@types/node': 25.8.0
+      '@types/node': 25.9.0
       form-data: 4.0.5
 
   '@types/supertest@7.2.0':
@@ -1845,7 +1845,7 @@ snapshots:
       obug: 2.1.1
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.5(@types/node@25.8.0)(@vitest/coverage-v8@4.1.5)(vite@8.0.13(@types/node@25.8.0)(esbuild@0.28.0)(tsx@4.22.3)(yaml@2.9.0))
+      vitest: 4.1.5(@types/node@25.9.0)(@vitest/coverage-v8@4.1.5)(vite@8.0.13(@types/node@25.9.0)(esbuild@0.28.0)(tsx@4.22.3)(yaml@2.9.0))
 
   '@vitest/expect@4.1.5':
     dependencies:
@@ -1856,13 +1856,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.5(vite@8.0.13(@types/node@25.8.0)(esbuild@0.28.0)(tsx@4.22.3)(yaml@2.9.0))':
+  '@vitest/mocker@4.1.5(vite@8.0.13(@types/node@25.9.0)(esbuild@0.28.0)(tsx@4.22.3)(yaml@2.9.0))':
     dependencies:
       '@vitest/spy': 4.1.5
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 8.0.13(@types/node@25.8.0)(esbuild@0.28.0)(tsx@4.22.3)(yaml@2.9.0)
+      vite: 8.0.13(@types/node@25.9.0)(esbuild@0.28.0)(tsx@4.22.3)(yaml@2.9.0)
 
   '@vitest/pretty-format@4.1.5':
     dependencies:
@@ -2409,16 +2409,16 @@ snapshots:
 
   undici-types@7.24.6: {}
 
-  unternehmen-steuer-gewerbe-privat@git+https://git@github.com:digitalservicebund/unternehmen-steuer-gewerbe-privat.git#e284a35f6718f33238bd15aba61d023c7bc40d09(@types/node@25.8.0):
+  unternehmen-steuer-gewerbe-privat@git+https://git@github.com:digitalservicebund/unternehmen-steuer-gewerbe-privat.git#e284a35f6718f33238bd15aba61d023c7bc40d09(@types/node@25.9.0):
     dependencies:
       dotenv: 17.4.2
       koffi: 2.16.2
       saxonjs-he: 3.0.0-beta2
-      xmllint-wasm: 5.2.0(@types/node@25.8.0)
+      xmllint-wasm: 5.2.0(@types/node@25.9.0)
     transitivePeerDependencies:
       - '@types/node'
 
-  vite@8.0.13(@types/node@25.8.0)(esbuild@0.28.0)(tsx@4.22.3)(yaml@2.9.0):
+  vite@8.0.13(@types/node@25.9.0)(esbuild@0.28.0)(tsx@4.22.3)(yaml@2.9.0):
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.4
@@ -2426,16 +2426,16 @@ snapshots:
       rolldown: 1.0.1
       tinyglobby: 0.2.16
     optionalDependencies:
-      '@types/node': 25.8.0
+      '@types/node': 25.9.0
       esbuild: 0.28.0
       fsevents: 2.3.3
       tsx: 4.22.3
       yaml: 2.9.0
 
-  vitest@4.1.5(@types/node@25.8.0)(@vitest/coverage-v8@4.1.5)(vite@8.0.13(@types/node@25.8.0)(esbuild@0.28.0)(tsx@4.22.3)(yaml@2.9.0)):
+  vitest@4.1.5(@types/node@25.9.0)(@vitest/coverage-v8@4.1.5)(vite@8.0.13(@types/node@25.9.0)(esbuild@0.28.0)(tsx@4.22.3)(yaml@2.9.0)):
     dependencies:
       '@vitest/expect': 4.1.5
-      '@vitest/mocker': 4.1.5(vite@8.0.13(@types/node@25.8.0)(esbuild@0.28.0)(tsx@4.22.3)(yaml@2.9.0))
+      '@vitest/mocker': 4.1.5(vite@8.0.13(@types/node@25.9.0)(esbuild@0.28.0)(tsx@4.22.3)(yaml@2.9.0))
       '@vitest/pretty-format': 4.1.5
       '@vitest/runner': 4.1.5
       '@vitest/snapshot': 4.1.5
@@ -2452,10 +2452,10 @@ snapshots:
       tinyexec: 1.1.1
       tinyglobby: 0.2.16
       tinyrainbow: 3.1.0
-      vite: 8.0.13(@types/node@25.8.0)(esbuild@0.28.0)(tsx@4.22.3)(yaml@2.9.0)
+      vite: 8.0.13(@types/node@25.9.0)(esbuild@0.28.0)(tsx@4.22.3)(yaml@2.9.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 25.8.0
+      '@types/node': 25.9.0
       '@vitest/coverage-v8': 4.1.5(vitest@4.1.5)
     transitivePeerDependencies:
       - msw
@@ -2467,9 +2467,9 @@ snapshots:
 
   xml-naming@0.1.0: {}
 
-  xmllint-wasm@5.2.0(@types/node@25.8.0):
+  xmllint-wasm@5.2.0(@types/node@25.9.0):
     dependencies:
-      '@types/node': 25.8.0
+      '@types/node': 25.9.0
 
   xslt3-he@3.0.0-beta2:
     dependencies:
