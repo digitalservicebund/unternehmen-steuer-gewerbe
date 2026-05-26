@@ -7,6 +7,12 @@ vi.mock("unternehmen-steuer-gewerbe-privat", () => ({
   createElsterFsEEUnXml: vi.fn().mockReturnValue("<xml/>"),
 }));
 
+const mockSubmitData = vi.fn().mockResolvedValue({ submissionId: "mock-submission-id" });
+
+vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
+  getFitConnectClient: () => ({ submitData: mockSubmitData }),
+}));
+
 import app from "../../app";
 import * as eric from "unternehmen-steuer-gewerbe-privat";
 import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
@@ -27,11 +33,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
 
   describe("in case of partial success", () => {
     it("Returns 207 MULTI-STATUS with gewerbeanmeldung upstream_error when FIT-Connect fails, steuernummer still succeeds", async () => {
-      vi.spyOn(globalThis, "fetch").mockResolvedValue(
-        new Response(JSON.stringify({ message: "Server Down" }), {
-          status: HttpStatusCode.InternalServerError,
-        }),
-      );
+      mockSubmitData.mockRejectedValueOnce(new Error("Server Down"));
 
       const response = await postRegisterGewerbe();
       const json = await response.json();
@@ -116,9 +118,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
     });
 
     it("Returns 500 INTERNAL SERVER ERROR when both submissions fail", async () => {
-      vi.spyOn(globalThis, "fetch").mockResolvedValue(
-        new Response(JSON.stringify({ message: "Server Down" }), { status: 500 }),
-      );
+      mockSubmitData.mockRejectedValueOnce(new Error("Server Down"));
       vi.spyOn(eric, "validateFsE").mockReturnValue({
         isValid: undefined,
         returnCode: undefined,

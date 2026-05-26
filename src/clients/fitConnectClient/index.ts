@@ -1,1 +1,1 @@
-export { default } from "./fitConnectClient";
+export { getFitConnectClient } from "./fitConnectClient";
