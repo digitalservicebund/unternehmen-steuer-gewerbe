@@ -12,7 +12,7 @@ interface FitConnectClientConfig {
   privateKey: JWK;
 }
 
-export interface PublicService {
+interface PublicService {
   identifier: string;
   name: string;
   description?: string | null;
