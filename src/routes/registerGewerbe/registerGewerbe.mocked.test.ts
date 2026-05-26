@@ -7,10 +7,6 @@ vi.mock("unternehmen-steuer-gewerbe-privat", () => ({
   createElsterFsEEUnXml: vi.fn().mockReturnValue("<xml/>"),
 }));
 
-vi.mock("../../clients/pvogClient/pvogClient", () => ({
-  getAGSandARS: vi.fn().mockResolvedValue({ ags: "00000000", ars: "000000000000" }),
-}));
-
 const mockSubmitData = vi.fn().mockResolvedValue({ submissionId: "mock-submission-id" });
 
 vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
