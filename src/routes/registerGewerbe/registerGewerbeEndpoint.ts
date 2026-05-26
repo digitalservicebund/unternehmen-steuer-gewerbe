@@ -1,4 +1,4 @@
-import { HonoAppType } from "../../app";
+import { HonoAppType } from "../../honoApp";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
 import { validateFsE, createElsterFsEEUnXml } from "unternehmen-steuer-gewerbe-privat";
 import { getSecret } from "../../secrets";

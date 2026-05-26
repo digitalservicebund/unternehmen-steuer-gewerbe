@@ -1,4 +1,4 @@
-import { HonoAppType } from "../../app";
+import { HonoAppType } from "../../honoApp";
 import { regionRoute } from "./regionRoute";
 import { isSupportedRegion } from "./supportedRegions";
 

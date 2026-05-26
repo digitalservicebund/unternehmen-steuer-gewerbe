@@ -1,4 +1,4 @@
-import { HonoAppType } from "../../app";
+import { HonoAppType } from "../../honoApp";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
 import { getSecret } from "../../secrets";
 import { getEventsRoute } from "./getEventsRoute";

@@ -1,4 +1,4 @@
-import { HonoAppType } from "../../app";
+import { HonoAppType } from "../../honoApp";
 import { getSecret } from "../../secrets";
 import { healthCheckRoute } from "./rootHealthCheckRoute";
 
