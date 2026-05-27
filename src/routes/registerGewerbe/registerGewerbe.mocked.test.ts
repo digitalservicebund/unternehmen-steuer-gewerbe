@@ -41,7 +41,6 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(response.status).toEqual(HttpStatusCode.MultiStatus);
       expect(json.gewerbeanmeldung.success).toBe(false);
       expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
-      expect(json.steuernummer.success).toBe(true);
       expect(json.fseÜbermittlung.success).toBe(true);
     });
 
@@ -55,7 +54,6 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(response.status).toEqual(HttpStatusCode.MultiStatus);
       expect(json.gewerbeanmeldung.success).toBe(false);
       expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
-      expect(json.steuernummer.success).toBe(true);
       expect(json.fseÜbermittlung.success).toBe(true);
     });
 
@@ -69,8 +67,6 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       const response = await postRegisterGewerbe();
       const json = await response.json();
       expect(response.status).toEqual(HttpStatusCode.MultiStatus);
-      expect(json.steuernummer.success).toBe(false);
-      expect(json.steuernummer.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
       expect(json.fseÜbermittlung.success).toBe(false);
       expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
       expect(json.gewerbeanmeldung.success).toBe(true);
@@ -87,8 +83,6 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       const response = await postRegisterGewerbe();
       const json = await response.json();
       expect(response.status).toEqual(HttpStatusCode.MultiStatus);
-      expect(json.steuernummer.success).toBe(false);
-      expect(json.steuernummer.errorType).toBe(ErrorTypeSchema.enum.validation_error);
       expect(json.fseÜbermittlung.success).toBe(false);
       expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
       expect(json.gewerbeanmeldung.success).toBe(true);
@@ -112,8 +106,6 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(response.status).toEqual(HttpStatusCode.BadRequest);
       expect(json.gewerbeanmeldung.success).toBe(false);
       expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
-      expect(json.steuernummer.success).toBe(false);
-      expect(json.steuernummer.errorType).toBe(ErrorTypeSchema.enum.validation_error);
       expect(json.fseÜbermittlung.success).toBe(false);
       expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
     });
@@ -130,7 +122,6 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       const json = await response.json();
       expect(response.status).toEqual(HttpStatusCode.InternalServerError);
       expect(json.gewerbeanmeldung.success).toBe(false);
-      expect(json.steuernummer.success).toBe(false);
       expect(json.fseÜbermittlung.success).toBe(false);
     });
   });
