@@ -76,6 +76,20 @@ interface DestinationKeysResponse {
   keys: JWK[];
 }
 
+interface Route {
+  destinationId: string;
+  destinationSignature: string;
+  destinationName?: string;
+  destinationShortName?: string;
+}
+
+interface RoutingApiResponse {
+  count: number;
+  offset: number;
+  totalCount: number;
+  routes: Route[];
+}
+
 export function getFitConnectClient() {
   const config: FitConnectClientConfig = {
     environment: (getSecret("FIT_CONNECT_ENV") || "test") as Environment,
@@ -165,5 +179,17 @@ export function getFitConnectClient() {
     return { ...events, eventLog };
   }
 
-  return { submitData, getSubmissionEvents };
+  async function getRoutes(leikaKey: string, ags: string): Promise<RoutingApiResponse> {
+    const { data: routingApiResponse } = await axios.get<RoutingApiResponse>(
+      `${urls.routingApiUrl}/v1/routes`,
+      {
+        params: { leikaKey, ags },
+        // The routing API blocks requests with the default axios User-Agent
+        headers: { Accept: "application/json", "User-Agent": "node" },
+      },
+    );
+    return routingApiResponse;
+  }
+
+  return { submitData, getSubmissionEvents, getRoutes };
 }
