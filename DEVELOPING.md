@@ -7,9 +7,11 @@ Parts of this code base are not public (e.g. the wrapper around the ELSTER [ERiC
 After cloning, run `pnpm install` as usual. You will need access to the private repository for pnpm to resolve the dependency.
 
 If you configured git to use HTTPS instead of SSH, add a URL rewrite rule so pnpm can resolve the private dependency:
+
 ```bash
 git config --global --add url."https://github.com/".insteadOf "git@github.com:"
 ```
+
 `--add` makes sure your existing config is not overwritten.
 
 ## Environment Variables
