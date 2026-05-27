@@ -7,6 +7,8 @@ eric.log
 # IDE specifics
 .vscode
 
+.claude
+
 # Logs
 logs
 *.log

@@ -1,16 +1,12 @@
 {
   // Visit https://aka.ms/tsconfig to read more about this file
-  "ts-node": {
-    // Include all project files so ambient declarations (e.g. src/declarations.d.ts) are loaded
-    "files": true
-  },
   "compilerOptions": {
     // File Layout
     "rootDir": "./src",
     "outDir": "./dist",
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
+    "module": "preserve",
     "target": "esnext",
     "types": ["node"],
     // For nodejs:
@@ -18,7 +14,7 @@
     // "types": ["node"],
     // and npm install -D @types/node
     // Other Outputs
-    "moduleResolution": "nodenext",
+    "moduleResolution": "bundler",
     "sourceMap": true,
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,

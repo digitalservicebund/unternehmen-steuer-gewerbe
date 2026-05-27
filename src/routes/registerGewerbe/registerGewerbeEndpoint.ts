@@ -1,7 +1,6 @@
-import { HonoAppType } from "../../app";
+import { HonoAppType } from "../../honoApp";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
-import { validateFsE } from "../../private/eric/eric";
-import { createElsterFsEEUnXml } from "../../private/xmlBuilders/elsterFsE/elsterFsEEUn";
+import { validateFsE, createElsterFsEEUnXml } from "unternehmen-steuer-gewerbe-privat";
 import { getSecret } from "../../secrets";
 import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { ErrorTypeSchema, type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
@@ -11,7 +10,7 @@ import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTra
 async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
   let gewerbeanmeldungXml: string;
   try {
-    gewerbeanmeldungXml = await createGewerbeanmeldungXml(transformToGewerbeanmeldung(data));
+    gewerbeanmeldungXml = await createGewerbeanmeldungXml(await transformToGewerbeanmeldung(data));
   } catch (error) {
     console.error("Gewerbeanmeldung XML validation failed", error);
     return {
@@ -106,7 +105,15 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
       ]);
 
       return c.json(
-        { gewerbeanmeldung, steuernummer },
+        {
+          gewerbeanmeldung,
+          steuernummer,
+          fseÜbermittlung: {
+            success: steuernummer.success,
+            submissionId: steuernummer.submissionId,
+            errorType: steuernummer.errorType,
+          },
+        },
         determineHttpStatus(gewerbeanmeldung, steuernummer),
       );
     } catch (error) {
@@ -120,6 +127,11 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
             info: "Internal Server Error",
           },
           steuernummer: {
+            success: false,
+            errorType: ErrorTypeSchema.enum.upstream_error,
+            info: "Internal Server Error",
+          },
+          fseÜbermittlung: {
             success: false,
             errorType: ErrorTypeSchema.enum.upstream_error,
             info: "Internal Server Error",

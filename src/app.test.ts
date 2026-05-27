@@ -1,10 +1,11 @@
-import { describe, test, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import app from "./app";
+import { HttpStatusCode } from "./helpers/httpStatusCodes";
 
 describe("App tests", () => {
-  test("Returns 404 NOT FOUND on unsupported route", async () => {
+  it("Returns 404 NOT FOUND on unsupported route", async () => {
     const response = await app.request("/unsupported-url");
-    expect(response.status).toEqual(404);
+    expect(response.status).toEqual(HttpStatusCode.NotFound);
   });
 });
