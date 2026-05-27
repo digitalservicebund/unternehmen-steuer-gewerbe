@@ -2,7 +2,10 @@ import fs from "node:fs";
 import { describe, it, expect } from "vitest";
 import { XMLParser } from "fast-xml-parser";
 import XMLBuilder from "fast-xml-builder";
-import { createGewerbeanmeldungXml, type Gewerbeanmeldung } from "./gewerbeanmeldung";
+import {
+  createGewerbeanmeldungXml,
+  type CreateGewerbeanmeldungXmlData as DataForCreateGewerbeanmeldungXml,
+} from "./gewerbeanmeldung";
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
 const builder = new XMLBuilder({
@@ -22,7 +25,7 @@ const xgewo_1_6_valid = fs.readFileSync(
   "utf-8",
 );
 
-const gewerbeanmeldung: Gewerbeanmeldung = {
+const gewerbeanmeldung: DataForCreateGewerbeanmeldungXml = {
   nachrichtenkopf: {
     nachrichtenUUID: "fb62d3b3-2a84-423a-bb0a-a767d32b6342",
     erstellungszeitpunkt: "2022-09-01T11:58:01.385+02:00",
@@ -150,7 +153,7 @@ const gewerbeanmeldung: Gewerbeanmeldung = {
 
 describe("createGewerbeanmeldungXml", () => {
   it("throws when the generated XML is invalid", async () => {
-    const withoutPerson: Gewerbeanmeldung = {
+    const withoutPerson: DataForCreateGewerbeanmeldungXml = {
       ...gewerbeanmeldung,
       referenzierteSubjekte: { natuerlichePerson: [] },
     };
@@ -204,7 +207,7 @@ describe("createGewerbeanmeldungXml", () => {
   });
 
   it("omits optional XML elements when data is not provided", async () => {
-    const minimal: Gewerbeanmeldung = {
+    const minimal: DataForCreateGewerbeanmeldungXml = {
       nachrichtenkopf: {
         nachrichtenUUID: "00000000-0000-0000-0000-000000000001",
         erstellungszeitpunkt: "2024-01-01T10:00:00.000+01:00",
@@ -281,7 +284,7 @@ describe("createGewerbeanmeldungXml", () => {
   });
 
   it(`escapes XML special characters (<, >, &, ', ") in text fields`, async () => {
-    const withSpecials: Gewerbeanmeldung = {
+    const withSpecials: DataForCreateGewerbeanmeldungXml = {
       ...gewerbeanmeldung,
       autor: { ...gewerbeanmeldung.autor, name: "Amt <Müller & Söhne>" },
       gewerbebetrieb: {
@@ -305,7 +308,7 @@ describe("createGewerbeanmeldungXml", () => {
   });
 
   it("includes housenumber range and suffix in the business address", async () => {
-    const withRange: Gewerbeanmeldung = {
+    const withRange: DataForCreateGewerbeanmeldungXml = {
       ...gewerbeanmeldung,
       gewerbebetrieb: {
         ...gewerbeanmeldung.gewerbebetrieb,
@@ -330,7 +333,7 @@ describe("createGewerbeanmeldungXml", () => {
   });
 
   it("includes fax, email and website even when phone is missing", async () => {
-    const withoutPhone: Gewerbeanmeldung = {
+    const withoutPhone: DataForCreateGewerbeanmeldungXml = {
       ...gewerbeanmeldung,
       gewerbebetrieb: {
         ...gewerbeanmeldung.gewerbebetrieb,
@@ -359,7 +362,7 @@ describe("createGewerbeanmeldungXml", () => {
 
   it("creates every natuerlichePerson entry when the array contains multiple", async () => {
     const firstPerson = gewerbeanmeldung.referenzierteSubjekte!.natuerlichePerson![0]!;
-    const multiPerson: Gewerbeanmeldung = {
+    const multiPerson: DataForCreateGewerbeanmeldungXml = {
       ...gewerbeanmeldung,
       referenzierteSubjekte: {
         natuerlichePerson: [
@@ -386,7 +389,7 @@ describe("createGewerbeanmeldungXml", () => {
   });
 
   it("includes bisherigeUnfallversicherung element when provided", async () => {
-    const withUnfallversicherung: Gewerbeanmeldung = {
+    const withUnfallversicherung: DataForCreateGewerbeanmeldungXml = {
       ...gewerbeanmeldung,
       grundAnmeldungSchluessel: "02", // Verlegung des Betriebs aus einem anderen Meldebezirk
       bisherigeUnfallversicherung: { traeger: "08", unternehmensnummer: "123456789012345" },
@@ -399,7 +402,7 @@ describe("createGewerbeanmeldungXml", () => {
   });
 
   it("includes bisherigeUnfallversicherung without unternehmensnummer when omitted", async () => {
-    const withUnfallversicherungButNoUnternehmensummer: Gewerbeanmeldung = {
+    const withUnfallversicherungButNoUnternehmensummer: DataForCreateGewerbeanmeldungXml = {
       ...gewerbeanmeldung,
       grundAnmeldungSchluessel: "02",
       bisherigeUnfallversicherung: { traeger: "08" },

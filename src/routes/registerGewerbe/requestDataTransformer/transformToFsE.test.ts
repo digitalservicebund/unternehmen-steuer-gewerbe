@@ -14,8 +14,8 @@ describe("transformToEUnFsE", () => {
     expect(natPers?.adrkette?.strAdr).toMatchObject({
       str: "Musterstraße",
       hausNr: "1",
-      plz: "12345",
-      ort: "Musterstadt",
+      plz: "03046",
+      ort: "Cottbus",
     });
     expect(result.eUn?.allgAngaben?.komm?.tel?.[0]).toEqual({
       intVorw: "+49",

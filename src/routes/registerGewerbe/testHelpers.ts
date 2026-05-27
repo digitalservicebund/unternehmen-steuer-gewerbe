@@ -12,8 +12,8 @@ export const registerGewerbeCompleteRequest: RegisterGewerbeRequest = {
     staatsangehörigkeitDeutsch: true,
     adresse: {
       strasseUndHausnummer: "Musterstraße 1",
-      postleitzahl: "12345",
-      ort: "Musterstadt",
+      postleitzahl: "03046",
+      ort: "Cottbus",
     },
     telefon: "+49 234 121314",
     email: "e.mustermann@example.org",
@@ -33,8 +33,8 @@ export const registerGewerbeCompleteRequest: RegisterGewerbeRequest = {
     zahllastUeberschussBetrag: 0,
     adresseAbweichend: {
       strasseUndHausnummer: "Musterstraße 2",
-      postleitzahl: "67890",
-      ort: "Musterstadt",
+      postleitzahl: "96450",
+      ort: "Coburg",
     },
   },
 };

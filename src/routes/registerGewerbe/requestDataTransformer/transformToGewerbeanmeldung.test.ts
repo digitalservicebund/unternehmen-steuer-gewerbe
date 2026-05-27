@@ -4,7 +4,7 @@ import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { registerGewerbeCompleteRequest } from "../testHelpers";
 
 describe("transformToGewerbeanmeldung", () => {
-  it("maps default values, applies the geschlecht fallback if the geschlecht is not given and drops optional fields", () => {
+  it("maps default values, applies the geschlecht fallback if the geschlecht is not given and drops optional fields", async () => {
     const request: RegisterGewerbeRequest = {
       ...registerGewerbeCompleteRequest,
       persönlicheDaten: {
@@ -19,7 +19,7 @@ describe("transformToGewerbeanmeldung", () => {
         adresseAbweichend: undefined,
       },
     };
-    const result = transformToGewerbeanmeldung(request);
+    const result = await transformToGewerbeanmeldung(request);
     const person = result.referenzierteSubjekte!.natuerlichePerson![0]!;
 
     expect(result.gewerbebetrieb!.istNebenerwerb).toBe(false);
@@ -32,22 +32,22 @@ describe("transformToGewerbeanmeldung", () => {
     expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
       strasse: "Musterstraße",
       hausnummerVon: "1",
-      postleitzahl: "12345",
-      ort: "Musterstadt",
+      postleitzahl: "03046",
+      ort: "Cottbus",
     });
     expect(person.geschlecht).toBe("x");
     expect(person.name!.geburtsname).toBeUndefined();
   });
 
-  it("uses adresseAbweichend as betriebsstaette anschrift when provided", () => {
-    const result = transformToGewerbeanmeldung({
+  it("uses adresseAbweichend as betriebsstaette anschrift when provided", async () => {
+    const result = await transformToGewerbeanmeldung({
       ...registerGewerbeCompleteRequest,
       unternehmensDaten: {
         ...registerGewerbeCompleteRequest.unternehmensDaten,
         adresseAbweichend: {
           strasseUndHausnummer: "Betriebsweg 42a",
-          postleitzahl: "67890",
-          ort: "Gewerbestadt",
+          postleitzahl: "23936",
+          ort: "Testorf-Steinfort",
         },
       },
     });
@@ -55,8 +55,44 @@ describe("transformToGewerbeanmeldung", () => {
     expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
       strasse: "Betriebsweg",
       hausnummerVon: "42a",
-      postleitzahl: "67890",
-      ort: "Gewerbestadt",
+      postleitzahl: "23936",
+      ort: "Testorf-Steinfort",
+    });
+  });
+
+  describe("AGS (Amtlicher Gemeindeschlüssel)", () => {
+    it("returns AGS 02000000 if persönlicheDaten.adresse.postleitzahl is 21149 and there is no adresseAbweichend of the company", async () => {
+      const result = await transformToGewerbeanmeldung({
+        ...registerGewerbeCompleteRequest,
+        persönlicheDaten: {
+          ...registerGewerbeCompleteRequest.persönlicheDaten,
+          adresse: {
+            ...registerGewerbeCompleteRequest.persönlicheDaten.adresse,
+            postleitzahl: "21149",
+          },
+        },
+        unternehmensDaten: {
+          ...registerGewerbeCompleteRequest.unternehmensDaten,
+          adresseAbweichend: undefined,
+        },
+      });
+
+      expect(result.gemeindeSchluessel).toBe("02000000");
+    });
+
+    it("returns AGS 11000000 if company has adresseAbweichend.postleitzahl of 10969", async () => {
+      const result = await transformToGewerbeanmeldung({
+        ...registerGewerbeCompleteRequest,
+        unternehmensDaten: {
+          ...registerGewerbeCompleteRequest.unternehmensDaten,
+          adresseAbweichend: {
+            ...registerGewerbeCompleteRequest.unternehmensDaten.adresseAbweichend!,
+            postleitzahl: "10969",
+          },
+        },
+      });
+
+      expect(result.gemeindeSchluessel).toBe("11000000");
     });
   });
 });

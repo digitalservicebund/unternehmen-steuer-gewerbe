@@ -16,6 +16,7 @@ vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
 import app from "../../app";
 import * as eric from "unternehmen-steuer-gewerbe-privat";
 import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
+
 import { registerGewerbeCompleteRequest } from "./testHelpers";
 import { ErrorTypeSchema } from "./registerGewerbeInterfaces";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";

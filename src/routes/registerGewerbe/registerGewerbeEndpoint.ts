@@ -10,7 +10,7 @@ import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTra
 async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
   let gewerbeanmeldungXml: string;
   try {
-    gewerbeanmeldungXml = await createGewerbeanmeldungXml(transformToGewerbeanmeldung(data));
+    gewerbeanmeldungXml = await createGewerbeanmeldungXml(await transformToGewerbeanmeldung(data));
   } catch (error) {
     console.error("Gewerbeanmeldung XML validation failed", error);
     return {

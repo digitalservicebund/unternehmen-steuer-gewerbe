@@ -37,7 +37,11 @@ jobs:
           cache: true
 
       - name: Configure git to use HTTPS for GitHub
-        run: git config --global url."https://x-access-token:${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}@github.com/".insteadOf "git@github.com:"
+        env:
+          PRIVATE_REPOSITORY_ACCESS_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
+        run: |
+          git config --global url."https://x-access-token:${PRIVATE_REPOSITORY_ACCESS_TOKEN}@github.com/".insteadOf "https://github.com/"
+          git config --global --add url."https://x-access-token:${PRIVATE_REPOSITORY_ACCESS_TOKEN}@github.com/".insteadOf "git@github.com:"
 
       - name: Install dependencies
         run: pnpm install --ignore-scripts

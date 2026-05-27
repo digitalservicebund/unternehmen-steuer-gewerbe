@@ -1,11 +1,14 @@
 import { randomUUID } from "node:crypto";
-import { type Gewerbeanmeldung } from "../../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
+import { type CreateGewerbeanmeldungXmlData } from "../../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { splitStrasseHausnummer } from "../../../helpers/formFieldTransformations";
+import { getAGSandARS } from "../../../clients/pvogClient/pvogClient";
 
 // Transforms a RegisterGewerbeRequest into a complete Gewerbeanmeldung structure.
 // NOTE: several values are hardcoded placeholders and will be generated / fetched from other sources later.
-export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewerbeanmeldung {
+export async function transformToGewerbeanmeldung(
+  data: RegisterGewerbeRequest,
+): Promise<CreateGewerbeanmeldungXmlData> {
   const adresseAbweichend = data.unternehmensDaten.adresseAbweichend;
 
   const betriebsStrasseHausnummer = splitStrasseHausnummer(
@@ -15,18 +18,22 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
     data.persönlicheDaten.adresse.strasseUndHausnummer,
   );
 
+  const gemeindeSchluessel = await getAgsFromRegisterGewerbeRequestData(data);
+
+  const autorKennung = `MELDID:${gemeindeSchluessel}`;
+
   return {
     nachrichtenkopf: {
       nachrichtenUUID: randomUUID(),
       erstellungszeitpunkt: new Date().toISOString(),
       leser: { kennung: "xga:000000000001", name: "Gewerbeamt Muster" },
-      autor: { kennung: "MELDID:00000000", name: "Schneller Gruenden OSS" },
+      autor: { kennung: autorKennung, name: "Schneller Gruenden OSS" },
     },
-    autor: { kennung: "MELDID:00000000", name: "Schneller Gruenden OSS" },
+    autor: { kennung: autorKennung, name: "Schneller Gruenden OSS" },
     satzErstellung: new Date().toISOString(),
     ereigniszeitpunkt: new Date().toISOString(),
     istStorno: false,
-    gemeindeSchluessel: "00000000",
+    gemeindeSchluessel,
     uuid: randomUUID(),
     gueltigAb: data.unternehmensDaten.tätigkeitsbeginn,
     datumMeldung: new Date().toISOString().split("T")[0]!,
@@ -97,4 +104,10 @@ export function transformToGewerbeanmeldung(data: RegisterGewerbeRequest): Gewer
       ],
     },
   };
+}
+
+async function getAgsFromRegisterGewerbeRequestData(data: RegisterGewerbeRequest): Promise<string> {
+  if (data.unternehmensDaten.adresseAbweichend?.postleitzahl)
+    return (await getAGSandARS(data.unternehmensDaten.adresseAbweichend.postleitzahl)).ags;
+  else return (await getAGSandARS(data.persönlicheDaten.adresse.postleitzahl)).ags;
 }
