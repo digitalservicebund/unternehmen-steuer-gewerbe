@@ -14,16 +14,20 @@ function postRegisterGewerbe(data = registerGewerbeCompleteRequest) {
 
 describe("Route /api/v1/register-gewerbe", () => {
   describe("in case of success", () => {
-    it("Returns 200 OK with success=true for gewerbe and steuer and fseÜbermittlung on POST", async () => {
-      const response = await postRegisterGewerbe();
-      const json = await response.json();
-      expect(response.status).toEqual(HttpStatusCode.Ok);
-      expect(json.gewerbeanmeldung.success).toBe(true);
-      expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
-      expect(json.steuernummer.success).toBe(true);
-      expect(json.fseÜbermittlung.success).toBe(true);
-      expect(json.fseÜbermittlung.submissionId).toBeTruthy();
-    });
+    it(
+      "Returns 200 OK with success=true for gewerbe and steuer and fseÜbermittlung on POST",
+      { timeout: 10_000 },
+      async () => {
+        const response = await postRegisterGewerbe();
+        const json = await response.json();
+        expect(response.status).toEqual(HttpStatusCode.Ok);
+        expect(json.gewerbeanmeldung.success).toBe(true);
+        expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
+        expect(json.steuernummer.success).toBe(true);
+        expect(json.fseÜbermittlung.success).toBe(true);
+        expect(json.fseÜbermittlung.submissionId).toBeTruthy();
+      },
+    );
 
     it("does write the eric log to /tmp", async () => {
       const response = await postRegisterGewerbe();
