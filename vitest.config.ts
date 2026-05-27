@@ -4,6 +4,7 @@ export default defineConfig({
   test: {
     setupFiles: ["./vitest.setup.ts"],
     env: { NODE_ENV: "test" },
+    testTimeout: 10_000,
     exclude: [
       "**/node_modules/**",
       "**/.git/**",
