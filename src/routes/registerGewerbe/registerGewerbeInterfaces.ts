@@ -144,7 +144,6 @@ const RegisterGewerbeResponseItemSchema = z.object({
 export const RegisterGewerbeResponseSchema = z
   .object({
     gewerbeanmeldung: RegisterGewerbeResponseItemSchema,
-    steuernummer: RegisterGewerbeResponseItemSchema,
     fseÜbermittlung: RegisterGewerbeResponseItemSchema,
   })
   .openapi("RegisterGewerbeResponse");

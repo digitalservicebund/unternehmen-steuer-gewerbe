@@ -20,7 +20,6 @@ describe("Route /api/v1/register-gewerbe", () => {
       expect(response.status).toEqual(HttpStatusCode.Ok);
       expect(json.gewerbeanmeldung.success).toBe(true);
       expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
-      expect(json.steuernummer.success).toBe(true);
       expect(json.fseÜbermittlung.success).toBe(true);
       expect(json.fseÜbermittlung.submissionId).toBeTruthy();
     });
