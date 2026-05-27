@@ -1,4 +1,4 @@
-import { HonoAppType } from "../../app";
+import { HonoAppType } from "../../honoApp";
 import { getConnInfo } from "@hono/node-server/conninfo";
 
 export function addRequestLogging(app: HonoAppType): HonoAppType {

@@ -1,1 +1,0 @@
-export { getFitConnectClient } from "./fitConnectClient";
