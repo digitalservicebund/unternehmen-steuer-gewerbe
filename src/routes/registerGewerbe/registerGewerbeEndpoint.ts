@@ -6,11 +6,26 @@ import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gew
 import { ErrorTypeSchema, type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 import { registerGewerbeRoute } from "./registerGewerbeRoute";
 import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTransformer";
+import { lookupRequestContext } from "./lookupRequestContext";
+
+const GEWERBEANMELDUNG_LEIKA_KEY_URN = "urn:de:fim:leika:leistung:99050012104000";
 
 async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
+  let context: Awaited<ReturnType<typeof lookupRequestContext>>;
+  try {
+    context = await lookupRequestContext(data);
+  } catch (error) {
+    console.error("Context lookup failed", error);
+    return {
+      success: false,
+      errorType: ErrorTypeSchema.enum.upstream_error,
+      info: "Upstream service unavailable",
+    };
+  }
+
   let gewerbeanmeldungXml: string;
   try {
-    gewerbeanmeldungXml = await createGewerbeanmeldungXml(await transformToGewerbeanmeldung(data));
+    gewerbeanmeldungXml = await createGewerbeanmeldungXml(transformToGewerbeanmeldung(data, context));
   } catch (error) {
     console.error("Gewerbeanmeldung XML validation failed", error);
     return {
@@ -27,7 +42,7 @@ async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
       // use the Fit‑Connect routing API to determine the destination ID.
       destinationId: getSecret("FIT_CONNECT_DESTINATION_ID"),
       publicService: {
-        identifier: "urn:de:fim:leika:leistung:99050012104000",
+        identifier: GEWERBEANMELDUNG_LEIKA_KEY_URN,
         name: "Gewerbe Anmeldung",
       },
       dataSchema: {

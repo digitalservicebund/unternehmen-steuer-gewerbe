@@ -13,6 +13,15 @@ vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
   getFitConnectClient: () => ({ submitData: mockSubmitData }),
 }));
 
+const mockLookupRequestContext = vi.fn().mockResolvedValue({
+  ags: "03046001",
+  destinationId: "mock-destination-id",
+});
+
+vi.mock("./lookupRequestContext", () => ({
+  lookupRequestContext: mockLookupRequestContext,
+}));
+
 import app from "../../app";
 import * as eric from "unternehmen-steuer-gewerbe-privat";
 import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
@@ -33,6 +42,20 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
   afterEach(() => vi.restoreAllMocks());
 
   describe("in case of partial success", () => {
+    it("Returns 207 MULTI-STATUS with gewerbeanmeldung upstream_error when routing returns no destinations, steuernummer still succeeds", async () => {
+      mockLookupRequestContext.mockRejectedValueOnce(
+        new Error("No FIT-Connect destination found for AGS 03046001"),
+      );
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+      expect(response.status).toEqual(HttpStatusCode.MultiStatus);
+      expect(json.gewerbeanmeldung.success).toBe(false);
+      expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
+      expect(json.steuernummer.success).toBe(true);
+      expect(json.fseÜbermittlung.success).toBe(true);
+    });
+
     it("Returns 207 MULTI-STATUS with gewerbeanmeldung upstream_error when FIT-Connect fails, steuernummer still succeeds", async () => {
       mockSubmitData.mockRejectedValueOnce(new Error("Server Down"));
 
