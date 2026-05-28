@@ -287,6 +287,27 @@ describe("createGewerbeanmeldungXml", () => {
     expect(xml).not.toContain("<xga:weitereTaetigkeiten>");
     expect(xml).not.toContain("<xga:aufenthaltstitel>");
     expect(xml).not.toContain("<bk:bisherigeUnfallversicherung>");
+    expect(xml).not.toContain("<antr:anzeigender.id>");
+    expect(xml).not.toContain("<antr:handelndePerson.id>");
+    expect(xml).not.toContain("<antr:ansprechpartner.id>");
+  });
+
+  it("renders vertrauensniveauIdentifikation with code and listVersionID", async () => {
+    const xml = await createGewerbeanmeldungXml({
+      ...gewerbeanmeldung,
+      handelndePersonVertrauensniveauCode: "hoch",
+      handelndePersonVertrauensniveauVersion: "2.0",
+    });
+    expect(xml).toContain('listVersionID="2.0"');
+    expect(xml).toContain("<code>hoch</code>");
+  });
+
+  it("includes ansprechpartner.id when provided", async () => {
+    const xml = await createGewerbeanmeldungXml({
+      ...gewerbeanmeldung,
+      ansprechpartnerId: "np-1",
+    });
+    expect(xml).toContain("<antr:ansprechpartner.id>np-1</antr:ansprechpartner.id>");
   });
 
   it(`escapes XML special characters (<, >, &, ', ") in text fields`, async () => {
