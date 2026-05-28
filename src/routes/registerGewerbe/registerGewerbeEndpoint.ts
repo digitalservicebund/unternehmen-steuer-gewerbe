@@ -37,6 +37,8 @@ async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
     };
   }
 
+  // Before using FIT-Connect -> Check in context if FIT-Connect or OSCI is supported by
+  // the Communes as soon as we have Pilot-Communes
   try {
     const response = await getFitConnectClient().submitData({
       // The destination varies from commune to commune.
