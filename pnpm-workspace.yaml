@@ -2,8 +2,5 @@ allowBuilds:
   esbuild: true
   koffi: true
 
-onlyBuiltDependencies:
-  - koffi
-
 minimumReleaseAgeExclude:
   - "@digitalservicebund/unternehmen-steuer-gewerbe-privat"
