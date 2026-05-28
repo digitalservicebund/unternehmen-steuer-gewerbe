@@ -36,15 +36,10 @@ jobs:
         with:
           cache: true
 
-      - name: Configure git to use HTTPS for GitHub
-        env:
-          PRIVATE_REPOSITORY_ACCESS_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
-        run: |
-          git config --global url."https://x-access-token:${PRIVATE_REPOSITORY_ACCESS_TOKEN}@github.com/".insteadOf "https://github.com/"
-          git config --global --add url."https://x-access-token:${PRIVATE_REPOSITORY_ACCESS_TOKEN}@github.com/".insteadOf "git@github.com:"
-
       - name: Install dependencies
         run: pnpm install --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
       - name: Cache node_modules
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
@@ -223,6 +218,8 @@ jobs:
 
       - name: Build project and docker image
         run: pnpm build:image
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
       - name: Run Trivy vulnerability image scanner
         # Note: Results are shown in the GitHub Security tab
