@@ -27,6 +27,7 @@
     "test:watch": "op run --env-file .env -- vitest"
   },
   "dependencies": {
+    "@digitalservicebund/unternehmen-steuer-gewerbe-privat": "^1.0.0-105",
     "@hono/node-server": "^2.0.3",
     "@hono/swagger-ui": "^0.6.1",
     "@hono/zod-openapi": "^1.4.0",
@@ -36,7 +37,6 @@
     "jose": "^6.2.3",
     "koffi": "^2.16.2",
     "saxonjs-he": "3.0.0-beta2",
-    "unternehmen-steuer-gewerbe-privat": "github:digitalservicebund/unternehmen-steuer-gewerbe-privat#v1.0.0-105",
     "vite": "8.0.14",
     "xmllint-wasm": "^5.2.0",
     "zod": "^4.4.3"
