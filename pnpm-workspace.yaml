@@ -1,2 +1,3 @@
-minimumReleaseAgeExclude:
-  - "@digitalservicebund/unternehmen-steuer-gewerbe-privat@1.0.0-125"
+allowBuilds:
+  esbuild: true
+  koffi: true
