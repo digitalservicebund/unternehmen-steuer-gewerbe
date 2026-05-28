@@ -24,7 +24,7 @@ describe("Load test: POST /api/v1/register-gewerbe", () => {
       for (let i = 0; i < 100; i++) {
         expect(responses[i]!.status, `request ${i} status`).toEqual(200); // NOSONAR
         expect(results[i].gewerbeanmeldung.success, `request ${i} gewerbeanmeldung`).toBe(true);
-        expect(results[i].steuernummer.success, `request ${i} steuernummer`).toBe(true);
+        expect(results[i].fseÜbermittlung.success, `request ${i} fseÜbermittlung`).toBe(true);
       }
     },
   );
