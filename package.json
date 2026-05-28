@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc --noEmit && echo 'Type check passed. Use build:dev or build:prod to produce dist/'",
     "build:dev": "rm -rf dist && rolldown -c && mkdir -p dist/resources && cp -r src/resources/. dist/resources/",
-    "build:prod": "pnpm build:dev && pnpm install --prod",
+    "build:prod": "pnpm build:dev && pnpm install --prod && pnpm rebuild koffi",
     "build:image": "pnpm build:prod; docker build . --tag ${IMAGE_TAG:-unternehmen-steuer-gewerbe} --build-arg COMMIT_SHA=$(git rev-parse HEAD); pnpm install",
     "format": "oxfmt --check",
     "format:fix": "oxfmt",
