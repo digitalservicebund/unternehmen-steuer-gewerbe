@@ -1,30 +1,54 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+
+const { mockGetAGSandARS, mockGetRoutes } = vi.hoisted(() => ({
+  mockGetAGSandARS: vi.fn().mockResolvedValue({ ags: "03046001", ars: "030460014004" }),
+  mockGetRoutes: vi.fn(),
+}));
+
+vi.mock("../../clients/pvogClient/pvogClient", () => ({
+  getAGSandARS: mockGetAGSandARS,
+}));
+
+vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
+  getFitConnectClient: () => ({ getRoutes: mockGetRoutes }),
+}));
+
 import { lookupRequestContext } from "./lookupRequestContext";
 import { registerGewerbeCompleteRequest } from "./testHelpers";
 
+const requestWithFitConnectSupport = {
+  ...registerGewerbeCompleteRequest,
+  persönlicheDaten: {
+    ...registerGewerbeCompleteRequest.persönlicheDaten,
+    adresse: {
+      ...registerGewerbeCompleteRequest.persönlicheDaten.adresse,
+      postleitzahl: "00000",
+    },
+  },
+  unternehmensDaten: {
+    ...registerGewerbeCompleteRequest.unternehmensDaten,
+    adresseAbweichend: undefined,
+  },
+};
+
 describe("lookupRequestContext", () => {
   describe("AGS (Amtlicher Gemeindeschlüssel)", () => {
-    it("returns AGS 02000000 if persönlicheDaten.adresse.postleitzahl is 21149 and there is no adresseAbweichend of the company", async () => {
-      const result = await lookupRequestContext({
+    it("uses persönlicheDaten.adresse.postleitzahl when no adresseAbweichend", async () => {
+      await lookupRequestContext({
         ...registerGewerbeCompleteRequest,
-        persönlicheDaten: {
-          ...registerGewerbeCompleteRequest.persönlicheDaten,
-          adresse: {
-            ...registerGewerbeCompleteRequest.persönlicheDaten.adresse,
-            postleitzahl: "21149",
-          },
-        },
         unternehmensDaten: {
           ...registerGewerbeCompleteRequest.unternehmensDaten,
           adresseAbweichend: undefined,
         },
       });
 
-      expect(result.ags).toBe("02000000");
+      expect(mockGetAGSandARS).toHaveBeenCalledWith(
+        registerGewerbeCompleteRequest.persönlicheDaten.adresse.postleitzahl,
+      );
     });
 
-    it("returns AGS 11000000 if company has adresseAbweichend.postleitzahl of 10969", async () => {
-      const result = await lookupRequestContext({
+    it("uses adresseAbweichend.postleitzahl when provided", async () => {
+      await lookupRequestContext({
         ...registerGewerbeCompleteRequest,
         unternehmensDaten: {
           ...registerGewerbeCompleteRequest.unternehmensDaten,
@@ -35,7 +59,34 @@ describe("lookupRequestContext", () => {
         },
       });
 
-      expect(result.ags).toBe("11000000");
+      expect(mockGetAGSandARS).toHaveBeenCalledWith("10969");
+    });
+  });
+
+  describe("FIT-Connect routing", () => {
+    it("returns destinationId from the first route when FIT-Connect is supported", async () => {
+      mockGetRoutes.mockResolvedValueOnce({
+        count: 1,
+        offset: 0,
+        totalCount: 1,
+        routes: [
+          { destinationId: "mock-destination-id", destinationSignature: "sig.nat.ure" },
+          { destinationId: "mock-destination-id2", destinationSignature: "sig.nat.ure" },
+        ],
+      });
+
+      const result = await lookupRequestContext(requestWithFitConnectSupport);
+
+      expect(result.fitConnect!.destinationId).toBe("mock-destination-id");
+      expect(result.ags).toBe("03046001");
+    });
+
+    it("throws when FIT-Connect returns no routes for the AGS", async () => {
+      mockGetRoutes.mockResolvedValueOnce({ count: 0, offset: 0, totalCount: 0, routes: [] });
+
+      await expect(lookupRequestContext(requestWithFitConnectSupport)).rejects.toThrow(
+        "No FIT-Connect destination found for AGS 03046001",
+      );
     });
   });
 });
