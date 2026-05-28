@@ -91,17 +91,17 @@ async function submitFsE(data: RegisterGewerbeRequest) {
 
 function determineHttpStatus(
   gewerbeanmeldung: { success: boolean; errorType?: string },
-  steuernummer: { success: boolean; errorType?: string },
+  fseÜbermittlung: { success: boolean; errorType?: string },
 ) {
-  if (gewerbeanmeldung.success && steuernummer.success) {
+  if (gewerbeanmeldung.success && fseÜbermittlung.success) {
     return 200;
   }
-  if (gewerbeanmeldung.success || steuernummer.success) {
+  if (gewerbeanmeldung.success || fseÜbermittlung.success) {
     return 207;
   }
   if (
     gewerbeanmeldung.errorType === ErrorTypeSchema.enum.validation_error &&
-    steuernummer.errorType === ErrorTypeSchema.enum.validation_error
+    fseÜbermittlung.errorType === ErrorTypeSchema.enum.validation_error
   ) {
     return 400;
   }
@@ -114,7 +114,7 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
       // With OpenAPIHono, the body is already validated against your schema
       const data = c.req.valid("json");
 
-      const [gewerbeanmeldung, steuernummer] = await Promise.all([
+      const [gewerbeanmeldung, fseÜbermittlung] = await Promise.all([
         submitGewerbeanmeldung(data),
         submitFsE(data),
       ]);
@@ -122,14 +122,13 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
       return c.json(
         {
           gewerbeanmeldung,
-          steuernummer,
           fseÜbermittlung: {
-            success: steuernummer.success,
-            submissionId: steuernummer.submissionId,
-            errorType: steuernummer.errorType,
+            success: fseÜbermittlung.success,
+            submissionId: fseÜbermittlung.submissionId,
+            errorType: fseÜbermittlung.errorType,
           },
         },
-        determineHttpStatus(gewerbeanmeldung, steuernummer),
+        determineHttpStatus(gewerbeanmeldung, fseÜbermittlung),
       );
     } catch (error) {
       // Unhandled Error
@@ -137,11 +136,6 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
       return c.json(
         {
           gewerbeanmeldung: {
-            success: false,
-            errorType: ErrorTypeSchema.enum.upstream_error,
-            info: "Internal Server Error",
-          },
-          steuernummer: {
             success: false,
             errorType: ErrorTypeSchema.enum.upstream_error,
             info: "Internal Server Error",

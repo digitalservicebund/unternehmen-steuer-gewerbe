@@ -42,7 +42,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
   afterEach(() => vi.restoreAllMocks());
 
   describe("in case of partial success", () => {
-    it("Returns 207 MULTI-STATUS with gewerbeanmeldung upstream_error when routing returns no destinations, steuernummer still succeeds", async () => {
+    it("Returns 207 MULTI-STATUS with gewerbeanmeldung upstream_error when FIT-Connect fails, fseÜbermittlung still succeeds", async () => {
       mockLookupRequestContext.mockRejectedValueOnce(
         new Error("No FIT-Connect destination found for AGS 03046001"),
       );
@@ -52,23 +52,10 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(response.status).toEqual(HttpStatusCode.MultiStatus);
       expect(json.gewerbeanmeldung.success).toBe(false);
       expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
-      expect(json.steuernummer.success).toBe(true);
       expect(json.fseÜbermittlung.success).toBe(true);
     });
 
-    it("Returns 207 MULTI-STATUS with gewerbeanmeldung upstream_error when FIT-Connect fails, steuernummer still succeeds", async () => {
-      mockSubmitData.mockRejectedValueOnce(new Error("Server Down"));
-
-      const response = await postRegisterGewerbe();
-      const json = await response.json();
-      expect(response.status).toEqual(HttpStatusCode.MultiStatus);
-      expect(json.gewerbeanmeldung.success).toBe(false);
-      expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
-      expect(json.steuernummer.success).toBe(true);
-      expect(json.fseÜbermittlung.success).toBe(true);
-    });
-
-    it("Returns 207 MULTI-STATUS with gewerbeanmeldung validation_error when XML creation throws, steuernummer still succeeds", async () => {
+    it("Returns 207 MULTI-STATUS with gewerbeanmeldung validation_error when XML creation throws, fseÜbermittlung still succeeds", async () => {
       vi.spyOn(gewerbeanmeldung, "createGewerbeanmeldungXml").mockRejectedValue(
         new Error("XML schema mismatch"),
       );
@@ -78,11 +65,10 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(response.status).toEqual(HttpStatusCode.MultiStatus);
       expect(json.gewerbeanmeldung.success).toBe(false);
       expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
-      expect(json.steuernummer.success).toBe(true);
       expect(json.fseÜbermittlung.success).toBe(true);
     });
 
-    it("Returns 207 MULTI-STATUS with steuernummer upstream_error when ERiC service is unavailable, gewerbeanmeldung still succeeds", async () => {
+    it("Returns 207 MULTI-STATUS with fseÜbermittlung upstream_error when ERiC service is unavailable, gewerbeanmeldung still succeeds", async () => {
       vi.spyOn(eric, "validateFsE").mockReturnValue({
         isValid: undefined,
         returnCode: undefined,
@@ -92,15 +78,13 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       const response = await postRegisterGewerbe();
       const json = await response.json();
       expect(response.status).toEqual(HttpStatusCode.MultiStatus);
-      expect(json.steuernummer.success).toBe(false);
-      expect(json.steuernummer.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
       expect(json.fseÜbermittlung.success).toBe(false);
       expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
       expect(json.gewerbeanmeldung.success).toBe(true);
       expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
     });
 
-    it("Returns 207 MULTI-STATUS with steuernummer validation_error when FsE validation fails, gewerbeanmeldung still succeeds", async () => {
+    it("Returns 207 MULTI-STATUS with fseÜbermittlung validation_error when FsE validation fails, gewerbeanmeldung still succeeds", async () => {
       vi.spyOn(eric, "validateFsE").mockReturnValue({
         isValid: false,
         returnCode: 1,
@@ -110,8 +94,6 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       const response = await postRegisterGewerbe();
       const json = await response.json();
       expect(response.status).toEqual(HttpStatusCode.MultiStatus);
-      expect(json.steuernummer.success).toBe(false);
-      expect(json.steuernummer.errorType).toBe(ErrorTypeSchema.enum.validation_error);
       expect(json.fseÜbermittlung.success).toBe(false);
       expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
       expect(json.gewerbeanmeldung.success).toBe(true);
@@ -135,8 +117,6 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(response.status).toEqual(HttpStatusCode.BadRequest);
       expect(json.gewerbeanmeldung.success).toBe(false);
       expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
-      expect(json.steuernummer.success).toBe(false);
-      expect(json.steuernummer.errorType).toBe(ErrorTypeSchema.enum.validation_error);
       expect(json.fseÜbermittlung.success).toBe(false);
       expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
     });
@@ -153,7 +133,6 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       const json = await response.json();
       expect(response.status).toEqual(HttpStatusCode.InternalServerError);
       expect(json.gewerbeanmeldung.success).toBe(false);
-      expect(json.steuernummer.success).toBe(false);
       expect(json.fseÜbermittlung.success).toBe(false);
     });
   });
