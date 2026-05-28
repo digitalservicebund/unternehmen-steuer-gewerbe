@@ -25,7 +25,9 @@ async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
 
   let gewerbeanmeldungXml: string;
   try {
-    gewerbeanmeldungXml = await createGewerbeanmeldungXml(transformToGewerbeanmeldung(data, context));
+    gewerbeanmeldungXml = await createGewerbeanmeldungXml(
+      transformToGewerbeanmeldung(data, context),
+    );
   } catch (error) {
     console.error("Gewerbeanmeldung XML validation failed", error);
     return {

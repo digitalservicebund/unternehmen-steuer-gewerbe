@@ -34,11 +34,12 @@ describe("FitConnectClient", () => {
 
       const result = await client.getRoutes(
         "99050012104000",
-        "08421000", // AGS Ulm, used in pvogClient tests
+        "08421000", // AGS Ulm
       );
 
       expect(Array.isArray(result.routes)).toBe(true);
       expect(typeof result.count).toBe("number");
+      expect(typeof result.routes[0]!.destinationId).toBe("string");
     });
   });
 
