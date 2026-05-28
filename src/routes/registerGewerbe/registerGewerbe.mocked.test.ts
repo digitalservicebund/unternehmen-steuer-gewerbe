@@ -7,16 +7,17 @@ vi.mock("unternehmen-steuer-gewerbe-privat", () => ({
   createElsterFsEEUnXml: vi.fn().mockReturnValue("<xml/>"),
 }));
 
-const mockSubmitData = vi.fn().mockResolvedValue({ submissionId: "mock-submission-id" });
+const { mockSubmitData, mockLookupRequestContext } = vi.hoisted(() => ({
+  mockSubmitData: vi.fn().mockResolvedValue({ submissionId: "mock-submission-id" }),
+  mockLookupRequestContext: vi.fn().mockResolvedValue({
+    ags: "03046001",
+    fitConnect: { destinationId: "mock-destination-id" },
+  }),
+}));
 
 vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
   getFitConnectClient: () => ({ submitData: mockSubmitData }),
 }));
-
-const mockLookupRequestContext = vi.fn().mockResolvedValue({
-  ags: "03046001",
-  destinationId: "mock-destination-id",
-});
 
 vi.mock("./lookupRequestContext", () => ({
   lookupRequestContext: mockLookupRequestContext,
