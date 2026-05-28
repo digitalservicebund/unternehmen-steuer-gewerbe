@@ -44,8 +44,7 @@ const gewerbeanmeldung: DataForCreateGewerbeanmeldungXml = {
   },
   anzeigerenderId: "np-1",
   handelndePersonId: "np-1",
-  handelndePersonVertrauensniveauCode: "substanziell",
-  handelndePersonVertrauensniveauVersion: "1.0",
+  handelndePersonVertrauensniveauCode: "20",
   satzErstellung: "2022-07-04T17:54:42.000+00:00",
   ereigniszeitpunkt: "2026-05-08T12:00:29.0",
   istStorno: false,
@@ -219,8 +218,7 @@ describe("createGewerbeanmeldungXml", () => {
         autor: { kennung: "MELDID:00000000", name: "Gewerbeamt Muster" },
       },
       autor: { kennung: "MELDID:00000000", name: "Gewerbeamt Muster" },
-      handelndePersonVertrauensniveauCode: "substanziell",
-      handelndePersonVertrauensniveauVersion: "1.0",
+      handelndePersonVertrauensniveauCode: "20",
       satzErstellung: "2024-01-01T09:00:00.000+01:00",
       ereigniszeitpunkt: "2024-01-02T08:00:00.0",
       istStorno: false,
@@ -292,14 +290,13 @@ describe("createGewerbeanmeldungXml", () => {
     expect(xml).not.toContain("<antr:ansprechpartner.id>");
   });
 
-  it("renders vertrauensniveauIdentifikation with code and listVersionID", async () => {
+  it("includes vertrauensniveauIdentifikation with code and listVersionID", async () => {
     const xml = await createGewerbeanmeldungXml({
       ...gewerbeanmeldung,
-      handelndePersonVertrauensniveauCode: "hoch",
-      handelndePersonVertrauensniveauVersion: "2.0",
+      handelndePersonVertrauensniveauCode: "30",
     });
-    expect(xml).toContain('listVersionID="2.0"');
-    expect(xml).toContain("<code>hoch</code>");
+    expect(xml).toContain('listVersionID="4"');
+    expect(xml).toContain("<code>30</code>");
   });
 
   it("includes ansprechpartner.id when provided", async () => {

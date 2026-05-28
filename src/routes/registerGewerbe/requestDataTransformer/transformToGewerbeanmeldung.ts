@@ -33,8 +33,7 @@ export async function transformToGewerbeanmeldung(
     autor: { kennung: autorKennung, name: "Schneller Gruenden OSS" },
     anzeigerenderId: personId,
     handelndePersonId: personId,
-    handelndePersonVertrauensniveauCode: "substanziell", // TODO: aus Authentifizierungskontext befüllen
-    handelndePersonVertrauensniveauVersion: "1.0", // TODO: korrekte Codelisten-Version klären
+    handelndePersonVertrauensniveauCode: "20", // TODO: clarify with OSS team which value to set once BundID is implemented
     satzErstellung: new Date().toISOString(),
     ereigniszeitpunkt: new Date().toISOString(),
     istStorno: false,

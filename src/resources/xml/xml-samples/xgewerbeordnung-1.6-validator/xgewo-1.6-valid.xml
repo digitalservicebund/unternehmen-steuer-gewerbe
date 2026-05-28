@@ -57,8 +57,8 @@
    <xga:satz>
       <antr:anzeigender.id>np-1</antr:anzeigender.id>
       <antr:handelndePerson.id>np-1</antr:handelndePerson.id>
-      <bk:handelndePerson.vertrauensniveauIdentifikation listVersionID="1.0">
-         <code>substanziell</code>
+      <bk:handelndePerson.vertrauensniveauIdentifikation listVersionID="4">
+         <code>20</code>
       </bk:handelndePerson.vertrauensniveauIdentifikation>
       <xga:anmeldung>
          <xga:autor>

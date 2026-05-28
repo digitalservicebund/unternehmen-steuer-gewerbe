@@ -26,8 +26,6 @@ export interface CreateGewerbeanmeldungXmlData {
   handelndePersonId?: string;
   /** Code des Vertrauensniveaus gemäß FIM-Codeliste urn:xoev-de:fim:codeliste:vertrauensniveau (XSD-Pflichtfeld). */
   handelndePersonVertrauensniveauCode?: string;
-  /** listVersionID-Attribut für bk:handelndePerson.vertrauensniveauIdentifikation. */
-  handelndePersonVertrauensniveauVersion?: string;
   /** ID-Querverweis auf das natuerlichePerson-Element des Ansprechpartners. */
   ansprechpartnerId?: string;
   /** Angabe des Zeitpunkts der Erstellung des XML-Datensatzes für die Übermittlung. */
@@ -99,7 +97,7 @@ export async function createGewerbeanmeldungXml(
       <xga:satz>
         ${gewerbeanmeldung.anzeigerenderId ? `<antr:anzeigender.id>${escapeXml(gewerbeanmeldung.anzeigerenderId)}</antr:anzeigender.id>` : ""}
         ${gewerbeanmeldung.handelndePersonId ? `<antr:handelndePerson.id>${escapeXml(gewerbeanmeldung.handelndePersonId)}</antr:handelndePerson.id>` : ""}
-        ${gewerbeanmeldung.handelndePersonVertrauensniveauCode ? `<bk:handelndePerson.vertrauensniveauIdentifikation listVersionID="${escapeXml(gewerbeanmeldung.handelndePersonVertrauensniveauVersion ?? "")}"><code>${escapeXml(gewerbeanmeldung.handelndePersonVertrauensniveauCode)}</code></bk:handelndePerson.vertrauensniveauIdentifikation>` : ""}
+        ${gewerbeanmeldung.handelndePersonVertrauensniveauCode ? `<bk:handelndePerson.vertrauensniveauIdentifikation listVersionID="4"><code>${escapeXml(gewerbeanmeldung.handelndePersonVertrauensniveauCode)}</code></bk:handelndePerson.vertrauensniveauIdentifikation>` : ""}
         ${gewerbeanmeldung.ansprechpartnerId ? `<antr:ansprechpartner.id>${escapeXml(gewerbeanmeldung.ansprechpartnerId)}</antr:ansprechpartner.id>` : ""}
         <xga:anmeldung>
             ${gewerbeanmeldung.autor ? `<xga:autor>${createBehoerde(gewerbeanmeldung.autor)}</xga:autor>` : ""}
