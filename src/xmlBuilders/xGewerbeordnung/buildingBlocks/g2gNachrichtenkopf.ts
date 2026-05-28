@@ -16,7 +16,7 @@ export function createG2gNachrichtenkopf(nachrichtenkopf: Nachrichtenkopf | unde
       <bn-g2g:identifikation.nachricht>
         ${nachrichtenkopf.nachrichtenUUID ? `<bn-g2g:nachrichtenUUID>${escapeXml(nachrichtenkopf.nachrichtenUUID)}</bn-g2g:nachrichtenUUID>` : ""}
         <bn-g2g:nachrichtentyp listURI="urn:xoev-de:xgewerbeordnung:codeliste:nachrichtentypen" listVersionID="1.6">
-          <code>0300</code>
+          <code>0400</code>
         </bn-g2g:nachrichtentyp>
         ${nachrichtenkopf.erstellungszeitpunkt ? `<bn-g2g:erstellungszeitpunkt>${escapeXml(nachrichtenkopf.erstellungszeitpunkt)}</bn-g2g:erstellungszeitpunkt>` : ""}
       </bn-g2g:identifikation.nachricht>

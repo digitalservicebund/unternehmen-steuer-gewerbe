@@ -21,15 +21,20 @@ export async function transformToGewerbeanmeldung(
   const gemeindeSchluessel = await getAgsFromRegisterGewerbeRequestData(data);
 
   const autorKennung = `MELDID:${gemeindeSchluessel}`;
+  const personId = randomUUID();
 
   return {
     nachrichtenkopf: {
       nachrichtenUUID: randomUUID(),
       erstellungszeitpunkt: new Date().toISOString(),
       leser: { kennung: "xga:000000000001", name: "Gewerbeamt Muster" },
-      autor: { kennung: autorKennung, name: "Schneller Gruenden OSS" },
+      autor: { kennung: autorKennung, name: "Schneller Gründen" },
     },
     autor: { kennung: autorKennung, name: "Schneller Gruenden OSS" },
+    anzeigerenderId: personId,
+    handelndePersonId: personId,
+    handelndePersonVertrauensniveauCode: "substanziell", // TODO: aus Authentifizierungskontext befüllen
+    handelndePersonVertrauensniveauVersion: "1.0", // TODO: korrekte Codelisten-Version klären
     satzErstellung: new Date().toISOString(),
     ereigniszeitpunkt: new Date().toISOString(),
     istStorno: false,
@@ -76,7 +81,7 @@ export async function transformToGewerbeanmeldung(
     referenzierteSubjekte: {
       natuerlichePerson: [
         {
-          id: randomUUID(),
+          id: personId,
           name: {
             familienname: data.persönlicheDaten.nachname,
             geburtsname: data.persönlicheDaten.geburtsname,
