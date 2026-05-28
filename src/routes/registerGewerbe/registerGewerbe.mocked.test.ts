@@ -2,7 +2,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 
 // Note 1: mocking is "global" on file level, therefore we have separate files for tests that mock and those that don't.
 // Note 2: We need to mock here, such that the private library correctly initializes their internal libraries before the tests are run.
-vi.mock("unternehmen-steuer-gewerbe-privat", () => ({
+vi.mock("@digitalservicebund/unternehmen-steuer-gewerbe-privat", () => ({
   validateFsE: vi.fn().mockReturnValue({ isValid: true, returnCode: 0, info: undefined }),
   createElsterFsEEUnXml: vi.fn().mockReturnValue("<xml/>"),
 }));
@@ -14,7 +14,7 @@ vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
 }));
 
 import app from "../../app";
-import * as eric from "unternehmen-steuer-gewerbe-privat";
+import { validateFsE as mockValidateFsE } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 
 import { registerGewerbeCompleteRequest } from "./testHelpers";
@@ -58,7 +58,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
     });
 
     it("Returns 207 MULTI-STATUS with fseÜbermittlung upstream_error when ERiC service is unavailable, gewerbeanmeldung still succeeds", async () => {
-      vi.spyOn(eric, "validateFsE").mockReturnValue({
+      vi.mocked(mockValidateFsE).mockReturnValueOnce({
         isValid: undefined,
         returnCode: undefined,
         info: undefined,
@@ -74,7 +74,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
     });
 
     it("Returns 207 MULTI-STATUS with fseÜbermittlung validation_error when FsE validation fails, gewerbeanmeldung still succeeds", async () => {
-      vi.spyOn(eric, "validateFsE").mockReturnValue({
+      vi.mocked(mockValidateFsE).mockReturnValueOnce({
         isValid: false,
         returnCode: 1,
         info: "FsE validation failed",
@@ -95,7 +95,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       vi.spyOn(gewerbeanmeldung, "createGewerbeanmeldungXml").mockRejectedValue(
         new Error("XML schema mismatch"),
       );
-      vi.spyOn(eric, "validateFsE").mockReturnValue({
+      vi.mocked(mockValidateFsE).mockReturnValueOnce({
         isValid: false,
         returnCode: 1,
         info: "FsE validation failed",
@@ -112,7 +112,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
 
     it("Returns 500 INTERNAL SERVER ERROR when both submissions fail", async () => {
       mockSubmitData.mockRejectedValueOnce(new Error("Server Down"));
-      vi.spyOn(eric, "validateFsE").mockReturnValue({
+      vi.mocked(mockValidateFsE).mockReturnValueOnce({
         isValid: undefined,
         returnCode: undefined,
         info: undefined,
