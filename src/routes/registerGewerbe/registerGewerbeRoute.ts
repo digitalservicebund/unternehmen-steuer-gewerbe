@@ -23,7 +23,7 @@ export const registerGewerbeRoute = createRoute({
           schema: RegisterGewerbeResponseSchema,
         },
       },
-      description: "Successfully submitted the Gewerbeanmeldung and Steuernummer request",
+      description: "Successfully submitted the Gewerbeanmeldung and fseÜbermittlung request",
     },
     207: {
       content: {
