@@ -4,9 +4,15 @@ import { type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 
 const GEWERBEANMELDUNG_LEIKA_KEY = "99050012104000";
 
+interface FitConnectDestinationInformation {
+  destinationId: string;
+}
+
 export interface RegisterGewerbeContext {
   ags: string;
-  destinationId: string;
+  ars: string;
+  /** FIT-Connect destination info. null if FIT-Connect is not supported */
+  fitConnect: FitConnectDestinationInformation | null;
 }
 
 export async function lookupRequestContext(
@@ -16,14 +22,30 @@ export async function lookupRequestContext(
     data.unternehmensDaten.adresseAbweichend?.postleitzahl ??
     data.persönlicheDaten.adresse.postleitzahl;
 
-  const { ags } = await getAGSandARS(postleitzahl);
+  const { ags, ars } = await getAGSandARS(postleitzahl);
 
-  const fitConnectClient = getFitConnectClient();
-  const { routes } = await fitConnectClient.getRoutes(GEWERBEANMELDUNG_LEIKA_KEY, ags);
+  let fitConnect = null;
 
-  if (routes.length === 0) {
-    throw new Error(`No FIT-Connect destination found for AGS ${ags}`);
+  if (isSupportingFitConnect(postleitzahl)) {
+    const fitConnectClient = getFitConnectClient();
+    const res = await fitConnectClient.getRoutes(GEWERBEANMELDUNG_LEIKA_KEY, ags);
+
+    if (res.routes.length === 0) {
+      throw new Error(`No FIT-Connect destination found for AGS ${ags}`);
+    }
+
+    // TODO: double-check response as soon as we have communes that support FIT-Connect
+    fitConnect = { destinationId: res.routes[0]!.destinationId };
   }
 
-  return { ags, destinationId: routes[0]!.destinationId };
+  return {
+    ags,
+    ars,
+    fitConnect,
+  };
+}
+
+function isSupportingFitConnect(postleitzahl: string) {
+  const communesWithFitConnect = ["00000"]; // currently no commune is supporting FIT-Connect
+  return communesWithFitConnect.includes(postleitzahl);
 }
