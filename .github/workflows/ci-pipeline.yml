@@ -25,7 +25,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: read
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -40,7 +39,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --ignore-scripts
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
       - name: Cache node_modules
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
@@ -220,7 +219,7 @@ jobs:
       - name: Build project and docker image
         run: pnpm build:image
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
       - name: Run Trivy vulnerability image scanner
         # Note: Results are shown in the GitHub Security tab
