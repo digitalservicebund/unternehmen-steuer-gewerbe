@@ -24,12 +24,11 @@
                              xmlns:ges="urn:xoev-de:xunternehmen:standard:basismodul:gesellschafter_1.2"
                              xmlns:spv="urn:xoev-de:xunternehmen:standard:basismodul:sonstigepersonenvereinigung_1.2"
                              xmlns:bspv="urn:xoev-de:xunternehmen:standard:basismodul:beteiligtersonstigepersonenvereinigung_1.2"
-                             produkt="XGA-Testsuite"
-                             produkthersteller="KoSIT"
-                             produktversion="2024"
+                             produkt="Schneller Gründen"
+                             produkthersteller="DigitalService GmbH des Bundes"
+                             produktversion="1"
                              standard="XGewerbeordnung"
-                             version="1.6"
-                             test="100">
+                             version="1.6">
    <bn-g2g:nachrichtenkopf.g2g>
       <bn-g2g:identifikation.nachricht>
          <bn-g2g:nachrichtenUUID>fb62d3b3-2a84-423a-bb0a-a767d32b6342</bn-g2g:nachrichtenUUID>
@@ -50,7 +49,7 @@
          <bn-beh:verzeichnisdienst listVersionID="1">
             <code>DVDV</code>
          </bn-beh:verzeichnisdienst>
-         <bn-beh:kennung>MELDID:12052000</bn-beh:kennung>
+         <bn-beh:kennung>oss:schnellergruenden</bn-beh:kennung>
          <bn-beh:name>Schneller Gründen</bn-beh:name>
       </bn-g2g:autor>
    </bn-g2g:nachrichtenkopf.g2g>

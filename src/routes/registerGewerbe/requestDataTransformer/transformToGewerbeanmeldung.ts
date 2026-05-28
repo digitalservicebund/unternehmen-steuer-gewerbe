@@ -28,7 +28,7 @@ export async function transformToGewerbeanmeldung(
       nachrichtenUUID: randomUUID(),
       erstellungszeitpunkt: new Date().toISOString(),
       leser: { kennung: "xga:000000000001", name: "Gewerbeamt Muster" },
-      autor: { kennung: autorKennung, name: "Schneller Gründen" },
+      autor: { kennung: "oss:schnellergruenden", name: "Schneller Gründen" },
     },
     autor: { kennung: autorKennung, name: "Schneller Gruenden OSS" },
     anzeigerenderId: personId,

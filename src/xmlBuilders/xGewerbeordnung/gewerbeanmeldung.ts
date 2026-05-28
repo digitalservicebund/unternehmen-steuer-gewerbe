@@ -78,12 +78,11 @@ const ROOT_ATTRIBUTES = `
   xmlns:ges="urn:xoev-de:xunternehmen:standard:basismodul:gesellschafter_1.2"
   xmlns:spv="urn:xoev-de:xunternehmen:standard:basismodul:sonstigepersonenvereinigung_1.2"
   xmlns:bspv="urn:xoev-de:xunternehmen:standard:basismodul:beteiligtersonstigepersonenvereinigung_1.2"
-  produkt="XGA-Testsuite"
-  produkthersteller="KoSIT"
-  produktversion="2024"
+  produkt="Schneller Gründen"
+  produkthersteller="DigitalService GmbH des Bundes"
+  produktversion="1"
   standard="XGewerbeordnung"
   version="1.6"
-  test="100"
 ` as const;
 
 export async function createGewerbeanmeldungXml(
