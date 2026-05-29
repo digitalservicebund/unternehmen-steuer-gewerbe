@@ -27,6 +27,8 @@ updates:
       semver-major-days: 14
       semver-minor-days: 7
       semver-patch-days: 3
+      exclude:
+        - "@digitalservicebund/unternehmen-steuer-gewerbe-privat"
   # Docker is handled by separate flow and a DigitalService action
   # We keep it with open-pull-request-limit: 0 so it does neither error out nor create PRs
   - package-ecosystem: "docker"
