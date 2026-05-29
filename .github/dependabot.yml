@@ -10,6 +10,7 @@ registries:
     url: https://npm.pkg.github.com
     username: x-access-token
     password: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
+    replaces-base: false
 
 updates:
   - package-ecosystem: "github-actions"
