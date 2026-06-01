@@ -19,9 +19,8 @@ function normalizeXml(xml: string) {
   return builder.build(parser.parse(xml));
 }
 
-// source https://www.xrepository.de/api/xrepository/urn:xoev-de:kosit:standard:xgewerbeordnung_1.6:dokument:Validator-Konfiguration__01.08.2025_
-const xgewo_1_6_valid = fs.readFileSync(
-  "src/resources/xml/xml-samples/xgewerbeordnung-1.6-validator/xgewo-1.6-valid.xml",
+const xgewo_1_6_valid_0400 = fs.readFileSync(
+  "src/resources/xml/xml-samples/custom-xgewo-1.6-valid-0400.xml",
   "utf-8",
 );
 
@@ -205,7 +204,7 @@ describe("createGewerbeanmeldungXml", () => {
 
   it("maps Gewerbeanmeldung data to the correct xGewerbeordnung 1.6 XML structure", async () => {
     expect(normalizeXml(await createGewerbeanmeldungXml(gewerbeanmeldung))).toBe(
-      normalizeXml(xgewo_1_6_valid),
+      normalizeXml(xgewo_1_6_valid_0400),
     );
   });
 
