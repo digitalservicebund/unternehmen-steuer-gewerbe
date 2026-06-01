@@ -4,7 +4,7 @@ import app from "../../app";
 
 describe("Route /api/v1/region/{plz}", () => {
   it("Returns supported:true for a supported PLZ", async () => {
-    const response = await app.request("/api/v1/region/52062");
+    const response = await app.request("/api/v1/region/01067");
     expect(response.status).toEqual(HttpStatusCode.Ok);
     expect(response.headers.get("content-type")).toMatch(/json/);
     expect(await response.json()).toEqual({ supported: true });
