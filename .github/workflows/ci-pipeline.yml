@@ -145,7 +145,31 @@ jobs:
   # SonarCloud for static code and test coverage analyses
   # requires the SonarQubeCloud GitHub app in the repository
   ################################
-  scan-with-sonarcloud:
+  sonar-static:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          fetch-depth: 0
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  sonar-coverage:
     needs: [test]
     runs-on: ubuntu-latest
     permissions:
@@ -176,6 +200,14 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+  sonar-quality-gate:
+    needs: [sonar-static, sonar-coverage]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
       # Break pipeline on Sonar quality gate
       - name: SonarQube Quality Gate check
         id: sonarqube-quality-gate-check
@@ -312,7 +344,7 @@ jobs:
 
   publish-image:
     name: Publish image to registry (main only)
-    needs: [check-format-and-lint, test, scan-with-sonarcloud, build-image, secret-scanning]
+    needs: [check-format-and-lint, test, sonar-quality-gate, build-image, secret-scanning]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
@@ -531,7 +563,7 @@ jobs:
     needs:
       - check-format-and-lint
       - test
-      - scan-with-sonarcloud
+      - sonar-quality-gate
       - build-image
       - secret-scanning
     if: ${{ github.event_name != 'schedule' && success() && github.actor ==
