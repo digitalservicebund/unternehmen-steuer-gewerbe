@@ -3,6 +3,7 @@ import { type CreateGewerbeanmeldungXmlData } from "../../../xmlBuilders/xGewerb
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { splitStrasseHausnummer } from "../../../helpers/formFieldTransformations";
 import { getAGSandARS } from "../../../clients/pvogClient/pvogClient";
+import { VERTRAUENSNIVEAU } from "./xGewerbeordnungCodes";
 
 // Transforms a RegisterGewerbeRequest into a complete Gewerbeanmeldung structure.
 // NOTE: several values are hardcoded placeholders and will be generated / fetched from other sources later.
@@ -30,10 +31,10 @@ export async function transformToGewerbeanmeldung(
       leser: { kennung: "xga:000000000001", name: "Gewerbeamt Muster" },
       autor: { kennung: "oss:schnellergruenden", name: "Schneller Gründen" },
     },
-    autor: { kennung: autorKennung, name: "Schneller Gruenden OSS" },
+    autor: { kennung: autorKennung, name: "Gewerbeamt" }, // TODO: add name of the the actual Gewerbeamt
     anzeigerenderId: personId,
     handelndePersonId: personId,
-    handelndePersonVertrauensniveauCode: "20", // TODO: clarify with OSS team which value to set once BundID is implemented
+    handelndePersonVertrauensniveauCode: VERTRAUENSNIVEAU["substantiell"], // TODO: clarify with OSS team which value to set once BundID is implemented
     satzErstellung: new Date().toISOString(),
     ereigniszeitpunkt: new Date().toISOString(),
     istStorno: false,

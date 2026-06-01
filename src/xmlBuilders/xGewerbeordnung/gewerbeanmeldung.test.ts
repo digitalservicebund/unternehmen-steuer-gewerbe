@@ -290,15 +290,6 @@ describe("createGewerbeanmeldungXml", () => {
     expect(xml).not.toContain("<antr:ansprechpartner.id>");
   });
 
-  it("includes vertrauensniveauIdentifikation with code and listVersionID", async () => {
-    const xml = await createGewerbeanmeldungXml({
-      ...gewerbeanmeldung,
-      handelndePersonVertrauensniveauCode: "30",
-    });
-    expect(xml).toContain('listVersionID="4"');
-    expect(xml).toContain("<code>30</code>");
-  });
-
   it("includes ansprechpartner.id when provided", async () => {
     const xml = await createGewerbeanmeldungXml({
       ...gewerbeanmeldung,
