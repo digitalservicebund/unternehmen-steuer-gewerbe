@@ -5,11 +5,12 @@
 
 version: 2
 registries:
-  digitalservicebund-github:
-    type: git
-    url: https://github.com
+  digitalservicebund-npm:
+    type: npm-registry
+    url: https://npm.pkg.github.com
     username: x-access-token
     password: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
+    replaces-base: false
 
 updates:
   - package-ecosystem: "github-actions"
@@ -19,7 +20,7 @@ updates:
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/" # Location of package manifests
     registries:
-      - digitalservicebund-github
+      - digitalservicebund-npm
     schedule:
       interval: "daily"
     cooldown:
@@ -27,6 +28,8 @@ updates:
       semver-major-days: 14
       semver-minor-days: 7
       semver-patch-days: 3
+      exclude:
+        - "@digitalservicebund/unternehmen-steuer-gewerbe-privat"
   # Docker is handled by separate flow and a DigitalService action
   # We keep it with open-pull-request-limit: 0 so it does neither error out nor create PRs
   - package-ecosystem: "docker"
