@@ -1,5 +1,4 @@
-type PLZ = string;
-type RangeOfPLZs = [PLZ, PLZ];
+type RangeOfPLZs = [string, string];
 
 const SUPPORTED_REGIONS = {
   aachen: [["52062", "52080"]],
@@ -33,7 +32,7 @@ const SUPPORTED_REGIONS = {
     "27499",
   ],
   mannheim: [["68159", "68309"]],
-} as const satisfies Record<string, ReadonlyArray<PLZ | RangeOfPLZs>>;
+} as const satisfies Record<string, ReadonlyArray<string | RangeOfPLZs>>;
 
 export function isSupportedRegion(plz: number): boolean {
   return Object.values(SUPPORTED_REGIONS).some((entries) =>
