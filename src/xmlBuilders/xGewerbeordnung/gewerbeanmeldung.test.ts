@@ -33,7 +33,7 @@ const gewerbeanmeldung: DataForCreateGewerbeanmeldungXml = {
       name: "Phantasie-Verteilplattform",
     },
     autor: {
-      kennung: "oss:schnellergruenden",
+      kennung: "schnellergruenden",
       name: "Schneller Gründen",
     },
   },
