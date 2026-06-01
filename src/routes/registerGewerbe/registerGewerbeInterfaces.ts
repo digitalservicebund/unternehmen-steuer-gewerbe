@@ -2,6 +2,7 @@ import { z } from "@hono/zod-openapi";
 import {
   UNFALLVERSICHERUNGSTRAEGER,
   UNFALLVERSICHERUNGSTRAEGER_KEYS,
+  VERTRAUENSNIVEAU_KEYS,
 } from "./requestDataTransformer/xGewerbeordnungCodes";
 import {
   RELIGIONSSCHLUESSEL_KEYS,
@@ -56,6 +57,10 @@ const PersönlicheDatenSchema = z.object({
     }),
   religion: z.enum(RELIGIONSSCHLUESSEL_KEYS).openapi({
     example: "nichtKirchensteuerpflichtig",
+  }),
+  vertrauensniveau: z.enum(VERTRAUENSNIVEAU_KEYS).default("unbestimmt").openapi({
+    example: "substantiell",
+    description: "Vertrauensniveau des verwendeten Identifizierungsmittels gemäß eIDAS-Verordnung",
   }),
 });
 

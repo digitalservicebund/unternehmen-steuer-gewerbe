@@ -31,10 +31,10 @@ export async function transformToGewerbeanmeldung(
       leser: { kennung: "xga:000000000001", name: "Gewerbeamt Muster" },
       autor: { kennung: "schnellergruenden", name: "Schneller Gründen" },
     },
-    autor: { kennung: autorKennung, name: "Gewerbeamt" }, // TODO: add name of the the actual Gewerbeamt
+    autor: { kennung: autorKennung, name: "Behörde" },
     anzeigerenderId: personId,
     handelndePersonId: personId,
-    handelndePersonVertrauensniveauCode: VERTRAUENSNIVEAU["substantiell"], // TODO: clarify with OSS team which value to set once BundID is implemented
+    handelndePersonVertrauensniveauCode: VERTRAUENSNIVEAU[data.persönlicheDaten.vertrauensniveau],
     satzErstellung: new Date().toISOString(),
     ereigniszeitpunkt: new Date().toISOString(),
     istStorno: false,
