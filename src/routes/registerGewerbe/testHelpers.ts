@@ -18,6 +18,7 @@ export const registerGewerbeCompleteRequest: RegisterGewerbeRequest = {
     telefon: "+49 234 121314",
     email: "e.mustermann@example.org",
     religion: "nichtKirchensteuerpflichtig",
+    vertrauensniveau: "substantiell",
   },
   unternehmensDaten: {
     tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",

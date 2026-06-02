@@ -20,6 +20,14 @@ export interface CreateGewerbeanmeldungXmlData {
   nachrichtenkopf?: Nachrichtenkopf;
   /** Die die Gewerbeanzeige entgegennehmende Behörde. */
   autor?: Behoerde;
+  /** ID-Querverweis auf das natuerlichePerson- oder juristischePerson-Element des Anzeigenden. */
+  anzeigerenderId?: string;
+  /** ID-Querverweis auf das natuerlichePerson-Element der handelnden Person. */
+  handelndePersonId?: string;
+  /** Code des Vertrauensniveaus gemäß FIM-Codeliste urn:xoev-de:fim:codeliste:vertrauensniveau (XSD-Pflichtfeld). */
+  handelndePersonVertrauensniveauCode?: string;
+  /** ID-Querverweis auf das natuerlichePerson-Element des Ansprechpartners. */
+  ansprechpartnerId?: string;
   /** Angabe des Zeitpunkts der Erstellung des XML-Datensatzes für die Übermittlung. */
   satzErstellung?: string;
   /** Der Zeitpunkt, zu welchem der die Übermittlung auslösende Verwaltungsvorgang (Aufnahme / Änderung / Korrektur eines Datensatzes) im gemeindlichen Gewerbeverzeichnis gespeichert wurde. */
@@ -70,12 +78,11 @@ const ROOT_ATTRIBUTES = `
   xmlns:ges="urn:xoev-de:xunternehmen:standard:basismodul:gesellschafter_1.2"
   xmlns:spv="urn:xoev-de:xunternehmen:standard:basismodul:sonstigepersonenvereinigung_1.2"
   xmlns:bspv="urn:xoev-de:xunternehmen:standard:basismodul:beteiligtersonstigepersonenvereinigung_1.2"
-  produkt="XGA-Testsuite"
-  produkthersteller="KoSIT"
-  produktversion="2024"
+  produkt="Schneller Gründen"
+  produkthersteller="DigitalService GmbH des Bundes"
+  produktversion="1"
   standard="XGewerbeordnung"
   version="1.6"
-  test="100"
 ` as const;
 
 export async function createGewerbeanmeldungXml(
@@ -84,9 +91,13 @@ export async function createGewerbeanmeldungXml(
   const natuerlichePerson0 = gewerbeanmeldung.referenzierteSubjekte?.natuerlichePerson?.[0];
 
   const gewerbeanmeldungXml = `<?xml version="1.0" encoding="UTF-8"?>
-    <xga:alg.gewerbemeldung.0300 ${ROOT_ATTRIBUTES}>
+    <xga:ext.gewerbemeldung.0400 ${ROOT_ATTRIBUTES}>
       ${createG2gNachrichtenkopf(gewerbeanmeldung.nachrichtenkopf)}
       <xga:satz>
+        ${gewerbeanmeldung.anzeigerenderId ? `<antr:anzeigender.id>${escapeXml(gewerbeanmeldung.anzeigerenderId)}</antr:anzeigender.id>` : ""}
+        ${gewerbeanmeldung.handelndePersonId ? `<antr:handelndePerson.id>${escapeXml(gewerbeanmeldung.handelndePersonId)}</antr:handelndePerson.id>` : ""}
+        ${gewerbeanmeldung.handelndePersonVertrauensniveauCode ? `<bk:handelndePerson.vertrauensniveauIdentifikation listVersionID="4"><code>${escapeXml(gewerbeanmeldung.handelndePersonVertrauensniveauCode)}</code></bk:handelndePerson.vertrauensniveauIdentifikation>` : ""}
+        ${gewerbeanmeldung.ansprechpartnerId ? `<antr:ansprechpartner.id>${escapeXml(gewerbeanmeldung.ansprechpartnerId)}</antr:ansprechpartner.id>` : ""}
         <xga:anmeldung>
             ${gewerbeanmeldung.autor ? `<xga:autor>${createBehoerde(gewerbeanmeldung.autor)}</xga:autor>` : ""}
             ${gewerbeanmeldung.satzErstellung ? `<xga:satzErstellung>${escapeXml(gewerbeanmeldung.satzErstellung)}</xga:satzErstellung>` : ""}
@@ -102,7 +113,7 @@ export async function createGewerbeanmeldungXml(
             ${gewerbeanmeldung.grundAnmeldungSchluessel ? `<xga:grundAnmeldungSchluessel><code>${escapeXml(gewerbeanmeldung.grundAnmeldungSchluessel)}</code></xga:grundAnmeldungSchluessel>` : ""}
         </xga:anmeldung>
       </xga:satz>
-    </xga:alg.gewerbemeldung.0300>`;
+    </xga:ext.gewerbemeldung.0400>`;
 
   const xmlValidationResult = await validateXml(gewerbeanmeldungXml);
 
