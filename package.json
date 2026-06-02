@@ -35,7 +35,7 @@
     "dotenv": "^17.4.2",
     "hono": "^4.12.22",
     "jose": "^6.2.3",
-    "koffi": "^2.16.2",
+    "koffi": "^3.0.0",
     "saxonjs-he": "3.0.0-beta2",
     "vite": "8.0.14",
     "xmllint-wasm": "^5.2.0",
