@@ -35,12 +35,13 @@ const SUPPORTED_REGIONS = {
 } as const satisfies Record<string, ReadonlyArray<string | RangeOfPLZs>>;
 
 export function isSupportedRegion(plz: number): boolean {
-  return Object.values(SUPPORTED_REGIONS).some((entries) =>
-    entries.some((entry) => {
-      if (Array.isArray(entry)) {
-        return plz >= Number(entry[0]) && plz <= Number(entry[1]);
-      }
-      return plz === Number(entry);
-    }),
-  );
+  const allSupportedPlzEntries = Object.values(SUPPORTED_REGIONS).flat();
+
+  return allSupportedPlzEntries.some((entry) => {
+    const isRangeOfPLZs = Array.isArray(entry);
+    if (isRangeOfPLZs) {
+      return plz >= Number(entry[0]) && plz <= Number(entry[1]);
+    }
+    return plz === Number(entry);
+  });
 }
