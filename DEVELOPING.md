@@ -4,15 +4,31 @@
 
 Parts of this code base are not public (e.g. the wrapper around the ELSTER [ERiC](https://www.elster.de/eportal/infoseite/entwickler) library). They are included as an npm dependency from a private GitHub repository (`unternehmen-steuer-gewerbe-privat`).
 
-After cloning, run `pnpm install` as usual. You will need access to the private repository for pnpm to resolve the dependency.
+After cloning, run `pnpm install` as usual. You will need read access to GitHub Packages for pnpm to resolve the dependency.
 
-If you configured git to use HTTPS instead of SSH, add a URL rewrite rule so pnpm can resolve the private dependency:
+Create a [GitHub personal access token](https://github.com/settings/tokens) with the `read:packages` scope and set it as `NODE_AUTH_TOKEN` in your shell environment (e.g. in `~/.bashrc` or `~/.zshrc`):
 
 ```bash
-git config --global --add url."https://github.com/".insteadOf "git@github.com:"
+export NODE_AUTH_TOKEN=<your-token>
 ```
 
-`--add` makes sure your existing config is not overwritten.
+The `.npmrc` in this repo routes the `@digitalservicebund` scope to `npm.pkg.github.com` and picks up the token automatically.
+
+> **Using `gh auth token`?** The GitHub CLI token does not include `read:packages` by default. You have two options:
+>
+> **Option A — refresh the credentials stored in the GitHub CLI:**
+>
+> ```bash
+> unset GH_TOKEN  # required if GH_TOKEN is set in your environment
+> gh auth refresh -s read:packages
+> export NODE_AUTH_TOKEN=$(gh auth token)
+> ```
+>
+> **Option B — if you use `GH_TOKEN` directly:** go to [github.com/settings/tokens](https://github.com/settings/tokens), find the underlying classic PAT, enable the `read:packages` scope, and re-export it:
+>
+> ```bash
+> export NODE_AUTH_TOKEN=$(gh auth token)  # or paste the token directly
+> ```
 
 ## Environment Variables
 

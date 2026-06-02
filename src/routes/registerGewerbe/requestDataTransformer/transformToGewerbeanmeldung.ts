@@ -3,6 +3,7 @@ import { type CreateGewerbeanmeldungXmlData } from "../../../xmlBuilders/xGewerb
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { type RegisterGewerbeContext } from "../lookupRequestContext";
 import { splitStrasseHausnummer } from "../../../helpers/formFieldTransformations";
+import { VERTRAUENSNIVEAU } from "./xGewerbeordnungCodes";
 
 // Transforms a RegisterGewerbeRequest into a complete Gewerbeanmeldung structure.
 // NOTE: several values are hardcoded placeholders and will be generated / fetched from other sources later.
@@ -21,15 +22,19 @@ export function transformToGewerbeanmeldung(
 
   const gemeindeSchluessel = context.ags;
   const autorKennung = `MELDID:${gemeindeSchluessel}`;
+  const personId = randomUUID();
 
   return {
     nachrichtenkopf: {
       nachrichtenUUID: randomUUID(),
       erstellungszeitpunkt: new Date().toISOString(),
       leser: { kennung: "xga:000000000001", name: "Gewerbeamt Muster" },
-      autor: { kennung: autorKennung, name: "Schneller Gruenden OSS" },
+      autor: { kennung: "schnellerGruendenDigitalServiceBMDS", name: "Schneller Gründen" },
     },
-    autor: { kennung: autorKennung, name: "Schneller Gruenden OSS" },
+    autor: { kennung: autorKennung, name: "Behörde" },
+    anzeigerenderId: personId,
+    handelndePersonId: personId,
+    handelndePersonVertrauensniveauCode: VERTRAUENSNIVEAU[data.persönlicheDaten.vertrauensniveau],
     satzErstellung: new Date().toISOString(),
     ereigniszeitpunkt: new Date().toISOString(),
     istStorno: false,
@@ -76,7 +81,7 @@ export function transformToGewerbeanmeldung(
     referenzierteSubjekte: {
       natuerlichePerson: [
         {
-          id: randomUUID(),
+          id: personId,
           name: {
             familienname: data.persönlicheDaten.nachname,
             geburtsname: data.persönlicheDaten.geburtsname,

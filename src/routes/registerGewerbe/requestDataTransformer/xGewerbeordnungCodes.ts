@@ -42,3 +42,19 @@ export const UNFALLVERSICHERUNGSTRAEGER_KEYS = Object.keys(UNFALLVERSICHERUNGSTR
   Unfallversicherungstraeger,
   ...Unfallversicherungstraeger[],
 ];
+
+// https://www.xrepository.de/details/urn:xoev-de:fim:codeliste:xzufi.vertrauensniveau
+export const VERTRAUENSNIVEAU = {
+  unbestimmt: "00",
+  basisregistrierung: "10",
+  niedrig: "15",
+  substantiell: "20",
+  hoch: "30",
+  hochplus: "40",
+};
+
+type Vertrauensniveau = keyof typeof VERTRAUENSNIVEAU;
+export const VERTRAUENSNIVEAU_KEYS = Object.keys(VERTRAUENSNIVEAU) as [
+  Vertrauensniveau,
+  ...Vertrauensniveau[],
+];
