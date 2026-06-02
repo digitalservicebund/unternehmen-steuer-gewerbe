@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@digitalservicebund/unternehmen-steuer-gewerbe-privat':
-        specifier: 1.0.0-149
-        version: 1.0.0-149(@types/node@25.9.1)
+        specifier: 1.0.0-150
+        version: 1.0.0-150(@types/node@25.9.1)
       '@hono/node-server':
         specifier: ^2.0.3
         version: 2.0.4(hono@4.12.23)
@@ -33,8 +33,8 @@ importers:
         specifier: ^6.2.3
         version: 6.2.3
       koffi:
-        specifier: ^2.16.2
-        version: 2.16.2
+        specifier: ^3.0.0
+        version: 3.0.0
       saxonjs-he:
         specifier: 3.0.0-beta2
         version: 3.0.0-beta2
@@ -113,8 +113,8 @@ packages:
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
 
-  '@digitalservicebund/unternehmen-steuer-gewerbe-privat@1.0.0-149':
-    resolution: {integrity: sha512-XxE4NcGMmoxWQlpHV2RVAWVxvB7/k0K0T561JGUgcWS9taKqL4zsYKbCgQfaK5KppzHEOAsNzSqNJcUkwS/ZoA==, tarball: https://npm.pkg.github.com/download/@digitalservicebund/unternehmen-steuer-gewerbe-privat/1.0.0-149/7c2b78547e55562bcd21044e6ce27fe8af6177f4}
+  '@digitalservicebund/unternehmen-steuer-gewerbe-privat@1.0.0-150':
+    resolution: {integrity: sha512-wy5xhcI3p4ZrnAmwc4hqXrHkZhKlR8VhmmNKCeXAUrKNZBZPtKxTArw0EdGbTk6NNdWm1Ckg3x0SoPmRbscK8w==, tarball: https://npm.pkg.github.com/download/@digitalservicebund/unternehmen-steuer-gewerbe-privat/1.0.0-150/126f4dbbef44aae3b48f7950b4ec748494c4d60d}
 
   '@emnapi/core@1.10.0':
     resolution: {integrity: sha512-yq6OkJ4p82CAfPl0u9mQebQHKPJkY7WrIuk205cTYnYe+k2Z8YBh11FrbRG/H6ihirqcacOgl2BIO8oyMQLeXw==}
@@ -315,73 +315,73 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@koromix/koffi-darwin-arm64@3.0.2':
-    resolution: {integrity: sha512-OaL5EViEvsdbc8Ut90zY44AKF3mq6JBqkK/xLkGaSXcLsOJUsD+XaPAZb/WOWcKVg7On31wP+4hB7MwHQPdiUg==}
+  '@koromix/koffi-darwin-arm64@3.0.0':
+    resolution: {integrity: sha512-FXvgsKe2D69Ypz8SptMdk+hoomYO1X4g+VsxaZNTFX8u1qsM8TmxRa4MnLnxpDUb8zcdnYvyWtlBilPUXVJY/w==}
     cpu: [arm64]
     os: [darwin]
 
-  '@koromix/koffi-darwin-x64@3.0.2':
-    resolution: {integrity: sha512-ZkBKudZkIOy5yVcp8cUTFCrE5DSgxkcH26mUxV6m8JgUtvtps4iMIGAAZLSq5aouvQQKhbKpXtZ3YdzpcytM+g==}
+  '@koromix/koffi-darwin-x64@3.0.0':
+    resolution: {integrity: sha512-+W1fB5ycyW3kLhRD9THY0I+hiNbSQgka4SSnVAEmgbABmXv5euNOzaI1Y1cbuhsGjhC7+5wBOM+HiRlJCyHfgg==}
     cpu: [x64]
     os: [darwin]
 
-  '@koromix/koffi-freebsd-arm64@3.0.2':
-    resolution: {integrity: sha512-eVHMjYL6yMc7GOdH0juDVEYFU4D9Az6cqyI7+ytWwovwAjHNtf96S17Ag/aI2qs7WVCoHceKDdMUATzs5grvMw==}
+  '@koromix/koffi-freebsd-arm64@3.0.0':
+    resolution: {integrity: sha512-tsgSczm/pdmXSjDsOTOqdg0/u9g0VYJYQ+5bqqTLe5YYqHI3tH9QWXuw//jxENWIsIbk2mbES6j99YQT7wQ+qw==}
     cpu: [arm64]
     os: [freebsd]
 
-  '@koromix/koffi-freebsd-ia32@3.0.2':
-    resolution: {integrity: sha512-qiSkR5fF/oa8MIukjsXMmFPC/FWGfUtw3ee+jgURg0R+Tuhlvqlfh50W4rQ0Y0faITJcF+3wmCI6WSt7p4iCkA==}
+  '@koromix/koffi-freebsd-ia32@3.0.0':
+    resolution: {integrity: sha512-aiW04Av3NpQpdKjS9BAerWIsmP70BdE+q66p4fXAcmjvkfXWh6RT4uytO+UuvkoFw4a8fduUFbEihNeAEcgJxg==}
     cpu: [ia32]
     os: [freebsd]
 
-  '@koromix/koffi-freebsd-x64@3.0.2':
-    resolution: {integrity: sha512-RDqoD8tBiRoe1C/lZEdMWETKk2dTR298XgJ9PBXbw2ETMVpIX+ci++X+j+4e7J3kVldxHLdFCykNei6d1wmhTA==}
+  '@koromix/koffi-freebsd-x64@3.0.0':
+    resolution: {integrity: sha512-xKFhO4Vqn2kzvsqWW1mstZQn5dvRPc2PMDuoc70/hTrKxEy7LXI0j4VWEc7v3R9qUI3GUSjhVE7B8bUwPJlhHg==}
     cpu: [x64]
     os: [freebsd]
 
-  '@koromix/koffi-linux-arm64@3.0.2':
-    resolution: {integrity: sha512-zIm5NlzFuxt4f6mDjwTDgfzu8oZngcALTmOkWbp7HSeWdjQeiy8JRaSOEpfzlIlqWoPxhRUX5Yniqkt8564VnA==}
+  '@koromix/koffi-linux-arm64@3.0.0':
+    resolution: {integrity: sha512-nu8Ot2BEoYB5sRtg1pQ5bXwuMTHfg1V1J2YBm8Zk1cVPKNfalls7AiMh9Oo/igxuuOkC0PtQEbRvzhFdcEmwPg==}
     cpu: [arm64]
     os: [linux]
 
-  '@koromix/koffi-linux-ia32@3.0.2':
-    resolution: {integrity: sha512-Le3JxJswxBhO3OeeSWA400/v2sTPwTWz/IIc6ARc4SbTGUcz2jm6jXXQviW01r5OvCQ+w2Q2T4PxP+eaRa2+fQ==}
+  '@koromix/koffi-linux-ia32@3.0.0':
+    resolution: {integrity: sha512-CIG3vAbf9u+puoJzyR6bKZds6QBYZF7oNZrkVEH1uoR18YV3F7xltMCknthiSO9RJY9xiI3uwhEnPlM7mhvJVw==}
     cpu: [ia32]
     os: [linux]
 
-  '@koromix/koffi-linux-loong64@3.0.2':
-    resolution: {integrity: sha512-TiPOFy4OX0tLhKwL6oSOhDIhwd5b48x7nxCBT8u6IW+nLXMIo2j+jla1h9niQ8HVGknGOzu48k55KVl0YMsaew==}
+  '@koromix/koffi-linux-loong64@3.0.0':
+    resolution: {integrity: sha512-oJruRFU+aDaMw3B796G1u3nrWM1bKVxrFpKvTYvcx5ZWL1IGQeYo/ARC0wq5Wgdemk9laByd1s56tVEZYW8qIg==}
     cpu: [loong64]
     os: [linux]
 
-  '@koromix/koffi-linux-riscv64@3.0.2':
-    resolution: {integrity: sha512-U44szVAHW4WKTV0s6K6rjeZEURJ0CFHbZC0Ik3lpzvEidbOu8dTft7OGNr4hhBvx/XaeLMCCebPLBoYZZNW2Dg==}
+  '@koromix/koffi-linux-riscv64@3.0.0':
+    resolution: {integrity: sha512-nQdQ2dDD8bDdzPspLCAiTahfcuGa9YbZ+giefQZfLNrMTOFHfUiY5sQTSDjPQocYriCnaKsroU7/HdkTpgbspA==}
     cpu: [riscv64]
     os: [linux]
 
-  '@koromix/koffi-linux-x64@3.0.2':
-    resolution: {integrity: sha512-bm4qT+e59KWn4V/jK8uF1RV2k0/JJvmGPUj4qCJ3E9663H+6ZLqz1rpCdgXSEA95f5CNR3RWcgjQwxgKO9xFtQ==}
+  '@koromix/koffi-linux-x64@3.0.0':
+    resolution: {integrity: sha512-IAO1fVmi9j5z6TmPmBd14y0//5I759s/qFqAuuXvg8VDySanP12TtU5uO/qlOWgJb4oA4hJKWPuaPBaNZ5XNPQ==}
     cpu: [x64]
     os: [linux]
 
-  '@koromix/koffi-openbsd-ia32@3.0.2':
-    resolution: {integrity: sha512-tUu2LMSyeCSe1DbJKZrjGOKRQzDhj/RAw4rVdlHXlU/B26sdyKZjEwE3GxVlYDdEBX4FiYYmoVuG3BwGWSefCw==}
+  '@koromix/koffi-openbsd-ia32@3.0.0':
+    resolution: {integrity: sha512-wU6YDsoDRfmYZHPNJd8BOKuPnH3jpk5z3RT3zH6wgSVoQ+gpo9rYbIsHWgcNB7MuC5bSHdgKbiRKt4Zy8gDwbg==}
     cpu: [ia32]
     os: [openbsd]
 
-  '@koromix/koffi-openbsd-x64@3.0.2':
-    resolution: {integrity: sha512-o4QZwsKIQvlMSIJaCXsu8d2sz4bbKEJrZhmnCeT/SKEU1VEiegmDn/I6DYrg5mOMDC15GWlUP1qP6AsVlrxqXA==}
+  '@koromix/koffi-openbsd-x64@3.0.0':
+    resolution: {integrity: sha512-dHRidKDEWHbLvVG7pnCcYVFPB/w6Q4dliDPtPaPC8LCdrqByN84ec3OnyVlzHi5aqDQ54FuWHqY2moWcFi39RQ==}
     cpu: [x64]
     os: [openbsd]
 
-  '@koromix/koffi-win32-ia32@3.0.2':
-    resolution: {integrity: sha512-Yz/iP2xLaq8t3TFy5+f2Oww7rBpXgZ4YRexdYffSm2EwcnDeCtPudQSjIiKyEBdvDsU2vQetTrxyqDHStXXocw==}
+  '@koromix/koffi-win32-ia32@3.0.0':
+    resolution: {integrity: sha512-ejFGOYhsGvCRQ9aZH4Mq4RaaTNlX2W4pEhqea8JfurK5ee1cgv0Pd3E7hK4Q4CE2CrMNtF2oCqA+6lDdSxj8xw==}
     cpu: [ia32]
     os: [win32]
 
-  '@koromix/koffi-win32-x64@3.0.2':
-    resolution: {integrity: sha512-zozoHzvSi61jch4sKqFi3ATsDC7lviFthoivzPKVk4VeJvFeSdqueKoYGHNXEzfhIXn9Y5K85l9a59nwfutkUA==}
+  '@koromix/koffi-win32-x64@3.0.0':
+    resolution: {integrity: sha512-0oiT0yn1iS7+v2bfNLbbZCf+lhaVg90jtVzo6UPCGU78tVlLpAIg+3MFVjhg3vWDOtmv7BzpoLnjndkA2uD7YQ==}
     cpu: [x64]
     os: [win32]
 
@@ -1130,11 +1130,8 @@ packages:
   js-tokens@10.0.0:
     resolution: {integrity: sha512-lM/UBzQmfJRo9ABXbPWemivdCW8V2G8FHaHdypQaIy523snUjog0W71ayWXTjiR+ixeMyVHN2XcpnTd/liPg/Q==}
 
-  koffi@2.16.2:
-    resolution: {integrity: sha512-owU0MRwv6xkrVqCd+33uw6BaYppkTRXbO/rVdJNI2dvZG0gzyRhYwW25eWtc5pauwK8TGh3AbkFONSezdykfSA==}
-
-  koffi@3.0.2:
-    resolution: {integrity: sha512-YS4sGzlVMhFNNkKbkB3tcLKJxH9WGP3jHTxi4Eyx+ieMRKVz4K2i+6rebYr9ngHN36jhIW6YXnxkzBeOQ51lsw==}
+  koffi@3.0.0:
+    resolution: {integrity: sha512-RiIXPz6MpJWee0l4nbC8+cUZmeRYKXxvreE2gTEJyJRNJ4dNND8sX7OGHBpI4OYqg92kbin//Bdugbo/yEEUGA==}
 
   lightningcss-android-arm64@1.32.0:
     resolution: {integrity: sha512-YK7/ClTt4kAK0vo6w3X+Pnm0D2cf2vPHbhOXdoNti1Ga0al1P4TBZhwjATvjNwLEBCnKvjJc2jQgHXH0NEwlAg==}
@@ -1543,9 +1540,9 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@digitalservicebund/unternehmen-steuer-gewerbe-privat@1.0.0-149(@types/node@25.9.1)':
+  '@digitalservicebund/unternehmen-steuer-gewerbe-privat@1.0.0-150(@types/node@25.9.1)':
     dependencies:
-      koffi: 3.0.2
+      koffi: 3.0.0
       saxonjs-he: 3.0.0-beta2
       xmllint-wasm: 5.2.0(@types/node@25.9.1)
     transitivePeerDependencies:
@@ -1675,46 +1672,46 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@koromix/koffi-darwin-arm64@3.0.2':
+  '@koromix/koffi-darwin-arm64@3.0.0':
     optional: true
 
-  '@koromix/koffi-darwin-x64@3.0.2':
+  '@koromix/koffi-darwin-x64@3.0.0':
     optional: true
 
-  '@koromix/koffi-freebsd-arm64@3.0.2':
+  '@koromix/koffi-freebsd-arm64@3.0.0':
     optional: true
 
-  '@koromix/koffi-freebsd-ia32@3.0.2':
+  '@koromix/koffi-freebsd-ia32@3.0.0':
     optional: true
 
-  '@koromix/koffi-freebsd-x64@3.0.2':
+  '@koromix/koffi-freebsd-x64@3.0.0':
     optional: true
 
-  '@koromix/koffi-linux-arm64@3.0.2':
+  '@koromix/koffi-linux-arm64@3.0.0':
     optional: true
 
-  '@koromix/koffi-linux-ia32@3.0.2':
+  '@koromix/koffi-linux-ia32@3.0.0':
     optional: true
 
-  '@koromix/koffi-linux-loong64@3.0.2':
+  '@koromix/koffi-linux-loong64@3.0.0':
     optional: true
 
-  '@koromix/koffi-linux-riscv64@3.0.2':
+  '@koromix/koffi-linux-riscv64@3.0.0':
     optional: true
 
-  '@koromix/koffi-linux-x64@3.0.2':
+  '@koromix/koffi-linux-x64@3.0.0':
     optional: true
 
-  '@koromix/koffi-openbsd-ia32@3.0.2':
+  '@koromix/koffi-openbsd-ia32@3.0.0':
     optional: true
 
-  '@koromix/koffi-openbsd-x64@3.0.2':
+  '@koromix/koffi-openbsd-x64@3.0.0':
     optional: true
 
-  '@koromix/koffi-win32-ia32@3.0.2':
+  '@koromix/koffi-win32-ia32@3.0.0':
     optional: true
 
-  '@koromix/koffi-win32-x64@3.0.2':
+  '@koromix/koffi-win32-x64@3.0.0':
     optional: true
 
   '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
@@ -2273,24 +2270,22 @@ snapshots:
 
   js-tokens@10.0.0: {}
 
-  koffi@2.16.2: {}
-
-  koffi@3.0.2:
+  koffi@3.0.0:
     optionalDependencies:
-      '@koromix/koffi-darwin-arm64': 3.0.2
-      '@koromix/koffi-darwin-x64': 3.0.2
-      '@koromix/koffi-freebsd-arm64': 3.0.2
-      '@koromix/koffi-freebsd-ia32': 3.0.2
-      '@koromix/koffi-freebsd-x64': 3.0.2
-      '@koromix/koffi-linux-arm64': 3.0.2
-      '@koromix/koffi-linux-ia32': 3.0.2
-      '@koromix/koffi-linux-loong64': 3.0.2
-      '@koromix/koffi-linux-riscv64': 3.0.2
-      '@koromix/koffi-linux-x64': 3.0.2
-      '@koromix/koffi-openbsd-ia32': 3.0.2
-      '@koromix/koffi-openbsd-x64': 3.0.2
-      '@koromix/koffi-win32-ia32': 3.0.2
-      '@koromix/koffi-win32-x64': 3.0.2
+      '@koromix/koffi-darwin-arm64': 3.0.0
+      '@koromix/koffi-darwin-x64': 3.0.0
+      '@koromix/koffi-freebsd-arm64': 3.0.0
+      '@koromix/koffi-freebsd-ia32': 3.0.0
+      '@koromix/koffi-freebsd-x64': 3.0.0
+      '@koromix/koffi-linux-arm64': 3.0.0
+      '@koromix/koffi-linux-ia32': 3.0.0
+      '@koromix/koffi-linux-loong64': 3.0.0
+      '@koromix/koffi-linux-riscv64': 3.0.0
+      '@koromix/koffi-linux-x64': 3.0.0
+      '@koromix/koffi-openbsd-ia32': 3.0.0
+      '@koromix/koffi-openbsd-x64': 3.0.0
+      '@koromix/koffi-win32-ia32': 3.0.0
+      '@koromix/koffi-win32-x64': 3.0.0
 
   lightningcss-android-arm64@1.32.0:
     optional: true
