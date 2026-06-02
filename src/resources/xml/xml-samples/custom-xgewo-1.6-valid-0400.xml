@@ -49,7 +49,7 @@
          <bn-beh:verzeichnisdienst listVersionID="1">
             <code>DVDV</code>
          </bn-beh:verzeichnisdienst>
-         <bn-beh:kennung>schnellergruenden</bn-beh:kennung>
+         <bn-beh:kennung>schnellerGruendenDigitalServiceBMDS</bn-beh:kennung>
          <bn-beh:name>Schneller Gründen</bn-beh:name>
       </bn-g2g:autor>
    </bn-g2g:nachrichtenkopf.g2g>

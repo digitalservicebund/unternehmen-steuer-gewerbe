@@ -29,7 +29,7 @@ export async function transformToGewerbeanmeldung(
       nachrichtenUUID: randomUUID(),
       erstellungszeitpunkt: new Date().toISOString(),
       leser: { kennung: "xga:000000000001", name: "Gewerbeamt Muster" },
-      autor: { kennung: "schnellergruenden", name: "Schneller Gründen" },
+      autor: { kennung: "schnellerGruendenDigitalServiceBMDS", name: "Schneller Gründen" },
     },
     autor: { kennung: autorKennung, name: "Behörde" },
     anzeigerenderId: personId,
