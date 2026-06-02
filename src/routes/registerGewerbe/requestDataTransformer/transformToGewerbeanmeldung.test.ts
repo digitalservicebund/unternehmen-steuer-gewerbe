@@ -3,7 +3,11 @@ import { transformToGewerbeanmeldung } from "./transformToGewerbeanmeldung";
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { registerGewerbeCompleteRequest } from "../testHelpers";
 
-const testContext = { ags: "03046001", destinationId: "00000000-0000-0000-0000-000000000002" };
+const testRoutingInfo = {
+  ags: "03046001",
+  ars: "030460014004",
+  fitConnect: { destinationId: "00000000-0000-0000-0000-000000000002" },
+};
 
 describe("transformToGewerbeanmeldung", () => {
   it("maps default values, applies the geschlecht fallback if the geschlecht is not given and drops optional fields", () => {
@@ -21,7 +25,7 @@ describe("transformToGewerbeanmeldung", () => {
         adresseAbweichend: undefined,
       },
     };
-    const result = transformToGewerbeanmeldung(request, testContext);
+    const result = transformToGewerbeanmeldung(request, testRoutingInfo);
     const person = result.referenzierteSubjekte!.natuerlichePerson![0]!;
 
     expect(result.gewerbebetrieb!.istNebenerwerb).toBe(false);
@@ -54,7 +58,7 @@ describe("transformToGewerbeanmeldung", () => {
           },
         },
       },
-      testContext,
+      testRoutingInfo,
     );
 
     expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
@@ -65,9 +69,9 @@ describe("transformToGewerbeanmeldung", () => {
     });
   });
 
-  it("uses context.ags as gemeindeSchluessel", () => {
-    const result = transformToGewerbeanmeldung(registerGewerbeCompleteRequest, testContext);
+  it("uses routingInfo.ags as gemeindeSchluessel", () => {
+    const result = transformToGewerbeanmeldung(registerGewerbeCompleteRequest, testRoutingInfo);
 
-    expect(result.gemeindeSchluessel).toBe(testContext.ags);
+    expect(result.gemeindeSchluessel).toBe(testRoutingInfo.ags);
   });
 });

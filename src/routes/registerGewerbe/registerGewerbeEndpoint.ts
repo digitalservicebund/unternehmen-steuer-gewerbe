@@ -9,16 +9,16 @@ import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gew
 import { ErrorTypeSchema, type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 import { registerGewerbeRoute } from "./registerGewerbeRoute";
 import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTransformer";
-import { lookupRequestContext } from "./lookupRequestContext";
+import { getGewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
 
 const GEWERBEANMELDUNG_LEIKA_KEY_URN = "urn:de:fim:leika:leistung:99050012104000";
 
 async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
-  let context: Awaited<ReturnType<typeof lookupRequestContext>>;
+  let routingInfo: Awaited<ReturnType<typeof getGewerbeRoutingInfo>>;
   try {
-    context = await lookupRequestContext(data);
+    routingInfo = await getGewerbeRoutingInfo(data);
   } catch (error) {
-    console.error("Context lookup failed", error);
+    console.error("Gewerbe routing info lookup failed", error);
     return {
       success: false,
       errorType: ErrorTypeSchema.enum.upstream_error,
@@ -29,7 +29,7 @@ async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
   let gewerbeanmeldungXml: string;
   try {
     gewerbeanmeldungXml = await createGewerbeanmeldungXml(
-      transformToGewerbeanmeldung(data, context),
+      transformToGewerbeanmeldung(data, routingInfo),
     );
   } catch (error) {
     console.error("Gewerbeanmeldung XML validation failed", error);

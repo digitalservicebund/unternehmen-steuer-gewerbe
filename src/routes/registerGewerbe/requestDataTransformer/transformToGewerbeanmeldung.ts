@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { type CreateGewerbeanmeldungXmlData } from "../../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
-import { type RegisterGewerbeContext } from "../lookupRequestContext";
+import { type GewerbeRoutingInfo } from "../getGewerbeRoutingInfo";
 import { splitStrasseHausnummer } from "../../../helpers/formFieldTransformations";
 import { VERTRAUENSNIVEAU } from "./xGewerbeordnungCodes";
 
@@ -9,7 +9,7 @@ import { VERTRAUENSNIVEAU } from "./xGewerbeordnungCodes";
 // NOTE: several values are hardcoded placeholders and will be generated / fetched from other sources later.
 export function transformToGewerbeanmeldung(
   data: RegisterGewerbeRequest,
-  context: RegisterGewerbeContext,
+  routingInfo: GewerbeRoutingInfo,
 ): CreateGewerbeanmeldungXmlData {
   const adresseAbweichend = data.unternehmensDaten.adresseAbweichend;
 
@@ -20,7 +20,7 @@ export function transformToGewerbeanmeldung(
     data.persönlicheDaten.adresse.strasseUndHausnummer,
   );
 
-  const gemeindeSchluessel = context.ags;
+  const gemeindeSchluessel = routingInfo.ags;
   const autorKennung = `MELDID:${gemeindeSchluessel}`;
   const personId = randomUUID();
 

@@ -8,16 +8,16 @@ interface FitConnectDestinationInformation {
   destinationId: string;
 }
 
-export interface RegisterGewerbeContext {
+export interface GewerbeRoutingInfo {
   ags: string;
   ars: string;
   /** FIT-Connect destination info. null if FIT-Connect is not supported */
   fitConnect: FitConnectDestinationInformation | null;
 }
 
-export async function lookupRequestContext(
+export async function getGewerbeRoutingInfo(
   data: RegisterGewerbeRequest,
-): Promise<RegisterGewerbeContext> {
+): Promise<GewerbeRoutingInfo> {
   const postleitzahl =
     data.unternehmensDaten.adresseAbweichend?.postleitzahl ??
     data.persönlicheDaten.adresse.postleitzahl;

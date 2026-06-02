@@ -13,7 +13,7 @@ vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
   getFitConnectClient: () => ({ getRoutes: mockGetRoutes }),
 }));
 
-import { lookupRequestContext } from "./lookupRequestContext";
+import { getGewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
 import { registerGewerbeCompleteRequest } from "./testHelpers";
 
 const requestWithFitConnectSupport = {
@@ -31,10 +31,10 @@ const requestWithFitConnectSupport = {
   },
 };
 
-describe("lookupRequestContext", () => {
+describe("getGewerbeRoutingInfo", () => {
   describe("AGS (Amtlicher Gemeindeschlüssel)", () => {
     it("uses persönlicheDaten.adresse.postleitzahl when no adresseAbweichend", async () => {
-      await lookupRequestContext({
+      await getGewerbeRoutingInfo({
         ...registerGewerbeCompleteRequest,
         unternehmensDaten: {
           ...registerGewerbeCompleteRequest.unternehmensDaten,
@@ -48,7 +48,7 @@ describe("lookupRequestContext", () => {
     });
 
     it("uses adresseAbweichend.postleitzahl when provided", async () => {
-      await lookupRequestContext({
+      await getGewerbeRoutingInfo({
         ...registerGewerbeCompleteRequest,
         unternehmensDaten: {
           ...registerGewerbeCompleteRequest.unternehmensDaten,
@@ -75,7 +75,7 @@ describe("lookupRequestContext", () => {
         ],
       });
 
-      const result = await lookupRequestContext(requestWithFitConnectSupport);
+      const result = await getGewerbeRoutingInfo(requestWithFitConnectSupport);
 
       expect(result.fitConnect!.destinationId).toBe("mock-destination-id");
       expect(result.ags).toBe("03046001");
@@ -84,7 +84,7 @@ describe("lookupRequestContext", () => {
     it("throws when FIT-Connect returns no routes for the AGS", async () => {
       mockGetRoutes.mockResolvedValueOnce({ count: 0, offset: 0, totalCount: 0, routes: [] });
 
-      await expect(lookupRequestContext(requestWithFitConnectSupport)).rejects.toThrow(
+      await expect(getGewerbeRoutingInfo(requestWithFitConnectSupport)).rejects.toThrow(
         "No FIT-Connect destination found for AGS 03046001",
       );
     });

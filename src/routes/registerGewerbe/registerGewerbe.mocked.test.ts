@@ -7,9 +7,9 @@ vi.mock("@digitalservicebund/unternehmen-steuer-gewerbe-privat", () => ({
   createElsterFsEEUnXml: vi.fn().mockReturnValue("<xml/>"),
 }));
 
-const { mockSubmitData, mockLookupRequestContext } = vi.hoisted(() => ({
+const { mockSubmitData, mockGetGewerbeRoutingInfo } = vi.hoisted(() => ({
   mockSubmitData: vi.fn().mockResolvedValue({ submissionId: "mock-submission-id" }),
-  mockLookupRequestContext: vi.fn().mockResolvedValue({
+  mockGetGewerbeRoutingInfo: vi.fn().mockResolvedValue({
     ags: "03046001",
     fitConnect: { destinationId: "mock-destination-id" },
   }),
@@ -19,8 +19,8 @@ vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
   getFitConnectClient: () => ({ submitData: mockSubmitData }),
 }));
 
-vi.mock("./lookupRequestContext", () => ({
-  lookupRequestContext: mockLookupRequestContext,
+vi.mock("./getGewerbeRoutingInfo", () => ({
+  getGewerbeRoutingInfo: mockGetGewerbeRoutingInfo,
 }));
 
 import app from "../../app";
@@ -44,7 +44,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
 
   describe("in case of partial success", () => {
     it("Returns 207 MULTI-STATUS with gewerbeanmeldung upstream_error when FIT-Connect fails, fseÜbermittlung still succeeds", async () => {
-      mockLookupRequestContext.mockRejectedValueOnce(
+      mockGetGewerbeRoutingInfo.mockRejectedValueOnce(
         new Error("No FIT-Connect destination found for AGS 03046001"),
       );
 
