@@ -19,9 +19,8 @@ function normalizeXml(xml: string) {
   return builder.build(parser.parse(xml));
 }
 
-// source https://www.xrepository.de/api/xrepository/urn:xoev-de:kosit:standard:xgewerbeordnung_1.6:dokument:Validator-Konfiguration__01.08.2025_
-const xgewo_1_6_valid = fs.readFileSync(
-  "src/resources/xml/xml-samples/xgewerbeordnung-1.6-validator/xgewo-1.6-valid.xml",
+const xgewo_1_6_valid_0400 = fs.readFileSync(
+  "src/resources/xml/xml-samples/custom-xgewo-1.6-valid-0400.xml",
   "utf-8",
 );
 
@@ -34,14 +33,17 @@ const gewerbeanmeldung: DataForCreateGewerbeanmeldungXml = {
       name: "Phantasie-Verteilplattform",
     },
     autor: {
-      kennung: "MELDID:12052000",
-      name: "Gewerbeamt Cottbus",
+      kennung: "schnellerGruendenDigitalServiceBMDS",
+      name: "Schneller Gründen",
     },
   },
   autor: {
     kennung: "MELDID:12052000",
     name: "Gewerbeamt Cottbus",
   },
+  anzeigerenderId: "np-1",
+  handelndePersonId: "np-1",
+  handelndePersonVertrauensniveauCode: "20",
   satzErstellung: "2022-07-04T17:54:42.000+00:00",
   ereigniszeitpunkt: "2026-05-08T12:00:29.0",
   istStorno: false,
@@ -202,7 +204,7 @@ describe("createGewerbeanmeldungXml", () => {
 
   it("maps Gewerbeanmeldung data to the correct xGewerbeordnung 1.6 XML structure", async () => {
     expect(normalizeXml(await createGewerbeanmeldungXml(gewerbeanmeldung))).toBe(
-      normalizeXml(xgewo_1_6_valid),
+      normalizeXml(xgewo_1_6_valid_0400),
     );
   });
 
@@ -215,6 +217,7 @@ describe("createGewerbeanmeldungXml", () => {
         autor: { kennung: "MELDID:00000000", name: "Gewerbeamt Muster" },
       },
       autor: { kennung: "MELDID:00000000", name: "Gewerbeamt Muster" },
+      handelndePersonVertrauensniveauCode: "20",
       satzErstellung: "2024-01-01T09:00:00.000+01:00",
       ereigniszeitpunkt: "2024-01-02T08:00:00.0",
       istStorno: false,
@@ -275,12 +278,23 @@ describe("createGewerbeanmeldungXml", () => {
       },
     };
     const xml = await createGewerbeanmeldungXml(minimal);
-    expect(xml).toContain("<xga:alg.gewerbemeldung.0300");
+    expect(xml).toContain("<xga:ext.gewerbemeldung.0400");
     expect(xml).not.toContain("<bk:kommunikation>");
     expect(xml).not.toContain("<xga:handwerkskarte>");
     expect(xml).not.toContain("<xga:weitereTaetigkeiten>");
     expect(xml).not.toContain("<xga:aufenthaltstitel>");
     expect(xml).not.toContain("<bk:bisherigeUnfallversicherung>");
+    expect(xml).not.toContain("<antr:anzeigender.id>");
+    expect(xml).not.toContain("<antr:handelndePerson.id>");
+    expect(xml).not.toContain("<antr:ansprechpartner.id>");
+  });
+
+  it("includes ansprechpartner.id when provided", async () => {
+    const xml = await createGewerbeanmeldungXml({
+      ...gewerbeanmeldung,
+      ansprechpartnerId: "np-1",
+    });
+    expect(xml).toContain("<antr:ansprechpartner.id>np-1</antr:ansprechpartner.id>");
   });
 
   it(`escapes XML special characters (<, >, &, ', ") in text fields`, async () => {
@@ -325,7 +339,7 @@ describe("createGewerbeanmeldungXml", () => {
 
     const parsed = parser.parse(await createGewerbeanmeldungXml(withRange));
     const anschrift =
-      parsed["xga:alg.gewerbemeldung.0300"]["xga:satz"]["xga:anmeldung"]["xga:gewerbebetrieb"][
+      parsed["xga:ext.gewerbemeldung.0400"]["xga:satz"]["xga:anmeldung"]["xga:gewerbebetrieb"][
         "xga:betriebsstaette"
       ]["bk:anschrift"]["bk:strassenanschriftInland"];
     expect(anschrift["bk:hausnummerVon"]).toBe(90);
@@ -351,7 +365,7 @@ describe("createGewerbeanmeldungXml", () => {
     const generatedXml = await createGewerbeanmeldungXml(withoutPhone);
     const parsed = parser.parse(generatedXml);
     const kommunikation =
-      parsed["xga:alg.gewerbemeldung.0300"]["xga:satz"]["xga:anmeldung"]["xga:gewerbebetrieb"][
+      parsed["xga:ext.gewerbemeldung.0400"]["xga:satz"]["xga:anmeldung"]["xga:gewerbebetrieb"][
         "xga:betriebsstaette"
       ]["bk:kommunikation"];
     expect(kommunikation["komm:telefax"]).toBe("+49 234 555000");
@@ -378,7 +392,7 @@ describe("createGewerbeanmeldungXml", () => {
 
     const parsed = parser.parse(await createGewerbeanmeldungXml(multiPerson));
     const personen =
-      parsed["xga:alg.gewerbemeldung.0300"]["xga:satz"]["xga:anmeldung"][
+      parsed["xga:ext.gewerbemeldung.0400"]["xga:satz"]["xga:anmeldung"][
         "xga:referenzierteSubjekte"
       ]["xga:natuerlichePerson"];
     expect(Array.isArray(personen)).toBe(true);
