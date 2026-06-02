@@ -6,7 +6,7 @@ import { registerGewerbeCompleteRequest } from "../testHelpers";
 const testRoutingInfo = {
   ags: "03046001",
   ars: "030460014004",
-  fitConnect: { destinationId: "00000000-0000-0000-0000-000000000002" },
+  fitConnectDestinationInformation: { destinationId: "00000000-0000-0000-0000-000000000002" },
 };
 
 describe("transformToGewerbeanmeldung", () => {

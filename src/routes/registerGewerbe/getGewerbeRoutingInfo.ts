@@ -12,7 +12,7 @@ export interface GewerbeRoutingInfo {
   ags: string;
   ars: string;
   /** FIT-Connect destination info. null if FIT-Connect is not supported */
-  fitConnect: FitConnectDestinationInformation | null;
+  fitConnectDestinationInformation: FitConnectDestinationInformation | null;
 }
 
 export async function getGewerbeRoutingInfo(
@@ -24,7 +24,7 @@ export async function getGewerbeRoutingInfo(
 
   const { ags, ars } = await getAGSandARS(postleitzahl);
 
-  let fitConnect = null;
+  let fitConnectDestinationInformation = null;
 
   if (isSupportingFitConnect(postleitzahl)) {
     const fitConnectClient = getFitConnectClient();
@@ -35,13 +35,13 @@ export async function getGewerbeRoutingInfo(
     }
 
     // TODO: double-check response as soon as we have communes that support FIT-Connect
-    fitConnect = { destinationId: res.routes[0]!.destinationId };
+    fitConnectDestinationInformation = { destinationId: res.routes[0]!.destinationId };
   }
 
   return {
     ags,
     ars,
-    fitConnect,
+    fitConnectDestinationInformation,
   };
 }
 

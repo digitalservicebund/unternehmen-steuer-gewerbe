@@ -77,7 +77,7 @@ describe("getGewerbeRoutingInfo", () => {
 
       const result = await getGewerbeRoutingInfo(requestWithFitConnectSupport);
 
-      expect(result.fitConnect!.destinationId).toBe("mock-destination-id");
+      expect(result.fitConnectDestinationInformation!.destinationId).toBe("mock-destination-id");
       expect(result.ags).toBe("03046001");
     });
 
