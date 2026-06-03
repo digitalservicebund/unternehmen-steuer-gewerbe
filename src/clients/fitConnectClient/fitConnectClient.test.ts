@@ -34,9 +34,8 @@ describe("FitConnectClient", () => {
 
       const result = await client.getRoutes(
         "99050012104000",
-        "08421000", // AGS Ulm
+        "14612000", // AGS Dresden
       );
-
       expect(Array.isArray(result.routes)).toBe(true);
       expect(typeof result.count).toBe("number");
       expect(typeof result.routes[0]!.destinationId).toBe("string");

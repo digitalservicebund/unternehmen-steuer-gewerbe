@@ -16,21 +16,6 @@ vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
 import { getGewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
 import { registerGewerbeCompleteRequest } from "./testHelpers";
 
-const requestWithFitConnectSupport = {
-  ...registerGewerbeCompleteRequest,
-  persönlicheDaten: {
-    ...registerGewerbeCompleteRequest.persönlicheDaten,
-    adresse: {
-      ...registerGewerbeCompleteRequest.persönlicheDaten.adresse,
-      postleitzahl: "00000",
-    },
-  },
-  unternehmensDaten: {
-    ...registerGewerbeCompleteRequest.unternehmensDaten,
-    adresseAbweichend: undefined,
-  },
-};
-
 describe("getGewerbeRoutingInfo", () => {
   describe("AGS (Amtlicher Gemeindeschlüssel)", () => {
     it("uses persönlicheDaten.adresse.postleitzahl when no adresseAbweichend", async () => {
@@ -64,6 +49,21 @@ describe("getGewerbeRoutingInfo", () => {
   });
 
   describe("FIT-Connect routing", () => {
+    const requestWithFitConnectSupport = {
+      ...registerGewerbeCompleteRequest,
+      persönlicheDaten: {
+        ...registerGewerbeCompleteRequest.persönlicheDaten,
+        adresse: {
+          ...registerGewerbeCompleteRequest.persönlicheDaten.adresse,
+          postleitzahl: "00000",
+        },
+      },
+      unternehmensDaten: {
+        ...registerGewerbeCompleteRequest.unternehmensDaten,
+        adresseAbweichend: undefined,
+      },
+    };
+
     it("returns destinationId from the first route when FIT-Connect is supported", async () => {
       mockGetRoutes.mockResolvedValueOnce({
         count: 1,
