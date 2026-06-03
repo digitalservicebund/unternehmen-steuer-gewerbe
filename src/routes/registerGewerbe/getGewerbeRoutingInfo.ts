@@ -46,6 +46,6 @@ export async function getGewerbeRoutingInfo(
 }
 
 function isSupportingFitConnect(postleitzahl: string) {
-  const communesWithFitConnect = ["00000"]; // currently no commune is supporting FIT-Connect
+  const communesWithFitConnect = ["00000"]; // currently no commune is supporting FIT-Connect; "00000" can be used for testing
   return communesWithFitConnect.includes(postleitzahl);
 }
