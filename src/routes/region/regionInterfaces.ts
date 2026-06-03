@@ -6,7 +6,7 @@ export const SupportedRegionParamsSchema = z.object({
     .regex(/^\d{5}$/, "plz must be a 5-digit number")
     .openapi({
       param: { name: "plz", in: "path" },
-      example: "10969",
+      example: "01239",
       type: "number",
     }),
 });

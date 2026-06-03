@@ -21,13 +21,15 @@ env:
   SLACK_ALERTS_CHANNEL_ID: C0AQJKRSPM4
 
 jobs:
-  install-dependencies:
+  # Note: Formatting and linting do break the pipeline
+  # There's a Git hooks setup to fix both before pushing. Cf. the repository README
+  check-format-and-lint:
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
         with:
           fetch-depth: 1
 
@@ -40,44 +42,6 @@ jobs:
         run: pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
-
-      - name: Cache node_modules
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
-        with:
-          path: node_modules
-          key: node_modules-${{ hashFiles('pnpm-lock.yaml') }}
-
-      - name: Send failure to Slack
-        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
-
-  # Note: Formatting and linting do break the pipeline
-  # There's a Git hooks setup to fix both before pushing. Cf. the repository README
-  check-format-and-lint:
-    needs: [install-dependencies]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          fetch-depth: 1
-
-      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093
-        name: Install pnpm
-        with:
-          cache: true
-
-      - name: Restore node_modules from cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
-        with:
-          path: node_modules
-          key: node_modules-${{ hashFiles('pnpm-lock.yaml') }}
-          fail-on-cache-miss: true
 
       - name: Check format
         run: pnpm run format
@@ -93,14 +57,13 @@ jobs:
           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
   test:
-    needs: [install-dependencies]
     runs-on: ubuntu-latest
     permissions:
       contents: read
 
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
         with:
           fetch-depth: 0
 
@@ -109,12 +72,10 @@ jobs:
         with:
           cache: true
 
-      - name: Restore node_modules from cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
-        with:
-          path: node_modules
-          key: node_modules-${{ hashFiles('pnpm-lock.yaml') }}
-          fail-on-cache-miss: true
+      - name: Install dependencies
+        run: pnpm install --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
       - name: Run tests with coverage report
         run: pnpm run test:coverage:ci
@@ -154,7 +115,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
         with:
           fetch-depth: 0
 
@@ -194,13 +155,12 @@ jobs:
 
   build-image:
     name: Build image and run Trivy scan
-    needs: [install-dependencies]
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
         with:
           fetch-depth: 1
 
@@ -209,12 +169,10 @@ jobs:
         with:
           cache: true
 
-      - name: Restore node_modules from cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
-        with:
-          path: node_modules
-          key: node_modules-${{ hashFiles('pnpm-lock.yaml') }}
-          fail-on-cache-miss: true
+      - name: Install dependencies
+        run: pnpm install --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
       - name: Build project and docker image
         run: pnpm build:image
@@ -381,7 +339,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
 
       - name: Install Trivy
         env:
@@ -453,7 +411,7 @@ jobs:
           exit 1
 
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
         with:
           fetch-depth: 1
 
@@ -462,12 +420,10 @@ jobs:
         with:
           cache: true
 
-      - name: Restore node_modules from cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
-        with:
-          path: node_modules
-          key: node_modules-${{ hashFiles('pnpm-lock.yaml') }}
-          fail-on-cache-miss: true
+      - name: Install dependencies
+        run: pnpm install --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
       - name: Run smoke tests against development
         run: pnpm run test:smoke:ci
