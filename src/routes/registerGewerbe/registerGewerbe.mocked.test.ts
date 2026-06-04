@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
+import { XMLParser } from "fast-xml-parser";
 
 // Note 1: mocking is "global" on file level, therefore we have separate files for tests that mock and those that don't.
 // Note 2: We need to mock here, such that the private library correctly initializes their internal libraries before the tests are run.
@@ -20,6 +21,8 @@ import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanme
 import { registerGewerbeCompleteRequest } from "./testHelpers";
 import { ErrorTypeSchema } from "./registerGewerbeInterfaces";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
+
+const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
 
 function postRegisterGewerbe(data = registerGewerbeCompleteRequest) {
   return app.request("/api/v1/register-gewerbe", {
@@ -123,6 +126,24 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(response.status).toEqual(HttpStatusCode.InternalServerError);
       expect(json.gewerbeanmeldung.success).toBe(false);
       expect(json.fseÜbermittlung.success).toBe(false);
+    });
+  });
+
+  describe("Autorenkennung in the submitted xGewerbeanmeldung", () => {
+    it("uses 'ds:schnellergruenden' for the nachrichtenkopf autor but NOT for the xga:autor (Behörde)", async () => {
+      const response = await postRegisterGewerbe();
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+
+      const submittedXml = mockSubmitData.mock.calls.at(-1)![0].data as string;
+      const xGewO = parser.parse(submittedXml)["xga:ext.gewerbemeldung.0400"];
+
+      expect(xGewO["bn-g2g:nachrichtenkopf.g2g"]["bn-g2g:autor"]["bn-beh:kennung"]).toBe(
+        "ds:schnellergruenden",
+      );
+
+      const behoerdeKennung = xGewO["xga:satz"]["xga:anmeldung"]["xga:autor"]["bn-beh:kennung"];
+      expect(behoerdeKennung).not.toBe("ds:schnellergruenden");
+      expect(behoerdeKennung).toMatch(/^MELDID:/);
     });
   });
 });
