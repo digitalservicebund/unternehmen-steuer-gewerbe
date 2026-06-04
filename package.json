@@ -52,7 +52,7 @@
     "rolldown": "^1.0.3",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.5",
+    "vitest": "^4.1.8",
     "xslt3-he": "3.0.0-beta2"
   },
   "engines": {
