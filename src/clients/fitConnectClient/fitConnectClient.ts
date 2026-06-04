@@ -1,8 +1,8 @@
-import axios from "axios";
 import { decodeProtectedHeader, type JWK, type JWTPayload } from "jose";
 import { encryptData, verifyEventToken } from "./crypto";
 import { type Environment, getEnvironmentUrls } from "./environments";
 import { createMetadata, type DataSchema } from "./metadata";
+import { fetchJson } from "../../helpers/fetchJson";
 import { getSecret } from "../../secrets";
 
 interface FitConnectClientConfig {
@@ -89,11 +89,11 @@ export function getFitConnectClient() {
   const urls = getEnvironmentUrls(config.environment);
 
   async function authenticate(): Promise<string> {
-    const { data } = await axios.post<TokenResponse>(
-      urls.oauthTokenUrl,
-      `grant_type=client_credentials&client_id=${config.clientId}&client_secret=${config.clientSecret}`,
-      { headers: { "Content-Type": "application/x-www-form-urlencoded" } },
-    );
+    const data = await fetchJson<TokenResponse>(urls.oauthTokenUrl, {
+      method: "POST",
+      body: `grant_type=client_credentials&client_id=${config.clientId}&client_secret=${config.clientSecret}`,
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    });
     return data.access_token;
   }
 
@@ -105,29 +105,35 @@ export function getFitConnectClient() {
   }: SubmitDataOptions): Promise<SubmitDataResponse> {
     const accessToken = await authenticate();
 
-    const { data: submission } = await axios.post<CreateSubmissionResponse>(
+    const submission = await fetchJson<CreateSubmissionResponse>(
       `${urls.submissionApiUrl}/v2/submissions`,
-      { announcedAttachments: [], destinationId, publicService },
-      { headers: { Authorization: `Bearer ${accessToken}` } },
+      {
+        method: "POST",
+        body: { announcedAttachments: [], destinationId, publicService },
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
     );
 
     const metadata = createMetadata(dataSchema, data);
 
-    const { data: destination } = await axios.get<DestinationResponse>(
+    const destination = await fetchJson<DestinationResponse>(
       `${urls.submissionApiUrl}/v2/destinations/${destinationId}`,
     );
 
-    const { data: publicJwk } = await axios.get<JWK>(
+    const publicJwk = await fetchJson<JWK>(
       `${urls.submissionApiUrl}/v2/destinations/${destinationId}/keys/${destination.encryptionKid}`,
     );
 
     const encryptedData = await encryptData(data, publicJwk, dataSchema.mimeType);
     const encryptedMetadata = await encryptData(JSON.stringify(metadata), publicJwk);
 
-    const { data: result } = await axios.put<SubmitDataResponse>(
+    const result = await fetchJson<SubmitDataResponse>(
       `${urls.submissionApiUrl}/v2/submissions/${submission.submissionId}`,
-      { encryptedData, encryptedMetadata },
-      { headers: { Authorization: `Bearer ${accessToken}` } },
+      {
+        method: "PUT",
+        body: { encryptedData, encryptedMetadata },
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
     );
 
     return result;
@@ -139,16 +145,16 @@ export function getFitConnectClient() {
   ): Promise<SubmissionEventsResponse> {
     const accessToken = await authenticate();
 
-    const { data: events } = await axios.get<CaseEventsResponse>(
+    const events = await fetchJson<CaseEventsResponse>(
       `${urls.submissionApiUrl}/v2/submissions/${submissionId}/events`,
       { headers: { Authorization: `Bearer ${accessToken}` } },
     );
 
-    const { data: wellKnownJWKs } = await axios.get<{ keys: JWK[] }>(
+    const wellKnownJWKs = await fetchJson<{ keys: JWK[] }>(
       `${urls.destinationApiUrl}//.well-known/jwks.json`,
     );
 
-    const { data: destinationKeys } = await axios.get<DestinationKeysResponse>(
+    const destinationKeys = await fetchJson<DestinationKeysResponse>(
       `${urls.destinationApiUrl}/v2/destinations/${destinationId}/keys`,
     );
 
