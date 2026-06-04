@@ -131,10 +131,12 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
 
   describe("Autorenkennung in the submitted xGewerbeanmeldung", () => {
     it("uses 'ds:schnellergruenden' for the nachrichtenkopf autor but NOT for the xga:autor (Behörde)", async () => {
+      mockSubmitData.mockClear();
+
       const response = await postRegisterGewerbe();
       expect(response.status).toEqual(HttpStatusCode.Ok);
 
-      const submittedXml = mockSubmitData.mock.calls.at(-1)![0].data as string;
+      const submittedXml = mockSubmitData.mock.calls[0]![0].data;
       const xGewO = parser.parse(submittedXml)["xga:ext.gewerbemeldung.0400"];
 
       expect(xGewO["bn-g2g:nachrichtenkopf.g2g"]["bn-g2g:autor"]["bn-beh:kennung"]).toBe(
