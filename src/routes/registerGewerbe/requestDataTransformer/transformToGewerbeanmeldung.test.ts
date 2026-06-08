@@ -39,7 +39,7 @@ describe("transformToGewerbeanmeldung", () => {
     expect(person.name!.geburtsname).toBeUndefined();
   });
 
-  it("maps the staatsangehörigkeit key to its destatis code", async () => {
+  it("maps the staatsangehörigkeit key to its destatis code (deutschland = 000, frankreich = 129)", async () => {
     const deutsch = await transformToGewerbeanmeldung(registerGewerbeCompleteRequest);
     expect(deutsch.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe("000");
 
