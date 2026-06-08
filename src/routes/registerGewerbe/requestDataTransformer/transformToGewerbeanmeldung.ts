@@ -47,13 +47,10 @@ export async function transformToGewerbeanmeldung(
     gewerbebetrieb: {
       gewerbebetriebID: randomUUID(),
       gemeindeMeldungNr: "2024 0001",
-      rechtsformcode: RECHTSFORM[data.unternehmensDaten.rechtsform],
-      // A non-registered sole proprietorship must not carry a registered name (SCH-0205),
-      // so the provided eingetragenerName is ignored for that legal form.
-      eingetragenerName:
-        data.unternehmensDaten.rechtsform === "nichtEingetragenesEinzelunternehmen"
-          ? undefined
-          : data.unternehmensDaten.eingetragenerName,
+      rechtsformcode: RECHTSFORM.nichtEingetragenesEinzelunternehmen,
+      // We currently only support non-registered sole proprietorships (412000), which must
+      // not carry a registered name (SCH-0205), so eingetragenerName stays undefined.
+      eingetragenerName: undefined,
       betriebsstaette: {
         artBetriebsstaette: "01",
         anschrift: {

@@ -60,36 +60,6 @@ describe("transformToGewerbeanmeldung", () => {
     });
   });
 
-  describe("rechtsform and eingetragenerName", () => {
-    it("maps the rechtsform code and passes eingetragenerName through for eingetragenesEinzelunternehmen", async () => {
-      const result = await transformToGewerbeanmeldung({
-        ...registerGewerbeCompleteRequest,
-        unternehmensDaten: {
-          ...registerGewerbeCompleteRequest.unternehmensDaten,
-          rechtsform: "eingetragenesEinzelunternehmen",
-          eingetragenerName: "Muster e.K.",
-        },
-      });
-
-      expect(result.gewerbebetrieb!.rechtsformcode).toBe("411000");
-      expect(result.gewerbebetrieb!.eingetragenerName).toBe("Muster e.K.");
-    });
-
-    it("ignores eingetragenerName for nichtEingetragenesEinzelunternehmen", async () => {
-      const result = await transformToGewerbeanmeldung({
-        ...registerGewerbeCompleteRequest,
-        unternehmensDaten: {
-          ...registerGewerbeCompleteRequest.unternehmensDaten,
-          rechtsform: "nichtEingetragenesEinzelunternehmen",
-          eingetragenerName: "Muster e.K.",
-        },
-      });
-
-      expect(result.gewerbebetrieb!.rechtsformcode).toBe("412000");
-      expect(result.gewerbebetrieb!.eingetragenerName).toBeUndefined();
-    });
-  });
-
   describe("AGS (Amtlicher Gemeindeschlüssel)", () => {
     it("returns AGS 02000000 if persönlicheDaten.adresse.postleitzahl is 21149 and there is no adresseAbweichend of the company", async () => {
       const result = await transformToGewerbeanmeldung({
