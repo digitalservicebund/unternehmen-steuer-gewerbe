@@ -17,7 +17,7 @@ describe("fetchJson", () => {
 
     expect(fetchSpy).toHaveBeenCalledWith("https://example.de/data", {
       method: "GET",
-      headers: {},
+      headers: { "Content-Type": "application/json" },
       body: undefined,
     });
   });
