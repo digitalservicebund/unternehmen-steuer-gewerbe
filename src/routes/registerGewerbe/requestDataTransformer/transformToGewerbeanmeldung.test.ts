@@ -39,6 +39,23 @@ describe("transformToGewerbeanmeldung", () => {
     expect(person.name!.geburtsname).toBeUndefined();
   });
 
+  it("maps the staatsangehörigkeit key to its destatis code", async () => {
+    const deutsch = await transformToGewerbeanmeldung(registerGewerbeCompleteRequest);
+    expect(deutsch.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe("000");
+
+    const französisch = await transformToGewerbeanmeldung({
+      ...registerGewerbeCompleteRequest,
+      persönlicheDaten: {
+        ...registerGewerbeCompleteRequest.persönlicheDaten,
+        staatsangehörigkeitDeutsch: false,
+        staatsangehörigkeit: "frankreich",
+      },
+    });
+    expect(französisch.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe(
+      "129",
+    );
+  });
+
   it("uses adresseAbweichend as betriebsstaette anschrift when provided", async () => {
     const result = await transformToGewerbeanmeldung({
       ...registerGewerbeCompleteRequest,

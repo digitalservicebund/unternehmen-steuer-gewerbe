@@ -129,6 +129,34 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
     });
   });
 
+  describe("staatsangehörigkeit validation", () => {
+    it("Returns 400 BAD REQUEST when staatsangehörigkeitDeutsch is false but staatsangehörigkeit is 'deutschland'", async () => {
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeCompleteRequest,
+        persönlicheDaten: {
+          ...registerGewerbeCompleteRequest.persönlicheDaten,
+          staatsangehörigkeitDeutsch: false,
+          staatsangehörigkeit: "deutschland",
+        },
+      });
+
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+    });
+
+    it("Returns 400 BAD REQUEST when staatsangehörigkeitDeutsch is true but staatsangehörigkeit is not 'deutschland'", async () => {
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeCompleteRequest,
+        persönlicheDaten: {
+          ...registerGewerbeCompleteRequest.persönlicheDaten,
+          staatsangehörigkeitDeutsch: true,
+          staatsangehörigkeit: "frankreich",
+        },
+      });
+
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+    });
+  });
+
   describe("Autorenkennung in the submitted xGewerbeanmeldung", () => {
     it("uses 'ds:schnellergruenden' for the nachrichtenkopf autor but NOT for the xga:autor (Behörde)", async () => {
       mockSubmitData.mockClear();

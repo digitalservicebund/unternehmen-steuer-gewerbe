@@ -3,6 +3,7 @@ import {
   UNFALLVERSICHERUNGSTRAEGER,
   UNFALLVERSICHERUNGSTRAEGER_KEYS,
   VERTRAUENSNIVEAU_KEYS,
+  STAATSANGEHOERIGKEIT_KEYS,
 } from "./requestDataTransformer/xGewerbeordnungCodes";
 import {
   RELIGIONSSCHLUESSEL_KEYS,
@@ -27,42 +28,62 @@ const AdresseSchema = z.object({
   ort: z.string().openapi({ example: "Musterstadt" }),
 });
 
-const PersönlicheDatenSchema = z.object({
-  vorname: z.string().openapi({ example: "Erika" }),
-  nachname: z.string().openapi({ example: "Mustermann" }),
-  geburtsname: z.string().openapi({ example: "Muster" }).optional(),
-  geburtsdatum: z.iso.date().openapi({ example: "1988-09-10" }),
-  geschlecht: z.enum(["d", "w", "m"]).openapi({ example: "d" }).optional(),
-  geburtsort: z.string().openapi({ example: "Musterstadt" }).optional(),
-  geburtsland: z.string().openapi({ example: "Deutschland" }).optional(),
-  staatsangehörigkeitDeutsch: z.literal(true),
-  adresse: AdresseSchema,
-  telefon: z
-    .string()
-    .regex(/^\+[0-9]{1,5}\s[0-9]{1,5}\s[0-9]{1,13}(-[0-9]{1,5})?$/)
-    .openapi({
-      example: "+49 234 121314",
+const PersönlicheDatenSchema = z
+  .object({
+    vorname: z.string().openapi({ example: "Erika" }),
+    nachname: z.string().openapi({ example: "Mustermann" }),
+    geburtsname: z.string().openapi({ example: "Muster" }).optional(),
+    geburtsdatum: z.iso.date().openapi({ example: "1988-09-10" }),
+    geschlecht: z.enum(["d", "w", "m"]).openapi({ example: "d" }).optional(),
+    geburtsort: z.string().openapi({ example: "Musterstadt" }).optional(),
+    geburtsland: z.string().openapi({ example: "Deutschland" }).optional(),
+    staatsangehörigkeitDeutsch: z.boolean().default(true).openapi({
+      deprecated: true,
+      example: true,
       description:
-        "Phone numbers are encoded according to the DIN 5008 standard as follows: +[Country code] (up to 5 digits) [Area code] (up to 5 digits) [Phone number] (up to 13 digits) [-Extension] (optional, up to 5 digits).",
+        "Whether the person holds German citizenship. Deprecated: redundant with `staatsangehörigkeit` (derivable from it). Must be consistent with `staatsangehörigkeit`: true exactly when `staatsangehörigkeit` is 'deutschland' (code 000).",
     }),
-  email: z.email().openapi({ example: "e.mustermann@example.org" }),
-  steuernummer: z
-    .string()
-    .regex(/^[0-9]{4}0[0-9]{8}$/)
-    .optional()
-    .openapi({
-      example: "2695002219428",
+    staatsangehörigkeit: z.enum(STAATSANGEHOERIGKEIT_KEYS).default("deutschland").openapi({
+      example: "deutschland",
       description:
-        "Bestehende Einkommensteuernummer der Person, falls bereits vorhanden (z.B. durch frühere Steuererklärungen als Arbeitnehmer). ELSTER-Format: 4 Ziffern, gefolgt von einer festen 0, gefolgt von 8 Ziffern (13 Zeichen gesamt).",
+        "Citizenship of the person according to the code list of the German Federal Statistical Office. Defaults to 'deutschland' (code 000).",
     }),
-  religion: z.enum(RELIGIONSSCHLUESSEL_KEYS).openapi({
-    example: "nichtKirchensteuerpflichtig",
-  }),
-  vertrauensniveau: z.enum(VERTRAUENSNIVEAU_KEYS).default("unbestimmt").openapi({
-    example: "substantiell",
-    description: "Vertrauensniveau des verwendeten Identifizierungsmittels gemäß eIDAS-Verordnung",
-  }),
-});
+    adresse: AdresseSchema,
+    telefon: z
+      .string()
+      .regex(/^\+[0-9]{1,5}\s[0-9]{1,5}\s[0-9]{1,13}(-[0-9]{1,5})?$/)
+      .openapi({
+        example: "+49 234 121314",
+        description:
+          "Phone numbers are encoded according to the DIN 5008 standard as follows: +[Country code] (up to 5 digits) [Area code] (up to 5 digits) [Phone number] (up to 13 digits) [-Extension] (optional, up to 5 digits).",
+      }),
+    email: z.email().openapi({ example: "e.mustermann@example.org" }),
+    steuernummer: z
+      .string()
+      .regex(/^[0-9]{4}0[0-9]{8}$/)
+      .optional()
+      .openapi({
+        example: "2695002219428",
+        description:
+          "Bestehende Einkommensteuernummer der Person, falls bereits vorhanden (z.B. durch frühere Steuererklärungen als Arbeitnehmer). ELSTER-Format: 4 Ziffern, gefolgt von einer festen 0, gefolgt von 8 Ziffern (13 Zeichen gesamt).",
+      }),
+    religion: z.enum(RELIGIONSSCHLUESSEL_KEYS).openapi({
+      example: "nichtKirchensteuerpflichtig",
+    }),
+    vertrauensniveau: z.enum(VERTRAUENSNIVEAU_KEYS).default("unbestimmt").openapi({
+      example: "substantiell",
+      description:
+        "Vertrauensniveau des verwendeten Identifizierungsmittels gemäß eIDAS-Verordnung",
+    }),
+  })
+  .refine(
+    (data) => data.staatsangehörigkeitDeutsch === (data.staatsangehörigkeit === "deutschland"),
+    {
+      message:
+        "staatsangehörigkeitDeutsch must be true exactly when staatsangehörigkeit is 'deutschland' (code 000).",
+      path: ["staatsangehörigkeit"],
+    },
+  );
 
 const UnternehmensDatenSchema = z.object({
   adresseAbweichend: AdresseSchema.openapi({

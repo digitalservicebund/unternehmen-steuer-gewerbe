@@ -3,7 +3,7 @@ import { type CreateGewerbeanmeldungXmlData } from "../../../xmlBuilders/xGewerb
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { splitStrasseHausnummer } from "../../../helpers/formFieldTransformations";
 import { getAGSandARS } from "../../../clients/pvogClient/pvogClient";
-import { VERTRAUENSNIVEAU } from "./xGewerbeordnungCodes";
+import { VERTRAUENSNIVEAU, STAATSANGEHOERIGKEIT } from "./xGewerbeordnungCodes";
 
 // Transforms a RegisterGewerbeRequest into a complete Gewerbeanmeldung structure.
 // NOTE: several values are hardcoded placeholders and will be generated / fetched from other sources later.
@@ -93,7 +93,7 @@ export async function transformToGewerbeanmeldung(
             staat: data.persönlicheDaten.geburtsland,
           },
           geschlecht: data.persönlicheDaten.geschlecht ?? "x",
-          staatsangehoerigkeit: "000",
+          staatsangehoerigkeit: STAATSANGEHOERIGKEIT[data.persönlicheDaten.staatsangehörigkeit],
           anschrift: {
             strasse: personStrasseHausnummer.strasse,
             hausnummerVon: personStrasseHausnummer.hausnummer,
