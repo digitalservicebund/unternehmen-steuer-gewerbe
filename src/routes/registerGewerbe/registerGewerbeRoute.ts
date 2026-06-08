@@ -51,5 +51,5 @@ export const registerGewerbeRoute = createRoute({
     },
   },
   tags: ["Active Development"],
-  summary: "Register Gewerbe via FIT-Connect",
+  summary: 'Submit a "Kombiantrag" (Gewerbeanmeldung + FsE)',
 });
