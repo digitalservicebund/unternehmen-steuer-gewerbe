@@ -25,7 +25,6 @@ export const registerGewerbeCompleteRequest: RegisterGewerbeRequest = {
     tätigkeitsbereich: "handwerk",
     tätigkeitsbeginn: "2026-04-17",
     gewerbeart: "hauptgewerbe",
-    rechtsform: "nichtEingetragenesEinzelunternehmen",
     gewinnErmittlung: "einnahmenüberschussrechnung",
     kleinunternehmerRegelung: false,
     umsatzGruendungsjahr: 1,
