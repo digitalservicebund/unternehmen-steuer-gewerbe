@@ -1,5 +1,7 @@
 import { z } from "@hono/zod-openapi";
 import {
+  RECHTSFORM,
+  RECHTSFORM_KEYS,
   UNFALLVERSICHERUNGSTRAEGER,
   UNFALLVERSICHERUNGSTRAEGER_KEYS,
   VERTRAUENSNIVEAU_KEYS,
@@ -63,6 +65,10 @@ const PersönlicheDatenSchema = z.object({
     description: "Vertrauensniveau des verwendeten Identifizierungsmittels gemäß eIDAS-Verordnung",
   }),
 });
+
+const rechtsformCodesDescription = Object.entries(RECHTSFORM)
+  .map(([name, code]) => `- \`${name}\` (${code})`)
+  .join("\n");
 
 const UnternehmensDatenSchema = z.object({
   adresseAbweichend: AdresseSchema.openapi({

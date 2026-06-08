@@ -58,3 +58,33 @@ export const VERTRAUENSNIVEAU_KEYS = Object.keys(VERTRAUENSNIVEAU) as [
   Vertrauensniveau,
   ...Vertrauensniveau[],
 ];
+
+// https://www.xrepository.de/details/urn:xoev-de:xunternehmen:codeliste:rechtsformen_2
+// Only the Einzelunternehmen branch (codes 400000-492000) is listed, as we currently
+// only support Einzelunternehmen. The German labels are the official designations from version 2.4 of the codelist.
+export const RECHTSFORM = {
+  wirtschaftlicheTaetigkeitNatuerlichePerson: "400000", // Wirtschaftliche Tätigkeit einer natürlichen Person
+  gewerblichesEinzelunternehmen: "410000", // gewerbliches Einzelunternehmen (ohne Hausgewerbe)
+  eingetragenesEinzelunternehmen: "411000", // eingetragenes gewerbliches Einzelunternehmen (e.K.; e.Kfm.; e.Kfr.)
+  eingetragenesEinzelunternehmenSitzInland: "411100", // eingetragenes gewerbliches Einzelunternehmen (Sitz in Deutschland)
+  eingetragenesEinzelunternehmenSitzAusland: "411200", // eingetragenes gewerbliches Einzelunternehmen (Sitz im Ausland)
+  nichtEingetragenesEinzelunternehmen: "412000", // nicht eingetragenes gewerbliches Einzelunternehmen
+  nichtEingetragenesEinzelunternehmenSitzInland: "412100", // nicht eingetragenes gewerbliches Einzelunternehmen (Sitz in Deutschland)
+  nichtEingetragenesEinzelunternehmenSitzAusland: "412200", // nicht eingetragenes gewerbliches Einzelunternehmen (Sitz im Ausland)
+  sonstigeWirtschaftlicheTaetigkeitNatuerlichePerson: "420000", // sonstige wirtschaftliche Tätigkeit einer natürlichen Person
+  freiberufler: "421000", // Freiberufler
+  landForstwirt: "422000", // Land-/Forstwirt
+  hausgewerbe: "423000", // Hausgewerbe (und gleichgestellte Personen)
+  beteiligungGewerblichePersonengesellschaft: "424000", // Beteiligung an gewerblichen Personengesellschaften
+  auffangtatbestaende: "428000", // Auffangtatbestände (wirtschaftliche Tätigkeit einer natürlichen Person)
+  sonstigeWirtschaftlicheTaetigkeitAuffangtatbestand: "428100", // sonstige wirtschaftliche Tätigkeit einer natürlichen Person (Auffangtatbestand)
+  auslaendischeWirtschaftlicheTaetigkeitNatuerlichePerson: "490000", // ausländische wirtschaftliche Tätigkeit einer natürlichen Person
+  auslaendischesEinzelunternehmenEuRecht: "491000", // ausländisches gewerbliches Einzelunternehmen (EU-Recht)
+  auslaendischesEinzelunternehmenNichtEuRecht: "492000", // ausländisches gewerbliches Einzelunternehmen (Nicht-EU-Recht)
+} as const;
+
+type RechtsformEinzelunternehmen = keyof typeof RECHTSFORM;
+export const RECHTSFORM_KEYS = Object.keys(RECHTSFORM) as [
+  RechtsformEinzelunternehmen,
+  ...RechtsformEinzelunternehmen[],
+];

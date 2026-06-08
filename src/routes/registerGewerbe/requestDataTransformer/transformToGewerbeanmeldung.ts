@@ -3,7 +3,7 @@ import { type CreateGewerbeanmeldungXmlData } from "../../../xmlBuilders/xGewerb
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { splitStrasseHausnummer } from "../../../helpers/formFieldTransformations";
 import { getAGSandARS } from "../../../clients/pvogClient/pvogClient";
-import { VERTRAUENSNIVEAU } from "./xGewerbeordnungCodes";
+import { VERTRAUENSNIVEAU, RECHTSFORM } from "./xGewerbeordnungCodes";
 
 // Transforms a RegisterGewerbeRequest into a complete Gewerbeanmeldung structure.
 // NOTE: several values are hardcoded placeholders and will be generated / fetched from other sources later.
@@ -47,8 +47,13 @@ export async function transformToGewerbeanmeldung(
     gewerbebetrieb: {
       gewerbebetriebID: randomUUID(),
       gemeindeMeldungNr: "2024 0001",
-      rechtsformcode: "411000",
-      eingetragenerName: "Muster GmbH",
+      rechtsformcode: RECHTSFORM[data.unternehmensDaten.rechtsform],
+      // A non-registered sole proprietorship must not carry a registered name (SCH-0205),
+      // so the provided eingetragenerName is ignored for that legal form.
+      eingetragenerName:
+        data.unternehmensDaten.rechtsform === "nichtEingetragenesEinzelunternehmen"
+          ? undefined
+          : data.unternehmensDaten.eingetragenerName,
       betriebsstaette: {
         artBetriebsstaette: "01",
         anschrift: {
