@@ -3,7 +3,8 @@ import { type CreateGewerbeanmeldungXmlData } from "../../../xmlBuilders/xGewerb
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { type GewerbeRoutingInfo } from "../getGewerbeRoutingInfo";
 import { splitStrasseHausnummer } from "../../../helpers/formFieldTransformations";
-import { VERTRAUENSNIVEAU } from "./xGewerbeordnungCodes";
+import { getAGSandARS } from "../../../clients/pvogClient/pvogClient";
+import { VERTRAUENSNIVEAU, RECHTSFORM } from "./xGewerbeordnungCodes";
 
 // Transforms a RegisterGewerbeRequest into a complete Gewerbeanmeldung structure.
 // NOTE: several values are hardcoded placeholders and will be generated / fetched from other sources later.
@@ -29,7 +30,7 @@ export function transformToGewerbeanmeldung(
       nachrichtenUUID: randomUUID(),
       erstellungszeitpunkt: new Date().toISOString(),
       leser: { kennung: "xga:000000000001", name: "Gewerbeamt Muster" },
-      autor: { kennung: "schnellerGruendenDigitalServiceBMDS", name: "Schneller Gründen" },
+      autor: { kennung: "ds:schnellergruenden", name: "Schneller Gründen" },
     },
     autor: { kennung: autorKennung, name: "Behörde" },
     anzeigerenderId: personId,
@@ -47,8 +48,10 @@ export function transformToGewerbeanmeldung(
     gewerbebetrieb: {
       gewerbebetriebID: randomUUID(),
       gemeindeMeldungNr: "2024 0001",
-      rechtsformcode: "411000",
-      eingetragenerName: "Muster GmbH",
+      rechtsformcode: RECHTSFORM.nichtEingetragenesEinzelunternehmen,
+      // We currently only support non-registered sole proprietorships (412000), which must
+      // not carry a registered name (SCH-0205), so eingetragenerName stays undefined.
+      eingetragenerName: undefined,
       betriebsstaette: {
         artBetriebsstaette: "01",
         anschrift: {

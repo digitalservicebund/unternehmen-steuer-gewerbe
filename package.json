@@ -27,7 +27,7 @@
     "test:watch": "op run --env-file .env -- vitest"
   },
   "dependencies": {
-    "@digitalservicebund/unternehmen-steuer-gewerbe-privat": "1.0.0-150",
+    "@digitalservicebund/unternehmen-steuer-gewerbe-privat": "1.0.0-159",
     "@hono/node-server": "^2.0.3",
     "@hono/swagger-ui": "^0.6.1",
     "@hono/zod-openapi": "^1.4.0",
@@ -37,22 +37,22 @@
     "jose": "^6.2.3",
     "koffi": "^3.0.2",
     "saxonjs-he": "3.0.0-beta2",
-    "vite": "8.0.14",
+    "vite": "8.0.16",
     "xmllint-wasm": "^5.2.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^25.9.0",
-    "@vitest/coverage-v8": "4.1.7",
+    "@vitest/coverage-v8": "4.1.8",
     "fast-xml-builder": "^1.2.0",
     "fast-xml-parser": "^5.8.0",
     "nodemon": "^3.1.14",
     "oxfmt": "^0.52.0",
     "oxlint": "^1.65.0",
     "rolldown": "^1.0.3",
-    "tsx": "^4.22.3",
+    "tsx": "^4.22.4",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.5",
+    "vitest": "^4.1.8",
     "xslt3-he": "3.0.0-beta2"
   },
   "engines": {
