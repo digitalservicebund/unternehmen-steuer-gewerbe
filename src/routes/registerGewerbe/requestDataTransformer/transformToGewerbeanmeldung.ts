@@ -1,15 +1,16 @@
 import { randomUUID } from "node:crypto";
 import { type CreateGewerbeanmeldungXmlData } from "../../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
+import { type GewerbeRoutingInfo } from "../getGewerbeRoutingInfo";
 import { splitStrasseHausnummer } from "../../../helpers/formFieldTransformations";
-import { getAGSandARS } from "../../../clients/pvogClient/pvogClient";
-import { VERTRAUENSNIVEAU } from "./xGewerbeordnungCodes";
+import { VERTRAUENSNIVEAU, RECHTSFORM } from "./xGewerbeordnungCodes";
 
 // Transforms a RegisterGewerbeRequest into a complete Gewerbeanmeldung structure.
 // NOTE: several values are hardcoded placeholders and will be generated / fetched from other sources later.
-export async function transformToGewerbeanmeldung(
+export function transformToGewerbeanmeldung(
   data: RegisterGewerbeRequest,
-): Promise<CreateGewerbeanmeldungXmlData> {
+  routingInfo: GewerbeRoutingInfo,
+): CreateGewerbeanmeldungXmlData {
   const adresseAbweichend = data.unternehmensDaten.adresseAbweichend;
 
   const betriebsStrasseHausnummer = splitStrasseHausnummer(
@@ -19,8 +20,7 @@ export async function transformToGewerbeanmeldung(
     data.persönlicheDaten.adresse.strasseUndHausnummer,
   );
 
-  const gemeindeSchluessel = await getAgsFromRegisterGewerbeRequestData(data);
-
+  const gemeindeSchluessel = routingInfo.ags;
   const autorKennung = `MELDID:${gemeindeSchluessel}`;
   const personId = randomUUID();
 
@@ -47,8 +47,10 @@ export async function transformToGewerbeanmeldung(
     gewerbebetrieb: {
       gewerbebetriebID: randomUUID(),
       gemeindeMeldungNr: "2024 0001",
-      rechtsformcode: "411000",
-      eingetragenerName: "Muster GmbH",
+      rechtsformcode: RECHTSFORM.nichtEingetragenesEinzelunternehmen,
+      // We currently only support non-registered sole proprietorships (412000), which must
+      // not carry a registered name (SCH-0205), so eingetragenerName stays undefined.
+      eingetragenerName: undefined,
       betriebsstaette: {
         artBetriebsstaette: "01",
         anschrift: {
@@ -109,10 +111,4 @@ export async function transformToGewerbeanmeldung(
       ],
     },
   };
-}
-
-async function getAgsFromRegisterGewerbeRequestData(data: RegisterGewerbeRequest): Promise<string> {
-  if (data.unternehmensDaten.adresseAbweichend?.postleitzahl)
-    return (await getAGSandARS(data.unternehmensDaten.adresseAbweichend.postleitzahl)).ags;
-  else return (await getAGSandARS(data.persönlicheDaten.adresse.postleitzahl)).ags;
 }
