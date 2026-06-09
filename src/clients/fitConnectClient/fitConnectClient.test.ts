@@ -28,6 +28,20 @@ describe("FitConnectClient", () => {
     });
   });
 
+  describe("getRoutes", () => {
+    it("returns a routing result for a known leiKa key and AGS", async () => {
+      const client = getFitConnectClient();
+
+      const result = await client.getRoutes(
+        "99050012104000",
+        "14612000", // AGS Dresden
+      );
+      expect(Array.isArray(result.routes)).toBe(true);
+      expect(typeof result.count).toBe("number");
+      expect(typeof result.routes[0]!.destinationId).toBe("string");
+    });
+  });
+
   describe("getSubmissionEvents", () => {
     it("returns events for a submission", async () => {
       const client = getFitConnectClient();
