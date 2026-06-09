@@ -3,7 +3,6 @@ import { type CreateGewerbeanmeldungXmlData } from "../../../xmlBuilders/xGewerb
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { type GewerbeRoutingInfo } from "../getGewerbeRoutingInfo";
 import { splitStrasseHausnummer } from "../../../helpers/formFieldTransformations";
-import { getAGSandARS } from "../../../clients/pvogClient/pvogClient";
 import { VERTRAUENSNIVEAU, RECHTSFORM } from "./xGewerbeordnungCodes";
 
 // Transforms a RegisterGewerbeRequest into a complete Gewerbeanmeldung structure.
