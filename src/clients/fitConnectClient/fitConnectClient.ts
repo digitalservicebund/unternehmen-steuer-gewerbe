@@ -279,14 +279,12 @@ export function getFitConnectClient() {
   }
 
   async function getRoutes(leikaKey: string, ags: string): Promise<RoutingApiResponse> {
-    const { data: routingApiResponse } = await axios.get<RoutingApiResponse>(
-      `${urls.routingApiUrl}/v1/routes`,
-      {
-        params: { leikaKey, ags },
-        // The routing API blocks requests with the default axios User-Agent
-        headers: { Accept: "application/json", "User-Agent": "node" },
-      },
-    );
+    const url = new URL(`${urls.routingApiUrl}/v1/routes`);
+    url.searchParams.set("leikaKey", leikaKey);
+    url.searchParams.set("ags", ags);
+    const routingApiResponse = await fetchJson<RoutingApiResponse>(url.toString(), {
+      headers: { Accept: "application/json" },
+    });
     return routingApiResponse;
   }
 
