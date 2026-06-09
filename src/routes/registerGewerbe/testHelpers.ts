@@ -24,6 +24,7 @@ export const registerGewerbeCompleteRequest: RegisterGewerbeRequest = {
     tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
     tätigkeitsbereich: "handwerk",
     tätigkeitsbeginn: "2026-04-17",
+    gründungsdatum: "2026-01-15",
     gewerbeart: "hauptgewerbe",
     gewinnErmittlung: "einnahmenüberschussrechnung",
     kleinunternehmerRegelung: false,

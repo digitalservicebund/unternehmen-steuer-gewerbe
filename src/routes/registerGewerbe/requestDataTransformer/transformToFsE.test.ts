@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { transformToEUnFsE } from "./transformToFsE";
 import { registerGewerbeCompleteRequest } from "../testHelpers";
+import { RegisterGewerbeRequestSchema } from "../registerGewerbeInterfaces";
+import { formatDatumDE } from "../../../helpers/formFieldTransformations";
 
 describe("transformToEUnFsE", () => {
   it("maps output fields from request data", () => {
@@ -24,6 +26,9 @@ describe("transformToEUnFsE", () => {
     });
     expect(result.eUn?.allgAngaben?.artTaet?.gewerbeArt).toBe("Vertrieb von Vertriebsmustern");
     expect(result.eUn?.betrieb?.betrBeginn?.betriebsbeginn).toBe("17.04.2026");
+    expect(result.eUn?.betrieb?.gruendungsangaben?.gruendungsForm?.uebertrStichtag).toBe(
+      "15.01.2026",
+    );
     expect(result.eUn?.umsatzsteuer?.sollIstVersteuerung?.auswahlSollIstVerst).toBe("1");
     expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toBe("1");
   });
@@ -68,5 +73,22 @@ describe("transformToEUnFsE", () => {
       unternehmensDaten: unternehmensDatenOhneAbweichung,
     });
     expect(result.eUn?.betrieb?.unternehmen?.entsprichtWohnanschrift).toBe(true);
+  });
+
+  // TODO: temporary — the gründungsdatum default exists only to give the OSS time to
+  // start sending the field. Remove this test together with the schema default once
+  // gründungsdatum is always provided (field made required).
+  it("falls back to today's date for uebertrStichtag when gründungsdatum is omitted", () => {
+    const { gründungsdatum: _, ...unternehmensDatenOhneGründung } =
+      registerGewerbeCompleteRequest.unternehmensDaten;
+    const parsed = RegisterGewerbeRequestSchema.parse({
+      ...registerGewerbeCompleteRequest,
+      unternehmensDaten: unternehmensDatenOhneGründung,
+    });
+
+    const result = transformToEUnFsE(parsed);
+
+    const heute = formatDatumDE(new Date().toISOString().split("T")[0]!);
+    expect(result.eUn?.betrieb?.gruendungsangaben?.gruendungsForm?.uebertrStichtag).toBe(heute);
   });
 });
