@@ -38,7 +38,7 @@ describe("fetchJson", () => {
     });
   });
 
-  it("passes a string body through unchanged and keeps the caller's Content-Type", async () => {
+  it("passes a string request body through unchanged and keeps the caller's Content-Type", async () => {
     const fetchSpy = mockFetch(new Response("{}", { status: 200 }));
 
     await fetchJson("https://example.de/auth", {
