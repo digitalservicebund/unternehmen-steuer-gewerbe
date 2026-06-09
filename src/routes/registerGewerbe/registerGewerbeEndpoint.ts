@@ -9,11 +9,28 @@ import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gew
 import { ErrorTypeSchema, type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 import { registerGewerbeRoute } from "./registerGewerbeRoute";
 import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTransformer";
+import { getGewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
+
+const GEWERBEANMELDUNG_LEIKA_KEY_URN = "urn:de:fim:leika:leistung:99050012104000";
 
 async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
+  let routingInfo: Awaited<ReturnType<typeof getGewerbeRoutingInfo>>;
+  try {
+    routingInfo = await getGewerbeRoutingInfo(data);
+  } catch (error) {
+    console.error("Gewerbe routing info lookup failed", error);
+    return {
+      success: false,
+      errorType: ErrorTypeSchema.enum.upstream_error,
+      info: "Upstream service unavailable",
+    };
+  }
+
   let gewerbeanmeldungXml: string;
   try {
-    gewerbeanmeldungXml = await createGewerbeanmeldungXml(await transformToGewerbeanmeldung(data));
+    gewerbeanmeldungXml = await createGewerbeanmeldungXml(
+      transformToGewerbeanmeldung(data, routingInfo),
+    );
   } catch (error) {
     console.error("Gewerbeanmeldung XML validation failed", error);
     return {
@@ -23,6 +40,8 @@ async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
     };
   }
 
+  // Before using FIT-Connect -> Check in context if FIT-Connect or OSCI is supported by
+  // the Communes as soon as we have Pilot-Communes
   try {
     const response = await getFitConnectClient().submitData({
       // The destination varies from commune to commune.
@@ -30,7 +49,7 @@ async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
       // use the Fit‑Connect routing API to determine the destination ID.
       destinationId: getSecret("FIT_CONNECT_DESTINATION_ID"),
       publicService: {
-        identifier: "urn:de:fim:leika:leistung:99050012104000",
+        identifier: GEWERBEANMELDUNG_LEIKA_KEY_URN,
         name: "Gewerbe Anmeldung",
       },
       dataSchema: {

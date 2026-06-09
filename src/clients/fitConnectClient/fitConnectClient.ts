@@ -76,6 +76,113 @@ interface DestinationKeysResponse {
   keys: JWK[];
 }
 
+interface ContactPerson {
+  name: string;
+  tel: string;
+  fax: string;
+  email: string;
+}
+
+interface Address {
+  street: string;
+  houseNumber: string;
+  zip: string;
+  city: string;
+}
+
+interface PostalAddress {
+  street: string;
+  houseNumber: string;
+  additional: string;
+  zip: string;
+  city: string;
+}
+
+interface PostOfficeBox {
+  postOfficeBox: string;
+  zip: string;
+  city: string;
+}
+
+interface FurtherInformation {
+  /** Textuelle Beschreibung: Textuelle Beschreibung der weiterführenden Informationen (enthält ggf. HTML-Elemente) */
+  description: Record<string, string>;
+}
+
+interface RequiredDocuments {
+  /** Textuelle Beschreibung: Textuelle Beschreibung der weiterführenden Informationen (enthält ggf. HTML-Elemente) */
+  description: Record<string, string>;
+}
+
+interface LegalBasis {
+  /** Textuelle Beschreibung: Textuelle Beschreibung der weiterführenden Informationen (enthält ggf. HTML-Elemente) */
+  description: Record<string, string>;
+}
+
+interface Deadline {
+  /** Textuelle Beschreibung: Textuelle Beschreibung der weiterführenden Informationen (enthält ggf. HTML-Elemente) */
+  description: Record<string, string>;
+}
+
+interface ProcessingDuration {
+  minDuration: number;
+  maxDuration: number;
+  unit: "year" | "month" | "week" | "day" | "workday" | "hour" | "minute" | "second";
+}
+
+interface Route {
+  destinationId: string;
+  /** Die in XZuFI hinterlegte Signatur der FIT-Connect-Adressierungsinformationen (JWS gemäß RFC 7515) */
+  destinationSignature: string;
+  /** undocumented */
+  destinationParameters?: unknown;
+  /** undocumented */
+  destinationParametersSignature?: string;
+  /** Vollständiger Name der zuständigen Fachbehörde inkl. der vollständigen Hierarchie */
+  destinationName?: string;
+  /** Kurzbezeichnung der zuständigen Fachbehörde */
+  destinationShortName?: string;
+  /** URL zum Logo der zuständigen Fachbehörde */
+  destinationLogo?: string;
+  /** Die für die jeweilige Leistung zuständige Kontaktpersonen der zuständigen Fachbehörde */
+  contactPersons?: ContactPerson;
+  /** Hausanschrift der zuständigen Fachbehörde: Hausanschrift gemäß Codeliste Anschrifttyp, siehe https://www.xrepository.de/details/urn:xoev-de:fim:codeliste:xzufi.anschrifttyp */
+  address?: Address;
+  /** Postalische Adresse der zuständigen Fachbehörde: Postanschrift gemäß Codeliste Anschrifttyp, siehe https://www.xrepository.de/details/urn:xoev-de:fim:codeliste:xzufi.anschrifttyp */
+  postalAddress?: PostalAddress;
+  /** Postfachadresse der zuständigen Fachbehörde: Postfach gemäß Codeliste Anschrifttyp, siehe https://www.xrepository.de/details/urn:xoev-de:fim:codeliste:xzufi.anschrifttyp  */
+  postOfficeBox?: PostOfficeBox;
+  /** URL zur regionalen Datenschutzerklärung auf Ebene der zuständigen Fachbehörde */
+  privacyPolicyUrl?: string;
+  /** URL zum regionalen Impressum auf Ebene der zuständigen Fachbehörde */
+  imprintUrl?: string;
+  /** URL zum regionalen Barrierefreiheitserklärung auf Ebene der zuständigen Fachbehörde */
+  accessibilityUrl?: string;
+  /** URL zum Kontaktformular der zuständigen Fachbehörde */
+  contactFormUrl?: string;
+  /** Weiterführende Informationen zur Leistung */
+  furtherInformation?: FurtherInformation;
+  /** Erforderliche Unterlagen für die Leistung */
+  requiredDocuments?: RequiredDocuments;
+  /** Rechtsgrundlagen der Leitung */
+  legalBasis?: LegalBasis;
+  /** Hinweis zu Fristen der Leistung  */
+  deadline?: Deadline;
+  /** Bearbeitungsdauer der Leistung */
+  processingDuration?: ProcessingDuration;
+  /** Dienstspezifische Parameter: Liste an nicht-standardisierten, dienstspezifischen Parametern */
+  customParameters?: unknown;
+  /** Quellsystem der Routeninformation (z.B. PVOG, Infodienste, Zustellddienst) */
+  origin: string;
+}
+
+interface RoutingApiResponse {
+  count: number;
+  offset: number;
+  totalCount: number;
+  routes: Route[];
+}
+
 export function getFitConnectClient() {
   const config: FitConnectClientConfig = {
     environment: (getSecret("FIT_CONNECT_ENV") || "test") as Environment,
@@ -165,5 +272,17 @@ export function getFitConnectClient() {
     return { ...events, eventLog };
   }
 
-  return { submitData, getSubmissionEvents };
+  async function getRoutes(leikaKey: string, ags: string): Promise<RoutingApiResponse> {
+    const { data: routingApiResponse } = await axios.get<RoutingApiResponse>(
+      `${urls.routingApiUrl}/v1/routes`,
+      {
+        params: { leikaKey, ags },
+        // The routing API blocks requests with the default axios User-Agent
+        headers: { Accept: "application/json", "User-Agent": "node" },
+      },
+    );
+    return routingApiResponse;
+  }
+
+  return { submitData, getSubmissionEvents, getRoutes };
 }
