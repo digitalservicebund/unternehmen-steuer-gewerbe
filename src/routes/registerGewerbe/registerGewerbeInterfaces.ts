@@ -78,8 +78,7 @@ const UnternehmensDatenSchema = z.object({
     .openapi({ example: "handwerk" }),
   tätigkeitsbeginn: z.iso.date().openapi({ example: "2026-04-17" }),
   // TODO: temporary default — remove it (make gründungsdatum required) once the OSS
-  // always sends the field. The default exists only to keep current callers working in the
-  // meantime, falling back to the current date (date of submission).
+  // always sends the field.
   gründungsdatum: z.iso
     .date()
     .default(() => new Date().toISOString().split("T")[0]!)
