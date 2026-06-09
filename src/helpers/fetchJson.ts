@@ -3,7 +3,7 @@ export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 interface RequestOptions {
   method?: HttpMethod;
   headers?: Record<string, string>;
-  body?: unknown;
+  body?: string | object
 }
 
 /**
