@@ -77,6 +77,15 @@ const UnternehmensDatenSchema = z.object({
     .enum(["industrie", "handwerk", "handel", "sonstiges"])
     .openapi({ example: "handwerk" }),
   tätigkeitsbeginn: z.iso.date().openapi({ example: "2026-04-17" }),
+  // TODO: temporary default — remove it (make gründungsdatum required) once the OSS
+  // always sends the field.
+  gründungsdatum: z.iso
+    .date()
+    .default(() => new Date().toISOString().split("T")[0]!)
+    .openapi({
+      example: "2026-04-17",
+      description: "Founding date of the business.",
+    }),
   gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
   gewinnErmittlung: z.enum(GEWINN_ERMITTLUNG_KEYS).openapi({
     example: "einnahmenüberschussrechnung",

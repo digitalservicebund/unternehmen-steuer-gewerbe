@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { transformToGewerbeanmeldung } from "./transformToGewerbeanmeldung";
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
-import { registerGewerbeCompleteRequest } from "../testHelpers";
+import { registerGewerbeSampleRequestAllFieldsFilled } from "../testHelpers";
 
 const testRoutingInfo = {
   ags: "03046001",
@@ -12,16 +12,16 @@ const testRoutingInfo = {
 describe("transformToGewerbeanmeldung", () => {
   it("maps default values, applies the geschlecht fallback if the geschlecht is not given and drops optional fields", () => {
     const request: RegisterGewerbeRequest = {
-      ...registerGewerbeCompleteRequest,
+      ...registerGewerbeSampleRequestAllFieldsFilled,
       persönlicheDaten: {
-        ...registerGewerbeCompleteRequest.persönlicheDaten,
+        ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
         geburtsname: undefined,
         geschlecht: undefined,
         geburtsort: undefined,
         geburtsland: undefined,
       },
       unternehmensDaten: {
-        ...registerGewerbeCompleteRequest.unternehmensDaten,
+        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
         adresseAbweichend: undefined,
       },
     };
@@ -48,9 +48,9 @@ describe("transformToGewerbeanmeldung", () => {
   it("uses adresseAbweichend as betriebsstaette anschrift when provided", () => {
     const result = transformToGewerbeanmeldung(
       {
-        ...registerGewerbeCompleteRequest,
+        ...registerGewerbeSampleRequestAllFieldsFilled,
         unternehmensDaten: {
-          ...registerGewerbeCompleteRequest.unternehmensDaten,
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
           adresseAbweichend: {
             strasseUndHausnummer: "Betriebsweg 42a",
             postleitzahl: "23936",
@@ -70,7 +70,10 @@ describe("transformToGewerbeanmeldung", () => {
   });
 
   it("uses routingInfo.ags as gemeindeSchluessel", () => {
-    const result = transformToGewerbeanmeldung(registerGewerbeCompleteRequest, testRoutingInfo);
+    const result = transformToGewerbeanmeldung(
+      registerGewerbeSampleRequestAllFieldsFilled,
+      testRoutingInfo,
+    );
 
     expect(result.gemeindeSchluessel).toBe(testRoutingInfo.ags);
   });

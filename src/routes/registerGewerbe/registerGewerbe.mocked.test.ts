@@ -28,13 +28,13 @@ import app from "../../app";
 import { validateFsE as mockValidateFsE } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 
-import { registerGewerbeCompleteRequest } from "./testHelpers";
+import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
 import { ErrorTypeSchema } from "./registerGewerbeInterfaces";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
 
-function postRegisterGewerbe(data = registerGewerbeCompleteRequest) {
+function postRegisterGewerbe(data = registerGewerbeSampleRequestAllFieldsFilled) {
   return app.request("/api/v1/register-gewerbe", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

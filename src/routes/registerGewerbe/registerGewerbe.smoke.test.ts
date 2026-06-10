@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { registerGewerbeCompleteRequest } from "./testHelpers";
+import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
 
 const baseUrl = process.env.TEST_BASE_URL;
 
@@ -9,7 +9,7 @@ describe(`Smoke test against DEVELOPMENT API at ${baseUrl}`, () => {
       const response = await fetch(`${baseUrl}/api/v1/register-gewerbe`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(registerGewerbeCompleteRequest),
+        body: JSON.stringify(registerGewerbeSampleRequestAllFieldsFilled),
       });
 
       expect(response.status).toEqual(200);

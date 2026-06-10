@@ -200,7 +200,7 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
         gruendungsangaben: {
           gruendungsForm: {
             gruendungsArt: "1",
-            uebertrStichtag: formatDatumDE(data.unternehmensDaten.tätigkeitsbeginn),
+            uebertrStichtag: formatDatumDE(data.unternehmensDaten.gründungsdatum),
           },
         },
       },
