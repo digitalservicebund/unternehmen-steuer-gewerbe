@@ -1,6 +1,6 @@
 import { type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 
-export const registerGewerbeCompleteRequest: RegisterGewerbeRequest = {
+export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest = {
   persönlicheDaten: {
     vorname: "Erika",
     nachname: "Mustermann",
@@ -24,7 +24,7 @@ export const registerGewerbeCompleteRequest: RegisterGewerbeRequest = {
     tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
     tätigkeitsbereich: "handwerk",
     tätigkeitsbeginn: "2026-04-17",
-    gründungsdatum: "2026-01-15",
+    gründungsdatum: "2026-05-18",
     gewerbeart: "hauptgewerbe",
     gewinnErmittlung: "einnahmenüberschussrechnung",
     kleinunternehmerRegelung: false,

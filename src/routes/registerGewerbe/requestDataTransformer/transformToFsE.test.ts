@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { transformToEUnFsE } from "./transformToFsE";
-import { registerGewerbeCompleteRequest } from "../testHelpers";
+import { registerGewerbeSampleRequestAllFieldsFilled } from "../testHelpers";
 import { RegisterGewerbeRequestSchema } from "../registerGewerbeInterfaces";
 import { formatDatumDE } from "../../../helpers/formFieldTransformations";
 
 describe("transformToEUnFsE", () => {
   it("maps output fields from request data", () => {
-    const result = transformToEUnFsE(registerGewerbeCompleteRequest);
+    const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
     const natPers = result.eUn?.allgAngaben?.inhaber?.natPers;
 
     expect(natPers?.vorname).toBe("Erika");
@@ -27,7 +27,7 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.allgAngaben?.artTaet?.gewerbeArt).toBe("Vertrieb von Vertriebsmustern");
     expect(result.eUn?.betrieb?.betrBeginn?.betriebsbeginn).toBe("17.04.2026");
     expect(result.eUn?.betrieb?.gruendungsangaben?.gruendungsForm?.uebertrStichtag).toBe(
-      "15.01.2026",
+      "18.05.2026",
     );
     expect(result.eUn?.umsatzsteuer?.sollIstVersteuerung?.auswahlSollIstVerst).toBe("1");
     expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toBe("1");
@@ -35,30 +35,36 @@ describe("transformToEUnFsE", () => {
 
   it("maps geschlecht 'm' to anredeId '1' and 'w' to '2'", () => {
     const männlich = transformToEUnFsE({
-      ...registerGewerbeCompleteRequest,
-      persönlicheDaten: { ...registerGewerbeCompleteRequest.persönlicheDaten, geschlecht: "m" },
+      ...registerGewerbeSampleRequestAllFieldsFilled,
+      persönlicheDaten: {
+        ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
+        geschlecht: "m",
+      },
     });
     expect(männlich.eUn?.allgAngaben?.inhaber?.natPers?.anredeId).toBe("1");
 
     const weiblich = transformToEUnFsE({
-      ...registerGewerbeCompleteRequest,
-      persönlicheDaten: { ...registerGewerbeCompleteRequest.persönlicheDaten, geschlecht: "w" },
+      ...registerGewerbeSampleRequestAllFieldsFilled,
+      persönlicheDaten: {
+        ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
+        geschlecht: "w",
+      },
     });
     expect(weiblich.eUn?.allgAngaben?.inhaber?.natPers?.anredeId).toBe("2");
 
     const istVersteuerung = transformToEUnFsE({
-      ...registerGewerbeCompleteRequest,
+      ...registerGewerbeSampleRequestAllFieldsFilled,
       unternehmensDaten: {
-        ...registerGewerbeCompleteRequest.unternehmensDaten,
+        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
         sollIstVersteuerung: "istVersteuerung",
       },
     });
     expect(istVersteuerung.eUn?.umsatzsteuer?.sollIstVersteuerung?.auswahlSollIstVerst).toBe("2");
 
     const ueberschuss = transformToEUnFsE({
-      ...registerGewerbeCompleteRequest,
+      ...registerGewerbeSampleRequestAllFieldsFilled,
       unternehmensDaten: {
-        ...registerGewerbeCompleteRequest.unternehmensDaten,
+        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
         zahllastUeberschussAuswahl: "ueberschuss",
       },
     });
@@ -67,9 +73,9 @@ describe("transformToEUnFsE", () => {
 
   it("sets entsprichtWohnanschrift: true when adresseAbweichend is not set", () => {
     const { adresseAbweichend: _, ...unternehmensDatenOhneAbweichung } =
-      registerGewerbeCompleteRequest.unternehmensDaten;
+      registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten;
     const result = transformToEUnFsE({
-      ...registerGewerbeCompleteRequest,
+      ...registerGewerbeSampleRequestAllFieldsFilled,
       unternehmensDaten: unternehmensDatenOhneAbweichung,
     });
     expect(result.eUn?.betrieb?.unternehmen?.entsprichtWohnanschrift).toBe(true);
@@ -80,9 +86,9 @@ describe("transformToEUnFsE", () => {
   // gründungsdatum is always provided (field made required).
   it("falls back to today's date for uebertrStichtag when gründungsdatum is omitted", () => {
     const { gründungsdatum: _, ...unternehmensDatenOhneGründung } =
-      registerGewerbeCompleteRequest.unternehmensDaten;
+      registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten;
     const parsed = RegisterGewerbeRequestSchema.parse({
-      ...registerGewerbeCompleteRequest,
+      ...registerGewerbeSampleRequestAllFieldsFilled,
       unternehmensDaten: unternehmensDatenOhneGründung,
     });
 

@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import app from "../../app";
-import { registerGewerbeCompleteRequest } from "./testHelpers";
+import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
 import { existsSync } from "node:fs";
 
-function postRegisterGewerbe(data = registerGewerbeCompleteRequest) {
+function postRegisterGewerbe(data = registerGewerbeSampleRequestAllFieldsFilled) {
   return app.request("/api/v1/register-gewerbe", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

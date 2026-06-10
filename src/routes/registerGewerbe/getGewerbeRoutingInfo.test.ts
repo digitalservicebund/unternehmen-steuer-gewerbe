@@ -14,31 +14,31 @@ vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
 }));
 
 import { getGewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
-import { registerGewerbeCompleteRequest } from "./testHelpers";
+import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
 
 describe("getGewerbeRoutingInfo", () => {
   describe("AGS (Amtlicher Gemeindeschlüssel)", () => {
     it("uses persönlicheDaten.adresse.postleitzahl when no adresseAbweichend", async () => {
       await getGewerbeRoutingInfo({
-        ...registerGewerbeCompleteRequest,
+        ...registerGewerbeSampleRequestAllFieldsFilled,
         unternehmensDaten: {
-          ...registerGewerbeCompleteRequest.unternehmensDaten,
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
           adresseAbweichend: undefined,
         },
       });
 
       expect(mockGetAGSandARS).toHaveBeenCalledWith(
-        registerGewerbeCompleteRequest.persönlicheDaten.adresse.postleitzahl,
+        registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten.adresse.postleitzahl,
       );
     });
 
     it("uses adresseAbweichend.postleitzahl when provided", async () => {
       await getGewerbeRoutingInfo({
-        ...registerGewerbeCompleteRequest,
+        ...registerGewerbeSampleRequestAllFieldsFilled,
         unternehmensDaten: {
-          ...registerGewerbeCompleteRequest.unternehmensDaten,
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
           adresseAbweichend: {
-            ...registerGewerbeCompleteRequest.unternehmensDaten.adresseAbweichend!,
+            ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten.adresseAbweichend!,
             postleitzahl: "10969",
           },
         },
@@ -50,16 +50,16 @@ describe("getGewerbeRoutingInfo", () => {
 
   describe("FIT-Connect routing", () => {
     const requestWithFitConnectSupport = {
-      ...registerGewerbeCompleteRequest,
+      ...registerGewerbeSampleRequestAllFieldsFilled,
       persönlicheDaten: {
-        ...registerGewerbeCompleteRequest.persönlicheDaten,
+        ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
         adresse: {
-          ...registerGewerbeCompleteRequest.persönlicheDaten.adresse,
+          ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten.adresse,
           postleitzahl: "00000",
         },
       },
       unternehmensDaten: {
-        ...registerGewerbeCompleteRequest.unternehmensDaten,
+        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
         adresseAbweichend: undefined,
       },
     };
