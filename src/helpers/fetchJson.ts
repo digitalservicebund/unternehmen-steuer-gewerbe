@@ -9,7 +9,6 @@ interface RequestOptions {
   body?: string | object;
 }
 
-
 function createUrlWithParams(url: string, params: QueryParams): string {
   const urlWithParams = new URL(url);
   for (const [key, value] of Object.entries(params)) {
