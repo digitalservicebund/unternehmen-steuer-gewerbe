@@ -22,6 +22,31 @@ describe("fetchJson", () => {
     });
   });
 
+  it("appends params to the url as an encoded query string", async () => {
+    const fetchSpy = mockFetch(new Response("{}", { status: 200 }));
+
+    await fetchJson("https://example.de/search", {
+      params: { q: "köln mitte", page: 0, exact: true },
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      "https://example.de/search?q=k%C3%B6ln+mitte&page=0&exact=true",
+      { method: "GET", headers: { "Content-Type": "application/json" }, body: undefined },
+    );
+  });
+
+  it("keeps query params that are already part of the url when appending params", async () => {
+    const fetchSpy = mockFetch(new Response("{}", { status: 200 }));
+
+    await fetchJson("https://example.de/search?lang=de", { params: { page: 0 } });
+
+    expect(fetchSpy).toHaveBeenCalledWith("https://example.de/search?lang=de&page=0", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      body: undefined,
+    });
+  });
+
   it("stringifies an object body, sets JSON Content-Type and returns the parsed response", async () => {
     const fetchSpy = mockFetch(new Response(JSON.stringify({ value: 42 }), { status: 200 }));
 
