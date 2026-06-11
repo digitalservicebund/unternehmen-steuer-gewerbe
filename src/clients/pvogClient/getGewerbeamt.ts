@@ -168,10 +168,9 @@ export async function getGewerbeamt(ars: string): Promise<Gewerbeamt> {
   }
   const lbId = serviceDescription.id;
 
-  // applyDynamicParams=true resolves region-specific placeholders in the online service URIs
   const serviceDescriptionDetail = await fetchJson<ServiceDescriptionDetail>(
     `${PVOG_SUCHDIENST_API_URL}/v6/servicedescriptions/${lbId}/detail`,
-    { params: { applyDynamicParams: true, ars, validDate } },
+    { params: { ars } },
   );
 
   const organisationUnits = await fetchJson<OrganisationUnitTitle[]>(

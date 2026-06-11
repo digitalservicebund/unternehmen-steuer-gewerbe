@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { getGewerbeamt } from "./getGewerbeamt";
+import { getGewerbeamt } from ".";
 
 describe("getGewerbeamt", () => {
-  it("should return the Gewerbeamt Ulm with address, contact details and online service links for ARS 084210000000", async () => {
+  it("returns the Gewerbeamt Ulm with address, contact details and online service links for ARS 084210000000", async () => {
     const gewerbeamt = await getGewerbeamt("084210000000");
     expect(gewerbeamt).toEqual({
       name: "Bürgerdienste - Gewerbean-, um-, abmeldungen, Reisegewerbekarten, Gaststättenrecht, Gesundheitswesen, Waffen- und Sprengstoffwesen",
@@ -35,14 +35,14 @@ describe("getGewerbeamt", () => {
     });
   });
 
-  it("should return an empty onlineServiceLinks list for Fraureuth (ARS 146120000000), which has no online services", async () => {
+  it("returns an empty onlineServiceLinks list for Fraureuth (ARS 146120000000), which has no online services", async () => {
     const gewerbeamt = await getGewerbeamt("146120000000");
 
     expect(gewerbeamt.name).toBe("Gewerbeamt");
     expect(gewerbeamt.onlineServiceLinks).toEqual([]);
   });
 
-  it("should throw if no service description was found for ARS 000000000000", async () => {
+  it("throws if no service description was found for ARS 000000000000", async () => {
     await expect(getGewerbeamt("000000000000")).rejects.toThrow(
       "No service description found for ARS 000000000000",
     );
