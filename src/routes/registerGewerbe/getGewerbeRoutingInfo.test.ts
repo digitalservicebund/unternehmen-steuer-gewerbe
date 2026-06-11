@@ -5,7 +5,7 @@ const { mockGetAGSandARS, mockGetRoutes } = vi.hoisted(() => ({
   mockGetRoutes: vi.fn(),
 }));
 
-vi.mock("../../clients/pvogClient/pvogClient", () => ({
+vi.mock("../../clients/pvogClient", () => ({
   getAGSandARS: mockGetAGSandARS,
 }));
 

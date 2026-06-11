@@ -1,4 +1,4 @@
-import { getAGSandARS } from "../../clients/pvogClient/pvogClient";
+import { getAGSandARS } from "../../clients/pvogClient";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
 import { type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 

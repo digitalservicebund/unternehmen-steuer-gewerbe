@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getAGSandARS } from "./pvogClient";
+import { getAGSandARS } from "./getAGSandARS";
 
 describe("PVOG client", () => {
   it("should return AGS (Amtlicher Gemeindeschlüssel) 08421000 and ARS (Amtlicher Regionalschlüssel) 084210000000 for zip code 89073", async () => {
