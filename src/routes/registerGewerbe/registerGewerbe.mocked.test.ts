@@ -6,6 +6,7 @@ import { XMLParser } from "fast-xml-parser";
 vi.mock("@digitalservicebund/unternehmen-steuer-gewerbe-privat", () => ({
   validateFsE: vi.fn().mockReturnValue({ isValid: true, returnCode: 0, info: undefined }),
   createElsterFsEEUnXml: vi.fn().mockReturnValue("<xml/>"),
+  sendFsE: vi.fn().mockReturnValue({ success: true, returnCode: 0, info: undefined }),
 }));
 
 const { mockSubmitData, mockGetGewerbeRoutingInfo } = vi.hoisted(() => ({
