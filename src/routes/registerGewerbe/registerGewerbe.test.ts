@@ -14,7 +14,7 @@ function postRegisterGewerbe(data = registerGewerbeSampleRequestAllFieldsFilled)
 
 describe("Route /api/v1/register-gewerbe", () => {
   describe("in case of success", () => {
-    it("Returns 200 OK with success=true for gewerbe and steuer and fseÜbermittlung on POST", async () => {
+    it("Returns 200 OK with success=true for gewerbe and steuer and fseÜbermittlung and PDF receipt on POST", async () => {
       const response = await postRegisterGewerbe();
       const json = await response.json();
       expect(response.status).toEqual(HttpStatusCode.Ok);
@@ -22,6 +22,7 @@ describe("Route /api/v1/register-gewerbe", () => {
       expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
       expect(json.fseÜbermittlung.success).toBe(true);
       expect(json.fseÜbermittlung.submissionId).toBeTruthy();
+      expect(json.fseÜbermittlung.pdfReceiptBase64).toBeTruthy();
     });
 
     it("does write the eric log to /tmp", async () => {
