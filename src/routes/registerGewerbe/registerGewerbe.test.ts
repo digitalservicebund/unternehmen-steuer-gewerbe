@@ -23,18 +23,18 @@ describe("Route /api/v1/register-gewerbe", () => {
   });
 
   describe("in case of success on POST", () => {
-    it("Returns 200 OK with success=true for gewerbe and steuer", async () => {
+    it("returns 200 OK with success=true for gewerbe and steuer", async () => {
       expect(response.status).toEqual(HttpStatusCode.Ok);
       expect(json.gewerbeanmeldung.success).toBe(true);
       expect(json.fseÜbermittlung.success).toBe(true);
     });
 
-    it("submissionIds for gewerbe and steuer", async () => {
+    it("returns submissionIds for gewerbe and steuer", async () => {
       expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
       expect(json.fseÜbermittlung.submissionId).toBeTruthy();
     });
 
-    it("PDF receipt in base64", async () => {
+    it("returns FsE PDF receipt in base64", async () => {
       expect(json.fseÜbermittlung.pdfReceiptBase64).toBeTruthy();
       // base64 prefix is '%PDF-'
       expect(json.fseÜbermittlung.pdfReceiptBase64).toMatch(/^JVBERi0/);
