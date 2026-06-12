@@ -30,6 +30,8 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
     kleinunternehmerRegelung: false,
     umsatzGruendungsjahr: 1,
     umsatzFolgejahr: 1,
+    gewinnGründungsjahr: 1,
+    gewinnFolgejahr: 1,
     sollIstVersteuerung: "sollVersteuerung",
     zahllastUeberschussAuswahl: "zahllast",
     zahllastUeberschussBetrag: 0,
