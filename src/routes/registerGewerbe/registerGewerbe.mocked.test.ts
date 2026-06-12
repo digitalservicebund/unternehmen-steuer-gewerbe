@@ -29,7 +29,6 @@ import app from "../../app";
 import {
   validateFsE as mockValidateFsE,
   sendFsE as mockSendFsE,
-  createElsterFsEEUnXml as mockCreateElsterFsEEUnXml,
 } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 
@@ -139,22 +138,6 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
       expect(json.fseÜbermittlung.success).toBe(false);
       expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
-    });
-
-    it("Returns 500 INTERNAL SERVER ERROR when FsE XML creation throws outside the per-submission try/catch", async () => {
-      vi.mocked(mockCreateElsterFsEEUnXml).mockImplementationOnce(() => {
-        throw new Error("ElsterFsE XML creation crashed");
-      });
-
-      const response = await postRegisterGewerbe();
-      const json = await response.json();
-      expect(response.status).toEqual(HttpStatusCode.InternalServerError);
-      expect(json.gewerbeanmeldung.success).toBe(false);
-      expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
-      expect(json.gewerbeanmeldung.info).toBe("Internal Server Error");
-      expect(json.fseÜbermittlung.success).toBe(false);
-      expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
-      expect(json.fseÜbermittlung.info).toBe("Internal Server Error");
     });
 
     it("Returns 500 INTERNAL SERVER ERROR when both submissions fail", async () => {

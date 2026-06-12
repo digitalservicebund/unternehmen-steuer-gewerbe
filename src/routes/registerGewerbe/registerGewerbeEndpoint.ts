@@ -73,18 +73,18 @@ async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
 }
 
 async function submitFsE(data: RegisterGewerbeRequest) {
-  const fse = createElsterFsEEUnXml(transformToEUnFsE(data));
-
-  const validation = validateFsE(fse);
-  if (!validation.valid) {
-    return {
-      success: false,
-      errorType: ErrorTypeSchema.enum.validation_error,
-      info: validation.errors,
-    };
-  }
-
   try {
+    const fse = createElsterFsEEUnXml(transformToEUnFsE(data));
+
+    const validation = validateFsE(fse);
+    if (!validation.valid) {
+      return {
+        success: false,
+        errorType: ErrorTypeSchema.enum.validation_error,
+        info: validation.errors,
+      };
+    }
+
     const result = sendFsE(fse);
     if (!result.success) {
       return {
@@ -99,7 +99,6 @@ async function submitFsE(data: RegisterGewerbeRequest) {
     return {
       success: false,
       errorType: ErrorTypeSchema.enum.upstream_error,
-      info: "Upstream service unavailable",
     };
   }
 }
