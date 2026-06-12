@@ -76,49 +76,47 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(json.fseÜbermittlung.success).toBe(true);
     });
 
-    it("Returns 207 MULTI-STATUS with fseÜbermittlung upstream_error when ERiC service is unavailable, gewerbeanmeldung still succeeds", async () => {
-      vi.mocked(mockSendFsE).mockImplementationOnce(() => {
-        throw new Error("ERiC unavailable");
-      });
+    it.each([
+      {
+        label: "upstream_error when ERiC service is unavailable",
+        setup: () =>
+          vi.mocked(mockSendFsE).mockImplementationOnce(() => {
+            throw new Error("ERiC unavailable");
+          }),
+        errorType: ErrorTypeSchema.enum.upstream_error,
+      },
+      {
+        label: "upstream_error when sendFsE reports failure",
+        setup: () =>
+          vi.mocked(mockSendFsE).mockReturnValueOnce({
+            success: false,
+            info: "ERiC rejected submission",
+          }),
+        errorType: ErrorTypeSchema.enum.upstream_error,
+      },
+      {
+        label: "validation_error when FsE validation fails",
+        setup: () =>
+          vi.mocked(mockValidateFsE).mockReturnValueOnce({
+            valid: false,
+            errors: "FsE validation failed",
+          }),
+        errorType: ErrorTypeSchema.enum.validation_error,
+      },
+    ])(
+      "Returns 207 MULTI-STATUS with fseÜbermittlung $label, gewerbeanmeldung still succeeds",
+      async ({ setup, errorType }) => {
+        setup();
 
-      const response = await postRegisterGewerbe();
-      const json = await response.json();
-      expect(response.status).toEqual(HttpStatusCode.MultiStatus);
-      expect(json.fseÜbermittlung.success).toBe(false);
-      expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
-      expect(json.gewerbeanmeldung.success).toBe(true);
-      expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
-    });
-
-    it("Returns 207 MULTI-STATUS with fseÜbermittlung upstream_error when sendFsE reports failure, gewerbeanmeldung still succeeds", async () => {
-      vi.mocked(mockSendFsE).mockReturnValueOnce({
-        success: false,
-        info: "ERiC rejected submission",
-      });
-
-      const response = await postRegisterGewerbe();
-      const json = await response.json();
-      expect(response.status).toEqual(HttpStatusCode.MultiStatus);
-      expect(json.fseÜbermittlung.success).toBe(false);
-      expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
-      expect(json.gewerbeanmeldung.success).toBe(true);
-      expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
-    });
-
-    it("Returns 207 MULTI-STATUS with fseÜbermittlung validation_error when FsE validation fails, gewerbeanmeldung still succeeds", async () => {
-      vi.mocked(mockValidateFsE).mockReturnValueOnce({
-        valid: false,
-        errors: "FsE validation failed",
-      });
-
-      const response = await postRegisterGewerbe();
-      const json = await response.json();
-      expect(response.status).toEqual(HttpStatusCode.MultiStatus);
-      expect(json.fseÜbermittlung.success).toBe(false);
-      expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
-      expect(json.gewerbeanmeldung.success).toBe(true);
-      expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
-    });
+        const response = await postRegisterGewerbe();
+        const json = await response.json();
+        expect(response.status).toEqual(HttpStatusCode.MultiStatus);
+        expect(json.fseÜbermittlung.success).toBe(false);
+        expect(json.fseÜbermittlung.errorType).toBe(errorType);
+        expect(json.gewerbeanmeldung.success).toBe(true);
+        expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
+      },
+    );
   });
 
   describe("in case of error", () => {
