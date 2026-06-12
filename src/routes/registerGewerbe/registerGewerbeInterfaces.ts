@@ -153,6 +153,7 @@ const RegisterGewerbeResponseItemSchema = z.object({
   submissionId: z.string().optional(),
   info: z.string().optional(),
   errorType: ErrorTypeSchema.optional(),
+  pdfReceiptBase64: z.base64().optional(),
 });
 
 export const RegisterGewerbeResponseSchema = z
