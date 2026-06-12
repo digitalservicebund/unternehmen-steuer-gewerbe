@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { HonoAppType } from "../../honoApp";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
 import {
@@ -126,6 +128,11 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
         submitFsE(data),
       ]);
 
+      // to be replaced by the real receipt once we really submit
+      const pdfReceiptBase64 = readFileSync(
+        join(import.meta.dirname, "fsePdfReceiptDummy.pdf"),
+      ).toString("base64");
+
       return c.json(
         {
           gewerbeanmeldung,
@@ -133,6 +140,7 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
             success: fseÜbermittlung.success,
             submissionId: fseÜbermittlung.submissionId,
             errorType: fseÜbermittlung.errorType,
+            pdfReceiptBase64,
           },
         },
         determineHttpStatus(gewerbeanmeldung, fseÜbermittlung),
