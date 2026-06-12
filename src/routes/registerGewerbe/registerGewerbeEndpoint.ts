@@ -3,8 +3,9 @@ import { join } from "node:path";
 import { HonoAppType } from "../../honoApp";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
 import {
-  validateFsE,
   createElsterFsEEUnXml,
+  sendFsE,
+  validateFsE,
 } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 import { getSecret } from "../../secrets";
 import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
@@ -73,27 +74,31 @@ async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
 
 async function submitFsE(data: RegisterGewerbeRequest) {
   try {
-    const result = validateFsE(createElsterFsEEUnXml(transformToEUnFsE(data)));
+    const fse = createElsterFsEEUnXml(transformToEUnFsE(data));
 
-    if (result.isValid === undefined) {
-      throw new Error("ERiC Service unavailable");
-    }
-
-    if (result.isValid === false) {
+    const validation = validateFsE(fse);
+    if (!validation.valid) {
       return {
         success: false,
         errorType: ErrorTypeSchema.enum.validation_error,
-        info: result.info ?? "FsE validation failed",
+        info: validation.errors,
       };
     }
 
-    return { success: true, submissionId: "00000000-0000-0000-0000-000000000000" }; // replace this as soon as we really send the data
+    const result = sendFsE(fse);
+    if (!result.success) {
+      return {
+        success: false,
+        errorType: ErrorTypeSchema.enum.upstream_error,
+        info: result.info,
+      };
+    }
+    return { success: true, info: result.info };
   } catch (error) {
     console.error("FsE submission failed", error);
     return {
       success: false,
       errorType: ErrorTypeSchema.enum.upstream_error,
-      info: "Upstream service unavailable",
     };
   }
 }
@@ -138,7 +143,7 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
           gewerbeanmeldung,
           fseÜbermittlung: {
             success: fseÜbermittlung.success,
-            submissionId: fseÜbermittlung.submissionId,
+            submissionId: "implementation missing",
             errorType: fseÜbermittlung.errorType,
             pdfReceiptBase64,
           },
