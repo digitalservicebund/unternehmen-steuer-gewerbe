@@ -23,6 +23,12 @@ describe("Route /api/v1/register-gewerbe", () => {
       expect(json.fseÜbermittlung.success).toBe(true);
       expect(json.fseÜbermittlung.submissionId).toBeTruthy();
       expect(json.fseÜbermittlung.pdfReceiptBase64).toBeTruthy();
+      // check base64 prefix (%PDF-)
+      expect(json.fseÜbermittlung.pdfReceiptBase64).toMatch(/^JVBERi0/);
+
+      // Option B: decode + check magic bytes
+      const buf = Buffer.from(json.fseÜbermittlung.pdfReceiptBase64, "base64");
+      expect(buf.subarray(0, 5).toString()).toBe("%PDF-");
     });
 
     it("does write the eric log to /tmp", async () => {
