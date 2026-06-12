@@ -161,7 +161,7 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
           gewerbeanmeldung,
           fseÜbermittlung: {
             success: fseÜbermittlung.success,
-            //submissionId: fseÜbermittlung.submissionId,
+            submissionId: "implementation missing",
             errorType: fseÜbermittlung.errorType,
             pdfReceiptBase64,
           },
