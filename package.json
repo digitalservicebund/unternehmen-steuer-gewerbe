@@ -27,12 +27,12 @@
     "test:watch": "op run --env-file .env -- vitest"
   },
   "dependencies": {
-    "@digitalservicebund/unternehmen-steuer-gewerbe-privat": "2.0.0-185",
+    "@digitalservicebund/unternehmen-steuer-gewerbe-privat": "2.0.0-187",
     "@hono/node-server": "^2.0.3",
     "@hono/swagger-ui": "^0.6.1",
     "@hono/zod-openapi": "^1.4.0",
     "dotenv": "^17.4.2",
-    "hono": "^4.12.22",
+    "hono": "^4.12.24",
     "jose": "^6.2.3",
     "koffi": "^3.0.2",
     "saxonjs-he": "3.0.0-beta2",

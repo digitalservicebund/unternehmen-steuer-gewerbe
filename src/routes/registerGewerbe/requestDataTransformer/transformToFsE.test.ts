@@ -81,6 +81,37 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.betrieb?.unternehmen?.entsprichtWohnanschrift).toBe(true);
   });
 
+  it("maps adresseAbweichend to Unternehmen-Anschrift (ERiC Anschrift_angegeben)", () => {
+    const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+    expect(result.eUn?.betrieb?.unternehmen?.entsprichtWohnanschrift).toBeUndefined();
+    expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
+      str: "Musterstraße",
+      hausNr: "2",
+      plz: "96450",
+      ort: "Coburg",
+    });
+  });
+
+  it("sets kleinUnternUStVerzicht=true when kleinunternehmerRegelung is false (ERiC KleinUN_fehlende_Angaben)", () => {
+    const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+    expect(result.eUn?.umsatzsteuer?.kleinunternehmerRegelung).toEqual({
+      kleinUnternUStVerzicht: true,
+    });
+  });
+
+  it("sets kleinUnternUSt=true when kleinunternehmerRegelung is true", () => {
+    const result = transformToEUnFsE({
+      ...registerGewerbeSampleRequestAllFieldsFilled,
+      unternehmensDaten: {
+        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+        kleinunternehmerRegelung: true,
+      },
+    });
+    expect(result.eUn?.umsatzsteuer?.kleinunternehmerRegelung).toEqual({
+      kleinUnternUSt: true,
+    });
+  });
+
   // TODO: temporary — the gründungsdatum default exists only to give the OSS time to
   // start sending the field. Remove this test together with the schema default once
   // gründungsdatum is always provided (field made required).

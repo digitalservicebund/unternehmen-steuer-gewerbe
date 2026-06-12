@@ -9,23 +9,23 @@ importers:
   .:
     dependencies:
       '@digitalservicebund/unternehmen-steuer-gewerbe-privat':
-        specifier: 2.0.0-185
-        version: 2.0.0-185(@types/node@25.9.2)
+        specifier: 2.0.0-187
+        version: 2.0.0-187(@types/node@25.9.2)
       '@hono/node-server':
         specifier: ^2.0.3
-        version: 2.0.4(hono@4.12.23)
+        version: 2.0.4(hono@4.12.24)
       '@hono/swagger-ui':
         specifier: ^0.6.1
-        version: 0.6.1(hono@4.12.23)
+        version: 0.6.1(hono@4.12.24)
       '@hono/zod-openapi':
         specifier: ^1.4.0
-        version: 1.4.0(hono@4.12.23)(zod@4.4.3)
+        version: 1.4.0(hono@4.12.24)(zod@4.4.3)
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2
       hono:
-        specifier: ^4.12.22
-        version: 4.12.23
+        specifier: ^4.12.24
+        version: 4.12.24
       jose:
         specifier: ^6.2.3
         version: 6.2.3
@@ -110,8 +110,8 @@ packages:
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
 
-  '@digitalservicebund/unternehmen-steuer-gewerbe-privat@2.0.0-185':
-    resolution: {integrity: sha512-p+gcZqakh9ekihb8FBHjoTraG4kXVu0/pQduxd5/TgnJIzD1Se5qzUCGW3NdEd9X+Hex/KBJIdtZKYnuBsDgcA==, tarball: https://npm.pkg.github.com/download/@digitalservicebund/unternehmen-steuer-gewerbe-privat/2.0.0-185/236f9c5908650477f5b25a0abc039f074925c637}
+  '@digitalservicebund/unternehmen-steuer-gewerbe-privat@2.0.0-187':
+    resolution: {integrity: sha512-kgo988WB3M4f/fMfo9mIP7RuHFTgeg0bSbv4V2601l9JPQLYefQQHKs3fILGsKy63gTB8Ag7GMK4E9MHuzzabQ==, tarball: https://npm.pkg.github.com/download/@digitalservicebund/unternehmen-steuer-gewerbe-privat/2.0.0-187/b164dc2ff48ccc9cdf6811e3304e12447624f557}
 
   '@emnapi/core@1.10.0':
     resolution: {integrity: sha512-yq6OkJ4p82CAfPl0u9mQebQHKPJkY7WrIuk205cTYnYe+k2Z8YBh11FrbRG/H6ihirqcacOgl2BIO8oyMQLeXw==}
@@ -997,8 +997,8 @@ packages:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
 
-  hono@4.12.23:
-    resolution: {integrity: sha512-eIaZ9qDgu7XV0pxOCrg7/WhnQ6Ivm22UcxhXx/A3dcbqbbYgBEkc6e/J/s7j2tS96zoB0S9VBdLwQNCWwUo4LA==}
+  hono@4.12.24:
+    resolution: {integrity: sha512-I36D1s+HgQc55KbhEr4iybfxv/9o1zdpw+XEM6dJa91LqQD0HCoSGdxpRJCZE+aavs87j4V3Ls2OJzq8C/U4iw==}
     engines: {node: '>=16.9.0'}
 
   html-escaper@2.0.2:
@@ -1435,7 +1435,7 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@digitalservicebund/unternehmen-steuer-gewerbe-privat@2.0.0-185(@types/node@25.9.2)':
+  '@digitalservicebund/unternehmen-steuer-gewerbe-privat@2.0.0-187(@types/node@25.9.2)':
     dependencies:
       fast-xml-parser: 5.8.0
       koffi: 3.0.2
@@ -1538,25 +1538,25 @@ snapshots:
   '@esbuild/win32-x64@0.28.0':
     optional: true
 
-  '@hono/node-server@2.0.4(hono@4.12.23)':
+  '@hono/node-server@2.0.4(hono@4.12.24)':
     dependencies:
-      hono: 4.12.23
+      hono: 4.12.24
 
-  '@hono/swagger-ui@0.6.1(hono@4.12.23)':
+  '@hono/swagger-ui@0.6.1(hono@4.12.24)':
     dependencies:
-      hono: 4.12.23
+      hono: 4.12.24
 
-  '@hono/zod-openapi@1.4.0(hono@4.12.23)(zod@4.4.3)':
+  '@hono/zod-openapi@1.4.0(hono@4.12.24)(zod@4.4.3)':
     dependencies:
       '@asteasolutions/zod-to-openapi': 8.5.0(zod@4.4.3)
-      '@hono/zod-validator': 0.8.0(hono@4.12.23)(zod@4.4.3)
-      hono: 4.12.23
+      '@hono/zod-validator': 0.8.0(hono@4.12.24)(zod@4.4.3)
+      hono: 4.12.24
       openapi3-ts: 4.5.0
       zod: 4.4.3
 
-  '@hono/zod-validator@0.8.0(hono@4.12.23)(zod@4.4.3)':
+  '@hono/zod-validator@0.8.0(hono@4.12.24)(zod@4.4.3)':
     dependencies:
-      hono: 4.12.23
+      hono: 4.12.24
       zod: 4.4.3
 
   '@jridgewell/resolve-uri@3.1.2': {}
@@ -2032,7 +2032,7 @@ snapshots:
 
   has-flag@4.0.0: {}
 
-  hono@4.12.23: {}
+  hono@4.12.24: {}
 
   html-escaper@2.0.2: {}
 
