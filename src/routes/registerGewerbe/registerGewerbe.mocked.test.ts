@@ -90,6 +90,21 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
     });
 
+    it("Returns 207 MULTI-STATUS with fseÜbermittlung upstream_error when sendFsE reports failure, gewerbeanmeldung still succeeds", async () => {
+      vi.mocked(mockSendFsE).mockReturnValueOnce({
+        success: false,
+        info: "ERiC rejected submission",
+      });
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+      expect(response.status).toEqual(HttpStatusCode.MultiStatus);
+      expect(json.fseÜbermittlung.success).toBe(false);
+      expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
+      expect(json.gewerbeanmeldung.success).toBe(true);
+      expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
+    });
+
     it("Returns 207 MULTI-STATUS with fseÜbermittlung validation_error when FsE validation fails, gewerbeanmeldung still succeeds", async () => {
       vi.mocked(mockValidateFsE).mockReturnValueOnce({
         valid: false,
