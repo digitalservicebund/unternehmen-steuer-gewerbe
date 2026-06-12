@@ -229,7 +229,12 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
         },
       },
       festsetzungsAngaben: {
-        voraussichtlicheEinkuenfte: {},
+        voraussichtlicheEinkuenfte: {
+          einkGewBetr: {
+            gruendJahrA: data.unternehmensDaten.gewinnGründungsjahr,
+            folgeJahrA: data.unternehmensDaten.gewinnFolgejahr,
+          },
+        },
       },
       gewinnErmittlgsAngaben: {
         gewinnErmittlung: GEWINN_ERMITTLUNG[data.unternehmensDaten.gewinnErmittlung],

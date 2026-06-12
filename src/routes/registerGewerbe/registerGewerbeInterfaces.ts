@@ -103,6 +103,14 @@ const UnternehmensDatenSchema = z.object({
     example: 26000,
     description: "Voraussichtlicher Gesamtumsatz (in Euro) im Folgejahr.",
   }),
+  gewinnGründungsjahr: z.number().int().min(0).default(1).openapi({
+    example: 25000,
+    description: "Voraussichtlicher Gewinn (in Euro) im Jahr der Betriebseröffnung.",
+  }),
+  gewinnFolgejahr: z.number().int().min(0).default(1).openapi({
+    example: 26000,
+    description: "Voraussichtlicher Gewinn (in Euro) im Folgejahr.",
+  }),
   sollIstVersteuerung: z.enum(SOLL_IST_VERSTEUERUNG_KEYS).default("sollVersteuerung").openapi({
     example: "sollVersteuerung",
     description:
