@@ -3,10 +3,11 @@ import { transformToEUnFsE } from "./transformToFsE";
 import { registerGewerbeSampleRequestAllFieldsFilled } from "../testHelpers";
 import { RegisterGewerbeRequestSchema } from "../registerGewerbeInterfaces";
 import { formatDatumDE } from "../../../helpers/formFieldTransformations";
+import { ElsterFsEEUn } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 
 describe("transformToEUnFsE", () => {
   it("maps output fields from request data", () => {
-    const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+    const result: ElsterFsEEUn = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
     const natPers = result.eUn?.allgAngaben?.inhaber?.natPers;
 
     expect(natPers?.vorname).toBe("Erika");
@@ -31,6 +32,13 @@ describe("transformToEUnFsE", () => {
     );
     expect(result.eUn?.umsatzsteuer?.sollIstVersteuerung?.auswahlSollIstVerst).toBe("1");
     expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toBe("1");
+
+    expect(
+      result.eUn?.festsetzungsAngaben?.voraussichtlicheEinkuenfte?.einkGewBetr?.gruendJahrA,
+    ).toBe(1);
+    expect(
+      result.eUn?.festsetzungsAngaben?.voraussichtlicheEinkuenfte?.einkGewBetr?.folgeJahrA,
+    ).toBe(1);
   });
 
   it("maps geschlecht 'm' to anredeId '1' and 'w' to '2'", () => {
