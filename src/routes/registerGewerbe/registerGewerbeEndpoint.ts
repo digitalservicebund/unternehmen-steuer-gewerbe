@@ -102,7 +102,7 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<SubmitFseResult>
     return {
       success: true,
       info: result.info,
-      pdfReceipt: result.pdf?.toBase64(),
+      pdfReceipt: result.pdf?.toString("base64"),
     };
   } catch (error) {
     console.error("FsE submission failed", error);
