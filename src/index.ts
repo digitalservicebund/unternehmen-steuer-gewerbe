@@ -6,6 +6,7 @@ import os from "node:os";
 
 const port = 3000;
 
+// Initialize once, so we know early on that the environment is set up correctly (env vars, secrets)
 initializeEricForSending();
 
 serve(
