@@ -5,6 +5,7 @@ import { HttpStatusCode } from "../../helpers/httpStatusCodes";
 import { RegisterGewerbeResponseSchema } from "./registerGewerbeInterfaces";
 import { existsSync } from "node:fs";
 import { z } from "@hono/zod-openapi";
+import { extractText } from "unpdf";
 
 function postRegisterGewerbe(data = registerGewerbeSampleRequestAllFieldsFilled) {
   return app.request("/api/v1/register-gewerbe", {
@@ -34,10 +35,15 @@ describe("Route /api/v1/register-gewerbe", () => {
       expect(json.fseÜbermittlung.submissionId).toBeTruthy();
     });
 
-    it("returns FsE PDF receipt in base64", async () => {
+    it("returns FsE PDF receipt containing user's last name", async () => {
       expect(json.fseÜbermittlung.pdfReceiptBase64).toBeTruthy();
-      // base64 prefix is '%PDF-'
+      // base64 prefix of '%PDF-'
       expect(json.fseÜbermittlung.pdfReceiptBase64).toMatch(/^JVBERi0/);
+      const pdfBytes = new Uint8Array(
+        Buffer.from(json.fseÜbermittlung.pdfReceiptBase64 ?? "", "base64"),
+      );
+      const { text } = await extractText(pdfBytes, { mergePages: true });
+      expect(text).toContain(registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten.nachname);
     });
 
     it("does write the eric log to /tmp", async () => {
