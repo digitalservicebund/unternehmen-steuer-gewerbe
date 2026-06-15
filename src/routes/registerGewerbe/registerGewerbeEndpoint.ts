@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { HonoAppType } from "../../honoApp";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
 import {
@@ -13,6 +11,7 @@ import { ErrorTypeSchema, type RegisterGewerbeRequest } from "./registerGewerbeI
 import { registerGewerbeRoute } from "./registerGewerbeRoute";
 import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTransformer";
 import { getGewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
+import { z } from "@hono/zod-openapi";
 
 const GEWERBEANMELDUNG_LEIKA_KEY_URN = "urn:de:fim:leika:leistung:99050012104000";
 
@@ -72,7 +71,14 @@ async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
   }
 }
 
-async function submitFsE(data: RegisterGewerbeRequest) {
+interface SubmitFseResult {
+  success: boolean;
+  errorType?: z.infer<typeof ErrorTypeSchema>;
+  info?: string;
+  pdfReceipt?: string;
+}
+
+async function submitFsE(data: RegisterGewerbeRequest): Promise<SubmitFseResult> {
   try {
     const fse = createElsterFsEEUnXml(transformToEUnFsE(data));
 
@@ -85,7 +91,7 @@ async function submitFsE(data: RegisterGewerbeRequest) {
       };
     }
 
-    const result = sendFsE(fse);
+    const result = sendFsE(fse, true);
     if (!result.success) {
       return {
         success: false,
@@ -93,7 +99,11 @@ async function submitFsE(data: RegisterGewerbeRequest) {
         info: result.info,
       };
     }
-    return { success: true, info: result.info };
+    return {
+      success: true,
+      info: result.info,
+      pdfReceipt: result.pdf?.toBase64(),
+    };
   } catch (error) {
     console.error("FsE submission failed", error);
     return {
@@ -133,11 +143,6 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
         submitFsE(data),
       ]);
 
-      // to be replaced by the real receipt once we really submit
-      const pdfReceiptBase64 = readFileSync(
-        join(import.meta.dirname, "fsePdfReceiptDummy.pdf"),
-      ).toString("base64");
-
       return c.json(
         {
           gewerbeanmeldung,
@@ -145,7 +150,7 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
             success: fseÜbermittlung.success,
             submissionId: "implementation missing",
             errorType: fseÜbermittlung.errorType,
-            pdfReceiptBase64,
+            pdfReceiptBase64: fseÜbermittlung.pdfReceipt,
           },
         },
         determineHttpStatus(gewerbeanmeldung, fseÜbermittlung),
