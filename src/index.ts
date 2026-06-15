@@ -1,9 +1,12 @@
 import { serve } from "@hono/node-server";
 import "dotenv/config";
+import { initializeEricForSending } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 import app from "./app";
 import os from "node:os";
 
 const port = 3000;
+
+initializeEricForSending();
 
 serve(
   {
