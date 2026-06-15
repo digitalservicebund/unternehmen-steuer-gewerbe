@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, vi } from "vitest";
 import app from "../../app";
 import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
@@ -42,7 +42,10 @@ describe("Route /api/v1/register-gewerbe", () => {
       const pdfBytes = new Uint8Array(
         Buffer.from(json.fseÜbermittlung.pdfReceiptBase64 ?? "", "base64"),
       );
+      // suppress irrelevant warnings of PDF -> TXT
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
       const { text } = await extractText(pdfBytes, { mergePages: true });
+      warnSpy.mockRestore();
       expect(text).toContain(registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten.nachname);
     });
 
