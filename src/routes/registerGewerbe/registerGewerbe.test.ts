@@ -67,6 +67,14 @@ describe("Route /api/v1/register-gewerbe", () => {
         expect(json.fseÜbermittlung.officeDetails!.ort).toEqual("Dummy");
         expect(json.fseÜbermittlung.officeDetails!.telefon).toEqual("0000-000 000");
       });
+
+      it("returns dummy Gewerbeamt details (name, street, zip, city, telephone number)", () => {
+        expect(json.gewerbeanmeldung.officeDetails!.name).toEqual("Gewerbeamt Dummy-Data");
+        expect(json.gewerbeanmeldung.officeDetails!.strasseUndHausnummer).toEqual("Dummystraße 2");
+        expect(json.gewerbeanmeldung.officeDetails!.postleitzahl).toEqual("22222");
+        expect(json.gewerbeanmeldung.officeDetails!.ort).toEqual("Dummy2");
+        expect(json.gewerbeanmeldung.officeDetails!.telefon).toEqual("2222-222 222");
+      });
     });
 
     it("does write the eric log to /tmp", async () => {
