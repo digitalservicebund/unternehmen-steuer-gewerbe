@@ -23,7 +23,7 @@ const AdresseSchema = z.object({
   postleitzahl: z
     .string()
     .regex(/^\d{5}$/)
-    .openapi({ example: "12345", description: "5-digit German postal code" }),
+    .openapi({ example: "01069", description: "5-digit German postal code" }),
   ort: z.string().openapi({ example: "Musterstadt" }),
 });
 
@@ -68,7 +68,7 @@ const UnternehmensDatenSchema = z.object({
   adresseAbweichend: AdresseSchema.openapi({
     example: {
       strasseUndHausnummer: "Musterstraße 2",
-      postleitzahl: "67890",
+      postleitzahl: "01069",
       ort: "Musterstadt",
     },
   }).optional(),
