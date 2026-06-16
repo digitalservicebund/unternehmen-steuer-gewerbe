@@ -7,15 +7,25 @@ import {
 } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 import { getSecret } from "../../secrets";
 import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
-import { ErrorTypeSchema, type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
+import {
+  ErrorTypeSchema,
+  type RegisterGewerbeRequest,
+  type RegisterGewerbeResponseItem,
+} from "./registerGewerbeInterfaces";
 import { registerGewerbeRoute } from "./registerGewerbeRoute";
 import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTransformer";
 import { getGewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
-import { z } from "@hono/zod-openapi";
+import { readFileSync } from "node:fs";
 
 const GEWERBEANMELDUNG_LEIKA_KEY_URN = "urn:de:fim:leika:leistung:99050012104000";
 
-async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
+const gewerbeanmeldungPdfReceiptBase64 = readFileSync(
+  new URL("./gewerbeanmeldungPdfReceipt.dummy.pdf", import.meta.url),
+).toString("base64");
+
+async function submitGewerbeanmeldung(
+  data: RegisterGewerbeRequest,
+): Promise<RegisterGewerbeResponseItem> {
   let routingInfo: Awaited<ReturnType<typeof getGewerbeRoutingInfo>>;
   try {
     routingInfo = await getGewerbeRoutingInfo(data);
@@ -60,7 +70,11 @@ async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
       },
       data: gewerbeanmeldungXml,
     });
-    return { success: true, submissionId: response.submissionId };
+    return {
+      success: true,
+      submissionId: response.submissionId,
+      pdfReceiptBase64: gewerbeanmeldungPdfReceiptBase64,
+    };
   } catch (error) {
     console.error("FIT-Connect submission failed", error);
     return {
@@ -71,14 +85,7 @@ async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
   }
 }
 
-interface SubmitFseResult {
-  success: boolean;
-  errorType?: z.infer<typeof ErrorTypeSchema>;
-  info?: string;
-  pdfReceipt?: string;
-}
-
-async function submitFsE(data: RegisterGewerbeRequest): Promise<SubmitFseResult> {
+async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeResponseItem> {
   try {
     const fse = createElsterFsEEUnXml(transformToEUnFsE(data));
 
@@ -101,8 +108,9 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<SubmitFseResult>
     }
     return {
       success: true,
+      submissionId: "implementation missing",
       info: result.info,
-      pdfReceipt: result.pdf?.toString("base64"),
+      pdfReceiptBase64: result.pdf?.toString("base64"),
     };
   } catch (error) {
     console.error("FsE submission failed", error);
@@ -135,7 +143,6 @@ function determineHttpStatus(
 export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
   app.openapi(registerGewerbeRoute, async (c) => {
     try {
-      // With OpenAPIHono, the body is already validated against your schema
       const data = c.req.valid("json");
 
       const [gewerbeanmeldung, fseÜbermittlung] = await Promise.all([
@@ -146,12 +153,7 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
       return c.json(
         {
           gewerbeanmeldung,
-          fseÜbermittlung: {
-            success: fseÜbermittlung.success,
-            submissionId: "implementation missing",
-            errorType: fseÜbermittlung.errorType,
-            pdfReceiptBase64: fseÜbermittlung.pdfReceipt,
-          },
+          fseÜbermittlung,
         },
         determineHttpStatus(gewerbeanmeldung, fseÜbermittlung),
       );

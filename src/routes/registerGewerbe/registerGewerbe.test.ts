@@ -49,6 +49,12 @@ describe("Route /api/v1/register-gewerbe", () => {
       expect(text).toContain(registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten.nachname);
     });
 
+    it("returns Gewerbeanmeldung PDF receipt", async () => {
+      expect(json.gewerbeanmeldung.pdfReceiptBase64).toBeTruthy();
+      // base64 prefix of '%PDF-'
+      expect(json.gewerbeanmeldung.pdfReceiptBase64).toMatch(/^JVBERi0/);
+    });
+
     it("does write the eric log to /tmp", async () => {
       expect(response.status).toEqual(HttpStatusCode.Ok);
 
