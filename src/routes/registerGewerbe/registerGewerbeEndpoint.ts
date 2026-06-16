@@ -74,6 +74,13 @@ async function submitGewerbeanmeldung(
       success: true,
       submissionId: response.submissionId,
       pdfReceiptBase64: gewerbeanmeldungPdfReceiptBase64,
+      officeDetails: {
+        name: "Gewerbeamt Dummy-Data",
+        strasseUndHausnummer: "Dummystraße 2",
+        postleitzahl: "22222",
+        ort: "Dummy2",
+        telefon: "2222-222 222",
+      },
     };
   } catch (error) {
     console.error("FIT-Connect submission failed", error);
@@ -111,6 +118,13 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
       submissionId: "implementation missing",
       info: result.info,
       pdfReceiptBase64: result.pdf?.toString("base64"),
+      officeDetails: {
+        name: "Finanzamt Dummy-Data",
+        strasseUndHausnummer: "Dummystraße 1",
+        postleitzahl: "00000",
+        ort: "Dummy",
+        telefon: "0000-000 000",
+      },
     };
   } catch (error) {
     console.error("FsE submission failed", error);

@@ -162,6 +162,15 @@ const RegisterGewerbeResponseItemSchema = z.object({
   info: z.string().optional(),
   errorType: ErrorTypeSchema.optional(),
   pdfReceiptBase64: z.base64().optional(),
+  officeDetails: z
+    .object({
+      name: z.string(),
+      strasseUndHausnummer: z.string(),
+      postleitzahl: z.string(),
+      ort: z.string(),
+      telefon: z.string(),
+    })
+    .optional(),
 });
 
 export type RegisterGewerbeResponseItem = z.infer<typeof RegisterGewerbeResponseItemSchema>;

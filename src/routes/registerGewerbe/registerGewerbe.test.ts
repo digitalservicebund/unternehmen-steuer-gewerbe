@@ -35,24 +35,46 @@ describe("Route /api/v1/register-gewerbe", () => {
       expect(json.fseÜbermittlung.submissionId).toBeTruthy();
     });
 
-    it("returns FsE PDF receipt containing user's last name", async () => {
-      expect(json.fseÜbermittlung.pdfReceiptBase64).toBeTruthy();
-      // base64 prefix of '%PDF-'
-      expect(json.fseÜbermittlung.pdfReceiptBase64).toMatch(/^JVBERi0/);
-      const pdfBytes = new Uint8Array(
-        Buffer.from(json.fseÜbermittlung.pdfReceiptBase64 ?? "", "base64"),
-      );
-      // suppress irrelevant warnings of PDF -> TXT
-      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-      const { text } = await extractText(pdfBytes, { mergePages: true });
-      warnSpy.mockRestore();
-      expect(text).toContain(registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten.nachname);
+    describe("on returning PDF receipts", () => {
+      it("returns FsE PDF receipt containing user's last name", async () => {
+        expect(json.fseÜbermittlung.pdfReceiptBase64).toBeTruthy();
+        // base64 prefix of '%PDF-'
+        expect(json.fseÜbermittlung.pdfReceiptBase64).toMatch(/^JVBERi0/);
+        const pdfBytes = new Uint8Array(
+          Buffer.from(json.fseÜbermittlung.pdfReceiptBase64 ?? "", "base64"),
+        );
+        // suppress irrelevant warnings of PDF -> TXT
+        const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+        const { text } = await extractText(pdfBytes, { mergePages: true });
+        warnSpy.mockRestore();
+        expect(text).toContain(
+          registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten.nachname,
+        );
+      });
+
+      it("returns Gewerbeanmeldung PDF receipt", async () => {
+        expect(json.gewerbeanmeldung.pdfReceiptBase64).toBeTruthy();
+        // base64 prefix of '%PDF-'
+        expect(json.gewerbeanmeldung.pdfReceiptBase64).toMatch(/^JVBERi0/);
+      });
     });
 
-    it("returns Gewerbeanmeldung PDF receipt", async () => {
-      expect(json.gewerbeanmeldung.pdfReceiptBase64).toBeTruthy();
-      // base64 prefix of '%PDF-'
-      expect(json.gewerbeanmeldung.pdfReceiptBase64).toMatch(/^JVBERi0/);
+    describe("on returning recipient details", () => {
+      it("returns dummy Finanzamt details (name, street, zip, city, telephone number)", () => {
+        expect(json.fseÜbermittlung.officeDetails!.name).toEqual("Finanzamt Dummy-Data");
+        expect(json.fseÜbermittlung.officeDetails!.strasseUndHausnummer).toEqual("Dummystraße 1");
+        expect(json.fseÜbermittlung.officeDetails!.postleitzahl).toEqual("00000");
+        expect(json.fseÜbermittlung.officeDetails!.ort).toEqual("Dummy");
+        expect(json.fseÜbermittlung.officeDetails!.telefon).toEqual("0000-000 000");
+      });
+
+      it("returns dummy Gewerbeamt details (name, street, zip, city, telephone number)", () => {
+        expect(json.gewerbeanmeldung.officeDetails!.name).toEqual("Gewerbeamt Dummy-Data");
+        expect(json.gewerbeanmeldung.officeDetails!.strasseUndHausnummer).toEqual("Dummystraße 2");
+        expect(json.gewerbeanmeldung.officeDetails!.postleitzahl).toEqual("22222");
+        expect(json.gewerbeanmeldung.officeDetails!.ort).toEqual("Dummy2");
+        expect(json.gewerbeanmeldung.officeDetails!.telefon).toEqual("2222-222 222");
+      });
     });
 
     it("does write the eric log to /tmp", async () => {
