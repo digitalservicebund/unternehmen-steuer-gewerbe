@@ -164,6 +164,8 @@ const RegisterGewerbeResponseItemSchema = z.object({
   pdfReceiptBase64: z.base64().optional(),
 });
 
+export type RegisterGewerbeResponseItem = z.infer<typeof RegisterGewerbeResponseItemSchema>;
+
 export const RegisterGewerbeResponseSchema = z
   .object({
     gewerbeanmeldung: RegisterGewerbeResponseItemSchema,
