@@ -19,6 +19,7 @@ describe("fetchJson", () => {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       body: undefined,
+      signal: expect.any(AbortSignal),
     });
   });
 
@@ -35,6 +36,7 @@ describe("fetchJson", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ passierschein: "a42" }),
+      signal: expect.any(AbortSignal),
     });
   });
 
@@ -51,6 +53,7 @@ describe("fetchJson", () => {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: "grant_type=client_credentials",
+      signal: expect.any(AbortSignal),
     });
   });
 
