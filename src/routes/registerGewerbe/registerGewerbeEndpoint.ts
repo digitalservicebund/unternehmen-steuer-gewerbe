@@ -111,6 +111,13 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
       submissionId: "implementation missing",
       info: result.info,
       pdfReceiptBase64: result.pdf?.toString("base64"),
+      officeDetails: {
+        name: "Finanzamt Dummy-Data",
+        strasseUndHausnummer: "Dummystraße 1",
+        postleitzahl: "00000",
+        ort: "Dummy",
+        telefon: "0000-000 000",
+      },
     };
   } catch (error) {
     console.error("FsE submission failed", error);
