@@ -74,6 +74,13 @@ async function submitGewerbeanmeldung(
       success: true,
       submissionId: response.submissionId,
       pdfReceiptBase64: gewerbeanmeldungPdfReceiptBase64,
+      officeDetails: {
+        name: "Gewerbeamt Dummy-Data",
+        strasseUndHausnummer: "Dummystraße 2",
+        postleitzahl: "22222",
+        ort: "Dummy2",
+        telefon: "2222-222 222",
+      },
     };
   } catch (error) {
     console.error("FIT-Connect submission failed", error);
