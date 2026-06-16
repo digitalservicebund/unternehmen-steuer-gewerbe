@@ -60,14 +60,12 @@ describe("Route /api/v1/register-gewerbe", () => {
     });
 
     describe("on returning recipient details", () => {
-      it("returns Finanzamt details (name, street, zip, city, telephone number)", () => {
-        expect(json.fseÜbermittlung.finanzamtDetails.name).toEqual("Finanzamt Dresden-Nord");
-        expect(json.fseÜbermittlung.finanzamtDetails.strasseUndHausnummer).toEqual(
-          "Rabenerstraße 1",
-        );
-        expect(json.fseÜbermittlung.finanzamtDetails.postleitzahl).toEqual("01069");
-        expect(json.fseÜbermittlung.finanzamtDetails.ort).toEqual("Dresden");
-        expect(json.fseÜbermittlung.finanzamtDetails.telefon).toEqual("0351 4691-0");
+      it("returns dummy Finanzamt details (name, street, zip, city, telephone number)", () => {
+        expect(json.fseÜbermittlung.finanzamtDetails.name).toEqual("Finanzamt Dummy-Data");
+        expect(json.fseÜbermittlung.finanzamtDetails.strasseUndHausnummer).toEqual("Dummystraße 1");
+        expect(json.fseÜbermittlung.finanzamtDetails.postleitzahl).toEqual("00000");
+        expect(json.fseÜbermittlung.finanzamtDetails.ort).toEqual("Dummy");
+        expect(json.fseÜbermittlung.finanzamtDetails.telefon).toEqual("0000-000 000");
       });
     });
 
