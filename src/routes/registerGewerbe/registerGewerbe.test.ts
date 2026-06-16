@@ -59,6 +59,18 @@ describe("Route /api/v1/register-gewerbe", () => {
       });
     });
 
+    describe("on returning recipient details", () => {
+      it("returns Finanzamt details (name, street, zip, city, telephone number)", () => {
+        expect(json.fseÜbermittlung.finanzamtDetails.name).toEqual("Finanzamt Dresden-Nord");
+        expect(json.fseÜbermittlung.finanzamtDetails.strasseUndHausnummer).toEqual(
+          "Rabenerstraße 1",
+        );
+        expect(json.fseÜbermittlung.finanzamtDetails.postleitzahl).toEqual("01069");
+        expect(json.fseÜbermittlung.finanzamtDetails.ort).toEqual("Dresden");
+        expect(json.fseÜbermittlung.finanzamtDetails.telefon).toEqual("0351 4691-0");
+      });
+    });
+
     it("does write the eric log to /tmp", async () => {
       expect(response.status).toEqual(HttpStatusCode.Ok);
 
