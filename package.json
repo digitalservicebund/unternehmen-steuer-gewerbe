@@ -10,7 +10,7 @@
     "build": "tsc --noEmit && echo 'Type check passed. Use build:dev or build:prod to produce dist/'",
     "build:dev": "rm -rf dist && rolldown -c && mkdir -p dist/resources && cp -r src/resources/. dist/resources/ && cp -r node_modules/@digitalservicebund/unternehmen-steuer-gewerbe-privat/dist/ERiC-43.4.6.0 dist/ERiC-43.4.6.0 && cp -r node_modules/@digitalservicebund/unternehmen-steuer-gewerbe-privat/dist/resources/. dist/resources/ && cp src/routes/registerGewerbe/gewerbeanmeldungPdfReceipt.dummy.pdf dist/",
     "build:prod": "pnpm build:dev && pnpm install --prod",
-    "build:image": "pnpm build:prod; docker build . --tag ${IMAGE_TAG:-unternehmen-steuer-gewerbe} --build-arg COMMIT_SHA=$(git rev-parse HEAD); pnpm install",
+    "build:image": "pnpm build:prod && docker build . --tag ${IMAGE_TAG:-unternehmen-steuer-gewerbe} --build-arg COMMIT_SHA=$(git rev-parse HEAD); status=$?; pnpm install; exit $status",
     "format": "oxfmt --check",
     "format:fix": "oxfmt",
     "lint": "oxlint",
