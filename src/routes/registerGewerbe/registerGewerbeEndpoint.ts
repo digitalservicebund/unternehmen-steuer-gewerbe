@@ -1,19 +1,31 @@
 import { HonoAppType } from "../../honoApp";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
 import {
-  validateFsE,
   createElsterFsEEUnXml,
+  sendFsE,
+  validateFsE,
 } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 import { getSecret } from "../../secrets";
 import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
-import { ErrorTypeSchema, type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
+import {
+  ErrorTypeSchema,
+  type RegisterGewerbeRequest,
+  type RegisterGewerbeResponseItem,
+} from "./registerGewerbeInterfaces";
 import { registerGewerbeRoute } from "./registerGewerbeRoute";
 import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTransformer";
 import { getGewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
+import { readFileSync } from "node:fs";
 
 const GEWERBEANMELDUNG_LEIKA_KEY_URN = "urn:de:fim:leika:leistung:99050012104000";
 
-async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
+const gewerbeanmeldungPdfReceiptBase64 = readFileSync(
+  new URL("./gewerbeanmeldungPdfReceipt.dummy.pdf", import.meta.url),
+).toString("base64");
+
+async function submitGewerbeanmeldung(
+  data: RegisterGewerbeRequest,
+): Promise<RegisterGewerbeResponseItem> {
   let routingInfo: Awaited<ReturnType<typeof getGewerbeRoutingInfo>>;
   try {
     routingInfo = await getGewerbeRoutingInfo(data);
@@ -58,7 +70,18 @@ async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
       },
       data: gewerbeanmeldungXml,
     });
-    return { success: true, submissionId: response.submissionId };
+    return {
+      success: true,
+      submissionId: response.submissionId,
+      pdfReceiptBase64: gewerbeanmeldungPdfReceiptBase64,
+      officeDetails: {
+        name: "Gewerbeamt Dummy-Data",
+        strasseUndHausnummer: "Dummystraße 2",
+        postleitzahl: "22222",
+        ort: "Dummy2",
+        telefon: "2222-222 222",
+      },
+    };
   } catch (error) {
     console.error("FIT-Connect submission failed", error);
     return {
@@ -69,29 +92,45 @@ async function submitGewerbeanmeldung(data: RegisterGewerbeRequest) {
   }
 }
 
-async function submitFsE(data: RegisterGewerbeRequest) {
+async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeResponseItem> {
   try {
-    const result = validateFsE(createElsterFsEEUnXml(transformToEUnFsE(data)));
+    const fse = createElsterFsEEUnXml(transformToEUnFsE(data));
 
-    if (result.isValid === undefined) {
-      throw new Error("ERiC Service unavailable");
-    }
-
-    if (result.isValid === false) {
+    const validation = validateFsE(fse);
+    if (!validation.valid) {
       return {
         success: false,
         errorType: ErrorTypeSchema.enum.validation_error,
-        info: result.info ?? "FsE validation failed",
+        info: validation.errors,
       };
     }
 
-    return { success: true, submissionId: "00000000-0000-0000-0000-000000000000" }; // replace this as soon as we really send the data
+    const result = sendFsE(fse, true);
+    if (!result.success) {
+      return {
+        success: false,
+        errorType: ErrorTypeSchema.enum.upstream_error,
+        info: result.info,
+      };
+    }
+    return {
+      success: true,
+      submissionId: "implementation missing",
+      info: result.info,
+      pdfReceiptBase64: result.pdf?.toString("base64"),
+      officeDetails: {
+        name: "Finanzamt Dummy-Data",
+        strasseUndHausnummer: "Dummystraße 1",
+        postleitzahl: "00000",
+        ort: "Dummy",
+        telefon: "0000-000 000",
+      },
+    };
   } catch (error) {
     console.error("FsE submission failed", error);
     return {
       success: false,
       errorType: ErrorTypeSchema.enum.upstream_error,
-      info: "Upstream service unavailable",
     };
   }
 }
@@ -118,7 +157,6 @@ function determineHttpStatus(
 export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
   app.openapi(registerGewerbeRoute, async (c) => {
     try {
-      // With OpenAPIHono, the body is already validated against your schema
       const data = c.req.valid("json");
 
       const [gewerbeanmeldung, fseÜbermittlung] = await Promise.all([
@@ -129,11 +167,7 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
       return c.json(
         {
           gewerbeanmeldung,
-          fseÜbermittlung: {
-            success: fseÜbermittlung.success,
-            submissionId: fseÜbermittlung.submissionId,
-            errorType: fseÜbermittlung.errorType,
-          },
+          fseÜbermittlung,
         },
         determineHttpStatus(gewerbeanmeldung, fseÜbermittlung),
       );

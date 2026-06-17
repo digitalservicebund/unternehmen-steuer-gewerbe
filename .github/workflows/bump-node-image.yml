@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: bump node image
-        uses: digitalservicebund/bump-chainguard-digest@937cc7a12750bfd06419f32cabcaa79a37f32705
+        uses: digitalservicebund/bump-chainguard-digest@5cef1778a56ae77fec46e2975f767a6a91049edf
         with:
           image_name: node
           file_path: Dockerfile

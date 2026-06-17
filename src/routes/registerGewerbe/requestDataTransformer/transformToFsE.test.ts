@@ -3,10 +3,11 @@ import { transformToEUnFsE } from "./transformToFsE";
 import { registerGewerbeSampleRequestAllFieldsFilled } from "../testHelpers";
 import { RegisterGewerbeRequestSchema } from "../registerGewerbeInterfaces";
 import { formatDatumDE } from "../../../helpers/formFieldTransformations";
+import { ElsterFsEEUn } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 
 describe("transformToEUnFsE", () => {
   it("maps output fields from request data", () => {
-    const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+    const result: ElsterFsEEUn = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
     const natPers = result.eUn?.allgAngaben?.inhaber?.natPers;
 
     expect(natPers?.vorname).toBe("Erika");
@@ -31,6 +32,13 @@ describe("transformToEUnFsE", () => {
     );
     expect(result.eUn?.umsatzsteuer?.sollIstVersteuerung?.auswahlSollIstVerst).toBe("1");
     expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toBe("1");
+
+    expect(
+      result.eUn?.festsetzungsAngaben?.voraussichtlicheEinkuenfte?.einkGewBetr?.gruendJahrA,
+    ).toBe(1);
+    expect(
+      result.eUn?.festsetzungsAngaben?.voraussichtlicheEinkuenfte?.einkGewBetr?.folgeJahrA,
+    ).toBe(1);
   });
 
   it("maps geschlecht 'm' to anredeId '1' and 'w' to '2'", () => {
@@ -79,6 +87,37 @@ describe("transformToEUnFsE", () => {
       unternehmensDaten: unternehmensDatenOhneAbweichung,
     });
     expect(result.eUn?.betrieb?.unternehmen?.entsprichtWohnanschrift).toBe(true);
+  });
+
+  it("maps adresseAbweichend to Unternehmen-Anschrift (ERiC Anschrift_angegeben)", () => {
+    const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+    expect(result.eUn?.betrieb?.unternehmen?.entsprichtWohnanschrift).toBeUndefined();
+    expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
+      str: "Musterstraße",
+      hausNr: "2",
+      plz: "96450",
+      ort: "Coburg",
+    });
+  });
+
+  it("sets kleinUnternUStVerzicht=true when kleinunternehmerRegelung is false (ERiC KleinUN_fehlende_Angaben)", () => {
+    const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+    expect(result.eUn?.umsatzsteuer?.kleinunternehmerRegelung).toEqual({
+      kleinUnternUStVerzicht: true,
+    });
+  });
+
+  it("sets kleinUnternUSt=true when kleinunternehmerRegelung is true", () => {
+    const result = transformToEUnFsE({
+      ...registerGewerbeSampleRequestAllFieldsFilled,
+      unternehmensDaten: {
+        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+        kleinunternehmerRegelung: true,
+      },
+    });
+    expect(result.eUn?.umsatzsteuer?.kleinunternehmerRegelung).toEqual({
+      kleinUnternUSt: true,
+    });
   });
 
   // TODO: temporary — the gründungsdatum default exists only to give the OSS time to

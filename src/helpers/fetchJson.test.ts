@@ -19,6 +19,7 @@ describe("fetchJson", () => {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       body: undefined,
+      signal: expect.any(AbortSignal),
     });
   });
 
@@ -31,7 +32,12 @@ describe("fetchJson", () => {
 
     expect(fetchSpy).toHaveBeenCalledWith(
       "https://example.de/search?q=k%C3%B6ln+mitte&page=0&exact=true",
-      { method: "GET", headers: { "Content-Type": "application/json" }, body: undefined },
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        body: undefined,
+        signal: expect.any(AbortSignal),
+      },
     );
   });
 
@@ -44,6 +50,7 @@ describe("fetchJson", () => {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       body: undefined,
+      signal: expect.any(AbortSignal),
     });
   });
 
@@ -60,6 +67,7 @@ describe("fetchJson", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ passierschein: "a42" }),
+      signal: expect.any(AbortSignal),
     });
   });
 
@@ -76,6 +84,7 @@ describe("fetchJson", () => {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: "grant_type=client_credentials",
+      signal: expect.any(AbortSignal),
     });
   });
 

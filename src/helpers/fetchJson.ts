@@ -7,7 +7,10 @@ interface RequestOptions {
   headers?: Record<string, string>;
   params?: QueryParams;
   body?: string | object;
+  timeoutMs?: number;
 }
+
+const DEFAULT_TIMEOUT_MS = 5_000;
 
 function createUrlWithParams(url: string, params: QueryParams): string {
   const urlWithParams = new URL(url);
@@ -21,7 +24,7 @@ function createUrlWithParams(url: string, params: QueryParams): string {
  * fetch wrapper that throws an error if the response is not ok, and otherwise returns the parsed JSON.
  */
 export async function fetchJson<T>(url: string, options: RequestOptions = {}): Promise<T> {
-  const { method = "GET", headers = {}, params, body } = options;
+  const { method = "GET", headers = {}, params, body, timeoutMs = DEFAULT_TIMEOUT_MS } = options;
 
   const requestUrl = params === undefined ? url : createUrlWithParams(url, params);
 
@@ -29,7 +32,12 @@ export async function fetchJson<T>(url: string, options: RequestOptions = {}): P
 
   const requestBody = typeof body === "string" ? body : JSON.stringify(body);
 
-  const response = await fetch(requestUrl, { method, headers: requestHeaders, body: requestBody });
+  const response = await fetch(requestUrl, {
+    method,
+    headers: requestHeaders,
+    body: requestBody,
+    signal: AbortSignal.timeout(timeoutMs),
+  });
 
   if (!response.ok) {
     throw new Error(
