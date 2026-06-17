@@ -60,10 +60,14 @@ describe("Route /api/v1/register-gewerbe", () => {
     });
 
     describe("on returning recipient details", () => {
-      it("returns correct Finanzamt details (name, street, zip, city, telephone number) for Finanzamt 1114", async () => {
+      it("returns correct Finanzamt details (name, street, zip, city, telephone number) for unternehmensDaten Prinzessinnenstraße 8-14 in 10969 Berlin", async () => {
         const dataWithPostleitZahl = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
 
-        dataWithPostleitZahl.unternehmensDaten.adresseAbweichend!.postleitzahl = "10969";
+        dataWithPostleitZahl.unternehmensDaten.adresseAbweichend! = {
+          postleitzahl: "10969",
+          ort: "Berlin",
+          strasseUndHausnummer: "Prinzessinnenstraße 8-14",
+        };
 
         const response = await postRegisterGewerbe(dataWithPostleitZahl);
 
@@ -76,6 +80,25 @@ describe("Route /api/v1/register-gewerbe", () => {
         expect(json.fseÜbermittlung.officeDetails!.postleitzahl).toEqual("10961");
         expect(json.fseÜbermittlung.officeDetails!.ort).toEqual("Berlin");
         expect(json.fseÜbermittlung.officeDetails!.telefon).toEqual("030 9024-14 0");
+      });
+
+      it("returns correct Finanzamt details (name, street, zip, city, telephone number) for persönlicheDaten Musterstraße 1, 03046 Cottbus", async () => {
+        const dataWithoutAdresseAbweichend = structuredClone(
+          registerGewerbeSampleRequestAllFieldsFilled,
+        );
+
+        dataWithoutAdresseAbweichend.unternehmensDaten.adresseAbweichend = undefined;
+
+        const response = await postRegisterGewerbe(dataWithoutAdresseAbweichend);
+        const json = await response.json();
+
+        expect(json.fseÜbermittlung.officeDetails!.name).toEqual("Finanzamt Cottbus");
+        expect(json.fseÜbermittlung.officeDetails!.strasseUndHausnummer).toEqual(
+          "Vom-Stein-Straße 29",
+        );
+        expect(json.fseÜbermittlung.officeDetails!.postleitzahl).toEqual("03050");
+        expect(json.fseÜbermittlung.officeDetails!.ort).toEqual("Cottbus");
+        expect(json.fseÜbermittlung.officeDetails!.telefon).toEqual("0355 4991-4100");
       });
 
       it("returns dummy Gewerbeamt details (name, street, zip, city, telephone number)", () => {
