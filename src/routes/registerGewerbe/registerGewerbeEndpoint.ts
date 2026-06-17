@@ -48,9 +48,7 @@ async function submitGewerbeanmeldung(
     };
   }
 
-  const gewerbeanmeldungPdfReceipt = generatePdfReceipt(gewerbeanmeldungXml);
-
-  console.log(gewerbeanmeldungXml);
+  const gewerbeanmeldungPdfReceipt = await generatePdfReceipt(gewerbeanmeldungXml);
 
   // Before using FIT-Connect -> Check in context if FIT-Connect or OSCI is supported by
   // the Communes as soon as we have Pilot-Communes
