@@ -10,7 +10,7 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
     geburtsort: "Musterstadt",
     geburtsland: "Deutschland",
     staatsangehörigkeitDeutsch: true,
-    staatsangehörigkeit: "deutschland",
+    staatsangehörigkeit: "deutsch",
     adresse: {
       strasseUndHausnummer: "Musterstraße 1",
       postleitzahl: "03046",

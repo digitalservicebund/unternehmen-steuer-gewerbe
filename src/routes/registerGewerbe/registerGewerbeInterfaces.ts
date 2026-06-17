@@ -40,12 +40,12 @@ const PersönlicheDatenSchema = z.object({
     deprecated: true,
     example: true,
     description:
-      "Whether the person holds German citizenship. Deprecated: redundant with `staatsangehörigkeit` (derivable from it). Must be consistent with `staatsangehörigkeit`: true exactly when `staatsangehörigkeit` is 'deutschland' (code 000).",
+      "Whether the person holds German citizenship. Deprecated: redundant with `staatsangehörigkeit` (derivable from it). Must be consistent with `staatsangehörigkeit`: true exactly when `staatsangehörigkeit` is 'deutsch' (code 000).",
   }),
-  staatsangehörigkeit: z.enum(STAATSANGEHOERIGKEIT_KEYS).default("deutschland").openapi({
-    example: "deutschland",
+  staatsangehörigkeit: z.enum(STAATSANGEHOERIGKEIT_KEYS).default("deutsch").openapi({
+    example: "deutsch",
     description:
-      "Citizenship of the person according to the code list of the German Federal Statistical Office. Defaults to 'deutschland' (code 000).",
+      "Citizenship of the person according to the code list of the German Federal Statistical Office. Defaults to 'deutsch' (code 000).",
   }),
   adresse: AdresseSchema,
   telefon: z

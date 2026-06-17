@@ -45,7 +45,7 @@ describe("transformToGewerbeanmeldung", () => {
     expect(person.name!.geburtsname).toBeUndefined();
   });
 
-  it("maps the staatsangehörigkeit key to its destatis code (deutschland = 000, frankreich = 129)", async () => {
+  it("maps the staatsangehörigkeit key to its destatis code (deutsch = 000, französisch = 129)", async () => {
     const deutsch = transformToGewerbeanmeldung(
       registerGewerbeSampleRequestAllFieldsFilled,
       testRoutingInfo,
@@ -58,7 +58,7 @@ describe("transformToGewerbeanmeldung", () => {
         persönlicheDaten: {
           ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
           staatsangehörigkeitDeutsch: false,
-          staatsangehörigkeit: "frankreich",
+          staatsangehörigkeit: "französisch",
         },
       },
       testRoutingInfo,
