@@ -52,7 +52,7 @@ describe("Route /api/v1/register-gewerbe", () => {
         );
       });
 
-      it("returns Gewerbeanmeldung PDF receipt", async () => {
+      it("returns Gewerbeanmeldung PDF receipt containing user's last name", async () => {
         expect(json.gewerbeanmeldung.pdfReceiptBase64).toBeTruthy();
         // base64 prefix of '%PDF-'
         expect(json.gewerbeanmeldung.pdfReceiptBase64).toMatch(/^JVBERi0/);
