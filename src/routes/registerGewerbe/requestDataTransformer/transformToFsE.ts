@@ -19,6 +19,33 @@ function toAnredeId(geschlecht: "d" | "w" | "m" | undefined): string | undefined
   return undefined; // "d" (divers) hat keinen ELSTER-Code
 }
 
+function getKleinunternehmerRegelung(data: RegisterGewerbeRequest) {
+  return data.unternehmensDaten.kleinunternehmerRegelung
+    ? { kleinUnternUSt: true }
+    : { kleinUnternUStVerzicht: true };
+}
+
+function getUnternehmensAnschrift(data: RegisterGewerbeRequest) {
+  const { adresseAbweichend } = data.unternehmensDaten;
+  if (adresseAbweichend === undefined) {
+    return { entsprichtWohnanschrift: true };
+  }
+  const { strasse, hausnummer, hausnummerBis } = splitStrasseHausnummer(
+    adresseAbweichend.strasseUndHausnummer,
+  );
+  return {
+    adrkette: {
+      strAdr: {
+        str: strasse,
+        hausNr: hausnummer,
+        hausNrZu: hausnummerBis,
+        plz: adresseAbweichend.postleitzahl,
+        ort: adresseAbweichend.ort,
+      },
+    },
+  };
+}
+
 export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
   const persönlicheStrasseHausnummer = splitStrasseHausnummer(
     data.persönlicheDaten.adresse.strasseUndHausnummer,
@@ -190,22 +217,24 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
         // },
       },
       betrieb: {
-        unternehmen: {
-          entsprichtWohnanschrift:
-            data.unternehmensDaten.adresseAbweichend === undefined ? true : undefined,
-        },
+        unternehmen: getUnternehmensAnschrift(data),
         betrBeginn: {
           betriebsbeginn: formatDatumDE(data.unternehmensDaten.tätigkeitsbeginn),
         },
         gruendungsangaben: {
           gruendungsForm: {
             gruendungsArt: "1",
-            uebertrStichtag: formatDatumDE(data.unternehmensDaten.tätigkeitsbeginn),
+            uebertrStichtag: formatDatumDE(data.unternehmensDaten.gründungsdatum),
           },
         },
       },
       festsetzungsAngaben: {
-        voraussichtlicheEinkuenfte: {},
+        voraussichtlicheEinkuenfte: {
+          einkGewBetr: {
+            gruendJahrA: data.unternehmensDaten.gewinnGründungsjahr,
+            folgeJahrA: data.unternehmensDaten.gewinnFolgejahr,
+          },
+        },
       },
       gewinnErmittlgsAngaben: {
         gewinnErmittlung: GEWINN_ERMITTLUNG[data.unternehmensDaten.gewinnErmittlung],
@@ -215,9 +244,7 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
           gruendJahr: data.unternehmensDaten.umsatzGruendungsjahr,
           folgeJahr: data.unternehmensDaten.umsatzFolgejahr,
         },
-        kleinunternehmerRegelung: {
-          kleinUnternUSt: data.unternehmensDaten.kleinunternehmerRegelung ? true : undefined,
-        },
+        kleinunternehmerRegelung: getKleinunternehmerRegelung(data),
         sollIstVersteuerung: {
           auswahlSollIstVerst: SOLL_IST_VERSTEUERUNG[data.unternehmensDaten.sollIstVersteuerung],
         },

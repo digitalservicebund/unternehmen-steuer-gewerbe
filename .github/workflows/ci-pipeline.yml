@@ -33,7 +33,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
         name: Install pnpm
         with:
           cache: true
@@ -67,7 +67,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
         name: Install pnpm
         with:
           cache: true
@@ -86,6 +86,8 @@ jobs:
           FIT_CONNECT_CLIENT_SECRET: ${{ secrets.FIT_CONNECT_CLIENT_SECRET }}
           FIT_CONNECT_DESTINATION_ID: ${{ vars.FIT_CONNECT_DESTINATION_ID }}
           ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
+          ERIC_CERTIFICATE_BASE64: ${{ secrets.ERIC_CERTIFICATE_BASE64 }}
+          ERIC_CERTIFICATE_PIN: ${{ secrets.ERIC_CERTIFICATE_PIN }}
 
       - name: Upload coverage report
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -133,7 +135,7 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
 
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995
+        uses: SonarSource/sonarqube-scan-action@713881670b6b3676cda39549040e2d88c70d582e
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
@@ -164,7 +166,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
         name: Install pnpm
         with:
           cache: true
@@ -415,7 +417,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
         name: Install pnpm
         with:
           cache: true

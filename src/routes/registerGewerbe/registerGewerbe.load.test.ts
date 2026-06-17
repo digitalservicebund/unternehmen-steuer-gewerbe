@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
 import app from "../../app";
-import { registerGewerbeCompleteRequest } from "./testHelpers";
+import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
 
 function postRegisterGewerbe() {
   return app.request("/api/v1/register-gewerbe", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(registerGewerbeCompleteRequest),
+    body: JSON.stringify(registerGewerbeSampleRequestAllFieldsFilled),
   });
 }
 

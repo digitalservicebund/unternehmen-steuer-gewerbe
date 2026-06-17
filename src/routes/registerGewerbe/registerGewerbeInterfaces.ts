@@ -24,7 +24,7 @@ const AdresseSchema = z.object({
   postleitzahl: z
     .string()
     .regex(/^\d{5}$/)
-    .openapi({ example: "12345", description: "5-digit German postal code" }),
+    .openapi({ example: "01069", description: "5-digit German postal code" }),
   ort: z.string().openapi({ example: "Musterstadt" }),
 });
 
@@ -79,7 +79,7 @@ const UnternehmensDatenSchema = z.object({
   adresseAbweichend: AdresseSchema.openapi({
     example: {
       strasseUndHausnummer: "Musterstraße 2",
-      postleitzahl: "67890",
+      postleitzahl: "01069",
       ort: "Musterstadt",
     },
   }).optional(),
@@ -88,6 +88,15 @@ const UnternehmensDatenSchema = z.object({
     .enum(["industrie", "handwerk", "handel", "sonstiges"])
     .openapi({ example: "handwerk" }),
   tätigkeitsbeginn: z.iso.date().openapi({ example: "2026-04-17" }),
+  // TODO: temporary default — remove it (make gründungsdatum required) once the OSS
+  // always sends the field.
+  gründungsdatum: z.iso
+    .date()
+    .default(() => new Date().toISOString().split("T")[0]!)
+    .openapi({
+      example: "2026-04-17",
+      description: "Founding date of the business.",
+    }),
   gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
   gewinnErmittlung: z.enum(GEWINN_ERMITTLUNG_KEYS).openapi({
     example: "einnahmenüberschussrechnung",
@@ -104,6 +113,14 @@ const UnternehmensDatenSchema = z.object({
   umsatzFolgejahr: z.number().int().min(0).default(1).openapi({
     example: 26000,
     description: "Voraussichtlicher Gesamtumsatz (in Euro) im Folgejahr.",
+  }),
+  gewinnGründungsjahr: z.number().int().min(0).default(1).openapi({
+    example: 25000,
+    description: "Voraussichtlicher Gewinn (in Euro) im Jahr der Betriebseröffnung.",
+  }),
+  gewinnFolgejahr: z.number().int().min(0).default(1).openapi({
+    example: 26000,
+    description: "Voraussichtlicher Gewinn (in Euro) im Folgejahr.",
   }),
   sollIstVersteuerung: z.enum(SOLL_IST_VERSTEUERUNG_KEYS).default("sollVersteuerung").openapi({
     example: "sollVersteuerung",
@@ -155,7 +172,19 @@ const RegisterGewerbeResponseItemSchema = z.object({
   submissionId: z.string().optional(),
   info: z.string().optional(),
   errorType: ErrorTypeSchema.optional(),
+  pdfReceiptBase64: z.base64().optional(),
+  officeDetails: z
+    .object({
+      name: z.string(),
+      strasseUndHausnummer: z.string(),
+      postleitzahl: z.string(),
+      ort: z.string(),
+      telefon: z.string(),
+    })
+    .optional(),
 });
+
+export type RegisterGewerbeResponseItem = z.infer<typeof RegisterGewerbeResponseItemSchema>;
 
 export const RegisterGewerbeResponseSchema = z
   .object({

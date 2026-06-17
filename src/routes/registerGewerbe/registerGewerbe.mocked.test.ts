@@ -4,27 +4,41 @@ import { XMLParser } from "fast-xml-parser";
 // Note 1: mocking is "global" on file level, therefore we have separate files for tests that mock and those that don't.
 // Note 2: We need to mock here, such that the private library correctly initializes their internal libraries before the tests are run.
 vi.mock("@digitalservicebund/unternehmen-steuer-gewerbe-privat", () => ({
-  validateFsE: vi.fn().mockReturnValue({ isValid: true, returnCode: 0, info: undefined }),
+  validateFsE: vi.fn().mockReturnValue({ valid: true }),
   createElsterFsEEUnXml: vi.fn().mockReturnValue("<xml/>"),
+  sendFsE: vi.fn().mockReturnValue({ success: true }),
 }));
 
-const mockSubmitData = vi.fn().mockResolvedValue({ submissionId: "mock-submission-id" });
+const { mockSubmitData, mockGetGewerbeRoutingInfo } = vi.hoisted(() => ({
+  mockSubmitData: vi.fn().mockResolvedValue({ submissionId: "mock-submission-id" }),
+  mockGetGewerbeRoutingInfo: vi.fn().mockResolvedValue({
+    ags: "03046001",
+    fitConnect: { destinationId: "mock-destination-id" },
+  }),
+}));
 
 vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
   getFitConnectClient: () => ({ submitData: mockSubmitData }),
 }));
 
+vi.mock("./getGewerbeRoutingInfo", () => ({
+  getGewerbeRoutingInfo: mockGetGewerbeRoutingInfo,
+}));
+
 import app from "../../app";
-import { validateFsE as mockValidateFsE } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
+import {
+  validateFsE as mockValidateFsE,
+  sendFsE as mockSendFsE,
+} from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 
-import { registerGewerbeCompleteRequest } from "./testHelpers";
+import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
 import { ErrorTypeSchema } from "./registerGewerbeInterfaces";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
 
-function postRegisterGewerbe(data = registerGewerbeCompleteRequest) {
+function postRegisterGewerbe(data = registerGewerbeSampleRequestAllFieldsFilled) {
   return app.request("/api/v1/register-gewerbe", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -37,7 +51,9 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
 
   describe("in case of partial success", () => {
     it("Returns 207 MULTI-STATUS with gewerbeanmeldung upstream_error when FIT-Connect fails, fseÜbermittlung still succeeds", async () => {
-      mockSubmitData.mockRejectedValueOnce(new Error("Server Down"));
+      mockGetGewerbeRoutingInfo.mockRejectedValueOnce(
+        new Error("No FIT-Connect destination found for AGS 03046001"),
+      );
 
       const response = await postRegisterGewerbe();
       const json = await response.json();
@@ -60,37 +76,47 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(json.fseÜbermittlung.success).toBe(true);
     });
 
-    it("Returns 207 MULTI-STATUS with fseÜbermittlung upstream_error when ERiC service is unavailable, gewerbeanmeldung still succeeds", async () => {
-      vi.mocked(mockValidateFsE).mockReturnValueOnce({
-        isValid: undefined,
-        returnCode: undefined,
-        info: undefined,
-      });
+    it.each([
+      {
+        label: "upstream_error when ERiC service is unavailable",
+        setup: () =>
+          vi.mocked(mockSendFsE).mockImplementationOnce(() => {
+            throw new Error("ERiC unavailable");
+          }),
+        errorType: ErrorTypeSchema.enum.upstream_error,
+      },
+      {
+        label: "upstream_error when sendFsE reports failure",
+        setup: () =>
+          vi.mocked(mockSendFsE).mockReturnValueOnce({
+            success: false,
+            info: "ERiC rejected submission",
+          }),
+        errorType: ErrorTypeSchema.enum.upstream_error,
+      },
+      {
+        label: "validation_error when FsE validation fails",
+        setup: () =>
+          vi.mocked(mockValidateFsE).mockReturnValueOnce({
+            valid: false,
+            errors: "FsE validation failed",
+          }),
+        errorType: ErrorTypeSchema.enum.validation_error,
+      },
+    ])(
+      "Returns 207 MULTI-STATUS with fseÜbermittlung $label, gewerbeanmeldung still succeeds",
+      async ({ setup, errorType }) => {
+        setup();
 
-      const response = await postRegisterGewerbe();
-      const json = await response.json();
-      expect(response.status).toEqual(HttpStatusCode.MultiStatus);
-      expect(json.fseÜbermittlung.success).toBe(false);
-      expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
-      expect(json.gewerbeanmeldung.success).toBe(true);
-      expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
-    });
-
-    it("Returns 207 MULTI-STATUS with fseÜbermittlung validation_error when FsE validation fails, gewerbeanmeldung still succeeds", async () => {
-      vi.mocked(mockValidateFsE).mockReturnValueOnce({
-        isValid: false,
-        returnCode: 1,
-        info: "FsE validation failed",
-      });
-
-      const response = await postRegisterGewerbe();
-      const json = await response.json();
-      expect(response.status).toEqual(HttpStatusCode.MultiStatus);
-      expect(json.fseÜbermittlung.success).toBe(false);
-      expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
-      expect(json.gewerbeanmeldung.success).toBe(true);
-      expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
-    });
+        const response = await postRegisterGewerbe();
+        const json = await response.json();
+        expect(response.status).toEqual(HttpStatusCode.MultiStatus);
+        expect(json.fseÜbermittlung.success).toBe(false);
+        expect(json.fseÜbermittlung.errorType).toBe(errorType);
+        expect(json.gewerbeanmeldung.success).toBe(true);
+        expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
+      },
+    );
   });
 
   describe("in case of error", () => {
@@ -99,9 +125,8 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
         new Error("XML schema mismatch"),
       );
       vi.mocked(mockValidateFsE).mockReturnValueOnce({
-        isValid: false,
-        returnCode: 1,
-        info: "FsE validation failed",
+        valid: false,
+        errors: "FsE validation failed",
       });
 
       const response = await postRegisterGewerbe();
@@ -115,10 +140,8 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
 
     it("Returns 500 INTERNAL SERVER ERROR when both submissions fail", async () => {
       mockSubmitData.mockRejectedValueOnce(new Error("Server Down"));
-      vi.mocked(mockValidateFsE).mockReturnValueOnce({
-        isValid: undefined,
-        returnCode: undefined,
-        info: undefined,
+      vi.mocked(mockSendFsE).mockImplementationOnce(() => {
+        throw new Error("ERiC unavailable");
       });
 
       const response = await postRegisterGewerbe();
