@@ -60,7 +60,7 @@ describe("Route /api/v1/register-gewerbe", () => {
     });
 
     describe("on returning recipient details", () => {
-      it("returns correct Finanzamt details (name, street, zip, city, telephone number) for Postleitzahl 10969", async () => {
+      it("returns correct Finanzamt details (name, street, zip, city, telephone number) for Finanzamt 1114", async () => {
         const dataWithPostleitZahl = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
 
         dataWithPostleitZahl.unternehmensDaten.adresseAbweichend!.postleitzahl = "10969";
