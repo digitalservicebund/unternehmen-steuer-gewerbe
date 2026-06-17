@@ -3,6 +3,7 @@ import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectCl
 import {
   createElsterFsEEUnXml,
   getFinanzamtDetailsById,
+  getFinanzamtId,
   sendFsE,
   validateFsE,
 } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
@@ -17,6 +18,7 @@ import { registerGewerbeRoute } from "./registerGewerbeRoute";
 import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTransformer";
 import { getGewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
 import { readFileSync } from "node:fs";
+import { splitStrasseHausnummer } from "../../helpers/formFieldTransformations";
 
 const GEWERBEANMELDUNG_LEIKA_KEY_URN = "urn:de:fim:leika:leistung:99050012104000";
 
@@ -106,9 +108,29 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
       };
     }
 
-    // TODO: Use getFinanzamtId(Postleitzahl) to determine ID
-    const finanzamtId = "1114";
-    // TODO: Use Finanzamt-ID in fse
+    // TODO: Is this true?
+    const address = data.unternehmensDaten.adresseAbweichend ?? data.persönlicheDaten.adresse;
+
+    // TODO: This is ad-hoc. Is there anything more reliable?
+    const { strasse, hausnummer, hausnummerBis } = splitStrasseHausnummer(
+      address.strasseUndHausnummer,
+    );
+
+    const finanzamtIds = getFinanzamtId({
+      postleitzahl: address.postleitzahl,
+      ort: address.ort,
+      strassenName: strasse,
+      hausnummerVon: hausnummer,
+      hausnummerBis: hausnummerBis,
+    });
+
+    // TODO: select how to decide on unique Finanzamt?
+    // TODO: how to exit if none found?
+    const finanzamtId = finanzamtIds[0]!;
+
+    // ***** WARNING, DANGEROUS *****
+    // TODO: (only on prod) Use Finanzamt-ID in fse
+    // ***** WARNING, DANGEROUS *****
 
     const finanzamtDetails = getFinanzamtDetailsById(finanzamtId);
     console.log(finanzamtDetails);
