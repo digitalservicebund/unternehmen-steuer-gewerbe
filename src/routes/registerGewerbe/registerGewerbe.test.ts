@@ -60,12 +60,22 @@ describe("Route /api/v1/register-gewerbe", () => {
     });
 
     describe("on returning recipient details", () => {
-      it("returns dummy Finanzamt details (name, street, zip, city, telephone number)", () => {
-        expect(json.fseÜbermittlung.officeDetails!.name).toEqual("Finanzamt Dummy-Data");
-        expect(json.fseÜbermittlung.officeDetails!.strasseUndHausnummer).toEqual("Dummystraße 1");
-        expect(json.fseÜbermittlung.officeDetails!.postleitzahl).toEqual("00000");
-        expect(json.fseÜbermittlung.officeDetails!.ort).toEqual("Dummy");
-        expect(json.fseÜbermittlung.officeDetails!.telefon).toEqual("0000-000 000");
+      it("returns correct Finanzamt details (name, street, zip, city, telephone number) for Postleitzahl 10969", async () => {
+        const dataWithPostleitZahl = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+
+        dataWithPostleitZahl.unternehmensDaten.adresseAbweichend!.postleitzahl = "10969";
+
+        const response = await postRegisterGewerbe(dataWithPostleitZahl);
+
+        const json = await response.json();
+
+        expect(json.fseÜbermittlung.officeDetails!.name).toEqual(
+          "Finanzamt Friedrichshain-Kreuzberg",
+        );
+        expect(json.fseÜbermittlung.officeDetails!.strasseUndHausnummer).toEqual("Mehringdamm 22");
+        expect(json.fseÜbermittlung.officeDetails!.postleitzahl).toEqual("10961");
+        expect(json.fseÜbermittlung.officeDetails!.ort).toEqual("Berlin");
+        expect(json.fseÜbermittlung.officeDetails!.telefon).toEqual("030 9024-14 0");
       });
 
       it("returns dummy Gewerbeamt details (name, street, zip, city, telephone number)", () => {
