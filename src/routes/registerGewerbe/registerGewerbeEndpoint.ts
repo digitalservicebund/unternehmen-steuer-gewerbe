@@ -133,7 +133,6 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
     // ***** WARNING, DANGEROUS *****
 
     const finanzamtDetails = getFinanzamtDetailsById(finanzamtId);
-    console.log(finanzamtDetails);
     const strasseUndHausnummer = `${finanzamtDetails?.hausanschrift?.strasse} ${finanzamtDetails?.hausanschrift?.hausnummer}`;
 
     const result = sendFsE(fse, true);
