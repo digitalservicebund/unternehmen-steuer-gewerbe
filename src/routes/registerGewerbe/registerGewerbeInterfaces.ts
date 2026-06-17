@@ -164,11 +164,11 @@ const RegisterGewerbeResponseItemSchema = z.object({
   pdfReceiptBase64: z.base64().optional(),
   officeDetails: z
     .object({
-      name: z.string(),
-      strasseUndHausnummer: z.string(),
-      postleitzahl: z.string(),
-      ort: z.string(),
-      telefon: z.string(),
+      name: z.string().optional(),
+      strasseUndHausnummer: z.string().optional(),
+      postleitzahl: z.string().optional(),
+      ort: z.string().optional(),
+      telefon: z.string().optional(),
     })
     .optional(),
 });

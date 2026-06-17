@@ -2,6 +2,7 @@ import { HonoAppType } from "../../honoApp";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
 import {
   createElsterFsEEUnXml,
+  getFinanzamtDetailsById,
   sendFsE,
   validateFsE,
 } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
@@ -105,6 +106,14 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
       };
     }
 
+    // TODO: Use getFinanzamtId(Postleitzahl) to determine ID
+    const finanzamtId = "1114";
+    // TODO: Use Finanzamt-ID in fse
+
+    const finanzamtDetails = getFinanzamtDetailsById(finanzamtId);
+    console.log(finanzamtDetails);
+    const strasseUndHausnummer = `${finanzamtDetails?.hausanschrift?.strasse} ${finanzamtDetails?.hausanschrift?.hausnummer}`;
+
     const result = sendFsE(fse, true);
     if (!result.success) {
       return {
@@ -119,11 +128,11 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
       info: result.info,
       pdfReceiptBase64: result.pdf?.toString("base64"),
       officeDetails: {
-        name: "Finanzamt Dummy-Data",
-        strasseUndHausnummer: "Dummystraße 1",
-        postleitzahl: "00000",
-        ort: "Dummy",
-        telefon: "0000-000 000",
+        name: finanzamtDetails?.name,
+        strasseUndHausnummer,
+        postleitzahl: finanzamtDetails?.hausanschrift?.postleitzahl,
+        ort: finanzamtDetails?.hausanschrift?.ort,
+        telefon: finanzamtDetails?.telefonnummer,
       },
     };
   } catch (error) {
