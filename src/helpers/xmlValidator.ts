@@ -22,7 +22,7 @@ interface SaxonTransformResult {
 
 // In ts-node, resolved relative to this source file (src/helpers/ -> src/resources/).
 // In Docker, overridden via RESOURCES_DIR env var pointing to /app/resources.
-function getResourcesDir(): string {
+export function getResourcesDir(): string {
   return (
     process.env["RESOURCES_DIR"] ??
     path.resolve(new URL(".", import.meta.url).pathname, "../resources")

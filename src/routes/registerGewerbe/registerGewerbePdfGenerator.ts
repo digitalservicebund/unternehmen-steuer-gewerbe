@@ -1,24 +1,36 @@
 import { XMLParser } from "fast-xml-parser";
 import PDFDocument from "pdfkit";
+import { loadDomainTerms } from "./xGewerbeordnungGlossary";
 
-interface EnteredField {
-  feld: string;
+interface Leaf {
+  pfad: string[];
   wert: string;
 }
+
+interface EnteredField {
+  domainTerm: string;
+  wert: string;
+  xmlPfad: string;
+}
+
+// Wrapper elements that carry no domain meaning of their own; the meaning
+// belongs to their parent (e.g. `grundAnmeldungSchluessel > code`).
+const GENERIC_WRAPPER_TAGS = new Set(["code"]);
 
 const parser = new XMLParser({ ignoreAttributes: true, parseTagValue: false });
 
 export async function generatePdfReceipt(xml: string): Promise<string> {
-  const pdf = await renderFieldsToPdf(extractEnteredFields(xml));
+  const domainTerms = await loadDomainTerms();
+  const fields = extractEnteredFields(xml).map((leaf) => describeField(leaf, domainTerms));
+  const pdf = await renderFieldsToPdf(fields);
   return pdf.toString("base64");
 }
 
-function extractEnteredFields(xml: string): EnteredField[] {
-  const parsed = parser.parse(xml) as Record<string, unknown>;
-  return Object.values(parsed).flatMap((root) => collectLeaves(root, []));
+function extractEnteredFields(xml: string): Leaf[] {
+  return collectLeaves(parser.parse(xml), []);
 }
 
-function collectLeaves(node: unknown, pfad: string[]): EnteredField[] {
+function collectLeaves(node: unknown, pfad: string[]): Leaf[] {
   if (Array.isArray(node)) {
     return node.flatMap((eintrag) => collectLeaves(eintrag, pfad));
   }
@@ -28,12 +40,25 @@ function collectLeaves(node: unknown, pfad: string[]): EnteredField[] {
     );
   }
   const wert = String(node).trim();
-  return wert === "" ? [] : [{ feld: pfad.join(" > "), wert }];
+  return wert === "" ? [] : [{ pfad, wert }];
 }
 
 function localName(tag: string): string {
   const lastColon = tag.lastIndexOf(":");
   return lastColon === -1 ? tag : tag.slice(lastColon + 1);
+}
+
+function describeField(leaf: Leaf, domainTerms: Map<string, string>): EnteredField {
+  const tag = meaningfulTag(leaf.pfad);
+  return {
+    domainTerm: domainTerms.get(tag) ?? tag,
+    wert: leaf.wert,
+    xmlPfad: leaf.pfad.join(" > "),
+  };
+}
+
+function meaningfulTag(pfad: string[]): string {
+  return pfad.findLast((segment) => !GENERIC_WRAPPER_TAGS.has(segment)) ?? pfad.at(-1) ?? "";
 }
 
 function renderFieldsToPdf(fields: EnteredField[]): Promise<Buffer> {
@@ -44,8 +69,8 @@ function renderFieldsToPdf(fields: EnteredField[]): Promise<Buffer> {
   doc.fontSize(16).text("Gewerbeanmeldung – erfasste Daten", { underline: true });
   doc.moveDown();
   doc.fontSize(10);
-  for (const { feld, wert } of fields) {
-    doc.text(`${feld}: ${wert}`);
+  for (const { domainTerm, wert, xmlPfad } of fields) {
+    doc.text(`${domainTerm}: ${wert} (${xmlPfad})`);
   }
   doc.end();
 

@@ -22,10 +22,12 @@ describe("generatePdfReceipt", () => {
     expect(await generatePdfReceipt(sampleXml)).toMatch(/^JVBERi0/);
   });
 
-  it("lists each entered field with its value", async () => {
+  it("labels each value with its domain term and XML path", async () => {
     const text = await pdfText(await generatePdfReceipt(sampleXml));
-    expect(text).toContain("familienname: Mustermann");
-    expect(text).toContain("vornamen: Erika");
+    // domain term (from XSD documentation), value, and the XML path
+    expect(text).toContain("Familienname");
+    expect(text).toContain("Mustermann");
+    expect(text).toContain("(name > familienname)");
   });
 
   it("omits fields left empty", async () => {
