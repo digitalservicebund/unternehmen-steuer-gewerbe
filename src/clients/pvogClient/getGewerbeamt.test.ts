@@ -35,7 +35,8 @@ describe("getGewerbeamt", () => {
     });
   });
 
-  it("returns an empty onlineServiceLinks list for Fraureuth (ARS 146120000000), which has no online services", async () => {
+  // temporarily skipped because of unstable API - proper fix (separate contract and unit tests) is in our backlog
+  it.skip("returns an empty onlineServiceLinks list for Fraureuth (ARS 146120000000), which has no online services", async () => {
     const gewerbeamt = await getGewerbeamt("146120000000");
 
     expect(gewerbeamt.name).toBe("Gewerbeamt");
