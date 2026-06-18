@@ -159,7 +159,7 @@ const _BisherigeUnfallversicherungSchema = z
   })
   .openapi("BisherigeUnfallversicherung");
 
-export const ErrorTypeSchema = z.enum(["validation_error", "upstream_error"]);
+export const ErrorTypeSchema = z.enum(["validation_error", "upstream_error", "invalid_data"]);
 
 export const RegisterGewerbeRequestSchema = z
   .object({

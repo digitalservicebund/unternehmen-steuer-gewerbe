@@ -97,21 +97,8 @@ async function submitGewerbeanmeldung(
 
 async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeResponseItem> {
   try {
-    const fse = createElsterFsEEUnXml(transformToEUnFsE(data));
-
-    const validation = validateFsE(fse);
-    if (!validation.valid) {
-      return {
-        success: false,
-        errorType: ErrorTypeSchema.enum.validation_error,
-        info: validation.errors,
-      };
-    }
-
-    // TODO: Is this true?
     const address = data.unternehmensDaten.adresseAbweichend ?? data.persönlicheDaten.adresse;
 
-    // TODO: This is ad-hoc. Is there anything more reliable?
     const { strasse, hausnummer, hausnummerBis } = splitStrasseHausnummer(
       address.strasseUndHausnummer,
     );
@@ -124,13 +111,29 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
       hausnummerBis: hausnummerBis,
     });
 
-    // TODO: select how to decide on unique Finanzamt?
-    // TODO: how to exit if none found?
+    if (finanzamtIds.length === 0) {
+      return {
+        success: false,
+        errorType: ErrorTypeSchema.enum.invalid_data,
+        info: "No Finanzamt found for address",
+      };
+    }
     const finanzamtId = finanzamtIds[0]!;
 
     // ***** WARNING, DANGEROUS *****
-    // TODO: (only on prod) Use Finanzamt-ID in fse
+    // Missing piece: Only on prod(!) set Finanzamt-ID in data for fse creation
     // ***** WARNING, DANGEROUS *****
+
+    const fse = createElsterFsEEUnXml(transformToEUnFsE(data));
+
+    const validation = validateFsE(fse);
+    if (!validation.valid) {
+      return {
+        success: false,
+        errorType: ErrorTypeSchema.enum.validation_error,
+        info: validation.errors,
+      };
+    }
 
     const finanzamtDetails = getFinanzamtDetailsById(finanzamtId);
     const strasseUndHausnummer = `${finanzamtDetails?.hausanschrift?.strasse} ${finanzamtDetails?.hausanschrift?.hausnummer}`;
