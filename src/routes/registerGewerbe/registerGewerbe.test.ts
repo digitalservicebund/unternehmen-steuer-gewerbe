@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, vi } from "vitest";
 import app from "../../app";
 import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
-import { RegisterGewerbeResponseSchema } from "./registerGewerbeInterfaces";
+import { ErrorTypeSchema, RegisterGewerbeResponseSchema } from "./registerGewerbeInterfaces";
 import { existsSync } from "node:fs";
 import { z } from "@hono/zod-openapi";
 import { extractText } from "unpdf";
@@ -60,12 +60,45 @@ describe("Route /api/v1/register-gewerbe", () => {
     });
 
     describe("on returning recipient details", () => {
-      it("returns dummy Finanzamt details (name, street, zip, city, telephone number)", () => {
-        expect(json.fseÜbermittlung.officeDetails!.name).toEqual("Finanzamt Dummy-Data");
-        expect(json.fseÜbermittlung.officeDetails!.strasseUndHausnummer).toEqual("Dummystraße 1");
-        expect(json.fseÜbermittlung.officeDetails!.postleitzahl).toEqual("00000");
-        expect(json.fseÜbermittlung.officeDetails!.ort).toEqual("Dummy");
-        expect(json.fseÜbermittlung.officeDetails!.telefon).toEqual("0000-000 000");
+      it("returns Finanzamt details for adresseAbweichend in unternehmensDaten (with Prinzessinnenstraße 8-14, 10969 Berlin)", async () => {
+        const dataWithPostleitZahl = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+
+        dataWithPostleitZahl.unternehmensDaten.adresseAbweichend = {
+          postleitzahl: "10969",
+          ort: "Berlin",
+          strasseUndHausnummer: "Prinzessinnenstraße 8-14",
+        };
+
+        const response = await postRegisterGewerbe(dataWithPostleitZahl);
+
+        const json = await response.json();
+
+        expect(json.fseÜbermittlung.officeDetails!.name).toEqual(
+          "Finanzamt Friedrichshain-Kreuzberg",
+        );
+        expect(json.fseÜbermittlung.officeDetails!.strasseUndHausnummer).toEqual("Mehringdamm 22");
+        expect(json.fseÜbermittlung.officeDetails!.postleitzahl).toEqual("10961");
+        expect(json.fseÜbermittlung.officeDetails!.ort).toEqual("Berlin");
+        expect(json.fseÜbermittlung.officeDetails!.telefon).toEqual("030 9024-14 0");
+      });
+
+      it("returns Finanzamt details for persönlicheDaten  (Musterstraße 1, 03046 Cottbus)", async () => {
+        const dataWithoutAdresseAbweichend = structuredClone(
+          registerGewerbeSampleRequestAllFieldsFilled,
+        );
+
+        dataWithoutAdresseAbweichend.unternehmensDaten.adresseAbweichend = undefined;
+
+        const response = await postRegisterGewerbe(dataWithoutAdresseAbweichend);
+        const json = await response.json();
+
+        expect(json.fseÜbermittlung.officeDetails!.name).toEqual("Finanzamt Cottbus");
+        expect(json.fseÜbermittlung.officeDetails!.strasseUndHausnummer).toEqual(
+          "Vom-Stein-Straße 29",
+        );
+        expect(json.fseÜbermittlung.officeDetails!.postleitzahl).toEqual("03050");
+        expect(json.fseÜbermittlung.officeDetails!.ort).toEqual("Cottbus");
+        expect(json.fseÜbermittlung.officeDetails!.telefon).toEqual("0355 4991-4100");
       });
 
       it("returns dummy Gewerbeamt details (name, street, zip, city, telephone number)", () => {
@@ -75,6 +108,27 @@ describe("Route /api/v1/register-gewerbe", () => {
         expect(json.gewerbeanmeldung.officeDetails!.ort).toEqual("Dummy2");
         expect(json.gewerbeanmeldung.officeDetails!.telefon).toEqual("2222-222 222");
       });
+    });
+
+    it("returns fseÜbermittlung success=false and 'invalid_data' if no Finanzamt found", async () => {
+      const requestDataWithNonExistentAddress = structuredClone(
+        registerGewerbeSampleRequestAllFieldsFilled,
+      );
+
+      requestDataWithNonExistentAddress.unternehmensDaten.adresseAbweichend = undefined;
+
+      requestDataWithNonExistentAddress.persönlicheDaten.adresse = {
+        postleitzahl: "00000",
+        ort: "Nonexistent Ort",
+        strasseUndHausnummer: "Nonexistent Street 1",
+      };
+
+      const response = await postRegisterGewerbe(requestDataWithNonExistentAddress);
+      const json = await response.json();
+
+      expect(json.fseÜbermittlung.success).toBe(false);
+      expect(json.fseÜbermittlung.errorType).toEqual(ErrorTypeSchema.enum.invalid_data);
+      expect(json.fseÜbermittlung.info).toEqual("No Finanzamt found for address");
     });
 
     it("does write the eric log to /tmp", async () => {

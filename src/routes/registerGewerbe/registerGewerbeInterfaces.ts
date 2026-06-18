@@ -159,7 +159,7 @@ const _BisherigeUnfallversicherungSchema = z
   })
   .openapi("BisherigeUnfallversicherung");
 
-export const ErrorTypeSchema = z.enum(["validation_error", "upstream_error"]);
+export const ErrorTypeSchema = z.enum(["validation_error", "upstream_error", "invalid_data"]);
 
 export const RegisterGewerbeRequestSchema = z
   .object({
@@ -179,10 +179,10 @@ const RegisterGewerbeResponseItemSchema = z.object({
   officeDetails: z
     .object({
       name: z.string(),
-      strasseUndHausnummer: z.string(),
-      postleitzahl: z.string(),
-      ort: z.string(),
-      telefon: z.string(),
+      strasseUndHausnummer: z.string().optional(),
+      postleitzahl: z.string().optional(),
+      ort: z.string().optional(),
+      telefon: z.string().optional(),
     })
     .optional(),
 });
