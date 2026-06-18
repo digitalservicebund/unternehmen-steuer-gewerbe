@@ -1,3 +1,7 @@
+// Disclaimer:
+// This is considered throw-away code until we have proper specs
+// Also: The PDF is far from "official". It's our home-made translation of the XGewerbeordnung-Anmeldung XML into something human-readable.
+
 import { XMLParser } from "fast-xml-parser";
 import PDFDocument from "pdfkit";
 import { loadDomainTerms } from "./xGewerbeordnungGlossary";
@@ -67,6 +71,14 @@ function renderFieldsToPdf(fields: EnteredField[]): Promise<Buffer> {
   doc.on("data", (chunk) => chunks.push(chunk));
 
   doc.fontSize(16).text("Gewerbeanmeldung – erfasste Daten", { underline: true });
+  doc.moveDown();
+  doc
+    .fontSize(10)
+    .text(
+      "Disclaimer: This PDF is a simple representation of the data sent as XGewerbeordnung. " +
+        'It\'s by no means an "official" receipt by any Gewerbeamt. ' +
+        "Also, it has not been styled, yet.",
+    );
   doc.moveDown();
   doc.fontSize(10);
   for (const { domainTerm, wert, xmlPfad } of fields) {
