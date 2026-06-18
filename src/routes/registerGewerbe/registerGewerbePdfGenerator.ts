@@ -4,37 +4,25 @@
 
 import { XMLParser } from "fast-xml-parser";
 import PDFDocument from "pdfkit";
-import { loadDomainTerms } from "./xGewerbeordnungGlossary";
-
-interface Leaf {
-  pfad: string[];
-  wert: string;
-}
 
 interface EnteredField {
-  domainTerm: string;
+  leafName: string;
   wert: string;
   xmlPfad: string;
 }
 
-// Wrapper elements that carry no domain meaning of their own; the meaning
-// belongs to their parent (e.g. `grundAnmeldungSchluessel > code`).
-const GENERIC_WRAPPER_TAGS = new Set(["code"]);
-
 const parser = new XMLParser({ ignoreAttributes: true, parseTagValue: false });
 
 export async function generatePdfReceipt(xml: string): Promise<string> {
-  const domainTerms = await loadDomainTerms();
-  const fields = extractEnteredFields(xml).map((leaf) => describeField(leaf, domainTerms));
-  const pdf = await renderFieldsToPdf(fields);
+  const pdf = await renderFieldsToPdf(extractEnteredFields(xml));
   return pdf.toString("base64");
 }
 
-function extractEnteredFields(xml: string): Leaf[] {
+function extractEnteredFields(xml: string): EnteredField[] {
   return collectLeaves(parser.parse(xml), []);
 }
 
-function collectLeaves(node: unknown, pfad: string[]): Leaf[] {
+function collectLeaves(node: unknown, pfad: string[]): EnteredField[] {
   if (Array.isArray(node)) {
     return node.flatMap((eintrag) => collectLeaves(eintrag, pfad));
   }
@@ -44,25 +32,12 @@ function collectLeaves(node: unknown, pfad: string[]): Leaf[] {
     );
   }
   const wert = String(node).trim();
-  return wert === "" ? [] : [{ pfad, wert }];
+  return wert === "" ? [] : [{ leafName: pfad.at(-1) ?? "", wert, xmlPfad: pfad.join(" > ") }];
 }
 
 function localName(tag: string): string {
   const lastColon = tag.lastIndexOf(":");
   return lastColon === -1 ? tag : tag.slice(lastColon + 1);
-}
-
-function describeField(leaf: Leaf, domainTerms: Map<string, string>): EnteredField {
-  const tag = meaningfulTag(leaf.pfad);
-  return {
-    domainTerm: domainTerms.get(tag) ?? tag,
-    wert: leaf.wert,
-    xmlPfad: leaf.pfad.join(" > "),
-  };
-}
-
-function meaningfulTag(pfad: string[]): string {
-  return pfad.findLast((segment) => !GENERIC_WRAPPER_TAGS.has(segment)) ?? pfad.at(-1) ?? "";
 }
 
 function renderFieldsToPdf(fields: EnteredField[]): Promise<Buffer> {
@@ -81,8 +56,17 @@ function renderFieldsToPdf(fields: EnteredField[]): Promise<Buffer> {
     );
   doc.moveDown();
   doc.fontSize(10);
-  for (const { domainTerm, wert, xmlPfad } of fields) {
-    doc.text(`${domainTerm}: ${wert} (${xmlPfad})`);
+
+  // Three columns: leafName | value | (path)
+  // Page is 595pt wide, 50pt margins → 495pt usable starting at x=50
+  const COL = { name: 50, value: 170, path: 340 };
+  const COL_W = { name: 115, value: 165, path: 595 - 50 - 340 };
+
+  for (const { leafName, wert, xmlPfad } of fields) {
+    const y = doc.y;
+    doc.text(leafName, COL.name, y, { width: COL_W.name, lineBreak: false });
+    doc.text(wert, COL.value, y, { width: COL_W.value, lineBreak: false });
+    doc.text(`(${xmlPfad})`, COL.path, y, { width: COL_W.path });
   }
   doc.end();
 
