@@ -1,3 +1,7 @@
+// Disclaimer:
+// This is considered throw-away code until we have proper specs.
+// Also: The PDF is far from "official". It's our home-made translation of the XGewerbeordnung-Anmeldung XML into something human-readable.
+
 import { describe, it, expect, vi } from "vitest";
 import { extractText } from "unpdf";
 import { generatePdfReceipt } from "./registerGewerbePdfGenerator";
