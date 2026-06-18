@@ -3,6 +3,7 @@ import {
   UNFALLVERSICHERUNGSTRAEGER,
   UNFALLVERSICHERUNGSTRAEGER_KEYS,
   VERTRAUENSNIVEAU_KEYS,
+  STAATSANGEHOERIGKEIT_KEYS,
 } from "./requestDataTransformer/xGewerbeordnungCodes";
 import {
   RELIGIONSSCHLUESSEL_KEYS,
@@ -35,7 +36,20 @@ const PersönlicheDatenSchema = z.object({
   geschlecht: z.enum(["d", "w", "m"]).openapi({ example: "d" }).optional(),
   geburtsort: z.string().openapi({ example: "Musterstadt" }).optional(),
   geburtsland: z.string().openapi({ example: "Deutschland" }).optional(),
-  staatsangehörigkeitDeutsch: z.literal(true),
+  staatsangehörigkeitDeutsch: z
+    .boolean()
+    .openapi({
+      deprecated: true,
+      example: true,
+      description:
+        "Whether the person holds German citizenship. Deprecated: redundant with `staatsangehörigkeit` (derivable from it). Must be consistent with `staatsangehörigkeit`: true exactly when `staatsangehörigkeit` is 'deutsch' (code 000).",
+    })
+    .optional(),
+  staatsangehörigkeit: z.enum(STAATSANGEHOERIGKEIT_KEYS).default("deutsch").openapi({
+    example: "deutsch",
+    description:
+      "Citizenship of the person according to the code list of the German Federal Statistical Office. Defaults to 'deutsch' (code 000).",
+  }),
   adresse: AdresseSchema,
   telefon: z
     .string()
