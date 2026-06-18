@@ -137,6 +137,15 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
 
     const finanzamtDetails = getFinanzamtDetailsById(finanzamtId);
     const strasseUndHausnummer = `${finanzamtDetails?.hausanschrift?.strasse} ${finanzamtDetails?.hausanschrift?.hausnummer}`;
+    const officeDetails = finanzamtDetails
+      ? {
+          name: finanzamtDetails.name, //
+          strasseUndHausnummer,
+          postleitzahl: finanzamtDetails?.hausanschrift?.postleitzahl,
+          ort: finanzamtDetails?.hausanschrift?.ort,
+          telefon: finanzamtDetails?.telefonnummer,
+        }
+      : undefined;
 
     const result = sendFsE(fse, true);
     if (!result.success) {
@@ -151,13 +160,7 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
       submissionId: "implementation missing",
       info: result.info,
       pdfReceiptBase64: result.pdf?.toString("base64"),
-      officeDetails: {
-        name: finanzamtDetails?.name,
-        strasseUndHausnummer,
-        postleitzahl: finanzamtDetails?.hausanschrift?.postleitzahl,
-        ort: finanzamtDetails?.hausanschrift?.ort,
-        telefon: finanzamtDetails?.telefonnummer,
-      },
+      officeDetails,
     };
   } catch (error) {
     console.error("FsE submission failed", error);
