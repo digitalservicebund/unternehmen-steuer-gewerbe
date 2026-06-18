@@ -22,10 +22,10 @@ describe("generatePdfReceipt", () => {
     expect(await generatePdfReceipt(sampleXml)).toMatch(/^JVBERi0/);
   });
 
-  it("labels each value with its domain term and XML path", async () => {
+  it("labels each value with its leaf node name and (simplified) XML path", async () => {
     const text = await pdfText(await generatePdfReceipt(sampleXml));
     // domain term (from XSD documentation), value, and the XML path
-    expect(text).toContain("Familienname");
+    expect(text).toContain("familienname");
     expect(text).toContain("Mustermann");
     expect(text).toContain("(name > familienname)");
   });
