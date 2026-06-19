@@ -13,18 +13,45 @@ describe("AkdbClient contract", () => {
     expect(token.token_type).toBe("Bearer");
   });
 
-  it("sends a valid XöV message and gets an empty ok response", async () => {
-    const { access_token } = await client.fetchToken();
+  describe("sending via OSCI service", () => {
+    it("sends a valid XöV message and gets an empty ok response", async () => {
+      const { access_token } = await client.fetchToken();
 
-    await expect(client.sendXoevMessage(okXml, access_token)).resolves.toBeUndefined();
+      await expect(client.sendXoevMessage(okXml, access_token)).resolves.toBeUndefined();
+    });
+
+    it("throws when sending a message with an unknown sender kennung", async () => {
+      const { access_token } = await client.fetchToken();
+
+      await expect(client.sendXoevMessage(nokXml, access_token)).rejects.toThrow(
+        `POST https://soaptest.akdb.de/okkomm/restapi/v3.0/messages/xoev:`,
+      );
+    });
   });
 
-  it("throws when sending a message with an unknown sender kennung", async () => {
-    const { access_token } = await client.fetchToken();
+  describe("requesting the 'laufzettel'", async () => {
+    it.only("fetches transport report", async () => {
+      const { access_token } = await client.fetchToken();
 
-    await expect(client.sendXoevMessage(nokXml, access_token)).rejects.toThrow(
-      `POST https://soaptest.akdb.de/okkomm/restapi/v3.0/messages/xoev:`,
-    );
+      const res = await fetch(
+        "https://soaptest.akdb.de/okkomm/restapi/v3.0/messages/transport-report/osci",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${access_token}`,
+          },
+          body: JSON.stringify({
+            messageID: "vps_by_17817854007568dc3a6b8-ff6b-4d63-b7f9-67e439f52ef1",
+            serviceID: "http://www.osci.de/xmeld2605/xmeld2605Statistik.wsdl",
+            authorityKey: "dbs:090030010000",
+          }),
+        },
+      );
+
+      console.log("status:", res.status);
+      console.log("body:", await res.text());
+    });
   });
 });
 
