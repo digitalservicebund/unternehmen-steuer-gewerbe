@@ -54,7 +54,7 @@
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
     "unpdf": "^1.4.0",
-    "vitest": "^4.1.8",
+    "vitest": "^4.1.9",
     "xslt3-he": "3.0.0-beta2"
   },
   "engines": {
