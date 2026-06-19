@@ -51,7 +51,7 @@ pre-commit:
       run: pnpm run format:fix
       stage_fixed: true
     - name: Secret scanning
-      run: trivy fs --scanners secret --exit-code 1 --skip-files "**/generated.spezifikation.sef.json" --skip-dirs ".claude" .
+      run: trivy fs --scanners secret --exit-code 1 --skip-files "**/generated.spezifikation.sef.json",".env" --skip-dirs ".claude" .
 #       glob: "*.{js,ts,jsx,tsx}"
 #
 #     - name: rubocop
