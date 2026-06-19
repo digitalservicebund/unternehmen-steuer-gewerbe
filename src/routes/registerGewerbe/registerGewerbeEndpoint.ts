@@ -2,6 +2,8 @@ import { HonoAppType } from "../../honoApp";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
 import {
   createElsterFsEEUnXml,
+  getFinanzamtDetailsById,
+  getFinanzamtId,
   sendFsE,
   validateFsE,
 } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
@@ -16,6 +18,7 @@ import { registerGewerbeRoute } from "./registerGewerbeRoute";
 import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTransformer";
 import { getGewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
 import { generatePdfReceipt } from "./registerGewerbePdfGenerator";
+import { splitStrasseHausnummer } from "../../helpers/formFieldTransformations";
 
 const GEWERBEANMELDUNG_LEIKA_KEY_URN = "urn:de:fim:leika:leistung:99050012104000";
 
@@ -92,6 +95,33 @@ async function submitGewerbeanmeldung(
 
 async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeResponseItem> {
   try {
+    const address = data.unternehmensDaten.adresseAbweichend ?? data.persönlicheDaten.adresse;
+
+    const { strasse, hausnummer, hausnummerBis } = splitStrasseHausnummer(
+      address.strasseUndHausnummer,
+    );
+
+    const finanzamtIds = getFinanzamtId({
+      postleitzahl: address.postleitzahl,
+      ort: address.ort,
+      strassenName: strasse,
+      hausnummerVon: hausnummer,
+      hausnummerBis: hausnummerBis,
+    });
+
+    if (finanzamtIds.length === 0) {
+      return {
+        success: false,
+        errorType: ErrorTypeSchema.enum.invalid_data,
+        info: "No Finanzamt found for address",
+      };
+    }
+    const finanzamtId = finanzamtIds[0]!;
+
+    // ***** WARNING, DANGEROUS *****
+    // Missing piece: Only on prod(!) set Finanzamt-ID in data for fse creation
+    // ***** WARNING, DANGEROUS *****
+
     const fse = createElsterFsEEUnXml(transformToEUnFsE(data));
 
     const validation = validateFsE(fse);
@@ -102,6 +132,18 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
         info: validation.errors,
       };
     }
+
+    const finanzamtDetails = getFinanzamtDetailsById(finanzamtId);
+    const strasseUndHausnummer = `${finanzamtDetails?.hausanschrift?.strasse} ${finanzamtDetails?.hausanschrift?.hausnummer}`;
+    const officeDetails = finanzamtDetails
+      ? {
+          name: finanzamtDetails.name, //
+          strasseUndHausnummer,
+          postleitzahl: finanzamtDetails?.hausanschrift?.postleitzahl,
+          ort: finanzamtDetails?.hausanschrift?.ort,
+          telefon: finanzamtDetails?.telefonnummer,
+        }
+      : undefined;
 
     const result = sendFsE(fse, true);
     if (!result.success) {
@@ -116,13 +158,7 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
       submissionId: "implementation missing",
       info: result.info,
       pdfReceiptBase64: result.pdf?.toString("base64"),
-      officeDetails: {
-        name: "Finanzamt Dummy-Data",
-        strasseUndHausnummer: "Dummystraße 1",
-        postleitzahl: "00000",
-        ort: "Dummy",
-        telefon: "0000-000 000",
-      },
+      officeDetails,
     };
   } catch (error) {
     console.error("FsE submission failed", error);
