@@ -30,7 +30,7 @@ describe("AkdbClient contract", () => {
   });
 
   describe("requesting the 'laufzettel'", async () => {
-    it.only("fetches transport report", async () => {
+    it.only("fetches transport report with sample data we received from AKDB", async () => {
       const { access_token } = await client.fetchToken();
 
       const res = await fetch(
@@ -44,13 +44,55 @@ describe("AkdbClient contract", () => {
           body: JSON.stringify({
             messageID: "vps_by_17817854007568dc3a6b8-ff6b-4d63-b7f9-67e439f52ef1",
             serviceID: "http://www.osci.de/xmeld2605/xmeld2605Statistik.wsdl",
-            authorityKey: "dbs:090030010000",
+            authorityKey: "dbs:090030010000", // their sample
+            /*
+               body: {"identifiers":{"messageID":"vps_by_17817854007568dc3a6b8-ff6b-4d63-b7f9-67e439f52ef1","serviceID":"http://www.osci.de/xmeld2605/xmeld2605Statistik.wsdl","authorityKey":"dbs:090030010000"},"tracks":[{"id":"vps_by_17817854007568dc3a6b8-ff6b-4d63-b7f9-67e439f52ef1","subject":"XMeld 26.05 Statistik","recentModification":"2026-06-18T14:23:42+02:00","events":[{"type":"creation","timestamp":"2026-06-18T14:23:20+02:00"},{"type":"forwarding","timestamp":"2026-06-18T14:23:40+02:00"},{"type":"reception","timestamp":"2026-06-18T14:23:42+02:00"}],"verifications":[{"timestamp":"2026-06-18T14:23:20+02:00","x509SubjectName":"2.5.4.5=#130131,CN=GRP: GRP: OSCI-Dateneingang XMeld 2025 -RTS BayLfStat,1.2.840.113549.1.9.1=#161a6b6f737461784073746174697374696b2e62617965726e2e6465,L=Fürth,OU=DOI-OSCI,O=Oeffentliche Verwaltung,C=DE","x509IssuerName":"CN=DOI CA 13,OU=DOI,O=PKI-1-Verwaltung,C=DE","x509SerialNumber":"1437645669049102766","certType":"advanced","mathResult":"ok","offlineResult":"valid","onlineChecked":true,"onlineResult":true},{"timestamp":"2026-06-18T14:23:20+02:00","x509SubjectName":"2.5.4.5=#130136,CN=GRP: AKDB,1.2.840.113549.1.9.1=#1616636c656172696e677374656c6c6540616b64622e6465,OU=DOI-OSCI,O=Oeffentliche Verwaltung,C=DE","x509IssuerName":"CN=DOI CA 11,OU=DOI,O=PKI-1-Verwaltung,C=DE","x509SerialNumber":"846646542233856","certType":"advanced","mathResult":"ok","offlineResult":"valid","onlineChecked":true,"onlineResult":true}]}]}
+            */
+
+            //  authorityKey: "xga:090010030000", // the "autor" in our XGewerbe (<bn-beh:kennung>)
+            /*
+               body: {"type":"uri:akdb.net:okkomm:rest:not_found","title":"not_found","status":404,"detail":"Kein DVDV-Eintrag zum angegebenen Dienst für diese Kennung gefunden!","instance":"/okkomm/restapi/v3.0/messages/transport-report/osci"}
+             */
+
+            //  authorityKey: "MELDID:12052000", // the "leser" in our XGewerbe (<bn-beh:kennung>)
+            /*
+               body: {"type":"uri:akdb.net:okkomm:rest:not_found","title":"not_found","status":404,"detail":"Kein DVDV-Eintrag zum angegebenen Dienst für diese Kennung gefunden!","instance":"/okkomm/restapi/v3.0/messages/transport-report/osci"}
+            */
           }),
         },
       );
 
       console.log("status:", res.status);
       console.log("body:", await res.text());
+    });
+
+    it("fetches transport report after sending (our data, not a sample)", async () => {
+      const { access_token } = await client.fetchToken();
+
+      const sendRes = await client.sendXoevMessage(okXml, access_token);
+
+      console.log("sendRes", JSON.stringify(sendRes));
+
+      // const bnBehKennung = "xga:090010030000";
+
+      // const res = await fetch(
+      //   "https://soaptest.akdb.de/okkomm/restapi/v3.0/messages/transport-report/osci",
+      //   {
+      //     method: "POST",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       Authorization: `Bearer ${access_token}`,
+      //     },
+      //     body: JSON.stringify({
+      //       messageID: "vps_by_17817854007568dc3a6b8-ff6b-4d63-b7f9-67e439f52ef1",
+      //       serviceID: "http://www.osci.de/xmeld2605/xmeld2605Statistik.wsdl",
+      //       authorityKey: bnBehKennung,
+      //     }),
+      //   },
+      // );
+
+      // console.log("status:", res.status);
+      // console.log("body:", await res.text());
     });
   });
 });
