@@ -18,7 +18,7 @@ export default [
       "@typescript-eslint/naming-convention": [
         "error",
         {
-          selector: "variable",
+          selector: ["variable", "property"],
           types: ["boolean"],
           format: null,
           prefix: ["is", "has", "can", "should"],
