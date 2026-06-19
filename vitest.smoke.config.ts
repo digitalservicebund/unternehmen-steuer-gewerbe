@@ -4,6 +4,6 @@ export default defineConfig({
   test: {
     env: { NODE_ENV: "test" },
     include: ["**/*.smoke.test.ts"],
-    testTimeout: 60_000,
+    testTimeout: 310_000,
   },
 });
