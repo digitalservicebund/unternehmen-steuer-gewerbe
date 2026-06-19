@@ -2,8 +2,9 @@ import tsLint from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 
 export default [
+  { ignores: ["coverage/", "dist/"] },
   {
-    files: ["**/*.ts", "**/*.tsx"],
+    files: ["src/**/*.ts", "src/**/*.tsx"],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -19,7 +20,7 @@ export default [
         {
           selector: "variable",
           types: ["boolean"],
-          format: ["camelCase"],
+          format: null,
           prefix: ["is", "has", "can", "should"],
         },
       ],
