@@ -7,6 +7,7 @@ export default defineConfig({
   // Keep native addons and WASM packages out of the bundle; Node resolves them from node_modules at runtime
   external: [
     "koffi",
+    "pdfkit",
     "saxonjs-he",
     "xslt3-he",
     "xmllint-wasm",
