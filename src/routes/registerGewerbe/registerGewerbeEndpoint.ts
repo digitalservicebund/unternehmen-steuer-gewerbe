@@ -17,14 +17,10 @@ import {
 import { registerGewerbeRoute } from "./registerGewerbeRoute";
 import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTransformer";
 import { getGewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
-import { readFileSync } from "node:fs";
+import { generatePdfReceipt } from "./registerGewerbePdfGenerator";
 import { splitStrasseHausnummer } from "../../helpers/formFieldTransformations";
 
 const GEWERBEANMELDUNG_LEIKA_KEY_URN = "urn:de:fim:leika:leistung:99050012104000";
-
-const gewerbeanmeldungPdfReceiptBase64 = readFileSync(
-  new URL("./gewerbeanmeldungPdfReceipt.dummy.pdf", import.meta.url),
-).toString("base64");
 
 async function submitGewerbeanmeldung(
   data: RegisterGewerbeRequest,
@@ -55,6 +51,8 @@ async function submitGewerbeanmeldung(
     };
   }
 
+  const gewerbeanmeldungPdfReceipt = await generatePdfReceipt(gewerbeanmeldungXml);
+
   // Before using FIT-Connect -> Check in context if FIT-Connect or OSCI is supported by
   // the Communes as soon as we have Pilot-Communes
   try {
@@ -76,7 +74,7 @@ async function submitGewerbeanmeldung(
     return {
       success: true,
       submissionId: response.submissionId,
-      pdfReceiptBase64: gewerbeanmeldungPdfReceiptBase64,
+      pdfReceiptBase64: gewerbeanmeldungPdfReceipt,
       officeDetails: {
         name: "Gewerbeamt Dummy-Data",
         strasseUndHausnummer: "Dummystraße 2",

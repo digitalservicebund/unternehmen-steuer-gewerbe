@@ -52,10 +52,20 @@ describe("Route /api/v1/register-gewerbe", () => {
         );
       });
 
-      it("returns Gewerbeanmeldung PDF receipt", async () => {
+      it("returns Gewerbeanmeldung PDF receipt containing user's last name", async () => {
         expect(json.gewerbeanmeldung.pdfReceiptBase64).toBeTruthy();
         // base64 prefix of '%PDF-'
         expect(json.gewerbeanmeldung.pdfReceiptBase64).toMatch(/^JVBERi0/);
+        const pdfBytes = new Uint8Array(
+          Buffer.from(json.gewerbeanmeldung.pdfReceiptBase64 ?? "", "base64"),
+        );
+        // suppress irrelevant warnings of PDF -> TXT
+        const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+        const { text } = await extractText(pdfBytes, { mergePages: true });
+        warnSpy.mockRestore();
+        expect(text).toContain(
+          registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten.nachname,
+        );
       });
     });
 
