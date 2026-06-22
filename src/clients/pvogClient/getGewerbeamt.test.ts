@@ -23,7 +23,7 @@ describe("getGewerbeamt", () => {
         {
           title: "Gewerberegisteranzeige",
           description:
-            "<p>\n\tZur Anmeldung bedarf es lediglich einer kurzen Registrierung als Benutzer des E-Bürgerdienstes Gewerbeanzeige. Mittels des daraufhin an Ihre angegeben E-Mail-Adresse gesandten Aktivierungscodes legitimieren Sie sich bitte als tatsächlich eingetragener Nutzer. Bei juristischen Personen schicken Sie uns bitte noch Ihren Handelsregisterauszug zu.</p>\n",
+            "<p>\n\tZur Anmeldung bedarf es lediglich einer kurzen Registrierung als Benutzer des E-Bürgerdienstes Gewerbeanzeige. Mittels des daraufhin an Ihre angegeben E-Mail-Adresse gesandten Aktivierungscodes legitimieren Sie sich bitte als tatsächlich eingetragener Nutzer. Bei juristischen Personen schicken Sie uns bitte noch Ihren Handelsregisterauszug zu.</p>",
           uri: "https://aipkogema-ebd.dvvbw.de/ebd-gwr/index.jsp?ags=08421000",
         },
         {

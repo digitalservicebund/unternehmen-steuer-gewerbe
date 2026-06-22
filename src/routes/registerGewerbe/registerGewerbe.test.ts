@@ -111,14 +111,24 @@ describe("Route /api/v1/register-gewerbe", () => {
         expect(json.fseÜbermittlung.officeDetails!.telefon).toEqual("0355 4991-4100");
       });
 
-      it("returns the responsible Gewerbeamt details looked up via PVOG (not dummy data)", () => {
-        // The exact field mapping is pinned in getGewerbeamt.test.ts. Here we only verify that the
-        // endpoint wires real PVOG details through for the request's postal code (Coburg, 96450).
-        expect(json.gewerbeanmeldung.officeDetails!.name).toBeTruthy();
-        expect(json.gewerbeanmeldung.officeDetails!.name).not.toEqual("Gewerbeamt Dummy-Data");
-        expect(json.gewerbeanmeldung.officeDetails!.strasseUndHausnummer).toBeTruthy();
-        expect(json.gewerbeanmeldung.officeDetails!.postleitzahl).toBeTruthy();
-        expect(json.gewerbeanmeldung.officeDetails!.ort).toBeTruthy();
+      it("returns the responsible Gewerbeamt details for Fulda", async () => {
+        const dataWithFulda = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+        dataWithFulda.unternehmensDaten.adresseAbweichend = {
+          strasseUndHausnummer: "Schlossstraße 2",
+          postleitzahl: "36037",
+          ort: "Fulda",
+        };
+
+        const response = await postRegisterGewerbe(dataWithFulda);
+        const json = await response.json();
+
+        expect(json.gewerbeanmeldung.officeDetails!.name).toEqual("Stadt Fulda");
+        expect(json.gewerbeanmeldung.officeDetails!.strasseUndHausnummer).toEqual(
+          "Schlossstraße 1",
+        );
+        expect(json.gewerbeanmeldung.officeDetails!.postleitzahl).toEqual("36037");
+        expect(json.gewerbeanmeldung.officeDetails!.ort).toEqual("Fulda");
+        expect(json.gewerbeanmeldung.officeDetails!.telefon).toEqual("0661 102-0");
       });
     });
 

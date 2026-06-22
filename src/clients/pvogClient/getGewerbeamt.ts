@@ -89,10 +89,10 @@ function toAdresse(addresses: OrganisationUnitAddress[]): GewerbeamtAdresse | un
   }
 
   return {
-    strasse: address.street,
-    hausnummer: address.houseNumber,
-    postleitzahl: address.zip,
-    ort: address.city,
+    strasse: address.street?.trim(),
+    hausnummer: address.houseNumber?.trim(),
+    postleitzahl: address.zip?.trim(),
+    ort: address.city?.trim(),
   };
 }
 
@@ -191,16 +191,19 @@ export async function getGewerbeamt(ars: string): Promise<Gewerbeamt> {
   );
 
   return {
-    name: detail.title,
+    name: detail.title.trim(),
     adresse: toAdresse(detail.location.addresses),
-    telefon: findCommunicationValue(detail.location.communications, COMMUNICATION_CODE_TELEFON),
-    email: findCommunicationValue(detail.location.communications, COMMUNICATION_CODE_EMAIL),
+    telefon: findCommunicationValue(
+      detail.location.communications,
+      COMMUNICATION_CODE_TELEFON,
+    )?.trim(),
+    email: findCommunicationValue(detail.location.communications, COMMUNICATION_CODE_EMAIL)?.trim(),
     // map explicitly so additional response fields (id, validity periods, ...) don't leak through
     onlineServiceLinks: serviceDescriptionDetail.onlineServiceLinks.map(
       ({ title, description, uri }) => ({
-        title,
-        description,
-        uri,
+        title: title?.trim(),
+        description: description?.trim(),
+        uri: uri.trim(),
       }),
     ),
   };
