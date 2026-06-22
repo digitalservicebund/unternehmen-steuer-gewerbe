@@ -6,7 +6,7 @@ import { registerGewerbeSampleRequestAllFieldsFilled } from "../testHelpers";
 const testRoutingInfo = {
   ags: "03046001",
   ars: "030460014004",
-  gewerbeamt: { name: "Gewerbeamt Cottbus", onlineServiceLinks: [] },
+  gewerbeamt: { name: "Stadt Fulda", onlineServiceLinks: [] },
   fitConnectDestinationInformation: { destinationId: "00000000-0000-0000-0000-000000000002" },
 };
 

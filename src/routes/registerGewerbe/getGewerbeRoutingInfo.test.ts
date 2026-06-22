@@ -3,9 +3,9 @@ import { describe, it, expect, vi } from "vitest";
 const { mockGetAGSandARS, mockGetGewerbeamt, mockGetRoutes } = vi.hoisted(() => ({
   mockGetAGSandARS: vi.fn().mockResolvedValue({ ags: "03046001", ars: "030460014004" }),
   mockGetGewerbeamt: vi.fn().mockResolvedValue({
-    name: "Gewerbeamt Cottbus",
-    adresse: { strasse: "Marktplatz", hausnummer: "1", postleitzahl: "03046", ort: "Cottbus" },
-    telefon: "0355 612-0",
+    name: "Stadt Fulda",
+    adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
+    telefon: "0661 102-0",
     onlineServiceLinks: [],
   }),
   mockGetRoutes: vi.fn(),
@@ -61,9 +61,9 @@ describe("getGewerbeRoutingInfo", () => {
 
       expect(mockGetGewerbeamt).toHaveBeenCalledWith("030460014004");
       expect(result.gewerbeamt).toEqual({
-        name: "Gewerbeamt Cottbus",
-        adresse: { strasse: "Marktplatz", hausnummer: "1", postleitzahl: "03046", ort: "Cottbus" },
-        telefon: "0355 612-0",
+        name: "Stadt Fulda",
+        adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
+        telefon: "0661 102-0",
         onlineServiceLinks: [],
       });
     });
