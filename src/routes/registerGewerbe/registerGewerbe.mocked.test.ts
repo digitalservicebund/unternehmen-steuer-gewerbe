@@ -199,6 +199,25 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(response.status).toEqual(HttpStatusCode.Ok);
       expect(json.gewerbeanmeldung.officeDetails).toEqual({ name: "Gewerbeamt Minimal" });
     });
+
+    it("returns only the street when the Gewerbeamt address has no house number", async () => {
+      mockGetGewerbeRoutingInfo.mockResolvedValueOnce({
+        ags: "03046001",
+        ars: "084210000000",
+        gewerbeamt: {
+          name: "Stadt Fulda",
+          adresse: { strasse: "Schlossstraße", postleitzahl: "36037", ort: "Fulda" },
+          onlineServiceLinks: [],
+        },
+        fitConnectDestinationInformation: { destinationId: "mock-destination-id" },
+      });
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+      expect(json.gewerbeanmeldung.officeDetails!.strasseUndHausnummer).toEqual("Schlossstraße");
+    });
   });
 
   describe("Autorenkennung in the submitted xGewerbeanmeldung", () => {

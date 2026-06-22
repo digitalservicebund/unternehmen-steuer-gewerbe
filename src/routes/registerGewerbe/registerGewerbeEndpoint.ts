@@ -18,7 +18,10 @@ import { registerGewerbeRoute } from "./registerGewerbeRoute";
 import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTransformer";
 import { getGewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
 import { generatePdfReceipt } from "./registerGewerbePdfGenerator";
-import { splitStrasseHausnummer } from "../../helpers/formFieldTransformations";
+import {
+  createStrasseUndHausnummer,
+  splitStrasseHausnummer,
+} from "../../helpers/formFieldTransformations";
 
 const GEWERBEANMELDUNG_LEIKA_KEY_URN = "urn:de:fim:leika:leistung:99050012104000";
 
@@ -56,9 +59,10 @@ async function submitGewerbeanmeldung(
   const gewerbeamtAdresse = routingInfo.gewerbeamt.adresse;
   const officeDetails = {
     name: routingInfo.gewerbeamt.name,
-    strasseUndHausnummer: gewerbeamtAdresse
-      ? `${gewerbeamtAdresse.strasse} ${gewerbeamtAdresse.hausnummer}`
-      : undefined,
+    strasseUndHausnummer: createStrasseUndHausnummer(
+      gewerbeamtAdresse?.strasse,
+      gewerbeamtAdresse?.hausnummer,
+    ),
     postleitzahl: gewerbeamtAdresse?.postleitzahl,
     ort: gewerbeamtAdresse?.ort,
     telefon: routingInfo.gewerbeamt.telefon,
@@ -138,14 +142,17 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
     }
 
     const finanzamtDetails = getFinanzamtDetailsById(finanzamtId);
-    const strasseUndHausnummer = `${finanzamtDetails?.hausanschrift?.strasse} ${finanzamtDetails?.hausanschrift?.hausnummer}`;
+    const hausanschrift = finanzamtDetails?.hausanschrift;
     const officeDetails = finanzamtDetails
       ? {
-          name: finanzamtDetails.name, //
-          strasseUndHausnummer,
-          postleitzahl: finanzamtDetails?.hausanschrift?.postleitzahl,
-          ort: finanzamtDetails?.hausanschrift?.ort,
-          telefon: finanzamtDetails?.telefonnummer,
+          name: finanzamtDetails.name,
+          strasseUndHausnummer: createStrasseUndHausnummer(
+            hausanschrift?.strasse,
+            hausanschrift?.hausnummer,
+          ),
+          postleitzahl: hausanschrift?.postleitzahl,
+          ort: hausanschrift?.ort,
+          telefon: finanzamtDetails.telefonnummer,
         }
       : undefined;
 
