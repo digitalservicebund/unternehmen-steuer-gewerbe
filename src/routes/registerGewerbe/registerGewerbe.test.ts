@@ -111,12 +111,14 @@ describe("Route /api/v1/register-gewerbe", () => {
         expect(json.fseÜbermittlung.officeDetails!.telefon).toEqual("0355 4991-4100");
       });
 
-      it("returns dummy Gewerbeamt details (name, street, zip, city, telephone number)", () => {
-        expect(json.gewerbeanmeldung.officeDetails!.name).toEqual("Gewerbeamt Dummy-Data");
-        expect(json.gewerbeanmeldung.officeDetails!.strasseUndHausnummer).toEqual("Dummystraße 2");
-        expect(json.gewerbeanmeldung.officeDetails!.postleitzahl).toEqual("22222");
-        expect(json.gewerbeanmeldung.officeDetails!.ort).toEqual("Dummy2");
-        expect(json.gewerbeanmeldung.officeDetails!.telefon).toEqual("2222-222 222");
+      it("returns the responsible Gewerbeamt details looked up via PVOG (not dummy data)", () => {
+        // The exact field mapping is pinned in getGewerbeamt.test.ts. Here we only verify that the
+        // endpoint wires real PVOG details through for the request's postal code (Coburg, 96450).
+        expect(json.gewerbeanmeldung.officeDetails!.name).toBeTruthy();
+        expect(json.gewerbeanmeldung.officeDetails!.name).not.toEqual("Gewerbeamt Dummy-Data");
+        expect(json.gewerbeanmeldung.officeDetails!.strasseUndHausnummer).toBeTruthy();
+        expect(json.gewerbeanmeldung.officeDetails!.postleitzahl).toBeTruthy();
+        expect(json.gewerbeanmeldung.officeDetails!.ort).toBeTruthy();
       });
     });
 

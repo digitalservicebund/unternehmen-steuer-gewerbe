@@ -1,12 +1,19 @@
 import { describe, it, expect, vi } from "vitest";
 
-const { mockGetAGSandARS, mockGetRoutes } = vi.hoisted(() => ({
+const { mockGetAGSandARS, mockGetGewerbeamt, mockGetRoutes } = vi.hoisted(() => ({
   mockGetAGSandARS: vi.fn().mockResolvedValue({ ags: "03046001", ars: "030460014004" }),
+  mockGetGewerbeamt: vi.fn().mockResolvedValue({
+    name: "Gewerbeamt Cottbus",
+    adresse: { strasse: "Marktplatz", hausnummer: "1", postleitzahl: "03046", ort: "Cottbus" },
+    telefon: "0355 612-0",
+    onlineServiceLinks: [],
+  }),
   mockGetRoutes: vi.fn(),
 }));
 
 vi.mock("../../clients/pvogClient", () => ({
   getAGSandARS: mockGetAGSandARS,
+  getGewerbeamt: mockGetGewerbeamt,
 }));
 
 vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
@@ -45,6 +52,28 @@ describe("getGewerbeRoutingInfo", () => {
       });
 
       expect(mockGetAGSandARS).toHaveBeenCalledWith("10969");
+    });
+  });
+
+  describe("Gewerbeamt lookup", () => {
+    it("looks up the Gewerbeamt by the resolved ARS and returns it", async () => {
+      const result = await getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled);
+
+      expect(mockGetGewerbeamt).toHaveBeenCalledWith("030460014004");
+      expect(result.gewerbeamt).toEqual({
+        name: "Gewerbeamt Cottbus",
+        adresse: { strasse: "Marktplatz", hausnummer: "1", postleitzahl: "03046", ort: "Cottbus" },
+        telefon: "0355 612-0",
+        onlineServiceLinks: [],
+      });
+    });
+
+    it("propagates errors from the Gewerbeamt lookup", async () => {
+      mockGetGewerbeamt.mockRejectedValueOnce(new Error("PVOG unavailable"));
+
+      await expect(
+        getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled),
+      ).rejects.toThrow("PVOG unavailable");
     });
   });
 

@@ -24,7 +24,14 @@ const { mockSubmitData, mockGetGewerbeRoutingInfo } = vi.hoisted(() => ({
   mockSubmitData: vi.fn().mockResolvedValue({ submissionId: "mock-submission-id" }),
   mockGetGewerbeRoutingInfo: vi.fn().mockResolvedValue({
     ags: "03046001",
-    fitConnect: { destinationId: "mock-destination-id" },
+    ars: "084210000000",
+    gewerbeamt: {
+      name: "Stadt Fulda",
+      adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
+      telefon: "0661 102-0",
+      onlineServiceLinks: [],
+    },
+    fitConnectDestinationInformation: { destinationId: "mock-destination-id" },
   }),
 }));
 
@@ -160,6 +167,37 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(response.status).toEqual(HttpStatusCode.InternalServerError);
       expect(json.gewerbeanmeldung.success).toBe(false);
       expect(json.fseÜbermittlung.success).toBe(false);
+    });
+  });
+
+  describe("Gewerbeamt officeDetails", () => {
+    it("returns the responsible Gewerbeamt address, joining strasse and hausnummer", async () => {
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+      expect(json.gewerbeanmeldung.officeDetails).toEqual({
+        name: "Stadt Fulda",
+        strasseUndHausnummer: "Schlossstraße 1",
+        postleitzahl: "36037",
+        ort: "Fulda",
+        telefon: "0661 102-0",
+      });
+    });
+
+    it("omits optional fields when the Gewerbeamt has no address or phone number", async () => {
+      mockGetGewerbeRoutingInfo.mockResolvedValueOnce({
+        ags: "03046001",
+        ars: "084210000000",
+        gewerbeamt: { name: "Gewerbeamt Minimal", onlineServiceLinks: [] },
+        fitConnectDestinationInformation: { destinationId: "mock-destination-id" },
+      });
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+      expect(json.gewerbeanmeldung.officeDetails).toEqual({ name: "Gewerbeamt Minimal" });
     });
   });
 

@@ -53,6 +53,16 @@ async function submitGewerbeanmeldung(
 
   const gewerbeanmeldungPdfReceipt = await generatePdfReceipt(gewerbeanmeldungXml);
 
+  const gewerbeamtAdresse = routingInfo.gewerbeamt.adresse;
+  const officeDetails = {
+    name: routingInfo.gewerbeamt.name,
+    strasseUndHausnummer: gewerbeamtAdresse
+      ? `${gewerbeamtAdresse.strasse} ${gewerbeamtAdresse.hausnummer}`
+      : undefined,
+    postleitzahl: gewerbeamtAdresse?.postleitzahl,
+    ort: gewerbeamtAdresse?.ort,
+    telefon: routingInfo.gewerbeamt.telefon,
+  };
   // Before using FIT-Connect -> Check in context if FIT-Connect or OSCI is supported by
   // the Communes as soon as we have Pilot-Communes
   try {
@@ -75,13 +85,7 @@ async function submitGewerbeanmeldung(
       success: true,
       submissionId: response.submissionId,
       pdfReceiptBase64: gewerbeanmeldungPdfReceipt,
-      officeDetails: {
-        name: "Gewerbeamt Dummy-Data",
-        strasseUndHausnummer: "Dummystraße 2",
-        postleitzahl: "22222",
-        ort: "Dummy2",
-        telefon: "2222-222 222",
-      },
+      officeDetails,
     };
   } catch (error) {
     console.error("FIT-Connect submission failed", error);
