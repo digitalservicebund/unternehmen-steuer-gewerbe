@@ -31,6 +31,11 @@ describe("getGewerbeamt", () => {
           title: "Terminvereinbarung bei den Bürgerdiensten in der Olgastraße 66, 89073 Ulm",
           uri: "http://www.ulm.de/mb",
         },
+        {
+          description: undefined,
+          title: "Gewerbeanmeldung",
+          uri: "https://gewerbe.komm.one/intelliform/forms/pool/Behoerde/Gewerbeverfahren/Gewerbeanmeldung/index?caller=084210000000",
+        },
       ],
     });
   });
