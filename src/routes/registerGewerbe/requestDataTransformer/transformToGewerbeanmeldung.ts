@@ -9,6 +9,24 @@ import {
   STAATSANGEHOERIGKEIT,
   getGemeindeschluesselErgaenzung,
 } from "./xGewerbeordnungCodes";
+import { Anschrift } from "../../../xmlBuilders/xGewerbeordnung/buildingBlocks/anschrift";
+
+function getBetriebsAnschriftWithFallbackToPersönlicheDaten(
+  adresseAbweichend: RegisterGewerbeRequest["unternehmensDaten"]["adresseAbweichend"],
+  privateAdresse: RegisterGewerbeRequest["persönlicheDaten"]["adresse"],
+): Anschrift {
+  const betriebsAdresse = adresseAbweichend ?? privateAdresse;
+  const { strasse, hausnummer, hausnummerBis } = splitStrasseHausnummer(
+    betriebsAdresse.strasseUndHausnummer,
+  );
+  return {
+    strasse,
+    hausnummerVon: hausnummer,
+    hausnummerBis,
+    postleitzahl: betriebsAdresse.postleitzahl,
+    ort: betriebsAdresse.ort,
+  };
+}
 
 // Transforms a RegisterGewerbeRequest into a complete Gewerbeanmeldung structure.
 // NOTE: several values are hardcoded placeholders and will be generated / fetched from other sources later.
@@ -16,29 +34,28 @@ export function transformToGewerbeanmeldung(
   data: RegisterGewerbeRequest,
   routingInfo: GewerbeRoutingInfo,
 ): CreateGewerbeanmeldungXmlData {
-  const adresseAbweichend = data.unternehmensDaten.adresseAbweichend;
-
-  const betriebsStrasseHausnummer = splitStrasseHausnummer(
-    adresseAbweichend?.strasseUndHausnummer ?? data.persönlicheDaten.adresse.strasseUndHausnummer,
-  );
   const personStrasseHausnummer = splitStrasseHausnummer(
     data.persönlicheDaten.adresse.strasseUndHausnummer,
   );
 
-  const betriebsPlz = adresseAbweichend?.postleitzahl ?? data.persönlicheDaten.adresse.postleitzahl;
+  const betriebsAnschrift = getBetriebsAnschriftWithFallbackToPersönlicheDaten(
+    data.unternehmensDaten.adresseAbweichend,
+    data.persönlicheDaten.adresse,
+  );
 
   const gemeindeSchluessel = routingInfo.ags;
-  const autorKennung = `MELDID:${gemeindeSchluessel}`;
+  const gewerbeamtKennung = `MELDID:${gemeindeSchluessel}`;
+  const gewerbeamtName = routingInfo.gewerbeamt.name || "Gewerbeamt";
   const personId = randomUUID();
 
   return {
     nachrichtenkopf: {
       nachrichtenUUID: randomUUID(),
       erstellungszeitpunkt: new Date().toISOString(),
-      leser: { kennung: "xga:000000000001", name: "Gewerbeamt Muster" },
+      leser: { kennung: gewerbeamtKennung, name: gewerbeamtName },
       autor: { kennung: "ds:schnellergruenden", name: "Schneller Gründen" },
     },
-    autor: { kennung: autorKennung, name: "Behörde" },
+    autor: { kennung: gewerbeamtKennung, name: gewerbeamtName },
     anzeigerenderId: personId,
     handelndePersonId: personId,
     handelndePersonVertrauensniveauCode: VERTRAUENSNIVEAU[data.persönlicheDaten.vertrauensniveau],
@@ -46,7 +63,9 @@ export function transformToGewerbeanmeldung(
     ereigniszeitpunkt: new Date().toISOString(),
     istStorno: false,
     gemeindeSchluessel,
-    gemeindeschluesselErgaenzung: getGemeindeschluesselErgaenzung(gemeindeSchluessel, betriebsPlz),
+    gemeindeschluesselErgaenzung: betriebsAnschrift.postleitzahl
+      ? getGemeindeschluesselErgaenzung(gemeindeSchluessel, betriebsAnschrift.postleitzahl)
+      : undefined,
     uuid: randomUUID(),
     gueltigAb: data.unternehmensDaten.tätigkeitsbeginn,
     datumMeldung: new Date().toISOString().split("T")[0]!,
@@ -61,13 +80,7 @@ export function transformToGewerbeanmeldung(
       eingetragenerName: undefined,
       betriebsstaette: {
         artBetriebsstaette: "01",
-        anschrift: {
-          strasse: betriebsStrasseHausnummer.strasse,
-          hausnummerVon: betriebsStrasseHausnummer.hausnummer,
-          hausnummerBis: betriebsStrasseHausnummer.hausnummerBis,
-          postleitzahl: betriebsPlz,
-          ort: adresseAbweichend?.ort ?? data.persönlicheDaten.adresse.ort,
-        },
+        anschrift: betriebsAnschrift,
       },
       taetigkeitenGesamt: {
         schwerpunkt: {

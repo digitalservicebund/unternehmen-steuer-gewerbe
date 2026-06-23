@@ -111,12 +111,24 @@ describe("Route /api/v1/register-gewerbe", () => {
         expect(json.fseÜbermittlung.officeDetails!.telefon).toEqual("0355 4991-4100");
       });
 
-      it("returns dummy Gewerbeamt details (name, street, zip, city, telephone number)", () => {
-        expect(json.gewerbeanmeldung.officeDetails!.name).toEqual("Gewerbeamt Dummy-Data");
-        expect(json.gewerbeanmeldung.officeDetails!.strasseUndHausnummer).toEqual("Dummystraße 2");
-        expect(json.gewerbeanmeldung.officeDetails!.postleitzahl).toEqual("22222");
-        expect(json.gewerbeanmeldung.officeDetails!.ort).toEqual("Dummy2");
-        expect(json.gewerbeanmeldung.officeDetails!.telefon).toEqual("2222-222 222");
+      it("returns the appropriate Gewerbeamt details for Fulda", async () => {
+        const dataWithFulda = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+        dataWithFulda.unternehmensDaten.adresseAbweichend = {
+          strasseUndHausnummer: "Schlossstraße 2",
+          postleitzahl: "36037",
+          ort: "Fulda",
+        };
+
+        const response = await postRegisterGewerbe(dataWithFulda);
+        const json = await response.json();
+
+        expect(json.gewerbeanmeldung.officeDetails!.name).toEqual("Stadt Fulda");
+        expect(json.gewerbeanmeldung.officeDetails!.strasseUndHausnummer).toEqual(
+          "Schlossstraße 1",
+        );
+        expect(json.gewerbeanmeldung.officeDetails!.postleitzahl).toEqual("36037");
+        expect(json.gewerbeanmeldung.officeDetails!.ort).toEqual("Fulda");
+        expect(json.gewerbeanmeldung.officeDetails!.telefon).toEqual("0661 102-0");
       });
     });
 

@@ -1,4 +1,4 @@
-import { getAGSandARS } from "../../clients/pvogClient";
+import { getAGSandARS, getGewerbeamt, type Gewerbeamt } from "../../clients/pvogClient";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
 import { type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 
@@ -11,6 +11,7 @@ interface FitConnectDestinationInformation {
 export interface GewerbeRoutingInfo {
   ags: string;
   ars: string;
+  gewerbeamt: Gewerbeamt;
   /** FIT-Connect destination info. null if FIT-Connect is not supported */
   fitConnectDestinationInformation: FitConnectDestinationInformation | null;
 }
@@ -23,6 +24,8 @@ export async function getGewerbeRoutingInfo(
     data.persönlicheDaten.adresse.postleitzahl;
 
   const { ags, ars } = await getAGSandARS(postleitzahl);
+
+  const gewerbeamt = await getGewerbeamt(ars);
 
   let fitConnectDestinationInformation = null;
 
@@ -41,6 +44,7 @@ export async function getGewerbeRoutingInfo(
   return {
     ags,
     ars,
+    gewerbeamt,
     fitConnectDestinationInformation,
   };
 }

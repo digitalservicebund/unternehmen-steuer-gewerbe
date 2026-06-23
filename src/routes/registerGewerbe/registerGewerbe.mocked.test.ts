@@ -24,7 +24,14 @@ const { mockSubmitData, mockGetGewerbeRoutingInfo } = vi.hoisted(() => ({
   mockSubmitData: vi.fn().mockResolvedValue({ submissionId: "mock-submission-id" }),
   mockGetGewerbeRoutingInfo: vi.fn().mockResolvedValue({
     ags: "03046001",
-    fitConnect: { destinationId: "mock-destination-id" },
+    ars: "084210000000",
+    gewerbeamt: {
+      name: "Stadt Fulda",
+      adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
+      telefon: "0661 102-0",
+      onlineServiceLinks: [],
+    },
+    fitConnectDestinationInformation: { destinationId: "mock-destination-id" },
   }),
 }));
 
@@ -163,6 +170,56 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
     });
   });
 
+  describe("Gewerbeamt officeDetails", () => {
+    it("returns the responsible Gewerbeamt address, joining strasse and hausnummer", async () => {
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+      expect(json.gewerbeanmeldung.officeDetails).toEqual({
+        name: "Stadt Fulda",
+        strasseUndHausnummer: "Schlossstraße 1",
+        postleitzahl: "36037",
+        ort: "Fulda",
+        telefon: "0661 102-0",
+      });
+    });
+
+    it("omits optional fields when the Gewerbeamt has no address or phone number", async () => {
+      mockGetGewerbeRoutingInfo.mockResolvedValueOnce({
+        ags: "03046001",
+        ars: "084210000000",
+        gewerbeamt: { name: "Gewerbeamt Minimal", onlineServiceLinks: [] },
+        fitConnectDestinationInformation: { destinationId: "mock-destination-id" },
+      });
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+      expect(json.gewerbeanmeldung.officeDetails).toEqual({ name: "Gewerbeamt Minimal" });
+    });
+
+    it("returns only the street when the Gewerbeamt address has no house number", async () => {
+      mockGetGewerbeRoutingInfo.mockResolvedValueOnce({
+        ags: "03046001",
+        ars: "084210000000",
+        gewerbeamt: {
+          name: "Stadt Fulda",
+          adresse: { strasse: "Schlossstraße", postleitzahl: "36037", ort: "Fulda" },
+          onlineServiceLinks: [],
+        },
+        fitConnectDestinationInformation: { destinationId: "mock-destination-id" },
+      });
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+      expect(json.gewerbeanmeldung.officeDetails!.strasseUndHausnummer).toEqual("Schlossstraße");
+    });
+  });
+
   describe("Autorenkennung in the submitted xGewerbeanmeldung", () => {
     it("uses 'ds:schnellergruenden' for the nachrichtenkopf autor but NOT for the xga:autor (Behörde)", async () => {
       mockSubmitData.mockClear();
@@ -183,11 +240,22 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
     });
   });
 
-  describe("gemeindeschluesselErgaenzung for Hamburg & Berlin", () => {
+  describe("gemeindeschluesselErgaenzung for Hamburg", () => {
     it("includes the Hamburg Stadtbezirk gemeindeschluesselErgaenzung derived from the betriebsstaette PLZ", async () => {
       mockSubmitData.mockClear();
       mockGetGewerbeRoutingInfo.mockResolvedValueOnce({
         ags: "02000000",
+        ars: "020000000000",
+        gewerbeamt: {
+          name: "Stadt Hamburg",
+          adresse: {
+            strasse: "Rathausmarkt",
+            hausnummer: "1",
+            postleitzahl: "20095",
+            ort: "Hamburg",
+          },
+          onlineServiceLinks: [],
+        },
       });
 
       const response = await postRegisterGewerbe({
@@ -201,6 +269,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
           },
         },
       });
+
       expect(response.status).toEqual(HttpStatusCode.Ok);
 
       const submittedXml = mockSubmitData.mock.calls[0]![0].data;

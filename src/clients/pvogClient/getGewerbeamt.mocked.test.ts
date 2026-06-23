@@ -174,4 +174,41 @@ describe("getGewerbeamt with mocked PVOG responses", () => {
 
     expect(gewerbeamt.adresse).toBeUndefined();
   });
+
+  it("trims padding whitespace from the PVOG response values", async () => {
+    mockPvogApi({
+      serviceDescriptionDetail: {
+        onlineServiceLinks: [{ title: "  Online-Dienst  ", uri: "  https://example.org  " }],
+      },
+      organisationUnitDetail: {
+        title: "  Stadt Fulda  ",
+        location: {
+          addresses: [
+            {
+              street: "Schlossstraße  ",
+              houseNumber: "1   ",
+              zip: " 36037",
+              city: "Fulda ",
+              code: "001",
+            },
+          ],
+          communications: [{ code: "02", value: " 0661 102-0 " }],
+        },
+      },
+    });
+
+    const gewerbeamt = await getGewerbeamt("064120000000");
+
+    expect(gewerbeamt.name).toBe("Stadt Fulda");
+    expect(gewerbeamt.adresse).toEqual({
+      strasse: "Schlossstraße",
+      hausnummer: "1",
+      postleitzahl: "36037",
+      ort: "Fulda",
+    });
+    expect(gewerbeamt.telefon).toBe("0661 102-0");
+    expect(gewerbeamt.onlineServiceLinks).toEqual([
+      { title: "Online-Dienst", description: undefined, uri: "https://example.org" },
+    ]);
+  });
 });

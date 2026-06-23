@@ -24,8 +24,8 @@ const AdresseSchema = z.object({
   postleitzahl: z
     .string()
     .regex(/^\d{5}$/)
-    .openapi({ example: "01069", description: "5-digit German postal code" }),
-  ort: z.string().openapi({ example: "Musterstadt" }),
+    .openapi({ example: "36037", description: "5-digit German postal code" }),
+  ort: z.string().openapi({ example: "Fulda" }),
 });
 
 const PersönlicheDatenSchema = z.object({
@@ -82,8 +82,8 @@ const UnternehmensDatenSchema = z.object({
   adresseAbweichend: AdresseSchema.openapi({
     example: {
       strasseUndHausnummer: "Musterstraße 2",
-      postleitzahl: "01069",
-      ort: "Musterstadt",
+      postleitzahl: "36037",
+      ort: "Fulda",
     },
   }).optional(),
   tätigkeitsbeschreibung: z.string().openapi({ example: "Vertrieb von Vertriebsmustern" }),
@@ -106,8 +106,7 @@ const UnternehmensDatenSchema = z.object({
   }),
   kleinunternehmerRegelung: z.boolean().default(false).openapi({
     example: false,
-    description:
-      "Ob die Kleinunternehmer-Regelung (§ 19 UStG) in Anspruch genommen wird. Wenn nicht gesetzt, wird false angenommen (kein Kleinunternehmer).",
+    description: "Wird die Kleinunternehmer-Regelung (§ 19 UStG) in Anspruch genommen?",
   }),
   umsatzGruendungsjahr: z.number().int().min(0).default(1).openapi({
     example: 25000,
