@@ -18,7 +18,10 @@ import { registerGewerbeRoute } from "./registerGewerbeRoute";
 import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTransformer";
 import { getGewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
 import { generatePdfReceipt } from "./registerGewerbePdfGenerator";
-import { splitStrasseHausnummer } from "../../helpers/formFieldTransformations";
+import {
+  joinStrasseUndHausnummer,
+  splitStrasseHausnummer,
+} from "../../helpers/formFieldTransformations";
 
 const GEWERBEANMELDUNG_LEIKA_KEY_URN = "urn:de:fim:leika:leistung:99050012104000";
 
@@ -53,6 +56,17 @@ async function submitGewerbeanmeldung(
 
   const gewerbeanmeldungPdfReceipt = await generatePdfReceipt(gewerbeanmeldungXml);
 
+  const gewerbeamtAdresse = routingInfo.gewerbeamt.adresse;
+  const gewerbeamtDetails = {
+    name: routingInfo.gewerbeamt.name,
+    strasseUndHausnummer: joinStrasseUndHausnummer(
+      gewerbeamtAdresse?.strasse,
+      gewerbeamtAdresse?.hausnummer,
+    ),
+    postleitzahl: gewerbeamtAdresse?.postleitzahl,
+    ort: gewerbeamtAdresse?.ort,
+    telefon: routingInfo.gewerbeamt.telefon,
+  };
   // Before using FIT-Connect -> Check in context if FIT-Connect or OSCI is supported by
   // the Communes as soon as we have Pilot-Communes
   try {
@@ -75,13 +89,7 @@ async function submitGewerbeanmeldung(
       success: true,
       submissionId: response.submissionId,
       pdfReceiptBase64: gewerbeanmeldungPdfReceipt,
-      officeDetails: {
-        name: "Gewerbeamt Dummy-Data",
-        strasseUndHausnummer: "Dummystraße 2",
-        postleitzahl: "22222",
-        ort: "Dummy2",
-        telefon: "2222-222 222",
-      },
+      officeDetails: gewerbeamtDetails,
     };
   } catch (error) {
     console.error("FIT-Connect submission failed", error);
@@ -134,14 +142,17 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
     }
 
     const finanzamtDetails = getFinanzamtDetailsById(finanzamtId);
-    const strasseUndHausnummer = `${finanzamtDetails?.hausanschrift?.strasse} ${finanzamtDetails?.hausanschrift?.hausnummer}`;
+    const hausanschrift = finanzamtDetails?.hausanschrift;
     const officeDetails = finanzamtDetails
       ? {
-          name: finanzamtDetails.name, //
-          strasseUndHausnummer,
-          postleitzahl: finanzamtDetails?.hausanschrift?.postleitzahl,
-          ort: finanzamtDetails?.hausanschrift?.ort,
-          telefon: finanzamtDetails?.telefonnummer,
+          name: finanzamtDetails.name,
+          strasseUndHausnummer: joinStrasseUndHausnummer(
+            hausanschrift?.strasse,
+            hausanschrift?.hausnummer,
+          ),
+          postleitzahl: hausanschrift?.postleitzahl,
+          ort: hausanschrift?.ort,
+          telefon: finanzamtDetails.telefonnummer,
         }
       : undefined;
 

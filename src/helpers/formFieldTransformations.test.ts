@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  joinStrasseUndHausnummer,
   formatDatumDE,
   splitStrasseHausnummer,
   splitTelefonnummer,
@@ -26,6 +27,17 @@ describe("splitStrasseHausnummer", () => {
     expect(() => splitStrasseHausnummer("Musterstraße")).toThrow(
       "The given address format is not supported",
     );
+  });
+});
+
+describe("joinStrasseUndHausnummer", () => {
+  it.each([
+    ["Musterstraße", "1", "Musterstraße 1"],
+    ["Musterstraße", undefined, "Musterstraße"],
+    [undefined, "1", "1"],
+    [undefined, undefined, undefined],
+  ])("joins the Strasse '%s' and Hausnummer '%s' to '%s'", (strasse, hausnummer, expected) => {
+    expect(joinStrasseUndHausnummer(strasse, hausnummer)).toBe(expected);
   });
 });
 

@@ -19,6 +19,17 @@ export function splitStrasseHausnummer(strasseUndHausnummer: string) {
   };
 }
 
+/** Joins street and house number into "Straße 123", omitting missing parts */
+export function joinStrasseUndHausnummer(
+  strasse?: string,
+  hausnummer?: string,
+): string | undefined {
+  const presentParts = [strasse, hausnummer].filter(
+    (part) => part !== undefined && part.trim() !== "",
+  );
+  return presentParts.length === 0 ? undefined : presentParts.join(" ");
+}
+
 export function splitTelefonnummer(telefonnummer: string) {
   const match = /^(\+[0-9]{1,5})\s([0-9]{1,5})\s([0-9]{1,13})(-([0-9]{1,5}))?$/.exec(telefonnummer);
 

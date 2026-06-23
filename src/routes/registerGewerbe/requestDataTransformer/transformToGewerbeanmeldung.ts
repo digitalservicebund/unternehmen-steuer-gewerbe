@@ -39,17 +39,18 @@ export function transformToGewerbeanmeldung(
   );
 
   const gemeindeSchluessel = routingInfo.ags;
-  const autorKennung = `MELDID:${gemeindeSchluessel}`;
+  const gewerbeamtKennung = `MELDID:${gemeindeSchluessel}`;
+  const gewerbeamtName = routingInfo.gewerbeamt.name || "Gewerbeamt";
   const personId = randomUUID();
 
   return {
     nachrichtenkopf: {
       nachrichtenUUID: randomUUID(),
       erstellungszeitpunkt: new Date().toISOString(),
-      leser: { kennung: "xga:000000000001", name: "Gewerbeamt Muster" },
+      leser: { kennung: gewerbeamtKennung, name: gewerbeamtName },
       autor: { kennung: "ds:schnellergruenden", name: "Schneller Gründen" },
     },
-    autor: { kennung: autorKennung, name: "Behörde" },
+    autor: { kennung: gewerbeamtKennung, name: gewerbeamtName },
     anzeigerenderId: personId,
     handelndePersonId: personId,
     handelndePersonVertrauensniveauCode: VERTRAUENSNIVEAU[data.persönlicheDaten.vertrauensniveau],
