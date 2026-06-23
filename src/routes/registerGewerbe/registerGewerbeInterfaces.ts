@@ -106,8 +106,7 @@ const UnternehmensDatenSchema = z.object({
   }),
   kleinunternehmerRegelung: z.boolean().default(false).openapi({
     example: false,
-    description:
-      "Ob die Kleinunternehmer-Regelung (§ 19 UStG) in Anspruch genommen wird. Wenn nicht gesetzt, wird false angenommen (kein Kleinunternehmer).",
+    description: "Wird die Kleinunternehmer-Regelung (§ 19 UStG) in Anspruch genommen?",
   }),
   umsatzGruendungsjahr: z.number().int().min(0).default(1).openapi({
     example: 25000,
