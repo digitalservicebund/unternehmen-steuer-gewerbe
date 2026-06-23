@@ -24,7 +24,10 @@ export function joinStrasseUndHausnummer(
   strasse?: string,
   hausnummer?: string,
 ): string | undefined {
-  return [strasse, hausnummer].filter(Boolean).join(" ") || undefined;
+  const presentParts = [strasse, hausnummer].filter(
+    (part) => part !== undefined && part.trim() !== "",
+  );
+  return presentParts.length === 0 ? undefined : presentParts.join(" ");
 }
 
 export function splitTelefonnummer(telefonnummer: string) {
