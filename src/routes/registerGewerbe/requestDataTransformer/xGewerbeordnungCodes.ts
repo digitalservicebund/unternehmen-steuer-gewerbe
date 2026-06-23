@@ -458,3 +458,134 @@ export const STAATSANGEHOERIGKEIT_KEYS = Object.keys(STAATSANGEHOERIGKEIT) as [
   Staatsangehoerigkeit,
   ...Staatsangehoerigkeit[],
 ];
+
+// Amtlicher Gemeindeschlüssel (AGS) of Hamburg
+const HAMBURG_GEMEINDESCHLUESSEL = "02000000";
+// Hamburg district (Stadtbezirke) PLZs, grouped by Gemeindeschlüssel-Ergänzung Codes
+// see https://www.xrepository.de/details/urn:xoev-de:xgewerbeordnung:codeliste:gemeindeschluesselergaenzung_1
+const HAMBURG_STADTBEZIRK_PLZ: Record<string, readonly string[]> = {
+  // Hamburg-Mitte
+  "02100000": [
+    "20095",
+    "20097",
+    "20099",
+    "20354",
+    "20355",
+    "20357",
+    "20359",
+    "20457",
+    "20459",
+    "20535",
+    "20537",
+    "20539",
+    "21107",
+    "21109",
+    "21129",
+    "22087",
+    "22089",
+    "22111",
+    "22115",
+    "22117",
+    "22119",
+    "22767",
+    "22769",
+  ],
+  // Altona
+  "02200000": [
+    "20257",
+    "22525",
+    "22547",
+    "22549",
+    "22559",
+    "22587",
+    "22589",
+    "22605",
+    "22607",
+    "22609",
+    "22761",
+    "22763",
+    "22765",
+  ],
+  // Eimsbüttel
+  "02300000": [
+    "20144",
+    "20146",
+    "20148",
+    "20149",
+    "20249",
+    "20253",
+    "20255",
+    "20259",
+    "22453",
+    "22455",
+    "22457",
+    "22459",
+    "22523",
+    "22527",
+    "22529",
+  ],
+  // Hamburg-Nord
+  "02400000": [
+    "20251",
+    "22049",
+    "22081",
+    "22083",
+    "22085",
+    "22297",
+    "22299",
+    "22301",
+    "22303",
+    "22305",
+    "22307",
+    "22309",
+    "22335",
+    "22337",
+    "22339",
+    "22391",
+    "22415",
+    "22417",
+    "22419",
+  ],
+  // Wandsbek
+  "02500000": [
+    "22041",
+    "22043",
+    "22045",
+    "22047",
+    "22143",
+    "22145",
+    "22147",
+    "22149",
+    "22159",
+    "22175",
+    "22177",
+    "22179",
+    "22359",
+    "22393",
+    "22395",
+    "22397",
+    "22399",
+  ],
+  // Bergedorf
+  "02600000": ["21029", "21031", "21033", "21035", "21037", "21039", "22113"],
+  // Harburg
+  "02700000": ["21073", "21075", "21077", "21079", "21147", "21149"],
+};
+
+/**
+ * Resolves the Gemeindeschlüssel-Ergänzung Code for Hamburg.
+ * Returns undefined for non-Hamburg municipalities
+ */
+export function getGemeindeschluesselErgaenzung(gemeindeSchluessel: string, betriebsPlz: string) {
+  if (gemeindeSchluessel !== HAMBURG_GEMEINDESCHLUESSEL) {
+    return undefined;
+  }
+
+  for (const [gemeindeschluesselErgaenzung, plzList] of Object.entries(HAMBURG_STADTBEZIRK_PLZ)) {
+    if (plzList.includes(betriebsPlz)) {
+      return gemeindeschluesselErgaenzung;
+    }
+  }
+
+  return undefined;
+}
