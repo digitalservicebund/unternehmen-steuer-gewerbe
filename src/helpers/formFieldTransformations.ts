@@ -20,7 +20,7 @@ export function splitStrasseHausnummer(strasseUndHausnummer: string) {
 }
 
 /** Joins street and house number into "Straße 123", omitting missing parts */
-export function createStrasseUndHausnummer(
+export function joinStrasseUndHausnummer(
   strasse?: string,
   hausnummer?: string,
 ): string | undefined {

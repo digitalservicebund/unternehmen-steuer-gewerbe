@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
-  createStrasseUndHausnummer,
+  joinStrasseUndHausnummer,
   formatDatumDE,
   splitStrasseHausnummer,
   splitTelefonnummer,
@@ -30,14 +30,14 @@ describe("splitStrasseHausnummer", () => {
   });
 });
 
-describe("createStrasseUndHausnummer", () => {
+describe("joinStrasseUndHausnummer", () => {
   it.each([
     ["Musterstraße", "1", "Musterstraße 1"],
     ["Musterstraße", undefined, "Musterstraße"],
     [undefined, "1", "1"],
     [undefined, undefined, undefined],
   ])("joins the Strasse '%s' and Hausnummer '%s' to '%s'", (strasse, hausnummer, expected) => {
-    expect(createStrasseUndHausnummer(strasse, hausnummer)).toBe(expected);
+    expect(joinStrasseUndHausnummer(strasse, hausnummer)).toBe(expected);
   });
 });
 

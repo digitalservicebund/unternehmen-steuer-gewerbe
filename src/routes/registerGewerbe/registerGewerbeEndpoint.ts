@@ -19,7 +19,7 @@ import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTra
 import { getGewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
 import { generatePdfReceipt } from "./registerGewerbePdfGenerator";
 import {
-  createStrasseUndHausnummer,
+  joinStrasseUndHausnummer,
   splitStrasseHausnummer,
 } from "../../helpers/formFieldTransformations";
 
@@ -59,7 +59,7 @@ async function submitGewerbeanmeldung(
   const gewerbeamtAdresse = routingInfo.gewerbeamt.adresse;
   const officeDetails = {
     name: routingInfo.gewerbeamt.name,
-    strasseUndHausnummer: createStrasseUndHausnummer(
+    strasseUndHausnummer: joinStrasseUndHausnummer(
       gewerbeamtAdresse?.strasse,
       gewerbeamtAdresse?.hausnummer,
     ),
@@ -146,7 +146,7 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
     const officeDetails = finanzamtDetails
       ? {
           name: finanzamtDetails.name,
-          strasseUndHausnummer: createStrasseUndHausnummer(
+          strasseUndHausnummer: joinStrasseUndHausnummer(
             hausanschrift?.strasse,
             hausanschrift?.hausnummer,
           ),
