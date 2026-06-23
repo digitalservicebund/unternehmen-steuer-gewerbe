@@ -111,7 +111,7 @@ describe("Route /api/v1/register-gewerbe", () => {
         expect(json.fseÜbermittlung.officeDetails!.telefon).toEqual("0355 4991-4100");
       });
 
-      it("returns the responsible Gewerbeamt details for Fulda", async () => {
+      it("returns the appropriate Gewerbeamt details for Fulda", async () => {
         const dataWithFulda = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
         dataWithFulda.unternehmensDaten.adresseAbweichend = {
           strasseUndHausnummer: "Schlossstraße 2",
