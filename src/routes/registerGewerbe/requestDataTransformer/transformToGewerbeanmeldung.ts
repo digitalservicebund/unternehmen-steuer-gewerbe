@@ -4,6 +4,24 @@ import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { type GewerbeRoutingInfo } from "../getGewerbeRoutingInfo";
 import { splitStrasseHausnummer } from "../../../helpers/formFieldTransformations";
 import { VERTRAUENSNIVEAU, RECHTSFORM, STAATSANGEHOERIGKEIT } from "./xGewerbeordnungCodes";
+import { Anschrift } from "../../../xmlBuilders/xGewerbeordnung/buildingBlocks/anschrift";
+
+function getBetriebsAnschriftWithFallbackToPersönlicheDaten(
+  adresseAbweichend: RegisterGewerbeRequest["unternehmensDaten"]["adresseAbweichend"],
+  privateAdresse: RegisterGewerbeRequest["persönlicheDaten"]["adresse"],
+): Anschrift {
+  const betriebsAdresse = adresseAbweichend ?? privateAdresse;
+  const { strasse, hausnummer, hausnummerBis } = splitStrasseHausnummer(
+    betriebsAdresse.strasseUndHausnummer,
+  );
+  return {
+    strasse,
+    hausnummerVon: hausnummer,
+    hausnummerBis,
+    postleitzahl: betriebsAdresse.postleitzahl,
+    ort: betriebsAdresse.ort,
+  };
+}
 
 // Transforms a RegisterGewerbeRequest into a complete Gewerbeanmeldung structure.
 // NOTE: several values are hardcoded placeholders and will be generated / fetched from other sources later.
@@ -11,13 +29,13 @@ export function transformToGewerbeanmeldung(
   data: RegisterGewerbeRequest,
   routingInfo: GewerbeRoutingInfo,
 ): CreateGewerbeanmeldungXmlData {
-  const adresseAbweichend = data.unternehmensDaten.adresseAbweichend;
-
-  const betriebsStrasseHausnummer = splitStrasseHausnummer(
-    adresseAbweichend?.strasseUndHausnummer ?? data.persönlicheDaten.adresse.strasseUndHausnummer,
-  );
   const personStrasseHausnummer = splitStrasseHausnummer(
     data.persönlicheDaten.adresse.strasseUndHausnummer,
+  );
+
+  const betriebsAnschrift = getBetriebsAnschriftWithFallbackToPersönlicheDaten(
+    data.unternehmensDaten.adresseAbweichend,
+    data.persönlicheDaten.adresse,
   );
 
   const gemeindeSchluessel = routingInfo.ags;
@@ -53,14 +71,7 @@ export function transformToGewerbeanmeldung(
       eingetragenerName: undefined,
       betriebsstaette: {
         artBetriebsstaette: "01",
-        anschrift: {
-          strasse: betriebsStrasseHausnummer.strasse,
-          hausnummerVon: betriebsStrasseHausnummer.hausnummer,
-          hausnummerBis: betriebsStrasseHausnummer.hausnummerBis,
-          postleitzahl:
-            adresseAbweichend?.postleitzahl ?? data.persönlicheDaten.adresse.postleitzahl,
-          ort: adresseAbweichend?.ort ?? data.persönlicheDaten.adresse.ort,
-        },
+        anschrift: betriebsAnschrift,
       },
       taetigkeitenGesamt: {
         schwerpunkt: {
