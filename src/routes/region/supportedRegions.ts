@@ -11,14 +11,7 @@ const SUPPORTED_REGIONS = {
   nordfriesland: [rangeOfPLZs("25811", "25999")],
   duesseldorf: [rangeOfPLZs("40210", "40629")],
   goslar: ["38640", "38642", "38644", "38690"],
-  // Helgoland ("27499") belongs to Hamburg, but there is no gemeindeschluesselErgaenzung
-  // for it. Founding there is therefore not possible, because no valid
-  // xGewO XML can be generated (the rule SCH-0189 would fail)
-  hamburg: [
-    rangeOfPLZs("20095", "21149"),
-    rangeOfPLZs("22041", "22769"),
-    // "27499"
-  ],
+  hamburg: [rangeOfPLZs("20095", "21149"), rangeOfPLZs("22041", "22769"), "27499"],
   mannheim: [rangeOfPLZs("68159", "68309")],
 } as const satisfies Record<string, ReadonlyArray<string | PLZRange>>;
 

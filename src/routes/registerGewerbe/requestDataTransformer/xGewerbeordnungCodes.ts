@@ -489,6 +489,7 @@ const HAMBURG_STADTBEZIRK_PLZ: Record<string, readonly string[]> = {
     "22119",
     "22767",
     "22769",
+    "27499", // Neuwerk
   ],
   // Altona
   "02200000": [
