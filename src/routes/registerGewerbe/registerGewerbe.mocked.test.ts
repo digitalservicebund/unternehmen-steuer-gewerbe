@@ -182,4 +182,31 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(behoerdeKennung).toMatch(/^MELDID:/);
     });
   });
+
+  describe("gemeindeschluesselErgaenzung for Hamburg & Berlin", () => {
+    it("includes the Hamburg Stadtbezirk gemeindeschluesselErgaenzung derived from the betriebsstaette PLZ", async () => {
+      mockSubmitData.mockClear();
+      mockGetGewerbeRoutingInfo.mockResolvedValueOnce({
+        ags: "02000000",
+      });
+
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          adresseAbweichend: {
+            strasseUndHausnummer: "Reeperbahn 1",
+            postleitzahl: "22767",
+            ort: "Hamburg",
+          },
+        },
+      });
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+
+      const submittedXml = mockSubmitData.mock.calls[0]![0].data;
+      expect(submittedXml).toContain(
+        '<xga:gemeindeschluesselErgaenzung listVersionID="1"><code>02100000</code></xga:gemeindeschluesselErgaenzung>',
+      );
+    });
+  });
 });
