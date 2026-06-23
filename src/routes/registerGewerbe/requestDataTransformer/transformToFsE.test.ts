@@ -100,11 +100,12 @@ describe("transformToEUnFsE", () => {
     });
   });
 
-  it("sets kleinUnternUStVerzicht=true when kleinunternehmerRegelung is false (ERiC KleinUN_fehlende_Angaben)", () => {
+  it("sets kleinUnternUStVerzicht=true when kleinunternehmerRegelung is false (ERiC KleinUN_fehlende_Angaben), kleinUnternUst is undefined", () => {
     const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
     expect(result.eUn?.umsatzsteuer?.kleinunternehmerRegelung).toEqual({
       kleinUnternUStVerzicht: true,
     });
+    expect(result.eUn?.umsatzsteuer?.kleinunternehmerRegelung?.kleinUnternUSt).toBeUndefined();
   });
 
   it("sets kleinUnternUSt=true when kleinunternehmerRegelung is true, kleinUnternUStVerzicht is undefined", () => {
