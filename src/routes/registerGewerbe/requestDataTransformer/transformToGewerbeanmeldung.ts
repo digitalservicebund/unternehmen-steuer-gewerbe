@@ -3,7 +3,12 @@ import { type CreateGewerbeanmeldungXmlData } from "../../../xmlBuilders/xGewerb
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { type GewerbeRoutingInfo } from "../getGewerbeRoutingInfo";
 import { splitStrasseHausnummer } from "../../../helpers/formFieldTransformations";
-import { VERTRAUENSNIVEAU, RECHTSFORM, STAATSANGEHOERIGKEIT } from "./xGewerbeordnungCodes";
+import {
+  VERTRAUENSNIVEAU,
+  RECHTSFORM,
+  STAATSANGEHOERIGKEIT,
+  getGemeindeschluesselErgaenzung,
+} from "./xGewerbeordnungCodes";
 
 // Transforms a RegisterGewerbeRequest into a complete Gewerbeanmeldung structure.
 // NOTE: several values are hardcoded placeholders and will be generated / fetched from other sources later.
@@ -19,6 +24,8 @@ export function transformToGewerbeanmeldung(
   const personStrasseHausnummer = splitStrasseHausnummer(
     data.persönlicheDaten.adresse.strasseUndHausnummer,
   );
+
+  const betriebsPlz = adresseAbweichend?.postleitzahl ?? data.persönlicheDaten.adresse.postleitzahl;
 
   const gemeindeSchluessel = routingInfo.ags;
   const autorKennung = `MELDID:${gemeindeSchluessel}`;
@@ -39,6 +46,7 @@ export function transformToGewerbeanmeldung(
     ereigniszeitpunkt: new Date().toISOString(),
     istStorno: false,
     gemeindeSchluessel,
+    gemeindeschluesselErgaenzung: getGemeindeschluesselErgaenzung(gemeindeSchluessel, betriebsPlz),
     uuid: randomUUID(),
     gueltigAb: data.unternehmensDaten.tätigkeitsbeginn,
     datumMeldung: new Date().toISOString().split("T")[0]!,
@@ -57,8 +65,7 @@ export function transformToGewerbeanmeldung(
           strasse: betriebsStrasseHausnummer.strasse,
           hausnummerVon: betriebsStrasseHausnummer.hausnummer,
           hausnummerBis: betriebsStrasseHausnummer.hausnummerBis,
-          postleitzahl:
-            adresseAbweichend?.postleitzahl ?? data.persönlicheDaten.adresse.postleitzahl,
+          postleitzahl: betriebsPlz,
           ort: adresseAbweichend?.ort ?? data.persönlicheDaten.adresse.ort,
         },
       },

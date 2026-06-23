@@ -8,6 +8,7 @@ const testRoutingInfo = {
   ars: "030460014004",
   fitConnectDestinationInformation: { destinationId: "00000000-0000-0000-0000-000000000002" },
 };
+const testRoutingInfoHamburg = { ...testRoutingInfo, ags: "02000000" };
 
 describe("transformToGewerbeanmeldung", () => {
   it("maps default values, applies the geschlecht fallback if the geschlecht is not given and drops optional fields", () => {
@@ -99,5 +100,52 @@ describe("transformToGewerbeanmeldung", () => {
     );
 
     expect(result.gemeindeSchluessel).toBe(testRoutingInfo.ags);
+  });
+
+  it("derives the Hamburg gemeindeschluesselErgaenzung from the betriebsstaette PLZ", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          adresseAbweichend: {
+            strasseUndHausnummer: "Reeperbahn 1",
+            postleitzahl: "22767",
+            ort: "Hamburg",
+          },
+        },
+      },
+      testRoutingInfoHamburg,
+    );
+
+    expect(result.gemeindeschluesselErgaenzung).toBe("02100000");
+  });
+
+  it("leaves gemeindeschluesselErgaenzung undefined for non-Hamburg municipalities", () => {
+    const result = transformToGewerbeanmeldung(
+      registerGewerbeSampleRequestAllFieldsFilled,
+      testRoutingInfo,
+    );
+
+    expect(result.gemeindeschluesselErgaenzung).toBeUndefined();
+  });
+
+  it("leaves gemeindeschluesselErgaenzung undefined for an unmapped Hamburg PLZ", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          adresseAbweichend: {
+            strasseUndHausnummer: "Musterstraße 1",
+            postleitzahl: "20000",
+            ort: "Hamburg",
+          },
+        },
+      },
+      testRoutingInfoHamburg,
+    );
+
+    expect(result.gemeindeschluesselErgaenzung).toBeUndefined();
   });
 });
