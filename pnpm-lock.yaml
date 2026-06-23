@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@digitalservicebund/unternehmen-steuer-gewerbe-privat':
-        specifier: 3.2.0-215
-        version: 3.2.0-215(@types/node@26.0.0)
+        specifier: 3.2.0-223
+        version: 3.2.0-223(@types/node@26.0.0)
       '@hono/node-server':
         specifier: ^2.0.6
         version: 2.0.6(hono@4.12.26)
@@ -119,8 +119,8 @@ packages:
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
 
-  '@digitalservicebund/unternehmen-steuer-gewerbe-privat@3.2.0-215':
-    resolution: {integrity: sha512-fb/BDBtJlthcj6kx1Y3gsy2caP+YNB4D9rLg4cJvV/E0T6FQzjLWEZJRFbUjz4jq5wzDZB93FLVbIUawuA5V4g==, tarball: https://npm.pkg.github.com/download/@digitalservicebund/unternehmen-steuer-gewerbe-privat/3.2.0-215/c57b5f25e9b0bbcc3958da73b3388e4c2eea5828}
+  '@digitalservicebund/unternehmen-steuer-gewerbe-privat@3.2.0-223':
+    resolution: {integrity: sha512-SAMQXMUAfLcqjO1j9uj86Di3dVlYnQNlB9Z1TL/NmFSLcjdRqoSCWVkRMffcb8XrgDDSx4YuL3xw72paOg7avA==, tarball: https://npm.pkg.github.com/download/@digitalservicebund/unternehmen-steuer-gewerbe-privat/3.2.0-223/a636fc8d29768f4690dced26643d5e74ab00e1a4}
 
   '@emnapi/core@1.10.0':
     resolution: {integrity: sha512-yq6OkJ4p82CAfPl0u9mQebQHKPJkY7WrIuk205cTYnYe+k2Z8YBh11FrbRG/H6ihirqcacOgl2BIO8oyMQLeXw==}
@@ -1544,7 +1544,7 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@digitalservicebund/unternehmen-steuer-gewerbe-privat@3.2.0-215(@types/node@26.0.0)':
+  '@digitalservicebund/unternehmen-steuer-gewerbe-privat@3.2.0-223(@types/node@26.0.0)':
     dependencies:
       fast-xml-parser: 5.9.3
       koffi: 3.0.2
