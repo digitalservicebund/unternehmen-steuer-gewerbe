@@ -40,16 +40,17 @@ export function transformToGewerbeanmeldung(
 
   const gemeindeSchluessel = routingInfo.ags;
   const gewerbeamtKennung = `MELDID:${gemeindeSchluessel}`;
+  const gewerbeamtName = routingInfo.gewerbeamt.name || "Gewerbeamt";
   const personId = randomUUID();
 
   return {
     nachrichtenkopf: {
       nachrichtenUUID: randomUUID(),
       erstellungszeitpunkt: new Date().toISOString(),
-      leser: { kennung: gewerbeamtKennung, name: "Gewerbeamt" },
+      leser: { kennung: gewerbeamtKennung, name: gewerbeamtName },
       autor: { kennung: "ds:schnellergruenden", name: "Schneller Gründen" },
     },
-    autor: { kennung: gewerbeamtKennung, name: "Behörde" },
+    autor: { kennung: gewerbeamtKennung, name: gewerbeamtName },
     anzeigerenderId: personId,
     handelndePersonId: personId,
     handelndePersonVertrauensniveauCode: VERTRAUENSNIVEAU[data.persönlicheDaten.vertrauensniveau],
