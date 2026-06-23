@@ -68,12 +68,12 @@ describe("getGewerbeRoutingInfo", () => {
       });
     });
 
-    it("propagates errors from the Gewerbeamt lookup", async () => {
-      mockGetGewerbeamt.mockRejectedValueOnce(new Error("PVOG unavailable"));
+    it("propagates any error from the Gewerbeamt lookup", async () => {
+      mockGetGewerbeamt.mockRejectedValueOnce(new Error("Gewerbeamt lookup failed"));
 
       await expect(
         getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled),
-      ).rejects.toThrow("PVOG unavailable");
+      ).rejects.toThrow("Gewerbeamt lookup failed");
     });
   });
 
