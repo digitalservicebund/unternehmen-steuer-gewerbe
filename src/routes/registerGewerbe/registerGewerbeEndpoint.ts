@@ -57,7 +57,7 @@ async function submitGewerbeanmeldung(
   const gewerbeanmeldungPdfReceipt = await generatePdfReceipt(gewerbeanmeldungXml);
 
   const gewerbeamtAdresse = routingInfo.gewerbeamt.adresse;
-  const officeDetails = {
+  const gewerbeamtDetails = {
     name: routingInfo.gewerbeamt.name,
     strasseUndHausnummer: joinStrasseUndHausnummer(
       gewerbeamtAdresse?.strasse,
@@ -89,7 +89,7 @@ async function submitGewerbeanmeldung(
       success: true,
       submissionId: response.submissionId,
       pdfReceiptBase64: gewerbeanmeldungPdfReceipt,
-      officeDetails,
+      officeDetails: gewerbeamtDetails,
     };
   } catch (error) {
     console.error("FIT-Connect submission failed", error);
