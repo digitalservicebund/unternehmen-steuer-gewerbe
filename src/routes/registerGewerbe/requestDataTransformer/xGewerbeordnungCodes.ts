@@ -461,7 +461,7 @@ export const STAATSANGEHOERIGKEIT_KEYS = Object.keys(STAATSANGEHOERIGKEIT) as [
 
 // Amtlicher Gemeindeschlüssel (AGS) of Hamburg
 const HAMBURG_GEMEINDESCHLUESSEL = "02000000";
-// Hamburg district (Stadtbezirke) PLZs, grouped by Gemeindeschlüssel-Ergänzung Codes
+// Hamburg district (Stadtbezirke) Postleitzahlen, grouped by Gemeindeschlüssel-Ergänzung Codes
 // see https://www.xrepository.de/details/urn:xoev-de:xgewerbeordnung:codeliste:gemeindeschluesselergaenzung_1
 const HAMBURG_STADTBEZIRK_PLZ: Record<string, readonly string[]> = {
   // Hamburg-Mitte
