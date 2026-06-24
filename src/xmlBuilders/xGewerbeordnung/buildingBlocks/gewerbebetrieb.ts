@@ -53,12 +53,12 @@ export function createGewerbebetrieb(
       ${createTaetigkeiten(gewerbebetrieb.taetigkeitenGesamt)}
       <xga:gewerbetreibender>
         ${wirtschaftlichTaetigerId ? `<xga:gewerbetreibender.id>${escapeXml(wirtschaftlichTaetigerId)}</xga:gewerbetreibender.id>` : ""}
-        ${gewerbebetrieb.istNebenerwerb === undefined ? "" : `<xga:istNebenerwerb>${escapeXml(gewerbebetrieb.istNebenerwerb)}</xga:istNebenerwerb>`}
+        ${typeof gewerbebetrieb.istNebenerwerb === "boolean" ? `<xga:istNebenerwerb>${escapeXml(gewerbebetrieb.istNebenerwerb)}</xga:istNebenerwerb>` : ""}
       </xga:gewerbetreibender>
-      ${gewerbebetrieb.anzahlVollzeitBeschaeftigte === undefined ? "" : `<xga:anzahlVollzeitBeschaeftigte>${escapeXml(gewerbebetrieb.anzahlVollzeitBeschaeftigte)}</xga:anzahlVollzeitBeschaeftigte>`}
-      ${gewerbebetrieb.anzahlTeilzeitBeschaeftigte === undefined ? "" : `<xga:anzahlTeilzeitBeschaeftigte>${escapeXml(gewerbebetrieb.anzahlTeilzeitBeschaeftigte)}</xga:anzahlTeilzeitBeschaeftigte>`}
-      ${gewerbebetrieb.istReisegewerbe === undefined ? "" : `<xga:istReisegewerbe>${escapeXml(gewerbebetrieb.istReisegewerbe)}</xga:istReisegewerbe>`}
-      ${gewerbebetrieb.beteiligungOeffentlicheHand === undefined ? "" : `<xga:beteiligungOeffentlicheHand><code>${escapeXml(gewerbebetrieb.beteiligungOeffentlicheHand)}</code></xga:beteiligungOeffentlicheHand>`}
+      ${typeof gewerbebetrieb.anzahlVollzeitBeschaeftigte === "number" ? `<xga:anzahlVollzeitBeschaeftigte>${escapeXml(gewerbebetrieb.anzahlVollzeitBeschaeftigte)}</xga:anzahlVollzeitBeschaeftigte>` : ""}
+      ${typeof gewerbebetrieb.anzahlTeilzeitBeschaeftigte === "number" ? `<xga:anzahlTeilzeitBeschaeftigte>${escapeXml(gewerbebetrieb.anzahlTeilzeitBeschaeftigte)}</xga:anzahlTeilzeitBeschaeftigte>` : ""}
+      ${typeof gewerbebetrieb.istReisegewerbe === "boolean" ? `<xga:istReisegewerbe>${escapeXml(gewerbebetrieb.istReisegewerbe)}</xga:istReisegewerbe>` : ""}
+      ${gewerbebetrieb.beteiligungOeffentlicheHand ? `<xga:beteiligungOeffentlicheHand><code>${escapeXml(gewerbebetrieb.beteiligungOeffentlicheHand)}</code></xga:beteiligungOeffentlicheHand>` : ""}
       ${createBetriebArt(gewerbebetrieb.betriebArt)}
       ${createHandwerkskarte(gewerbebetrieb.handwerkskarte)}
     </xga:gewerbebetrieb>`;
