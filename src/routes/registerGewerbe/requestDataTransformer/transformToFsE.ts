@@ -47,7 +47,7 @@ function getUnternehmensAnschrift(data: RegisterGewerbeRequest) {
 }
 
 function getUstIdNr(data: RegisterGewerbeRequest) {
-  if (data.unternehmensDaten.umsatzSteuerIdMitbeantragen === true)
+  if (data.unternehmensDaten.umsatzsteuerIdMitbeantragen === true)
     return {
       uStIdAntrag: {
         merkerAntragUStId: true,

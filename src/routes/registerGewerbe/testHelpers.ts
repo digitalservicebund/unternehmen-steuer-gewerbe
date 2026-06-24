@@ -40,6 +40,6 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
       postleitzahl: "96450",
       ort: "Coburg",
     },
-    umsatzSteuerIdMitbeantragen: true,
+    umsatzsteuerIdMitbeantragen: true,
   },
 };
