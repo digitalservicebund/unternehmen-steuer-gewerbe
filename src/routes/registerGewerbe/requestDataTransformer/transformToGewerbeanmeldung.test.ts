@@ -103,7 +103,7 @@ describe("transformToGewerbeanmeldung", () => {
     expect(result.gemeindeSchluessel).toBe(testRoutingInfo.ags);
   });
 
-  it("derives the Hamburg gemeindeschluesselErgaenzung from the betriebsstaette PLZ", () => {
+  it("derives the Hamburg gemeindeschluesselErgaenzung 02100000 from adresseAbweichend.postleitzahl 22767", () => {
     const result = transformToGewerbeanmeldung(
       {
         ...registerGewerbeSampleRequestAllFieldsFilled,
