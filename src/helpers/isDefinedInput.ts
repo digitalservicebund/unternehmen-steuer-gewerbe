@@ -3,6 +3,6 @@
 */
 export function isDefinedInput<boolean | number | string | undefined>(
   value: T | undefined,
-): value is T {
+): boolean {
   return value !== undefined;
 }
