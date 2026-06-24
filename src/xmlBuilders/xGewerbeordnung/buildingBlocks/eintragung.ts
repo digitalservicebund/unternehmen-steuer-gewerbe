@@ -1,4 +1,5 @@
 import { escapeXml } from "../../../helpers/escapeXml";
+import { hasAValue } from "../../../helpers/hasAValue";
 
 export interface Eintragung {
   /** Angabe der Art des Registers, in welchem der wirtschaftlich Tätige bzw. die wirtschaftliche Tätigkeit (z. B. Zweigniederlassung) geführt wird. */
@@ -17,6 +18,6 @@ export function createEintragung(eintragung: Eintragung | undefined) {
     <bk:eintragung>
       ${eintragung.artEintragung ? `<eintragung:artEintragung listVersionID="1"><code>${escapeXml(eintragung.artEintragung)}</code></eintragung:artEintragung>` : ""}
       ${eintragung.registergericht?.code ? `<eintragung:registergericht.code listVersionID="12"><code>${escapeXml(eintragung.registergericht.code)}</code></eintragung:registergericht.code>` : ""}
-      ${typeof eintragung.eintragungsnummer === "number" ? `<eintragung:eintragungsnummer>${escapeXml(eintragung.eintragungsnummer)}</eintragung:eintragungsnummer>` : ""}
+      ${hasAValue(eintragung.eintragungsnummer) ? `<eintragung:eintragungsnummer>${escapeXml(eintragung.eintragungsnummer)}</eintragung:eintragungsnummer>` : ""}
     </bk:eintragung>`;
 }
