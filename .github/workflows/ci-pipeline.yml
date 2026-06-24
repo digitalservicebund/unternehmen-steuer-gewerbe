@@ -128,7 +128,7 @@ jobs:
           path: coverage/
 
       - name: Cache SonarQube packages
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        uses: actions/cache@2c8a9bd7457de244a408f35966fab2fb45fda9c8
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
@@ -250,7 +250,7 @@ jobs:
         run: docker save unternehmen-steuer-gewerbe | gzip > /tmp/docker-image.tar.gz
 
       - name: Cache Docker image
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        uses: actions/cache@2c8a9bd7457de244a408f35966fab2fb45fda9c8
         with:
           path: /tmp/docker-image.tar.gz
           key: docker-image-${{ github.sha }}
@@ -281,7 +281,7 @@ jobs:
       packages: write
     steps:
       - name: Restore Docker image from cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        uses: actions/cache@2c8a9bd7457de244a408f35966fab2fb45fda9c8
         with:
           path: /tmp/docker-image.tar.gz
           key: docker-image-${{ github.sha }}
@@ -368,7 +368,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to development
-        uses: digitalservicebund/argocd-deploy@d13e85a7c5d6ba7cfa3db5a1a254c328a281ba35
+        uses: digitalservicebund/argocd-deploy@753647aee2ae99081829cf103e33ca4d7a2266c4
         with:
           environment: development/unternehmen-steuer-gewerbe
           version: ${{ github.sha }}
@@ -452,7 +452,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to production
-        uses: digitalservicebund/argocd-deploy@d13e85a7c5d6ba7cfa3db5a1a254c328a281ba35
+        uses: digitalservicebund/argocd-deploy@753647aee2ae99081829cf103e33ca4d7a2266c4
         with:
           environment: production/unternehmen-steuer-gewerbe
           version: ${{ github.sha }}
