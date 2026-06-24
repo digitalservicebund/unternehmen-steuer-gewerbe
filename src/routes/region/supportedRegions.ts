@@ -3,6 +3,9 @@ interface PLZRange {
   to: string;
 }
 
+// There is no good single source of truth, unfortunately. When adding new supported regions, a
+// good starting point is Wikipedia to get the Postleitzahlen (ranges) and then verify them one by
+// one against other sources from the cities/regions themselves
 const SUPPORTED_REGIONS = {
   aachen: [rangeOfPLZs("52062", "52080")],
   dresden: [rangeOfPLZs("01067", "01328"), "01465"],
