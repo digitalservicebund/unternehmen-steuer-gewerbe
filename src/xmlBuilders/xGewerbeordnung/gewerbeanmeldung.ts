@@ -95,23 +95,23 @@ export async function createGewerbeanmeldungXml(
     <xga:ext.gewerbemeldung.0400 ${ROOT_ATTRIBUTES}>
       ${createG2gNachrichtenkopf(gewerbeanmeldung.nachrichtenkopf)}
       <xga:satz>
-        ${gewerbeanmeldung.anzeigerenderId ? `<antr:anzeigender.id>${escapeXml(gewerbeanmeldung.anzeigerenderId)}</antr:anzeigender.id>` : ""}
-        ${gewerbeanmeldung.handelndePersonId ? `<antr:handelndePerson.id>${escapeXml(gewerbeanmeldung.handelndePersonId)}</antr:handelndePerson.id>` : ""}
-        ${gewerbeanmeldung.handelndePersonVertrauensniveauCode ? `<bk:handelndePerson.vertrauensniveauIdentifikation listVersionID="4"><code>${escapeXml(gewerbeanmeldung.handelndePersonVertrauensniveauCode)}</code></bk:handelndePerson.vertrauensniveauIdentifikation>` : ""}
-        ${gewerbeanmeldung.ansprechpartnerId ? `<antr:ansprechpartner.id>${escapeXml(gewerbeanmeldung.ansprechpartnerId)}</antr:ansprechpartner.id>` : ""}
+        ${hasAValue(gewerbeanmeldung.anzeigerenderId) ? `<antr:anzeigender.id>${escapeXml(gewerbeanmeldung.anzeigerenderId)}</antr:anzeigender.id>` : ""}
+        ${hasAValue(gewerbeanmeldung.handelndePersonId) ? `<antr:handelndePerson.id>${escapeXml(gewerbeanmeldung.handelndePersonId)}</antr:handelndePerson.id>` : ""}
+        ${hasAValue(gewerbeanmeldung.handelndePersonVertrauensniveauCode) ? `<bk:handelndePerson.vertrauensniveauIdentifikation listVersionID="4"><code>${escapeXml(gewerbeanmeldung.handelndePersonVertrauensniveauCode)}</code></bk:handelndePerson.vertrauensniveauIdentifikation>` : ""}
+        ${hasAValue(gewerbeanmeldung.ansprechpartnerId) ? `<antr:ansprechpartner.id>${escapeXml(gewerbeanmeldung.ansprechpartnerId)}</antr:ansprechpartner.id>` : ""}
         <xga:anmeldung>
             ${gewerbeanmeldung.autor ? `<xga:autor>${createBehoerde(gewerbeanmeldung.autor)}</xga:autor>` : ""}
-            ${gewerbeanmeldung.satzErstellung ? `<xga:satzErstellung>${escapeXml(gewerbeanmeldung.satzErstellung)}</xga:satzErstellung>` : ""}
-            ${gewerbeanmeldung.ereigniszeitpunkt ? `<xga:ereigniszeitpunkt>${escapeXml(gewerbeanmeldung.ereigniszeitpunkt)}</xga:ereigniszeitpunkt>` : ""}
+            ${hasAValue(gewerbeanmeldung.satzErstellung) ? `<xga:satzErstellung>${escapeXml(gewerbeanmeldung.satzErstellung)}</xga:satzErstellung>` : ""}
+            ${hasAValue(gewerbeanmeldung.ereigniszeitpunkt) ? `<xga:ereigniszeitpunkt>${escapeXml(gewerbeanmeldung.ereigniszeitpunkt)}</xga:ereigniszeitpunkt>` : ""}
             ${hasAValue(gewerbeanmeldung.istStorno) ? `<xga:istStorno>${escapeXml(gewerbeanmeldung.istStorno)}</xga:istStorno>` : ""}
-            ${gewerbeanmeldung.gemeindeSchluessel ? `<xga:gemeindeSchluessel listVersionID="2020-03-31"><code>${escapeXml(gewerbeanmeldung.gemeindeSchluessel)}</code></xga:gemeindeSchluessel>` : ""}
-            ${gewerbeanmeldung.uuid ? `<xga:uuid>${escapeXml(gewerbeanmeldung.uuid)}</xga:uuid>` : ""}
-            ${gewerbeanmeldung.gueltigAb ? `<xga:gueltigAb>${escapeXml(gewerbeanmeldung.gueltigAb)}</xga:gueltigAb>` : ""}
-            ${gewerbeanmeldung.datumMeldung ? `<xga:datumMeldung>${escapeXml(gewerbeanmeldung.datumMeldung)}</xga:datumMeldung>` : ""}
+            ${hasAValue(gewerbeanmeldung.gemeindeSchluessel) ? `<xga:gemeindeSchluessel listVersionID="2020-03-31"><code>${escapeXml(gewerbeanmeldung.gemeindeSchluessel)}</code></xga:gemeindeSchluessel>` : ""}
+            ${hasAValue(gewerbeanmeldung.uuid) ? `<xga:uuid>${escapeXml(gewerbeanmeldung.uuid)}</xga:uuid>` : ""}
+            ${hasAValue(gewerbeanmeldung.gueltigAb) ? `<xga:gueltigAb>${escapeXml(gewerbeanmeldung.gueltigAb)}</xga:gueltigAb>` : ""}
+            ${hasAValue(gewerbeanmeldung.datumMeldung) ? `<xga:datumMeldung>${escapeXml(gewerbeanmeldung.datumMeldung)}</xga:datumMeldung>` : ""}
             ${createBisherigeUnfallversicherung(gewerbeanmeldung.bisherigeUnfallversicherung)}
             ${createGewerbebetrieb(gewerbeanmeldung.gewerbebetrieb, natuerlichePerson0?.id ?? "")}
             ${createReferenzierteSubjekte(gewerbeanmeldung.referenzierteSubjekte)}
-            ${gewerbeanmeldung.grundAnmeldungSchluessel ? `<xga:grundAnmeldungSchluessel><code>${escapeXml(gewerbeanmeldung.grundAnmeldungSchluessel)}</code></xga:grundAnmeldungSchluessel>` : ""}
+            ${hasAValue(gewerbeanmeldung.grundAnmeldungSchluessel) ? `<xga:grundAnmeldungSchluessel><code>${escapeXml(gewerbeanmeldung.grundAnmeldungSchluessel)}</code></xga:grundAnmeldungSchluessel>` : ""}
         </xga:anmeldung>
       </xga:satz>
     </xga:ext.gewerbemeldung.0400>`;

@@ -2,6 +2,7 @@ import { createAnschrift, type Anschrift } from "./anschrift";
 import { createKommunikation, type Kommunikation } from "./kommunikation";
 import { createAufenthaltstitel, type Aufenthaltstitel } from "./aufenthaltstitel";
 import { escapeXml } from "../../../helpers/escapeXml";
+import { hasAValue } from "../../../helpers/hasAValue";
 
 export interface Name {
   /** Familienname einer natürlichen Person bestehend aus Nachname, Zuname bzw. Familienname. */
@@ -44,9 +45,9 @@ function createName(name: Name | undefined) {
   if (!name) return "";
   return `
     <np:name>
-      ${name.familienname ? `<np:familienname>${escapeXml(name.familienname)}</np:familienname>` : ""}
-      ${name.geburtsname ? `<np:geburtsname>${escapeXml(name.geburtsname)}</np:geburtsname>` : ""}
-      ${name.vornamen ? `<np:vornamen>${escapeXml(name.vornamen)}</np:vornamen>` : ""}
+      ${hasAValue(name.familienname) ? `<np:familienname>${escapeXml(name.familienname)}</np:familienname>` : ""}
+      ${hasAValue(name.geburtsname) ? `<np:geburtsname>${escapeXml(name.geburtsname)}</np:geburtsname>` : ""}
+      ${hasAValue(name.vornamen) ? `<np:vornamen>${escapeXml(name.vornamen)}</np:vornamen>` : ""}
     </np:name>`;
 }
 
@@ -54,9 +55,9 @@ function createGeburt(geburt: Geburt | undefined) {
   if (!geburt) return "";
   return `
     <bk:geburt>
-      ${geburt.geburtsdatum ? `<np:geburtsdatum><dat:datum>${escapeXml(geburt.geburtsdatum)}</dat:datum></np:geburtsdatum>` : ""}
-      ${geburt.ort ? `<adr:ort>${escapeXml(geburt.ort)}</adr:ort>` : ""}
-      ${geburt.staat ? `<bk:staat>${escapeXml(geburt.staat)}</bk:staat>` : ""}
+      ${hasAValue(geburt.geburtsdatum) ? `<np:geburtsdatum><dat:datum>${escapeXml(geburt.geburtsdatum)}</dat:datum></np:geburtsdatum>` : ""}
+      ${hasAValue(geburt.ort) ? `<adr:ort>${escapeXml(geburt.ort)}</adr:ort>` : ""}
+      ${hasAValue(geburt.staat) ? `<bk:staat>${escapeXml(geburt.staat)}</bk:staat>` : ""}
     </bk:geburt>`;
 }
 
@@ -64,11 +65,11 @@ export function createNatuerlichePerson(natuerlichePerson: NatuerlichePerson | u
   if (!natuerlichePerson) return "";
   return `
     <xga:natuerlichePerson>
-      ${natuerlichePerson.id ? `<np:natuerlichePerson.id>${escapeXml(natuerlichePerson.id)}</np:natuerlichePerson.id>` : ""}
+      ${hasAValue(natuerlichePerson.id) ? `<np:natuerlichePerson.id>${escapeXml(natuerlichePerson.id)}</np:natuerlichePerson.id>` : ""}
       ${createName(natuerlichePerson.name)}
       ${createGeburt(natuerlichePerson.geburt)}
-      ${natuerlichePerson.geschlecht ? `<np:geschlecht listVersionID="1"><code>${escapeXml(natuerlichePerson.geschlecht)}</code></np:geschlecht>` : ""}
-      ${natuerlichePerson.staatsangehoerigkeit ? `<np:staatsangehoerigkeit listVersionID="2020-05-11"><code>${escapeXml(natuerlichePerson.staatsangehoerigkeit)}</code></np:staatsangehoerigkeit>` : ""}
+      ${hasAValue(natuerlichePerson.geschlecht) ? `<np:geschlecht listVersionID="1"><code>${escapeXml(natuerlichePerson.geschlecht)}</code></np:geschlecht>` : ""}
+      ${hasAValue(natuerlichePerson.staatsangehoerigkeit) ? `<np:staatsangehoerigkeit listVersionID="2020-05-11"><code>${escapeXml(natuerlichePerson.staatsangehoerigkeit)}</code></np:staatsangehoerigkeit>` : ""}
       ${createAnschrift(natuerlichePerson.anschrift)}
       ${createKommunikation(natuerlichePerson.kommunikation)}
       ${createAufenthaltstitel(natuerlichePerson.aufenthaltstitel)}

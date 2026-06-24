@@ -1,4 +1,5 @@
 import { escapeXml } from "../../../helpers/escapeXml";
+import { hasAValue } from "../../../helpers/hasAValue";
 import { createWirtschaftszweig } from "./wirtschaftszweig";
 
 export interface Taetigkeit {
@@ -37,17 +38,26 @@ function createTaetigkeitEinzeln(taetigkeitEinzeln: TaetigkeitEinzeln | undefine
   if (!taetigkeitEinzeln) return "";
   return `
     <xga:taetigkeit>
-      ${taetigkeitEinzeln.taetigkeitEinzeln ? `<xga:taetigkeitEinzeln>${escapeXml(taetigkeitEinzeln.taetigkeitEinzeln)}</xga:taetigkeitEinzeln>` : ""}
+      ${hasAValue(taetigkeitEinzeln.taetigkeitEinzeln) ? `<xga:taetigkeitEinzeln>${escapeXml(taetigkeitEinzeln.taetigkeitEinzeln)}</xga:taetigkeitEinzeln>` : ""}
       ${createWirtschaftszweig(taetigkeitEinzeln.wirtschaftszweigschluessel)}
-      ${taetigkeitEinzeln.stichwort ? `<xga:stichwort>${escapeXml(taetigkeitEinzeln.stichwort)}</xga:stichwort>` : ""}
+      ${hasAValue(taetigkeitEinzeln.stichwort) ? `<xga:stichwort>${escapeXml(taetigkeitEinzeln.stichwort)}</xga:stichwort>` : ""}
     </xga:taetigkeit>`;
+}
+
+function createSchwerpunkt(schwerpunkt: Taetigkeit | undefined) {
+  if (!schwerpunkt) return "";
+  return `<xga:schwerpunkt>
+        ${hasAValue(schwerpunkt.taetigkeitSchwerpunkt) ? `<xga:taetigkeitSchwerpunkt>${escapeXml(schwerpunkt.taetigkeitSchwerpunkt)}</xga:taetigkeitSchwerpunkt>` : ""}
+        ${createWirtschaftszweig(schwerpunkt.wirtschaftszweigschluessel)}
+        ${hasAValue(schwerpunkt.stichwort) ? `<xga:stichwort>${escapeXml(schwerpunkt.stichwort)}</xga:stichwort>` : ""}
+      </xga:schwerpunkt>`;
 }
 
 function createWeitereTaetigkeiten(weitereTaetigkeiten: WeitereTaetigkeiten | undefined) {
   if (!weitereTaetigkeiten) return "";
   return `
     <xga:weitereTaetigkeiten>
-      ${weitereTaetigkeiten.taetigkeitenZusammengefasst ? `<xga:taetigkeitenZusammengefasst>${escapeXml(weitereTaetigkeiten.taetigkeitenZusammengefasst)}</xga:taetigkeitenZusammengefasst>` : ""}
+      ${hasAValue(weitereTaetigkeiten.taetigkeitenZusammengefasst) ? `<xga:taetigkeitenZusammengefasst>${escapeXml(weitereTaetigkeiten.taetigkeitenZusammengefasst)}</xga:taetigkeitenZusammengefasst>` : ""}
       ${(weitereTaetigkeiten.taetigkeit ?? []).map(createTaetigkeitEinzeln).join("\n")}
     </xga:weitereTaetigkeiten>`;
 }
@@ -57,15 +67,7 @@ export function createTaetigkeiten(taetigkeitenGesamt: TaetigkeitenGesamt | unde
   const { schwerpunkt, weitereTaetigkeiten } = taetigkeitenGesamt;
   return `
     <xga:taetigkeitenGesamt>
-      ${
-        schwerpunkt
-          ? `<xga:schwerpunkt>
-        ${schwerpunkt.taetigkeitSchwerpunkt ? `<xga:taetigkeitSchwerpunkt>${escapeXml(schwerpunkt.taetigkeitSchwerpunkt)}</xga:taetigkeitSchwerpunkt>` : ""}
-        ${createWirtschaftszweig(schwerpunkt.wirtschaftszweigschluessel)}
-        ${schwerpunkt.stichwort ? `<xga:stichwort>${escapeXml(schwerpunkt.stichwort)}</xga:stichwort>` : ""}
-      </xga:schwerpunkt>`
-          : ""
-      }
+      ${createSchwerpunkt(schwerpunkt)}
       ${createWeitereTaetigkeiten(weitereTaetigkeiten)}
     </xga:taetigkeitenGesamt>`;
 }

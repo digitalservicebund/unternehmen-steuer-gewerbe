@@ -1,4 +1,5 @@
 import { escapeXml } from "../../../helpers/escapeXml";
+import { hasAValue } from "../../../helpers/hasAValue";
 import { createAnschrift, type Anschrift } from "./anschrift";
 import { createKommunikation, type Kommunikation } from "./kommunikation";
 
@@ -15,7 +16,7 @@ export function createBetriebsstaette(betriebsstaette: Betriebsstaette | undefin
   if (!betriebsstaette) return "";
   return `
     <xga:betriebsstaette>
-      ${betriebsstaette.artBetriebsstaette ? `<wt:artBetriebsstaette listVersionID="1"><code>${escapeXml(betriebsstaette.artBetriebsstaette)}</code></wt:artBetriebsstaette>` : ""}
+      ${hasAValue(betriebsstaette.artBetriebsstaette) ? `<wt:artBetriebsstaette listVersionID="1"><code>${escapeXml(betriebsstaette.artBetriebsstaette)}</code></wt:artBetriebsstaette>` : ""}
       ${createAnschrift(betriebsstaette.anschrift)}
       ${createKommunikation(betriebsstaette.kommunikation)}
     </xga:betriebsstaette>`;

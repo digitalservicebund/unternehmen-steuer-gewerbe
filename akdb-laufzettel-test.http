@@ -1,0 +1,21 @@
+POST https://soaptest.akdb.de/okkomm/restapi/v3.0/messages/transport-report/osci
+Content-Type: application/json
+
+{
+  "messageID": "vps_by_17817854007568dc3a6b8-ff6b-4d63-b7f9-67e439f52ef1",
+  "serviceID": "http://www.osci.de/xmeld2605/xmeld2605Statistik.wsdl",
+  "authorityKey": "dbs:090030010000"
+}
+
+HTTP/1.1 401  - 401
+date: Fri, 19 Jun 2026 11:29:36 GMT
+server: Apache
+x-akdb-server: AKDB Tomcat
+vary: Origin
+ratelimit-limit: 120
+ratelimit-remaining: 119
+ratelimit-reset: 59
+content-encoding: gzip
+content-length: 151
+connection: close
+content-type: application/problem+json
