@@ -415,7 +415,7 @@ describe("createGewerbeanmeldungXml", () => {
     expect(xml).toContain("<bk:unternehmensnummer>123456789012345</bk:unternehmensnummer>");
   });
 
-  it("includes gemeindeschluesselErgaenzung and satisfies SCH-0189 for Hamburg", async () => {
+  it("includes gemeindeschluesselErgaenzung for Hamburg (schematron rule SCH-0189)", async () => {
     const hamburg: DataForCreateGewerbeanmeldungXml = {
       ...gewerbeanmeldung,
       autor: { ...gewerbeanmeldung.autor, kennung: "MELDID:02000000" },
