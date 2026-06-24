@@ -440,7 +440,7 @@ describe("createGewerbeanmeldungXml", () => {
     );
   });
 
-  it("rejects a Hamburg Gewerbeanmeldung without gemeindeschluesselErgaenzung (SCH-0189)", async () => {
+  it("rejects a Hamburg Gewerbeanmeldung without gemeindeschluesselErgaenzung (schematron rule SCH-0189 violation)", async () => {
     const hamburgWithoutErgaenzung: DataForCreateGewerbeanmeldungXml = {
       ...gewerbeanmeldung,
       autor: { ...gewerbeanmeldung.autor, kennung: "MELDID:02000000" },
