@@ -1,4 +1,5 @@
 import { escapeXml } from "../../../helpers/escapeXml";
+import { isDefinedInput } from "../../../helpers/isDefinedInput";
 
 export interface BetriebArt {
   /** In diesem Element wird angegeben, ob es sich um einen Industriebetrieb handelt. */
@@ -15,9 +16,9 @@ export function createBetriebArt(betriebArt: BetriebArt | undefined) {
   if (!betriebArt) return "";
   return `
     <xga:betriebArt>
-      ${typeof betriebArt.industrie === "boolean" ? `<xga:industrie>${escapeXml(betriebArt.industrie)}</xga:industrie>` : ""}
-      ${typeof betriebArt.handwerk === "boolean" ? `<xga:handwerk>${escapeXml(betriebArt.handwerk)}</xga:handwerk>` : ""}
-      ${typeof betriebArt.handel === "boolean" ? `<xga:handel>${escapeXml(betriebArt.handel)}</xga:handel>` : ""}
-      ${typeof betriebArt.sonstiges === "boolean" ? `<xga:sonstiges>${escapeXml(betriebArt.sonstiges)}</xga:sonstiges>` : ""}
+      ${isDefinedInput(betriebArt.industrie) ? `<xga:industrie>${escapeXml(betriebArt.industrie)}</xga:industrie>` : ""}
+      ${isDefinedInput(betriebArt.handwerk) ? `<xga:handwerk>${escapeXml(betriebArt.handwerk)}</xga:handwerk>` : ""}
+      ${isDefinedInput(betriebArt.handel) ? `<xga:handel>${escapeXml(betriebArt.handel)}</xga:handel>` : ""}
+      ${isDefinedInput(betriebArt.sonstiges) ? `<xga:sonstiges>${escapeXml(betriebArt.sonstiges)}</xga:sonstiges>` : ""}
     </xga:betriebArt>`;
 }

@@ -1,4 +1,5 @@
 import { escapeXml } from "../../../helpers/escapeXml";
+import { isDefinedInput } from "../../../helpers/isDefinedInput";
 
 export interface Behoerde {
   /** Dieses Element enthält die eindeutige Kennzeichnung der Behörde / öffentlichen Stelle innerhalb des angegebenen Verzeichnisdienstes. Die Behördenkennung des Autors muss das Präfix MELDID oder xga haben. */
@@ -13,6 +14,6 @@ export function createBehoerde(behoerde: Behoerde | undefined) {
     <bn-beh:verzeichnisdienst listVersionID="1">
       <code>DVDV</code>
     </bn-beh:verzeichnisdienst>
-    ${behoerde.kennung ? `<bn-beh:kennung>${escapeXml(behoerde.kennung)}</bn-beh:kennung>` : ""}
-    ${behoerde.name ? `<bn-beh:name>${escapeXml(behoerde.name)}</bn-beh:name>` : ""}`;
+    ${isDefinedInput(behoerde.kennung) ? `<bn-beh:kennung>${escapeXml(behoerde.kennung)}</bn-beh:kennung>` : ""}
+    ${isDefinedInput(behoerde.name) ? `<bn-beh:name>${escapeXml(behoerde.name)}</bn-beh:name>` : ""}`;
 }

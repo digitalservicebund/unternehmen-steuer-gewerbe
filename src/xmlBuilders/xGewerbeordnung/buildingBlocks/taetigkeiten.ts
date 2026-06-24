@@ -1,4 +1,5 @@
 import { escapeXml } from "../../../helpers/escapeXml";
+import { isDefinedInput } from "../../../helpers/isDefinedInput";
 import { createWirtschaftszweig } from "./wirtschaftszweig";
 
 export interface Taetigkeit {
@@ -37,9 +38,9 @@ function createTaetigkeitEinzeln(taetigkeitEinzeln: TaetigkeitEinzeln | undefine
   if (!taetigkeitEinzeln) return "";
   return `
     <xga:taetigkeit>
-      ${taetigkeitEinzeln.taetigkeitEinzeln ? `<xga:taetigkeitEinzeln>${escapeXml(taetigkeitEinzeln.taetigkeitEinzeln)}</xga:taetigkeitEinzeln>` : ""}
+      ${isDefinedInput(taetigkeitEinzeln.taetigkeitEinzeln) ? `<xga:taetigkeitEinzeln>${escapeXml(taetigkeitEinzeln.taetigkeitEinzeln)}</xga:taetigkeitEinzeln>` : ""}
       ${createWirtschaftszweig(taetigkeitEinzeln.wirtschaftszweigschluessel)}
-      ${taetigkeitEinzeln.stichwort ? `<xga:stichwort>${escapeXml(taetigkeitEinzeln.stichwort)}</xga:stichwort>` : ""}
+      ${isDefinedInput(taetigkeitEinzeln.stichwort) ? `<xga:stichwort>${escapeXml(taetigkeitEinzeln.stichwort)}</xga:stichwort>` : ""}
     </xga:taetigkeit>`;
 }
 
@@ -47,7 +48,7 @@ function createWeitereTaetigkeiten(weitereTaetigkeiten: WeitereTaetigkeiten | un
   if (!weitereTaetigkeiten) return "";
   return `
     <xga:weitereTaetigkeiten>
-      ${weitereTaetigkeiten.taetigkeitenZusammengefasst ? `<xga:taetigkeitenZusammengefasst>${escapeXml(weitereTaetigkeiten.taetigkeitenZusammengefasst)}</xga:taetigkeitenZusammengefasst>` : ""}
+      ${isDefinedInput(weitereTaetigkeiten.taetigkeitenZusammengefasst) ? `<xga:taetigkeitenZusammengefasst>${escapeXml(weitereTaetigkeiten.taetigkeitenZusammengefasst)}</xga:taetigkeitenZusammengefasst>` : ""}
       ${(weitereTaetigkeiten.taetigkeit ?? []).map(createTaetigkeitEinzeln).join("\n")}
     </xga:weitereTaetigkeiten>`;
 }
@@ -60,9 +61,9 @@ export function createTaetigkeiten(taetigkeitenGesamt: TaetigkeitenGesamt | unde
       ${
         schwerpunkt
           ? `<xga:schwerpunkt>
-        ${schwerpunkt.taetigkeitSchwerpunkt ? `<xga:taetigkeitSchwerpunkt>${escapeXml(schwerpunkt.taetigkeitSchwerpunkt)}</xga:taetigkeitSchwerpunkt>` : ""}
+        ${isDefinedInput(schwerpunkt.taetigkeitSchwerpunkt) ? `<xga:taetigkeitSchwerpunkt>${escapeXml(schwerpunkt.taetigkeitSchwerpunkt)}</xga:taetigkeitSchwerpunkt>` : ""}
         ${createWirtschaftszweig(schwerpunkt.wirtschaftszweigschluessel)}
-        ${schwerpunkt.stichwort ? `<xga:stichwort>${escapeXml(schwerpunkt.stichwort)}</xga:stichwort>` : ""}
+        ${isDefinedInput(schwerpunkt.stichwort) ? `<xga:stichwort>${escapeXml(schwerpunkt.stichwort)}</xga:stichwort>` : ""}
       </xga:schwerpunkt>`
           : ""
       }
