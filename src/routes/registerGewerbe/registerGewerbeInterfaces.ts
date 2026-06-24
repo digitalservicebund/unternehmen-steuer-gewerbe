@@ -116,7 +116,9 @@ const UnternehmensDatenSchema = z.object({
     example: 26000,
     description: "Voraussichtlicher Gesamtumsatz (in Euro) im Folgejahr.",
   }),
-  umsatzSteuerMitbeantragen: z.boolean().default(false).optional(),
+  umsatzSteuerMitbeantragen: z.boolean().default(false).optional().openapi({
+    description: "Soll mit dem FsE auch eine UmsatzsteuerId mitbeantragt werden?",
+  }),
   gewinnGründungsjahr: z.number().int().min(0).default(1).openapi({
     example: 25000,
     description: "Voraussichtlicher Gewinn (in Euro) im Jahr der Betriebseröffnung.",
