@@ -46,6 +46,17 @@ function getUnternehmensAnschrift(data: RegisterGewerbeRequest) {
   };
 }
 
+function getUstIdNr(data: RegisterGewerbeRequest) {
+  if (data.unternehmensDaten.umsatzSteuerMitbeantragen === true)
+    return {
+      uStIdAntrag: {
+        merkerAntragUStId: true,
+      },
+    };
+
+  return undefined;
+}
+
 export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
   const persönlicheStrasseHausnummer = splitStrasseHausnummer(
     data.persönlicheDaten.adresse.strasseUndHausnummer,
@@ -252,6 +263,7 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
           auswahl: ZAHLLAST_UEBERSCHUSS[data.unternehmensDaten.zahllastUeberschussAuswahl],
           betrag: data.unternehmensDaten.zahllastUeberschussBetrag,
         },
+        uStIdNr: getUstIdNr(data),
       },
     },
   };
