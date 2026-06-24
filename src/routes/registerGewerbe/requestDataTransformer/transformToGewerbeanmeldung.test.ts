@@ -131,7 +131,7 @@ describe("transformToGewerbeanmeldung", () => {
     expect(result.gemeindeschluesselErgaenzung).toBeUndefined();
   });
 
-  it("leaves gemeindeschluesselErgaenzung undefined for an unmapped Hamburg PLZ", () => {
+  it("leaves gemeindeschluesselErgaenzung undefined for unmapped Hamburg PLZ 20000", () => {
     const result = transformToGewerbeanmeldung(
       {
         ...registerGewerbeSampleRequestAllFieldsFilled,
