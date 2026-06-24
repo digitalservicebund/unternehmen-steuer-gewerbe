@@ -3,7 +3,13 @@ import { type CreateGewerbeanmeldungXmlData } from "../../../xmlBuilders/xGewerb
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { type GewerbeRoutingInfo } from "../getGewerbeRoutingInfo";
 import { splitStrasseHausnummer } from "../../../helpers/formFieldTransformations";
-import { VERTRAUENSNIVEAU, RECHTSFORM, STAATSANGEHOERIGKEIT } from "./xGewerbeordnungCodes";
+import {
+  VERTRAUENSNIVEAU,
+  RECHTSFORM,
+  STAATSANGEHOERIGKEIT,
+  HAMBURG_GEMEINDESCHLUESSEL,
+  HAMBURG_STADTBEZIRK_PLZ,
+} from "./xGewerbeordnungCodes";
 import { Anschrift } from "../../../xmlBuilders/xGewerbeordnung/buildingBlocks/anschrift";
 
 function getBetriebsAnschriftWithFallbackToPersönlicheDaten(
@@ -21,6 +27,27 @@ function getBetriebsAnschriftWithFallbackToPersönlicheDaten(
     postleitzahl: betriebsAdresse.postleitzahl,
     ort: betriebsAdresse.ort,
   };
+}
+
+/**
+ * Resolves the Gemeindeschlüssel-Ergänzung Code for Hamburg.
+ * Returns undefined for non-Hamburg municipalities
+ */
+function getGemeindeschluesselErgaenzung(
+  gemeindeSchluessel: string,
+  betriebsPlz: string | undefined,
+) {
+  if (betriebsPlz === undefined || gemeindeSchluessel !== HAMBURG_GEMEINDESCHLUESSEL) {
+    return undefined;
+  }
+
+  for (const [gemeindeschluesselErgaenzung, plzList] of Object.entries(HAMBURG_STADTBEZIRK_PLZ)) {
+    if (plzList.includes(betriebsPlz)) {
+      return gemeindeschluesselErgaenzung;
+    }
+  }
+
+  return undefined;
 }
 
 // Transforms a RegisterGewerbeRequest into a complete Gewerbeanmeldung structure.
@@ -58,6 +85,10 @@ export function transformToGewerbeanmeldung(
     ereigniszeitpunkt: new Date().toISOString(),
     istStorno: false,
     gemeindeSchluessel,
+    gemeindeschluesselErgaenzung: getGemeindeschluesselErgaenzung(
+      gemeindeSchluessel,
+      betriebsAnschrift.postleitzahl,
+    ),
     uuid: randomUUID(),
     gueltigAb: data.unternehmensDaten.tätigkeitsbeginn,
     datumMeldung: new Date().toISOString().split("T")[0]!,

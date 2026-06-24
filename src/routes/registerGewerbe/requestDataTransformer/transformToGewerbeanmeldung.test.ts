@@ -9,6 +9,7 @@ const testRoutingInfo = {
   gewerbeamt: { name: "Stadt Fulda", onlineServiceLinks: [] },
   fitConnectDestinationInformation: { destinationId: "00000000-0000-0000-0000-000000000002" },
 };
+const testRoutingInfoHamburg = { ...testRoutingInfo, ags: "02000000" };
 
 describe("transformToGewerbeanmeldung", () => {
   it("maps default values, applies the geschlecht fallback if the geschlecht is not given and drops optional fields", () => {
@@ -100,5 +101,53 @@ describe("transformToGewerbeanmeldung", () => {
     );
 
     expect(result.gemeindeSchluessel).toBe(testRoutingInfo.ags);
+  });
+
+  it("derives the Hamburg gemeindeschluesselErgaenzung 02100000 from adresseAbweichend.postleitzahl 22767", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          adresseAbweichend: {
+            strasseUndHausnummer: "Reeperbahn 1",
+            postleitzahl: "22767",
+            ort: "Hamburg",
+          },
+        },
+      },
+      testRoutingInfoHamburg,
+    );
+
+    expect(result.gemeindeschluesselErgaenzung).toBe("02100000");
+  });
+
+  it("leaves gemeindeschluesselErgaenzung undefined for non-Hamburg municipalities", () => {
+    const result = transformToGewerbeanmeldung(
+      registerGewerbeSampleRequestAllFieldsFilled,
+      testRoutingInfo,
+    );
+
+    expect(result.gemeindeSchluessel).not.toBe(testRoutingInfoHamburg.ags);
+    expect(result.gemeindeschluesselErgaenzung).toBeUndefined();
+  });
+
+  it("leaves gemeindeschluesselErgaenzung undefined for unmapped Hamburg PLZ 20000", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          adresseAbweichend: {
+            strasseUndHausnummer: "Musterstraße 1",
+            postleitzahl: "20000",
+            ort: "Hamburg",
+          },
+        },
+      },
+      testRoutingInfoHamburg,
+    );
+
+    expect(result.gemeindeschluesselErgaenzung).toBeUndefined();
   });
 });
