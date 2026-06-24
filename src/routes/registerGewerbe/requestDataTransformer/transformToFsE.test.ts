@@ -39,6 +39,8 @@ describe("transformToEUnFsE", () => {
     expect(
       result.eUn?.festsetzungsAngaben?.voraussichtlicheEinkuenfte?.einkGewBetr?.folgeJahrA,
     ).toBe(1);
+
+    expect(result.eUn?.umsatzsteuer?.uStIdNr?.uStIdAntrag?.merkerAntragUStId).toBe("true");
   });
 
   it("maps geschlecht 'm' to anredeId '1' and 'w' to '2'", () => {
