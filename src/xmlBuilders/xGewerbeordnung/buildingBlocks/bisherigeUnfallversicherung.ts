@@ -1,5 +1,5 @@
 import { escapeXml } from "../../../helpers/escapeXml";
-import { hasAValue } from "../../../helpers/hasAValue";
+import { isDefined } from "../../../helpers/isDefined";
 
 export interface BisherigeUnfallversicherung {
   /** Schlüssel des Trägers der bisherigen gesetzlichen Unfallversicherung. */
@@ -15,8 +15,8 @@ export function createBisherigeUnfallversicherung(
   return `
     <bk:bisherigeUnfallversicherung>
       <bk:traeger listVersionID="1">
-        <code>${hasAValue(bisherigeUnfallversicherung.traeger) ? escapeXml(bisherigeUnfallversicherung.traeger) : ""}</code>
+        <code>${isDefined(bisherigeUnfallversicherung.traeger) ? escapeXml(bisherigeUnfallversicherung.traeger) : ""}</code>
       </bk:traeger>
-      ${hasAValue(bisherigeUnfallversicherung.unternehmensnummer) ? `<bk:unternehmensnummer>${escapeXml(bisherigeUnfallversicherung.unternehmensnummer)}</bk:unternehmensnummer>` : ""}
+      ${isDefined(bisherigeUnfallversicherung.unternehmensnummer) ? `<bk:unternehmensnummer>${escapeXml(bisherigeUnfallversicherung.unternehmensnummer)}</bk:unternehmensnummer>` : ""}
     </bk:bisherigeUnfallversicherung>`;
 }

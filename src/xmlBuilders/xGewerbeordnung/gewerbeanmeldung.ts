@@ -15,7 +15,7 @@ import {
   type ReferenzierteSubjekte,
 } from "./buildingBlocks/referenzierteSubjekte";
 import { escapeXml } from "../../helpers/escapeXml";
-import { hasAValue } from "../../helpers/hasAValue";
+import { isDefined } from "../../helpers/isDefined";
 
 export interface CreateGewerbeanmeldungXmlData {
   nachrichtenkopf?: Nachrichtenkopf;
@@ -95,23 +95,23 @@ export async function createGewerbeanmeldungXml(
     <xga:ext.gewerbemeldung.0400 ${ROOT_ATTRIBUTES}>
       ${createG2gNachrichtenkopf(gewerbeanmeldung.nachrichtenkopf)}
       <xga:satz>
-        ${hasAValue(gewerbeanmeldung.anzeigerenderId) ? `<antr:anzeigender.id>${escapeXml(gewerbeanmeldung.anzeigerenderId)}</antr:anzeigender.id>` : ""}
-        ${hasAValue(gewerbeanmeldung.handelndePersonId) ? `<antr:handelndePerson.id>${escapeXml(gewerbeanmeldung.handelndePersonId)}</antr:handelndePerson.id>` : ""}
-        ${hasAValue(gewerbeanmeldung.handelndePersonVertrauensniveauCode) ? `<bk:handelndePerson.vertrauensniveauIdentifikation listVersionID="4"><code>${escapeXml(gewerbeanmeldung.handelndePersonVertrauensniveauCode)}</code></bk:handelndePerson.vertrauensniveauIdentifikation>` : ""}
-        ${hasAValue(gewerbeanmeldung.ansprechpartnerId) ? `<antr:ansprechpartner.id>${escapeXml(gewerbeanmeldung.ansprechpartnerId)}</antr:ansprechpartner.id>` : ""}
+        ${isDefined(gewerbeanmeldung.anzeigerenderId) ? `<antr:anzeigender.id>${escapeXml(gewerbeanmeldung.anzeigerenderId)}</antr:anzeigender.id>` : ""}
+        ${isDefined(gewerbeanmeldung.handelndePersonId) ? `<antr:handelndePerson.id>${escapeXml(gewerbeanmeldung.handelndePersonId)}</antr:handelndePerson.id>` : ""}
+        ${isDefined(gewerbeanmeldung.handelndePersonVertrauensniveauCode) ? `<bk:handelndePerson.vertrauensniveauIdentifikation listVersionID="4"><code>${escapeXml(gewerbeanmeldung.handelndePersonVertrauensniveauCode)}</code></bk:handelndePerson.vertrauensniveauIdentifikation>` : ""}
+        ${isDefined(gewerbeanmeldung.ansprechpartnerId) ? `<antr:ansprechpartner.id>${escapeXml(gewerbeanmeldung.ansprechpartnerId)}</antr:ansprechpartner.id>` : ""}
         <xga:anmeldung>
             ${gewerbeanmeldung.autor ? `<xga:autor>${createBehoerde(gewerbeanmeldung.autor)}</xga:autor>` : ""}
-            ${hasAValue(gewerbeanmeldung.satzErstellung) ? `<xga:satzErstellung>${escapeXml(gewerbeanmeldung.satzErstellung)}</xga:satzErstellung>` : ""}
-            ${hasAValue(gewerbeanmeldung.ereigniszeitpunkt) ? `<xga:ereigniszeitpunkt>${escapeXml(gewerbeanmeldung.ereigniszeitpunkt)}</xga:ereigniszeitpunkt>` : ""}
-            ${hasAValue(gewerbeanmeldung.istStorno) ? `<xga:istStorno>${escapeXml(gewerbeanmeldung.istStorno)}</xga:istStorno>` : ""}
-            ${hasAValue(gewerbeanmeldung.gemeindeSchluessel) ? `<xga:gemeindeSchluessel listVersionID="2020-03-31"><code>${escapeXml(gewerbeanmeldung.gemeindeSchluessel)}</code></xga:gemeindeSchluessel>` : ""}
-            ${hasAValue(gewerbeanmeldung.uuid) ? `<xga:uuid>${escapeXml(gewerbeanmeldung.uuid)}</xga:uuid>` : ""}
-            ${hasAValue(gewerbeanmeldung.gueltigAb) ? `<xga:gueltigAb>${escapeXml(gewerbeanmeldung.gueltigAb)}</xga:gueltigAb>` : ""}
-            ${hasAValue(gewerbeanmeldung.datumMeldung) ? `<xga:datumMeldung>${escapeXml(gewerbeanmeldung.datumMeldung)}</xga:datumMeldung>` : ""}
+            ${isDefined(gewerbeanmeldung.satzErstellung) ? `<xga:satzErstellung>${escapeXml(gewerbeanmeldung.satzErstellung)}</xga:satzErstellung>` : ""}
+            ${isDefined(gewerbeanmeldung.ereigniszeitpunkt) ? `<xga:ereigniszeitpunkt>${escapeXml(gewerbeanmeldung.ereigniszeitpunkt)}</xga:ereigniszeitpunkt>` : ""}
+            ${isDefined(gewerbeanmeldung.istStorno) ? `<xga:istStorno>${escapeXml(gewerbeanmeldung.istStorno)}</xga:istStorno>` : ""}
+            ${isDefined(gewerbeanmeldung.gemeindeSchluessel) ? `<xga:gemeindeSchluessel listVersionID="2020-03-31"><code>${escapeXml(gewerbeanmeldung.gemeindeSchluessel)}</code></xga:gemeindeSchluessel>` : ""}
+            ${isDefined(gewerbeanmeldung.uuid) ? `<xga:uuid>${escapeXml(gewerbeanmeldung.uuid)}</xga:uuid>` : ""}
+            ${isDefined(gewerbeanmeldung.gueltigAb) ? `<xga:gueltigAb>${escapeXml(gewerbeanmeldung.gueltigAb)}</xga:gueltigAb>` : ""}
+            ${isDefined(gewerbeanmeldung.datumMeldung) ? `<xga:datumMeldung>${escapeXml(gewerbeanmeldung.datumMeldung)}</xga:datumMeldung>` : ""}
             ${createBisherigeUnfallversicherung(gewerbeanmeldung.bisherigeUnfallversicherung)}
             ${createGewerbebetrieb(gewerbeanmeldung.gewerbebetrieb, natuerlichePerson0?.id ?? "")}
             ${createReferenzierteSubjekte(gewerbeanmeldung.referenzierteSubjekte)}
-            ${hasAValue(gewerbeanmeldung.grundAnmeldungSchluessel) ? `<xga:grundAnmeldungSchluessel><code>${escapeXml(gewerbeanmeldung.grundAnmeldungSchluessel)}</code></xga:grundAnmeldungSchluessel>` : ""}
+            ${isDefined(gewerbeanmeldung.grundAnmeldungSchluessel) ? `<xga:grundAnmeldungSchluessel><code>${escapeXml(gewerbeanmeldung.grundAnmeldungSchluessel)}</code></xga:grundAnmeldungSchluessel>` : ""}
         </xga:anmeldung>
       </xga:satz>
     </xga:ext.gewerbemeldung.0400>`;

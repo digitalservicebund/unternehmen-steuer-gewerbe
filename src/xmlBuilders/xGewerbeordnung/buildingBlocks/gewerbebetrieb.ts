@@ -1,5 +1,5 @@
 import { escapeXml } from "../../../helpers/escapeXml";
-import { hasAValue } from "../../../helpers/hasAValue";
+import { isDefined } from "../../../helpers/isDefined";
 import { createBetriebArt, type BetriebArt } from "./betriebArt";
 import { createBetriebsstaette, type Betriebsstaette } from "./betriebsstaette";
 import { createEintragung, type Eintragung } from "./eintragung";
@@ -44,22 +44,22 @@ export function createGewerbebetrieb(
   if (!gewerbebetrieb) return "";
   return `
     <xga:gewerbebetrieb>
-      ${hasAValue(gewerbebetrieb.gewerbebetriebID) ? `<xga:gewerbebetriebID>${escapeXml(gewerbebetrieb.gewerbebetriebID)}</xga:gewerbebetriebID>` : ""}
-      ${hasAValue(gewerbebetrieb.gemeindeMeldungNr) ? `<xga:gemeindeMeldungNr>${escapeXml(gewerbebetrieb.gemeindeMeldungNr)}</xga:gemeindeMeldungNr>` : ""}
-      ${hasAValue(gewerbebetrieb.rechtsformcode) ? `<rf:rechtsform><rf:rechtsformcode listVersionID="2.2"><code>${escapeXml(gewerbebetrieb.rechtsformcode)}</code></rf:rechtsformcode></rf:rechtsform>` : ""}
-      ${hasAValue(wirtschaftlichTaetigerId) ? `<wt:wirtschaftlichTaetiger.id>${escapeXml(wirtschaftlichTaetigerId)}</wt:wirtschaftlichTaetiger.id>` : ""}
-      ${hasAValue(gewerbebetrieb.eingetragenerName) ? `<ename:eingetragenerName>${escapeXml(gewerbebetrieb.eingetragenerName)}</ename:eingetragenerName>` : ""}
+      ${isDefined(gewerbebetrieb.gewerbebetriebID) ? `<xga:gewerbebetriebID>${escapeXml(gewerbebetrieb.gewerbebetriebID)}</xga:gewerbebetriebID>` : ""}
+      ${isDefined(gewerbebetrieb.gemeindeMeldungNr) ? `<xga:gemeindeMeldungNr>${escapeXml(gewerbebetrieb.gemeindeMeldungNr)}</xga:gemeindeMeldungNr>` : ""}
+      ${isDefined(gewerbebetrieb.rechtsformcode) ? `<rf:rechtsform><rf:rechtsformcode listVersionID="2.2"><code>${escapeXml(gewerbebetrieb.rechtsformcode)}</code></rf:rechtsformcode></rf:rechtsform>` : ""}
+      ${isDefined(wirtschaftlichTaetigerId) ? `<wt:wirtschaftlichTaetiger.id>${escapeXml(wirtschaftlichTaetigerId)}</wt:wirtschaftlichTaetiger.id>` : ""}
+      ${isDefined(gewerbebetrieb.eingetragenerName) ? `<ename:eingetragenerName>${escapeXml(gewerbebetrieb.eingetragenerName)}</ename:eingetragenerName>` : ""}
       ${createEintragung(gewerbebetrieb.eintragung)}
       ${createBetriebsstaette(gewerbebetrieb.betriebsstaette)}
       ${createTaetigkeiten(gewerbebetrieb.taetigkeitenGesamt)}
       <xga:gewerbetreibender>
-        ${hasAValue(wirtschaftlichTaetigerId) ? `<xga:gewerbetreibender.id>${escapeXml(wirtschaftlichTaetigerId)}</xga:gewerbetreibender.id>` : ""}
-        ${hasAValue(gewerbebetrieb.istNebenerwerb) ? `<xga:istNebenerwerb>${escapeXml(gewerbebetrieb.istNebenerwerb)}</xga:istNebenerwerb>` : ""}
+        ${isDefined(wirtschaftlichTaetigerId) ? `<xga:gewerbetreibender.id>${escapeXml(wirtschaftlichTaetigerId)}</xga:gewerbetreibender.id>` : ""}
+        ${isDefined(gewerbebetrieb.istNebenerwerb) ? `<xga:istNebenerwerb>${escapeXml(gewerbebetrieb.istNebenerwerb)}</xga:istNebenerwerb>` : ""}
       </xga:gewerbetreibender>
-      ${hasAValue(gewerbebetrieb.anzahlVollzeitBeschaeftigte) ? `<xga:anzahlVollzeitBeschaeftigte>${escapeXml(gewerbebetrieb.anzahlVollzeitBeschaeftigte)}</xga:anzahlVollzeitBeschaeftigte>` : ""}
-      ${hasAValue(gewerbebetrieb.anzahlTeilzeitBeschaeftigte) ? `<xga:anzahlTeilzeitBeschaeftigte>${escapeXml(gewerbebetrieb.anzahlTeilzeitBeschaeftigte)}</xga:anzahlTeilzeitBeschaeftigte>` : ""}
-      ${hasAValue(gewerbebetrieb.istReisegewerbe) ? `<xga:istReisegewerbe>${escapeXml(gewerbebetrieb.istReisegewerbe)}</xga:istReisegewerbe>` : ""}
-      ${hasAValue(gewerbebetrieb.beteiligungOeffentlicheHand) ? `<xga:beteiligungOeffentlicheHand><code>${escapeXml(gewerbebetrieb.beteiligungOeffentlicheHand)}</code></xga:beteiligungOeffentlicheHand>` : ""}
+      ${isDefined(gewerbebetrieb.anzahlVollzeitBeschaeftigte) ? `<xga:anzahlVollzeitBeschaeftigte>${escapeXml(gewerbebetrieb.anzahlVollzeitBeschaeftigte)}</xga:anzahlVollzeitBeschaeftigte>` : ""}
+      ${isDefined(gewerbebetrieb.anzahlTeilzeitBeschaeftigte) ? `<xga:anzahlTeilzeitBeschaeftigte>${escapeXml(gewerbebetrieb.anzahlTeilzeitBeschaeftigte)}</xga:anzahlTeilzeitBeschaeftigte>` : ""}
+      ${isDefined(gewerbebetrieb.istReisegewerbe) ? `<xga:istReisegewerbe>${escapeXml(gewerbebetrieb.istReisegewerbe)}</xga:istReisegewerbe>` : ""}
+      ${isDefined(gewerbebetrieb.beteiligungOeffentlicheHand) ? `<xga:beteiligungOeffentlicheHand><code>${escapeXml(gewerbebetrieb.beteiligungOeffentlicheHand)}</code></xga:beteiligungOeffentlicheHand>` : ""}
       ${createBetriebArt(gewerbebetrieb.betriebArt)}
       ${createHandwerkskarte(gewerbebetrieb.handwerkskarte)}
     </xga:gewerbebetrieb>`;

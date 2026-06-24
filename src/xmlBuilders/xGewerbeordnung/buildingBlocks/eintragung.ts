@@ -1,5 +1,5 @@
 import { escapeXml } from "../../../helpers/escapeXml";
-import { hasAValue } from "../../../helpers/hasAValue";
+import { isDefined } from "../../../helpers/isDefined";
 
 export interface Eintragung {
   /** Angabe der Art des Registers, in welchem der wirtschaftlich Tätige bzw. die wirtschaftliche Tätigkeit (z. B. Zweigniederlassung) geführt wird. */
@@ -16,8 +16,8 @@ export function createEintragung(eintragung: Eintragung | undefined) {
   if (!eintragung) return "";
   return `
     <bk:eintragung>
-      ${hasAValue(eintragung.artEintragung) ? `<eintragung:artEintragung listVersionID="1"><code>${escapeXml(eintragung.artEintragung)}</code></eintragung:artEintragung>` : ""}
-      ${hasAValue(eintragung.registergericht?.code) ? `<eintragung:registergericht.code listVersionID="12"><code>${escapeXml(eintragung.registergericht.code)}</code></eintragung:registergericht.code>` : ""}
-      ${hasAValue(eintragung.eintragungsnummer) ? `<eintragung:eintragungsnummer>${escapeXml(eintragung.eintragungsnummer)}</eintragung:eintragungsnummer>` : ""}
+      ${isDefined(eintragung.artEintragung) ? `<eintragung:artEintragung listVersionID="1"><code>${escapeXml(eintragung.artEintragung)}</code></eintragung:artEintragung>` : ""}
+      ${isDefined(eintragung.registergericht?.code) ? `<eintragung:registergericht.code listVersionID="12"><code>${escapeXml(eintragung.registergericht.code)}</code></eintragung:registergericht.code>` : ""}
+      ${isDefined(eintragung.eintragungsnummer) ? `<eintragung:eintragungsnummer>${escapeXml(eintragung.eintragungsnummer)}</eintragung:eintragungsnummer>` : ""}
     </bk:eintragung>`;
 }
