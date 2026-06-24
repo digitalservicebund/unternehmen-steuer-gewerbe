@@ -1,5 +1,5 @@
 import { escapeXml } from "../../../helpers/escapeXml";
-import { isDefined } from "../../../helpers/isDefined";
+import { isDefinedInput } from "../../../helpers/isDefinedInput";
 import { createWirtschaftszweig } from "./wirtschaftszweig";
 
 export interface Taetigkeit {
@@ -38,18 +38,18 @@ function createTaetigkeitEinzeln(taetigkeitEinzeln: TaetigkeitEinzeln | undefine
   if (!taetigkeitEinzeln) return "";
   return `
     <xga:taetigkeit>
-      ${isDefined(taetigkeitEinzeln.taetigkeitEinzeln) ? `<xga:taetigkeitEinzeln>${escapeXml(taetigkeitEinzeln.taetigkeitEinzeln)}</xga:taetigkeitEinzeln>` : ""}
+      ${isDefinedInput(taetigkeitEinzeln.taetigkeitEinzeln) ? `<xga:taetigkeitEinzeln>${escapeXml(taetigkeitEinzeln.taetigkeitEinzeln)}</xga:taetigkeitEinzeln>` : ""}
       ${createWirtschaftszweig(taetigkeitEinzeln.wirtschaftszweigschluessel)}
-      ${isDefined(taetigkeitEinzeln.stichwort) ? `<xga:stichwort>${escapeXml(taetigkeitEinzeln.stichwort)}</xga:stichwort>` : ""}
+      ${isDefinedInput(taetigkeitEinzeln.stichwort) ? `<xga:stichwort>${escapeXml(taetigkeitEinzeln.stichwort)}</xga:stichwort>` : ""}
     </xga:taetigkeit>`;
 }
 
 function createSchwerpunkt(schwerpunkt: Taetigkeit | undefined) {
   if (!schwerpunkt) return "";
   return `<xga:schwerpunkt>
-        ${isDefined(schwerpunkt.taetigkeitSchwerpunkt) ? `<xga:taetigkeitSchwerpunkt>${escapeXml(schwerpunkt.taetigkeitSchwerpunkt)}</xga:taetigkeitSchwerpunkt>` : ""}
+        ${isDefinedInput(schwerpunkt.taetigkeitSchwerpunkt) ? `<xga:taetigkeitSchwerpunkt>${escapeXml(schwerpunkt.taetigkeitSchwerpunkt)}</xga:taetigkeitSchwerpunkt>` : ""}
         ${createWirtschaftszweig(schwerpunkt.wirtschaftszweigschluessel)}
-        ${isDefined(schwerpunkt.stichwort) ? `<xga:stichwort>${escapeXml(schwerpunkt.stichwort)}</xga:stichwort>` : ""}
+        ${isDefinedInput(schwerpunkt.stichwort) ? `<xga:stichwort>${escapeXml(schwerpunkt.stichwort)}</xga:stichwort>` : ""}
       </xga:schwerpunkt>`;
 }
 
@@ -57,7 +57,7 @@ function createWeitereTaetigkeiten(weitereTaetigkeiten: WeitereTaetigkeiten | un
   if (!weitereTaetigkeiten) return "";
   return `
     <xga:weitereTaetigkeiten>
-      ${isDefined(weitereTaetigkeiten.taetigkeitenZusammengefasst) ? `<xga:taetigkeitenZusammengefasst>${escapeXml(weitereTaetigkeiten.taetigkeitenZusammengefasst)}</xga:taetigkeitenZusammengefasst>` : ""}
+      ${isDefinedInput(weitereTaetigkeiten.taetigkeitenZusammengefasst) ? `<xga:taetigkeitenZusammengefasst>${escapeXml(weitereTaetigkeiten.taetigkeitenZusammengefasst)}</xga:taetigkeitenZusammengefasst>` : ""}
       ${(weitereTaetigkeiten.taetigkeit ?? []).map(createTaetigkeitEinzeln).join("\n")}
     </xga:weitereTaetigkeiten>`;
 }

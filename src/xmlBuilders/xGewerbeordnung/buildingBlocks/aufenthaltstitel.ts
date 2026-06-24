@@ -1,5 +1,5 @@
 import { escapeXml } from "../../../helpers/escapeXml";
-import { isDefined } from "../../../helpers/isDefined";
+import { isDefinedInput } from "../../../helpers/isDefinedInput";
 
 export interface Aufenthaltstitel {
   /** Angabe des Status des Aufenthaltstitels */
@@ -18,10 +18,10 @@ export function createAufenthaltstitel(aufenthaltstitel: Aufenthaltstitel | unde
   if (!aufenthaltstitel) return "";
   return `
     <xga:aufenthaltstitel>
-      ${isDefined(aufenthaltstitel.status) ? `<xga:status><code>${escapeXml(aufenthaltstitel.status)}</code></xga:status>` : ""}
-      ${isDefined(aufenthaltstitel.ausgestelltAm) ? `<xga:ausgestelltAm>${escapeXml(aufenthaltstitel.ausgestelltAm)}</xga:ausgestelltAm>` : ""}
-      ${isDefined(aufenthaltstitel.ausgestelltVonName) ? `<xga:ausgestelltVonName>${escapeXml(aufenthaltstitel.ausgestelltVonName)}</xga:ausgestelltVonName>` : ""}
-      ${isDefined(aufenthaltstitel.ausgestelltVonPLZ) ? `<xga:ausgestelltVonPLZ>${escapeXml(aufenthaltstitel.ausgestelltVonPLZ)}</xga:ausgestelltVonPLZ>` : ""}
-      ${isDefined(aufenthaltstitel.ausgestelltVonOrt) ? `<xga:ausgestelltVonOrt>${escapeXml(aufenthaltstitel.ausgestelltVonOrt)}</xga:ausgestelltVonOrt>` : ""}
+      ${isDefinedInput(aufenthaltstitel.status) ? `<xga:status><code>${escapeXml(aufenthaltstitel.status)}</code></xga:status>` : ""}
+      ${isDefinedInput(aufenthaltstitel.ausgestelltAm) ? `<xga:ausgestelltAm>${escapeXml(aufenthaltstitel.ausgestelltAm)}</xga:ausgestelltAm>` : ""}
+      ${isDefinedInput(aufenthaltstitel.ausgestelltVonName) ? `<xga:ausgestelltVonName>${escapeXml(aufenthaltstitel.ausgestelltVonName)}</xga:ausgestelltVonName>` : ""}
+      ${isDefinedInput(aufenthaltstitel.ausgestelltVonPLZ) ? `<xga:ausgestelltVonPLZ>${escapeXml(aufenthaltstitel.ausgestelltVonPLZ)}</xga:ausgestelltVonPLZ>` : ""}
+      ${isDefinedInput(aufenthaltstitel.ausgestelltVonOrt) ? `<xga:ausgestelltVonOrt>${escapeXml(aufenthaltstitel.ausgestelltVonOrt)}</xga:ausgestelltVonOrt>` : ""}
     </xga:aufenthaltstitel>`;
 }

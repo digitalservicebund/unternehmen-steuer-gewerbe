@@ -1,5 +1,5 @@
 import { escapeXml } from "../../../helpers/escapeXml";
-import { isDefined } from "../../../helpers/isDefined";
+import { isDefinedInput } from "../../../helpers/isDefinedInput";
 
 export interface Anschrift {
   /** Falls die Anschrift unbekannt ist (z. B. bei Abmeldung von Amts wegen), so ist hier der Wert "unbekannt" zu übermitteln. */
@@ -21,12 +21,12 @@ export function createAnschrift(strassenanschriftInland: Anschrift | undefined) 
   return `
     <bk:anschrift>
       <bk:strassenanschriftInland>
-        ${isDefined(strassenanschriftInland.strasse) ? `<adr:strasse>${escapeXml(strassenanschriftInland.strasse)}</adr:strasse>` : ""}
-        ${isDefined(strassenanschriftInland.strassenschluessel) ? `<bk:strassenschluessel>${escapeXml(strassenanschriftInland.strassenschluessel)}</bk:strassenschluessel>` : ""}
-        ${isDefined(strassenanschriftInland.hausnummerVon) ? `<bk:hausnummerVon>${escapeXml(strassenanschriftInland.hausnummerVon)}</bk:hausnummerVon>` : ""}
-        ${isDefined(strassenanschriftInland.hausnummerBis) ? `<bk:hausnummerBis>${escapeXml(strassenanschriftInland.hausnummerBis)}</bk:hausnummerBis>` : ""}
-        ${isDefined(strassenanschriftInland.postleitzahl) ? `<adr:postleitzahl>${escapeXml(strassenanschriftInland.postleitzahl)}</adr:postleitzahl>` : ""}
-        ${isDefined(strassenanschriftInland.ort) ? `<adr:ort>${escapeXml(strassenanschriftInland.ort)}</adr:ort>` : ""}
+        ${isDefinedInput(strassenanschriftInland.strasse) ? `<adr:strasse>${escapeXml(strassenanschriftInland.strasse)}</adr:strasse>` : ""}
+        ${isDefinedInput(strassenanschriftInland.strassenschluessel) ? `<bk:strassenschluessel>${escapeXml(strassenanschriftInland.strassenschluessel)}</bk:strassenschluessel>` : ""}
+        ${isDefinedInput(strassenanschriftInland.hausnummerVon) ? `<bk:hausnummerVon>${escapeXml(strassenanschriftInland.hausnummerVon)}</bk:hausnummerVon>` : ""}
+        ${isDefinedInput(strassenanschriftInland.hausnummerBis) ? `<bk:hausnummerBis>${escapeXml(strassenanschriftInland.hausnummerBis)}</bk:hausnummerBis>` : ""}
+        ${isDefinedInput(strassenanschriftInland.postleitzahl) ? `<adr:postleitzahl>${escapeXml(strassenanschriftInland.postleitzahl)}</adr:postleitzahl>` : ""}
+        ${isDefinedInput(strassenanschriftInland.ort) ? `<adr:ort>${escapeXml(strassenanschriftInland.ort)}</adr:ort>` : ""}
       </bk:strassenanschriftInland>
     </bk:anschrift>`;
 }

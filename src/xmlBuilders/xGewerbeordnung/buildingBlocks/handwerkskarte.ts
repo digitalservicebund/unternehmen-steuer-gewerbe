@@ -1,5 +1,5 @@
 import { escapeXml } from "../../../helpers/escapeXml";
-import { isDefined } from "../../../helpers/isDefined";
+import { isDefinedInput } from "../../../helpers/isDefinedInput";
 
 export interface Handwerkskarte {
   /** Status der Handwerkskarte */
@@ -18,10 +18,10 @@ export function createHandwerkskarte(handwerkskarte: Handwerkskarte | undefined)
   if (!handwerkskarte) return "";
   return `
     <xga:handwerkskarte>
-      ${isDefined(handwerkskarte.status) ? `<xga:status><code>${escapeXml(handwerkskarte.status)}</code></xga:status>` : ""}
-      ${isDefined(handwerkskarte.ausgestelltAm) ? `<xga:ausgestelltAm>${escapeXml(handwerkskarte.ausgestelltAm)}</xga:ausgestelltAm>` : ""}
-      ${isDefined(handwerkskarte.ausgestelltVonPLZ) ? `<xga:ausgestelltVonPLZ>${escapeXml(handwerkskarte.ausgestelltVonPLZ)}</xga:ausgestelltVonPLZ>` : ""}
-      ${isDefined(handwerkskarte.ausgestelltVonOrt) ? `<xga:ausgestelltVonOrt>${escapeXml(handwerkskarte.ausgestelltVonOrt)}</xga:ausgestelltVonOrt>` : ""}
-      ${isDefined(handwerkskarte.ausgestelltVonSchluessel) ? `<xga:ausgestelltVonSchluessel listVersionID="5"><code>${escapeXml(handwerkskarte.ausgestelltVonSchluessel)}</code></xga:ausgestelltVonSchluessel>` : ""}
+      ${isDefinedInput(handwerkskarte.status) ? `<xga:status><code>${escapeXml(handwerkskarte.status)}</code></xga:status>` : ""}
+      ${isDefinedInput(handwerkskarte.ausgestelltAm) ? `<xga:ausgestelltAm>${escapeXml(handwerkskarte.ausgestelltAm)}</xga:ausgestelltAm>` : ""}
+      ${isDefinedInput(handwerkskarte.ausgestelltVonPLZ) ? `<xga:ausgestelltVonPLZ>${escapeXml(handwerkskarte.ausgestelltVonPLZ)}</xga:ausgestelltVonPLZ>` : ""}
+      ${isDefinedInput(handwerkskarte.ausgestelltVonOrt) ? `<xga:ausgestelltVonOrt>${escapeXml(handwerkskarte.ausgestelltVonOrt)}</xga:ausgestelltVonOrt>` : ""}
+      ${isDefinedInput(handwerkskarte.ausgestelltVonSchluessel) ? `<xga:ausgestelltVonSchluessel listVersionID="5"><code>${escapeXml(handwerkskarte.ausgestelltVonSchluessel)}</code></xga:ausgestelltVonSchluessel>` : ""}
     </xga:handwerkskarte>`;
 }
