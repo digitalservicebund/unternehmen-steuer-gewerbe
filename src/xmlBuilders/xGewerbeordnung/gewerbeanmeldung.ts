@@ -36,7 +36,7 @@ export interface CreateGewerbeanmeldungXmlData {
   istStorno?: boolean;
   /** Amtlicher Gemeindeschlüssel der Sitzgemeinde der Betriebsstätte */
   gemeindeSchluessel?: string;
-  /** Stadtbezirk der Betriebsstätte (Stadtstaaten); für Hamburg/Berlin laut SCH-0189 Pflicht. */
+  /** Stadtbezirk der Betriebsstätte (Stadtstaaten); Pflicht für Hamburg und Berlin (schematron rule SCH-0189). */
   gemeindeschluesselErgaenzung?: string;
   /** Eindeutige Kennzeichnung der Gewerbeanzeige als UUID. */
   uuid?: string;
