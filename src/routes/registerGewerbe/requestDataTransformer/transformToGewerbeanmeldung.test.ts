@@ -128,6 +128,7 @@ describe("transformToGewerbeanmeldung", () => {
       testRoutingInfo,
     );
 
+    expect(result.gemeindeSchluessel).not.toBe(testRoutingInfoHamburg.ags);
     expect(result.gemeindeschluesselErgaenzung).toBeUndefined();
   });
 

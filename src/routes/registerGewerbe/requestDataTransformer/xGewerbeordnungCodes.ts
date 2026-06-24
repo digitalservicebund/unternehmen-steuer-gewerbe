@@ -460,10 +460,10 @@ export const STAATSANGEHOERIGKEIT_KEYS = Object.keys(STAATSANGEHOERIGKEIT) as [
 ];
 
 // Amtlicher Gemeindeschlüssel (AGS) of Hamburg
-const HAMBURG_GEMEINDESCHLUESSEL = "02000000";
+export const HAMBURG_GEMEINDESCHLUESSEL = "02000000";
 // Hamburg district (Stadtbezirke) Postleitzahlen, grouped by Gemeindeschlüssel-Ergänzung Codes
 // see https://www.xrepository.de/details/urn:xoev-de:xgewerbeordnung:codeliste:gemeindeschluesselergaenzung_1
-const HAMBURG_STADTBEZIRK_PLZ: Record<string, readonly string[]> = {
+export const HAMBURG_STADTBEZIRK_PLZ: Record<string, readonly string[]> = {
   // Hamburg-Mitte
   "02100000": [
     "20095",
@@ -572,21 +572,3 @@ const HAMBURG_STADTBEZIRK_PLZ: Record<string, readonly string[]> = {
   // Harburg
   "02700000": ["21073", "21075", "21077", "21079", "21147", "21149"],
 };
-
-/**
- * Resolves the Gemeindeschlüssel-Ergänzung Code for Hamburg.
- * Returns undefined for non-Hamburg municipalities
- */
-export function getGemeindeschluesselErgaenzung(gemeindeSchluessel: string, betriebsPlz: string) {
-  if (gemeindeSchluessel !== HAMBURG_GEMEINDESCHLUESSEL) {
-    return undefined;
-  }
-
-  for (const [gemeindeschluesselErgaenzung, plzList] of Object.entries(HAMBURG_STADTBEZIRK_PLZ)) {
-    if (plzList.includes(betriebsPlz)) {
-      return gemeindeschluesselErgaenzung;
-    }
-  }
-
-  return undefined;
-}
