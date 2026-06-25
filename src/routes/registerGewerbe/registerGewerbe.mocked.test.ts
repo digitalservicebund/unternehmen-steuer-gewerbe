@@ -169,6 +169,29 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(json.gewerbeanmeldung.success).toBe(false);
       expect(json.fseÜbermittlung.success).toBe(false);
     });
+
+    it("Returns 400 BAD REQUEST when sollIstVersteuerung is 'istVersteuerung' but istVersteuerungGrund is missing", async () => {
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          sollIstVersteuerung: "istVersteuerung",
+        },
+      });
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+    });
+
+    it("Returns 400 BAD REQUEST when istVersteuerungGrund is set but sollIstVersteuerung is not 'istVersteuerung'", async () => {
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          sollIstVersteuerung: "sollVersteuerung",
+          istVersteuerungGrund: "unterschreitungUmsatzgrenze",
+        },
+      });
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+    });
   });
 
   describe("partial submission via ?only=gewerbeanmeldung or ?only=fseÜbermittlung", () => {
