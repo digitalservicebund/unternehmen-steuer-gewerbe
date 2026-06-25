@@ -179,6 +179,18 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       });
       expect(response.status).toEqual(HttpStatusCode.BadRequest);
     });
+
+    it("Returns 400 BAD REQUEST when istVersteuerungGrund is set but sollIstVersteuerung is not 'istVersteuerung'", async () => {
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          sollIstVersteuerung: "sollVersteuerung",
+          istVersteuerungGrund: "unterschreitungUmsatzgrenze",
+        },
+      });
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+    });
   });
 
   describe("Gewerbeamt officeDetails", () => {
