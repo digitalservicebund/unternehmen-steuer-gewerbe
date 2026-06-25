@@ -10,6 +10,7 @@ import {
   RELIGIONSSCHLUESSEL,
   GEWINN_ERMITTLUNG,
   SOLL_IST_VERSTEUERUNG,
+  IST_VERSTEUERUNG_GRUND,
   ZAHLLAST_UEBERSCHUSS,
 } from "./fsECodes";
 
@@ -44,6 +45,25 @@ function getUnternehmensAnschrift(data: RegisterGewerbeRequest) {
       },
     },
   };
+}
+
+function getIstVersteuerungGrund({
+  sollIstVersteuerung,
+  istVersteuerungGrund,
+}: RegisterGewerbeRequest["unternehmensDaten"]) {
+  if (sollIstVersteuerung !== "istVersteuerung") {
+    return {};
+  }
+  if (istVersteuerungGrund === IST_VERSTEUERUNG_GRUND.unterschreitungUmsatzgrenze) {
+    return { istVerstUStGrundUmsatz: true };
+  }
+  if (istVersteuerungGrund === IST_VERSTEUERUNG_GRUND.befreiungBuchführungspflicht) {
+    return { istVerstUStGrundAO: true };
+  }
+  if (istVersteuerungGrund === IST_VERSTEUERUNG_GRUND.freiberuflicheTätigkeit) {
+    return { istVerstUStGrundFreierBeruf: true };
+  }
+  return {};
 }
 
 export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
@@ -247,6 +267,7 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
         kleinunternehmerRegelung: getKleinunternehmerRegelung(data),
         sollIstVersteuerung: {
           auswahlSollIstVerst: SOLL_IST_VERSTEUERUNG[data.unternehmensDaten.sollIstVersteuerung],
+          ...getIstVersteuerungGrund(data.unternehmensDaten),
         },
         zahllastUeberschuss: {
           auswahl: ZAHLLAST_UEBERSCHUSS[data.unternehmensDaten.zahllastUeberschussAuswahl],
