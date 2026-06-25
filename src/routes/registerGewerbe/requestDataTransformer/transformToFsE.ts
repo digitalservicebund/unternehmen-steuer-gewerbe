@@ -48,10 +48,9 @@ function getUnternehmensAnschrift(data: RegisterGewerbeRequest) {
 }
 
 function getIstVersteuerungGrund({
-  sollIstVersteuerung,
   istVersteuerungGrund,
 }: RegisterGewerbeRequest["unternehmensDaten"]) {
-  if (sollIstVersteuerung !== "istVersteuerung" || istVersteuerungGrund === undefined) {
+  if (istVersteuerungGrund === undefined) {
     return {};
   }
   return { [IST_VERSTEUERUNG_GRUND[istVersteuerungGrund]]: true };

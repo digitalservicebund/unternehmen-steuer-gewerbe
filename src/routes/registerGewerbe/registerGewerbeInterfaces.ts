@@ -127,14 +127,14 @@ const UnternehmensDatenSchema = z
       description: "Voraussichtlicher Gewinn (in Euro) im Folgejahr.",
     }),
     sollIstVersteuerung: z.enum(SOLL_IST_VERSTEUERUNG_KEYS).default("sollVersteuerung").openapi({
-      example: "sollVersteuerung",
+      example: "istVersteuerung",
       description:
         "Art der Umsatzbesteuerung gemäß § 16 bzw. § 20 UStG. Standard ist Sollversteuerung (nach vereinbarten Entgelten).",
     }),
     istVersteuerungGrund: z.enum(IST_VERSTEUERUNG_GRUND_KEYS).optional().openapi({
       example: "unterschreitungUmsatzgrenze",
       description:
-        "Begründung für die beantragte `istVersteuerung`; nur relevant, wenn `sollIstVersteuerung` auf `istVersteuerung` gesetzt ist und in diesem Fall verpflichtend wird. Wert wird bei ausgewählter sollVersteuerung ignoriert",
+        "Begründung für die beantragte Istversteuerung. Verpflichtend, wenn `sollIstVersteuerung` auf `istVersteuerung` gesetzt ist; andernfalls weglassen.",
     }),
     zahllastUeberschussAuswahl: z.enum(ZAHLLAST_UEBERSCHUSS_KEYS).default("zahllast").openapi({
       example: "zahllast",
@@ -146,11 +146,25 @@ const UnternehmensDatenSchema = z
     }),
   })
   .refine(
-    (data) =>
-      data.sollIstVersteuerung !== "istVersteuerung" || data.istVersteuerungGrund !== undefined,
+    (data) => {
+      return (
+        data.sollIstVersteuerung !== "istVersteuerung" || data.istVersteuerungGrund !== undefined
+      );
+    },
     {
       error:
         "istVersteuerungGrund is required when sollIstVersteuerung is set to 'istVersteuerung'.",
+      path: ["istVersteuerungGrund"],
+    },
+  )
+  .refine(
+    (data) => {
+      return (
+        data.sollIstVersteuerung === "istVersteuerung" || data.istVersteuerungGrund === undefined
+      );
+    },
+    {
+      error: "istVersteuerungGrund must only be set when sollIstVersteuerung is 'istVersteuerung'.",
       path: ["istVersteuerungGrund"],
     },
   );

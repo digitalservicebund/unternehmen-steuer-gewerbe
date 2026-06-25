@@ -105,21 +105,6 @@ describe("transformToEUnFsE", () => {
     },
   );
 
-  it("omits all istVerstUStGrund flags when sollVersteuerung is selected", () => {
-    const result = transformToEUnFsE({
-      ...registerGewerbeSampleRequestAllFieldsFilled,
-      unternehmensDaten: {
-        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-        sollIstVersteuerung: "sollVersteuerung",
-        istVersteuerungGrund: "befreiungBuchführungspflicht",
-      },
-    });
-    const sollIstVersteuerung = result.eUn?.umsatzsteuer?.sollIstVersteuerung;
-    expect(sollIstVersteuerung?.istVerstUStGrundAO).toBeUndefined();
-    expect(sollIstVersteuerung?.istVerstUStGrundUmsatz).toBeUndefined();
-    expect(sollIstVersteuerung?.istVerstUStGrundFreierBeruf).toBeUndefined();
-  });
-
   it("sets entsprichtWohnanschrift: true when adresseAbweichend is not set", () => {
     const { adresseAbweichend: _, ...unternehmensDatenOhneAbweichung } =
       registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten;
