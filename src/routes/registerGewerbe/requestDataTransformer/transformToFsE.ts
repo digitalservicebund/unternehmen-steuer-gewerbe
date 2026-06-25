@@ -51,19 +51,10 @@ function getIstVersteuerungGrund({
   sollIstVersteuerung,
   istVersteuerungGrund,
 }: RegisterGewerbeRequest["unternehmensDaten"]) {
-  if (sollIstVersteuerung !== "istVersteuerung") {
+  if (sollIstVersteuerung !== "istVersteuerung" || istVersteuerungGrund === undefined) {
     return {};
   }
-  if (istVersteuerungGrund === IST_VERSTEUERUNG_GRUND.unterschreitungUmsatzgrenze) {
-    return { istVerstUStGrundUmsatz: true };
-  }
-  if (istVersteuerungGrund === IST_VERSTEUERUNG_GRUND.befreiungBuchführungspflicht) {
-    return { istVerstUStGrundAO: true };
-  }
-  if (istVersteuerungGrund === IST_VERSTEUERUNG_GRUND.freiberuflicheTätigkeit) {
-    return { istVerstUStGrundFreierBeruf: true };
-  }
-  return {};
+  return { [IST_VERSTEUERUNG_GRUND[istVersteuerungGrund]]: true };
 }
 
 export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {

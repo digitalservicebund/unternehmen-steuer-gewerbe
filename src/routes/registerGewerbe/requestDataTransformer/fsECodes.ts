@@ -55,9 +55,9 @@ export const SOLL_IST_VERSTEUERUNG_KEYS = Object.keys(SOLL_IST_VERSTEUERUNG) as 
 ];
 
 export const IST_VERSTEUERUNG_GRUND = {
-  unterschreitungUmsatzgrenze: "unterschreitungUmsatzgrenze",
-  befreiungBuchführungspflicht: "befreiungBuchführungspflicht",
-  freiberuflicheTätigkeit: "freiberuflicheTätigkeit",
+  unterschreitungUmsatzgrenze: "istVerstUStGrundUmsatz",
+  befreiungBuchführungspflicht: "istVerstUStGrundAO",
+  freiberuflicheTätigkeit: "istVerstUStGrundFreierBeruf",
 } as const;
 
 type IstVersteuerungGrund = keyof typeof IST_VERSTEUERUNG_GRUND;
