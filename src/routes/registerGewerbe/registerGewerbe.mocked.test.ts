@@ -47,6 +47,7 @@ import app from "../../app";
 import {
   validateFsE as mockValidateFsE,
   sendFsE as mockSendFsE,
+  getFinanzamtId as mockGetFinanzamtId,
 } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 
@@ -172,8 +173,8 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
 
   describe("partial submission via ?only=gewerbeanmeldung or ?only=fseÜbermittlung", () => {
     it("submits only the Gewerbeanmeldung and skips the FsE with ?only=gewerbeanmeldung", async () => {
-      mockSubmitData.mockClear();
-      vi.mocked(mockSendFsE).mockClear();
+      mockGetGewerbeRoutingInfo.mockClear();
+      vi.mocked(mockGetFinanzamtId).mockClear();
 
       const response = await postRegisterGewerbe(
         registerGewerbeSampleRequestAllFieldsFilled,
@@ -184,13 +185,13 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(response.status).toEqual(HttpStatusCode.Ok);
       expect(json.gewerbeanmeldung.success).toBe(true);
       expect(json.fseÜbermittlung).toBeUndefined();
-      expect(mockSubmitData).toHaveBeenCalledOnce();
-      expect(mockSendFsE).not.toHaveBeenCalled();
+      expect(mockGetGewerbeRoutingInfo).toHaveBeenCalledOnce();
+      expect(mockGetFinanzamtId).not.toHaveBeenCalled();
     });
 
     it("submits only the FsE and skips the Gewerbeanmeldung with ?only=fseÜbermittlung", async () => {
-      mockSubmitData.mockClear();
-      vi.mocked(mockSendFsE).mockClear();
+      mockGetGewerbeRoutingInfo.mockClear();
+      vi.mocked(mockGetFinanzamtId).mockClear();
 
       const response = await postRegisterGewerbe(
         registerGewerbeSampleRequestAllFieldsFilled,
@@ -201,12 +202,12 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(response.status).toEqual(HttpStatusCode.Ok);
       expect(json.fseÜbermittlung.success).toBe(true);
       expect(json.gewerbeanmeldung).toBeUndefined();
-      expect(mockSendFsE).toHaveBeenCalledOnce();
-      expect(mockSubmitData).not.toHaveBeenCalled();
+      expect(mockGetFinanzamtId).toHaveBeenCalledOnce();
+      expect(mockGetGewerbeRoutingInfo).not.toHaveBeenCalled();
     });
 
     it("Returns 400 BAD REQUEST when the only requested part fails with a validation_error", async () => {
-      vi.mocked(mockSendFsE).mockClear();
+      vi.mocked(mockGetFinanzamtId).mockClear();
       vi.spyOn(gewerbeanmeldung, "createGewerbeanmeldungXml").mockRejectedValue(
         new Error("XML not valid"),
       );
@@ -220,11 +221,11 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(response.status).toEqual(HttpStatusCode.BadRequest);
       expect(json.gewerbeanmeldung.success).toBe(false);
       expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
-      expect(mockSendFsE).not.toHaveBeenCalled();
+      expect(mockGetFinanzamtId).not.toHaveBeenCalled();
     });
 
     it("Returns 500 INTERNAL SERVER ERROR when the only requested part fails upstream_error", async () => {
-      vi.mocked(mockSendFsE).mockClear();
+      vi.mocked(mockGetFinanzamtId).mockClear();
       mockSubmitData.mockRejectedValueOnce(new Error("Timeout"));
 
       const response = await postRegisterGewerbe(
@@ -236,7 +237,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(response.status).toEqual(HttpStatusCode.InternalServerError);
       expect(json.gewerbeanmeldung.success).toBe(false);
       expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
-      expect(mockSendFsE).not.toHaveBeenCalled();
+      expect(mockGetFinanzamtId).not.toHaveBeenCalled();
     });
   });
 
