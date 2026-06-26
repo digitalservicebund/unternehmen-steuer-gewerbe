@@ -43,7 +43,7 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.umsatzsteuer?.uStIdNr?.uStIdAntrag?.merkerAntragUStId).toBe(true);
   });
 
-  it("suppresses uStIdNr field if umsatzsteuerIdMitbeantragen=false or undefined", () => {
+  it("maps uStIdNr to undefined if umsatzsteuerIdMitbeantragen=false or undefined", () => {
     const caseFalse = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
     caseFalse.unternehmensDaten.umsatzsteuerIdMitbeantragen = false;
 
