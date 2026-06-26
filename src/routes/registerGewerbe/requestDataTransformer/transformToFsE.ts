@@ -69,8 +69,15 @@ function getIstVersteuerungGrund({
 function getZahllastUeberschuss(data: RegisterGewerbeRequest) {
   return {
     // 1 for zahllast (user needs to pay), 2 for Überschuss (tax office ows the user)
-    auswahl: data.unternehmensDaten.umsatzsteuerImErstenJahr > 0 ? "1" : "2",
-    betrag: Math.abs(data.unternehmensDaten.umsatzsteuerImErstenJahr),
+    auswahl:
+      data.unternehmensDaten.umsatzsteuerImErstenJahr !== undefined &&
+      data.unternehmensDaten.umsatzsteuerImErstenJahr > 0
+        ? "1"
+        : "2",
+    betrag:
+      data.unternehmensDaten.umsatzsteuerImErstenJahr !== undefined
+        ? Math.abs(data.unternehmensDaten.umsatzsteuerImErstenJahr)
+        : 0,
   };
 }
 
