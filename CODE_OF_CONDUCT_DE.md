@@ -43,13 +43,11 @@ Wir verpflichten uns, die folgenden Verhaltensweisen in unserer Gemeinschaft zu 
 
 Spannungen können auch bei bestem Bemühen um Zusammenarbeit entstehen. Nicht jeder Konflikt stellt einen Verstoß gegen den Verhaltenskodex dar; dieser Verhaltenskodex fördert erwünschte Verhaltensweisen und Normen, die helfen, Konflikte zu vermeiden und Schäden zu minimieren.
 
-Wenn ein Vorfall eintritt, ist es wichtig, ihn umgehend zu melden. Um einen möglichen Verstoß zu melden, **[ANMERKUNG: Beschreiben Sie hier Ihr Meldeverfahren.]**
+Wenn ein Vorfall eintritt, ist es wichtig, ihn umgehend zu melden. Um einen möglichen Verstoß zu melden, schreiben Sie an github-community@digitalservice.bund.de. Fälle im Zusammenhang mit Mitgliedern der Gemeinschaftsleitung können zusammen mit einem Hinweis auf die beteiligten Mitglieder an hallo@digitalservice.bund.de gesendet werden und werden separat bearbeitet.
 
 Moderator:innen nehmen Meldungen von Verstößen ernst und bemühen sich um eine zeitnahe Reaktion. Sie untersuchen alle Meldungen, prüfen Nachrichten, Protokolle und Aufzeichnungen oder befragen Zeugen und andere Beteiligte. Moderator:innen halten Untersuchungen zu und Maßnahmen bei Verstößen so transparent wie möglich, wobei Sicherheit und Vertraulichkeit Vorrang haben. Maßnahmen zur Durchsetzung des Verhaltenskodex erfolgen privat mit den beteiligten Parteien, aber eine Kommunikation an die gesamte Gemeinschaft kann Teil einer einvernehmlich verabredeten Lösung sein.
 
 ## Umgang mit Verstößen und Wiedergutmachung
-
-**[ANMERKUNG: Die unten aufgeführten Maßnahmen bei Verstößen und zur Wiedergutmachung sind Vorschläge basierend auf bewährten Praktiken der Durchsetzung von Verhaltenskodizes. Wenn Ihre Gemeinschaft eigene Verfahren hat, passen Sie diesen Abschnitt entsprechend an.]**
 
 Stellt das Moderationsteam nach einer Untersuchung einen Verstoß gegen diesen Verhaltenskodex fest, kann das folgende Eskalationsverfahren angewendet werden. Die Wahl der Maßnahme hängt von der Auswirkung des Vorfalls auf die Beteiligten und die Gemeinschaft ab. Je nach Schwere des Verstoßes können niedrigere Stufen übersprungen werden.
 
