@@ -1,5 +1,19 @@
 # Developing
 
+## Using Git Hooks (DO NOT SKIP as a contributor)
+
+We use GitHooks to prevent some problems from reaching the remote repository. This includes _security-related_ issues.
+
+As this relates to our [commitment](./SECURITY.md) to security, we urge you to
+
+1. Install [lefthook](https://lefthook.dev/) and run its install script once to enable the hooks:
+
+```bash
+lefthook install
+```
+
+2. Install [trivy](https://trivy.dev/) so that the hooks can use it to prevent passwords / security tokens from being leaked accidentally.
+
 ## Getting All the Code
 
 This project relies on proprietary code which is included via an npm dependency that wraps it in a Node interface (`"@digitalservicebund/unternehmen-steuer-gewerbe-privat"`).
@@ -8,8 +22,8 @@ If you don't have access to that repository, you can check the interface and imp
 
 If you do have access, you still need to authenticate in order to fetch the dependency:
 
-- Create a [GitHub personal access tokens](https://github.com/settings/tokens), assign the `read:packages` scope.
-- Export the token as `NODE_AUTH_TOKEN` in your respective shell.
+- Create a [GitHub personal access token](https://github.com/settings/tokens), assign the `read:packages` scope.
+- Export the token as `NODE_AUTH_TOKEN` in your shell.
 
 Once set up, `pnpm install` is all that's needed; there is an `.npmrc` in this repo that routes the `@digitalservicebund` scope to `npm.pkg.github.com` and makes the install use your `NODE_AUTH_TOKEN`.
 
@@ -21,9 +35,9 @@ In production, secrets and environment variables are exclusively provided throug
 
 For local development and testing, [`.env`](.env) is read. See [`.env.example`](.env.example) for details.
 
-We strongly recommend not to store plaintext secrets in either of these files, but use a tool like [1Password](https://developer.1password.com/docs/cli/secrets-environment-variables/) instead.
+We strongly recommend against storing plaintext secrets in either of these files. Use a tool like [1Password](https://developer.1password.com/docs/cli/secrets-environment-variables/) instead.
 
-## Running the API
+## Running the API (by default on port 3000)
 
 ### Locally via pnpm
 
@@ -45,7 +59,7 @@ Build image with
 pnpm run build:image
 ```
 
-start, mapping local port to container port
+Start, mapping the local port to the container port
 
 ```bash
 pnpm run start:image
@@ -63,19 +77,13 @@ or in watch mode, restarting on changes
 pnpm run test:watch
 ```
 
-### Running Tests in VSCode while secrets are stored in 1Password
+For CI scenarios there are more test-related NPM scripts. See the list below.
 
-The test runner is not able to read required secrets from 1Password. As a workaround add the following to your VSCode settings; this will make the test runner use a (1password aware) wrapper script instead of plain `node`:
+### Running Tests in VSCodium/VSCode with secrets stored in 1Password
+
+The VSCode test runner is not able to read required secrets from 1Password. As a workaround, you can make make the test runner use a (1Password-aware) wrapper script instead of plain `node`. In order to do so, add this to your settings:
 
 `"vitest.nodeExecutable": "vitest.wrapper.sh",`
-
-## Using Git Hooks
-
-We're using [lefthook](https://lefthook.dev/) for Git hook configuration. After installing `lefthook`, run the following once:
-
-```bash
-lefthook install
-```
 
 ## NPM Scripts
 
@@ -87,10 +95,13 @@ lefthook install
 - `format:fix` — Check format, fix if possible (used in pre-commit Git hook)
 - `lint` — Lint, fail on error (used in CI)
 - `lint:fix` — Lint, fix if possible (used in pre-commit Git hook)
-- `start` — Start API locally via ts-node (no building involved)
+- `start` — Start API locally via tsx (no building involved)
 - `start:image` — Start API via Docker (built via `build:image`)
-- `start:watch` — Start API locally via ts-node, restart on changes to TS, JSON, YAML, MD files
+- `start:watch` — Start API locally via nodemon, restart on changes to TS, JSON, YAML, MD files
 - `test` — Run tests once
+- `test:load` — Run load tests once
+- `test:load:ci` — Same as `test:load` but without 1Password secrets injection (for CI)
+- `test:smoke:ci` — Run smoke tests (CI only, no 1Password)
 - `test:coverage` — Run tests once, report coverage to console and `./coverage/` (lcov for SonarCloud)
-- `test:ci:coverage` — Same as `test:coverage` but without 1Password secrets injection (for CI)
+- `test:coverage:ci` — Same as `test:coverage` but without 1Password secrets injection (for CI)
 - `test:watch` — Run tests, restart on code changes
