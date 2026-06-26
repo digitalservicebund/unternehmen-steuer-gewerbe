@@ -32,7 +32,7 @@ describe("transformToEUnFsE", () => {
     );
     expect(result.eUn?.umsatzsteuer?.sollIstVersteuerung?.auswahlSollIstVerst).toBe("1");
     expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toBe("2"); // 1 means "zahllast", 2 means "überschuss"
-    expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toBe(111);
+    expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toBe(222);
 
     expect(
       result.eUn?.festsetzungsAngaben?.voraussichtlicheEinkuenfte?.einkGewBetr?.gruendJahrA,
@@ -42,6 +42,23 @@ describe("transformToEUnFsE", () => {
     ).toBe(1);
 
     expect(result.eUn?.umsatzsteuer?.uStIdNr?.uStIdAntrag?.merkerAntragUStId).toBe(true);
+  });
+
+  it("maps a positive number to zahllast and it's absolute value", () => {
+    const dataWithNegativeNumberAsUmsatzImErstenJahr = structuredClone(
+      registerGewerbeSampleRequestAllFieldsFilled,
+    );
+    // set deprecated values to the opposite of what we expect the new value to result in
+    dataWithNegativeNumberAsUmsatzImErstenJahr.unternehmensDaten.zahllastUeberschussAuswahl =
+      "ueberschuss";
+    dataWithNegativeNumberAsUmsatzImErstenJahr.unternehmensDaten.zahllastUeberschussBetrag = 0;
+    // set the new value
+    dataWithNegativeNumberAsUmsatzImErstenJahr.unternehmensDaten.umsatzsteuerImErstenJahr = 111;
+
+    const result = transformToEUnFsE(dataWithNegativeNumberAsUmsatzImErstenJahr);
+
+    expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toEqual("1"); // 1 for zahllast
+    expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toEqual(111);
   });
 
   it("maps uStIdNr to undefined if umsatzsteuerIdMitbeantragen=false or undefined", () => {
