@@ -1,12 +1,59 @@
-🇬🇧 Everyone is welcome to contribute to the development of this project. You can contribute by opening pull requests, providing documentation, answering questions or giving feedback. Please do follow our guidelines and our [Code of Conduct](CODE_OF_CONDUCT.md).
+# 🇬🇧 Code Contributions
 
-🇩🇪 Jede:r ist herzlich eingeladen, die Entwicklung dieses Projekts mitzugestalten. Du kannst einen Beitrag leisten, indem du Pull-Requests eröffnest, die Dokumentation erweiterst, Fragen beantwortest oder Feedback gibst. Bitte befolge die Richtlinien und unseren [Verhaltenskodex](./CODE_OF_CONDUCT_DE.md).
+Everyone is welcome to contribute to the development of this project. You can
+contribute by providing documentation, answering
+questions, or giving feedback. Please follow our guidelines and our
+[Code of Conduct](CODE_OF_CONDUCT.md).
 
-Code Contributions
-🇬🇧 Open a pull request with your changes and it will be reviewed by someone from the team. When you submit a pull request, you declare that you have the right to license your contribution to DigitalService and the community. By submitting the patch, you agree that your contributions are licensed under the GPLv3 license.
+We currently do not accept pull requests because we do not have enough review
+capacity at the moment. We are thankful for your interest and contributions,
+and this may change in the future.
 
-Please make sure that your changes have been tested before submitting a pull request.
+## Code Language Conventions
 
-🇩🇪 Nach dem Erstellen eines Pull Requests wird dieser von einer Person aus dem Team überprüft. Wenn du einen Pull Request einreichst, erklärst du dich damit einverstanden, deinen Beitrag an den DigitalService und die Community zu lizenzieren. Durch das Einreichen des Patches erklärst du dich damit einverstanden, dass deine Beiträge unter der GPLv3-Lizenz lizenziert sind.
+This project is developed in a German administrative domain and is also open to
+external contributors. Pure English code would improve first access for some
+contributors, but translating domain terms has repeatedly caused ambiguity and
+communication overhead with domain experts.
+Therefore, we use a hybrid language model:
 
-Bitte stelle sicher, dass deine Änderungen getestet wurden, bevor du einen Pull Request sendest.
+- Keep domain terms in German (for legal/administrative concepts).
+- Use English for technical implementation (framework, infrastructure, generic
+  programming terms).
+- If a domain term already has an established English name in the domain, keep
+  that English term.
+- Prefer clarity over language purity, and consistency within each context.
+- When in doubt, use the term domain experts use.
+- Keep special character transliteration consistent (`ae`, `oe`, `ue`, `ss`).
+
+# 🇩🇪 Codebeiträge
+
+Jede:r ist herzlich eingeladen, die Entwicklung dieses Projekts
+mitzugestalten. Du kannst einen Beitrag leisten, indem du die Dokumentation
+erweiterst, Fragen beantwortest oder Feedback gibst. Bitte befolge die
+Richtlinien und unseren
+[Verhaltenskodex](./CODE_OF_CONDUCT_DE.md).
+
+Aktuell nehmen wir keine Pull-Requests an, da uns derzeit die Kapazität für
+Reviews fehlt. Wir sind dankbar für dein Interesse und deine Beiträge, und das
+kann sich in Zukunft wieder ändern.
+
+## Sprachkonventionen im Code
+
+Dieses Projekt wird im Kontext der deutschen Verwaltung entwickelt und ist
+gleichzeitig offen für externe Mitwirkende. Rein englischer Code kann den
+Einstieg für manche Mitwirkende erleichtern, die Übersetzung von
+Domainbegriffen hat jedoch wiederholt zu Unklarheiten und zusätzlichem
+Abstimmungsaufwand mit Fachexpert:innen geführt.
+
+Daher nutzen wir ein hybrides Sprachmodell:
+
+- Domainbegriffe bleiben auf Deutsch (für rechtliche/administrative Konzepte).
+- Technische Implementierung bleibt auf Englisch (Framework, Infrastruktur,
+  allgemeine Programmierbegriffe).
+- Wenn es bereits einen etablierten englischen Begriff in der Domain gibt,
+  verwenden wir diesen.
+- Verständlichkeit ist wichtiger als Sprachreinheit; Konsistenz gilt immer im
+  jeweiligen Kontext.
+- Wenn unklar ist, welcher Begriff passt, gilt der Begriff der Fachexpert:innen.
+- Umlaute werden konsistent transliteriert (`ae`, `oe`, `ue`, `ss`).
