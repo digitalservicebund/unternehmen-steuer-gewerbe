@@ -27,9 +27,11 @@ _¹ Sending the tax registration questionnaire requires proprietary code ([ERiC]
 - [SECURITY.md](./SECURITY.md) - Für Hinweise zu Schwachstellen/Sicherheitslücken
 - [DEVELOPING.md](./DEVELOPING.md) - Für Software-Entwickler:innen
 - [CONTRIBUTING.md](./CONTRIBUTING.md) - For alle, die mithelfen möchten
+- [LICENSE.md](./LICENSE.md) - Unsere Open-Source-Lizenz (MIT)
 
 ## 🇬🇧 Further Information
 
 - [SECURITY.md](./SECURITY.md) - For vulnerability reports
 - [DEVELOPING.md](./DEVELOPING.md) - For Software-Engineers
 - [CONTRIBUTING.md](./CONTRIBUTING.md) - For anyone interested in improving the project
+- [LICENSE.md](./LICENSE.md) - Our open-source Lizenz (MIT)
