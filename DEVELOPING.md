@@ -2,54 +2,26 @@
 
 ## Getting All the Code
 
-Parts of this code base are not public (e.g. the wrapper around the ELSTER [ERiC](https://www.elster.de/eportal/infoseite/entwickler) library). They are included as an npm dependency from a private GitHub repository (`unternehmen-steuer-gewerbe-privat`).
+This project relies on proprietary code which is included via an npm dependency that wraps it in a Node interface (`"@digitalservicebund/unternehmen-steuer-gewerbe-privat"`).
 
-After cloning, run `pnpm install` as usual. You will need read access to GitHub Packages for pnpm to resolve the dependency.
+If you don't have access to that repository, you can check the interface and implement your own replacement (the proprietary code is available to anyone by (a) registering [here](https://www.elster.de/elsterweb/entwickler/login) and by (b) accepting the corresponding license.)
 
-Create a [GitHub personal access token](https://github.com/settings/tokens) with the `read:packages` scope and set it as `NODE_AUTH_TOKEN` in your shell environment (e.g. in `~/.bashrc` or `~/.zshrc`):
+If you do have access, you still need to authenticate in order to fetch the dependency:
 
-```bash
-export NODE_AUTH_TOKEN=<your-token>
-```
+- Create a [GitHub personal access tokens](https://github.com/settings/tokens), assign the `read:packages` scope.
+- Export the token as `NODE_AUTH_TOKEN` in your respective shell.
 
-The `.npmrc` in this repo routes the `@digitalservicebund` scope to `npm.pkg.github.com` and picks up the token automatically.
+Once set up, `pnpm install` is all that's needed; there is an `.npmrc` in this repo that routes the `@digitalservicebund` scope to `npm.pkg.github.com` and makes the install use your `NODE_AUTH_TOKEN`.
 
-> **Using `gh auth token`?** The GitHub CLI token does not include `read:packages` by default. You have two options:
->
-> **Option A — refresh the credentials stored in the GitHub CLI:**
->
-> ```bash
-> unset GH_TOKEN  # required if GH_TOKEN is set in your environment
-> gh auth refresh -s read:packages
-> export NODE_AUTH_TOKEN=$(gh auth token)
-> ```
->
-> **Option B — if you use `GH_TOKEN` directly:** go to [github.com/settings/tokens](https://github.com/settings/tokens), find the underlying classic PAT, enable the `read:packages` scope, and re-export it:
->
-> ```bash
-> export NODE_AUTH_TOKEN=$(gh auth token)  # or paste the token directly
-> ```
+(It's also possible to extend the default GitHub CLI token (`gh auth token`) to include `read:packages`, but exporting it is a security risk.)
 
-## Environment Variables
+## Secrets and Environment Variables
 
-> **Local development and testing only!** `.env.example` is a template that contains no real secrets. For anything beyond test values, load secrets at runtime from [1Password](https://developer.1password.com/docs/cli/secrets-environment-variables/) (or a similar secrets manager) and never commit them to git.
->
-> **In production we do not use a `.env` file at all** — secrets are provided exclusively through a secrets manager.
+In production, secrets and environment variables are exclusively provided through a secrets manager.
 
-Copy `.env.example` to `.env` and fill in the values:
+For local development and testing, [`.env`](.env) is read. See [`.env.example`](.env.example) for details.
 
-```bash
-cp .env.example .env
-```
-
-| Variable                                 | Description                                                                                                                                                                                      |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `FIT_CONNECT_ENV`                        | Target environment: `test`, `stage`, or `prod` (see [Betriebsumgebungen](https://docs.fitko.de/fit-connect/docs/getting-started/environments)). Sets all API URLs automatically. Default: `test` |
-| `FIT_CONNECT_CLIENT_ID`                  | OAuth2 Client-ID from the [Self-Service-Portal](https://docs.fitko.de/fit-connect/docs/receiving/destination/#zustellpunktverwaltung)                                                            |
-| `FIT_CONNECT_CLIENT_SECRET`              | OAuth2 Client-Secret, same source as above                                                                                                                                                       |
-| `FIT_CONNECT_DESTINATION_ID`             | UUID of the destination ([Zustellpunkt](https://docs.fitko.de/fit-connect/docs/receiving/destination/#zustellpunktverwaltung))                                                                   |
-| `FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK`  | Public JWK for encryption, as JSON string ([JWK erzeugen](https://docs.fitko.de/fit-connect/docs/organisation-tasks/jwks-erzeugen#jwk_erzeugen))                                                 |
-| `FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK` | Corresponding private JWK for decryption, same source as above                                                                                                                                   |
+We strongly recommend not to store plaintext secrets in either of these files, but use a tool like [1Password](https://developer.1password.com/docs/cli/secrets-environment-variables/) instead.
 
 ## Running the API
 
