@@ -34,7 +34,7 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
     gewinnFolgejahr: 1,
     sollIstVersteuerung: "sollVersteuerung",
     zahllastUeberschussBetrag: 0,
-    zahllastUeberschussAuswahl: "ueberschuss",
+    zahllastUeberschussAuswahl: "zahllast",
     umsatzsteuerImErstenJahr: -111,
     adresseAbweichend: {
       strasseUndHausnummer: "Musterstraße 2",
