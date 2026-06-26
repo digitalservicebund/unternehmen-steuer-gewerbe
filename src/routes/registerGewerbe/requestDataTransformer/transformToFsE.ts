@@ -70,7 +70,7 @@ function getZahllastUeberschuss(data: RegisterGewerbeRequest) {
   return {
     // 1 for zahllast (user needs to pay), 2 for Überschuss (tax office ows the user)
     auswahl: data.unternehmensDaten.umsatzsteuerImErstenJahr > 0 ? "1" : "2",
-    betrag: Math.abs(data.unternehmensDaten.umsatzsteuerImErstenJahr).toString(),
+    betrag: Math.abs(data.unternehmensDaten.umsatzsteuerImErstenJahr),
   };
 }
 
