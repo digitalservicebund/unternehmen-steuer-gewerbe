@@ -24,7 +24,6 @@ Therefore, we use a hybrid language model:
   that English term.
 - Prefer clarity over language purity, and consistency within each context.
 - When in doubt, use the term domain experts use.
-- Keep special character transliteration consistent (`ae`, `oe`, `ue`, `ss`).
 
 # 🇩🇪 Codebeiträge
 
@@ -56,4 +55,3 @@ Daher nutzen wir ein hybrides Sprachmodell:
 - Verständlichkeit ist wichtiger als Sprachreinheit; Konsistenz gilt immer im
   jeweiligen Kontext.
 - Wenn unklar ist, welcher Begriff passt, gilt der Begriff der Fachexpert:innen.
-- Umlaute werden konsistent transliteriert (`ae`, `oe`, `ue`, `ss`).
