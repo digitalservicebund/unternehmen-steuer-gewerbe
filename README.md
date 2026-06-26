@@ -1,11 +1,30 @@
 [![Pipeline](https://github.com/digitalservicebund/unternehmen-steuer-gewerbe/actions/workflows/ci-pipeline.yml/badge.svg)](https://github.com/digitalservicebund/unternehmen-steuer-gewerbe/actions/workflows/ci-pipeline.yml)<br/>
 
-# unternehmen-steuer-gewerbe
+# 🇩🇪 Schneller Gründen API für Steuernummer und Gewerbeantrag
 
-API for registering with "ELSTER" and "Gewerbeämtern"
+Open-Source¹-API, die die zur Unternehmensgründung notwendigen Daten im richtigen Format an die passenden Stellen weiterleitet:
+1. an das zustädige Finanzamt zur Beantragung einer Steuernummer als "Fragebogen zur Steuerlichen Erfassung (FsE)" und
+2. an das zuständige Gewerbeamt als Gewerbeanmeldung.
 
-Component of [digitalservicebund/unternehmen-one-stop-shop](https://github.com/digitalservicebund/unternehmen-one-stop-shop)
+Die API ist Teil des [Schneller Gründen: One-Stop-Shop](https://github.com/digitalservicebund/unternehmen-one-stop-shop)
 
-## Development
+_¹ Zum Versand der Daten an Finanzämter nutzt das Projekt proprietären Code ([ERiC](https://www.elster.de/elsterweb/infoseite/entwickler)), der daher __nicht__ Teil dieses Repositorys ist._
 
-Cf. [./DEVELOPING.md](./DEVELOPING.md)
+# 🇬🇧 Schneller Gründen API für Tax and Business Registration
+
+Open-Source¹ API for setting up a new business by sending valid forms to the required offices:
+1. To the responsible tax office as a questionaire for tax registration (DE: "Fragebogen zur Steuerlichen Erfassung" or "FsE") and
+2. To the competent trade office as a business registration application
+
+The API is a component of [Schneller Gründen: One-Stop-Shop](https://github.com/digitalservicebund/unternehmen-one-stop-shop)
+
+_¹ Sending the tex registration questionnaire requires proprietary code ([ERiC](https://www.elster.de/elsterweb/infoseite/entwickler)) which, therefore, is __not__ part of this repository. See [./DEVELOPING.md](./DEVELOPING.md) for details._
+
+
+## 🇩🇪 Weitere Informationen 
+
+* [./DEVELOPING.md](./DEVELOPING.md) - Informationen für Software-Entwickler:innen
+
+## 🇬🇧 Further Information
+
+* [./DEVELOPING.md](./DEVELOPING.md) - Information for Software-Engineers
