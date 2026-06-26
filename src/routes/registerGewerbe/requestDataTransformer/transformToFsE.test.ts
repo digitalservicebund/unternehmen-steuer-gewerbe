@@ -43,6 +43,20 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.umsatzsteuer?.uStIdNr?.uStIdAntrag?.merkerAntragUStId).toBe(true);
   });
 
+  it("suppresses uStIdNr field if umsatzsteuerIdMitbeantragen=false or undefined", () => {
+    const caseFalse = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+    caseFalse.unternehmensDaten.umsatzsteuerIdMitbeantragen = false;
+
+    const caseUndefined = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+    caseUndefined.unternehmensDaten.umsatzsteuerIdMitbeantragen = undefined;
+
+    const resultForFalse = transformToEUnFsE(caseUndefined);
+    const resultForUndefined = transformToEUnFsE(caseFalse);
+
+    expect(resultForFalse.eUn?.umsatzsteuer?.uStIdNr).toBeUndefined();
+    expect(resultForUndefined.eUn?.umsatzsteuer?.uStIdNr).toBeUndefined();
+  });
+
   it("maps geschlecht 'm' to anredeId '1' and 'w' to '2'", () => {
     const männlich = transformToEUnFsE({
       ...registerGewerbeSampleRequestAllFieldsFilled,
