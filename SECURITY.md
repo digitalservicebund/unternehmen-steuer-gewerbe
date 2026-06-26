@@ -1,6 +1,6 @@
 # 🇩🇪 Schwachstellen / Sicherheitslücken
 
-Sicherheit spielt in diesem Projekt eine große Rolle. Wir achten sehr darauf, den Code sicher zu machen, aber Schwachstellen können immer auftreten. Wir sind allen dankbar, die uns potentielle Schwachstellen vertraulich mitteilen.
+Sicherheit spielt in diesem Projekt eine große Rolle. Wir achten sehr darauf, den Code sicher zu machen, aber Schwachstellen können immer auftreten. Wir sind allen dankbar, die uns potenzielle Schwachstellen vertraulich mitteilen.
 
 ## Schwachstellen mitteilen (Disclosure)
 
@@ -8,7 +8,7 @@ Alle sicherheitsrelevanten Hinweise bitte an [security@digitalservice.bund.de](m
 
 - Senden Sie so viele Informationen wie möglich - auch Details können hilfreich sein.
 - Wenn möglich: Teilen Sie uns mit, um welches Release oder welchen Commit es sich handelt.
-- Nutzen Sie unseren [public key](https://raw.githubusercontent.com/digitalservicebund/public-keys/main/pgp-public-key-security-mail.pem) für verschlüsselte Email.
+- Nutzen Sie unseren [public key](https://raw.githubusercontent.com/digitalservicebund/public-keys/main/pgp-public-key-security-mail.pem) für verschlüsselte E-Mail.
 
 **Teilen Sie uns Schwachstellen nicht über GitHub "issues" mit**, da dies die Schwachstelle unmittelbar öffentlich machen würde!
 

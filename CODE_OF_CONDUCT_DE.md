@@ -61,7 +61,7 @@ Stellt das Moderationsteam nach einer Untersuchung einen Verstoß gegen diesen V
    3. Wiedergutmachung: Beispiele sind eine Entschuldigung, Reflexion während der Auszeit und achtsamer Wiedereintritt in die Gemeinschaft.
 3. Vorübergehende Sperre
    1. Ereignis: Ein Muster wiederholter Verstöße, die das Moderationsteam bereits mit Verwarnungen zu behandeln versucht hat, oder ein einzelner schwerwiegender Verstoß.
-   2. Konsequenz: Eine private, schriftliche Verwarnung mit Bedingungen für eine Aufhebung der Sperre. Die Sperre dient der Reflexion über das Verhalten und mögliche Korrekturmassnahmen.
+   2. Konsequenz: Eine private, schriftliche Verwarnung mit Bedingungen für eine Aufhebung der Sperre. Die Sperre dient der Reflexion über das Verhalten und mögliche Korrekturmaßnahmen.
    3. Wiedergutmachung: Beispiele sind die Respektierung des Sinns der Sperre, Erfüllung der Bedingungen für eine Aufhebung der Sperre und achtsame Wiedereingliederung in die Gemeinschaft.
 4. Dauerhafter Ausschluss
    1. Ereignis: Ein Muster wiederholter Verstöße gegen den Verhaltenskodex, das durch andere Stufen der Eskalation nicht behoben werden konnte, oder ein so schwerwiegender Verstoß, dass das Moderationsteam keine Möglichkeit sieht, die Gemeinschaft mit dieser Person sicher zu halten.
