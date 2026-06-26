@@ -24,8 +24,8 @@ _¹ Sending the tex registration questionnaire requires proprietary code ([ERiC]
 
 ## 🇩🇪 Weitere Informationen
 
-- [./DEVELOPING.md](./DEVELOPING.md) - Informationen für Software-Entwickler:innen
+- [./DEVELOPING.md](./DEVELOPING.md) - Für Software-Entwickler:innen
 
 ## 🇬🇧 Further Information
 
-- [./DEVELOPING.md](./DEVELOPING.md) - Information for Software-Engineers
+- [./DEVELOPING.md](./DEVELOPING.md) - For Software-Engineers
