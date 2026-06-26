@@ -139,13 +139,34 @@ const UnternehmensDatenSchema = z
       description:
         "Begründung für die beantragte Istversteuerung. Verpflichtend, wenn `sollIstVersteuerung` auf `istVersteuerung` gesetzt ist; andernfalls weglassen.",
     }),
-    zahllastUeberschussAuswahl: z.enum(ZAHLLAST_UEBERSCHUSS_KEYS).default("zahllast").openapi({
-      example: "zahllast",
-      description: "Ob voraussichtlich eine Zahllast oder ein Überschuss erwartet wird.",
-    }),
-    zahllastUeberschussBetrag: z.number().int().min(0).default(0).openapi({
-      example: 0,
-      description: "Voraussichtliche Zahllast oder Überschuss in Euro.",
+    zahllastUeberschussAuswahl: z
+      .enum(ZAHLLAST_UEBERSCHUSS_KEYS)
+      .default("zahllast")
+      .openapi({
+        example: "zahllast",
+        description:
+          "Deprecated. Use 'umsatzsteuerImErstenJahr instead. (Ob voraussichtlich eine Zahllast oder ein Überschuss erwartet wird.)",
+      })
+      .meta({
+        deprecated: true,
+      }),
+    zahllastUeberschussBetrag: z
+      .number()
+      .int()
+      .min(0)
+      .default(0)
+      .openapi({
+        example: 0,
+        description:
+          "Deprecated. Use 'umsatzsteuerImErstenJahr instead. (Voraussichtliche Zahllast oder Überschuss in Euro.)",
+      })
+      .meta({
+        deprecated: true,
+      }),
+    umsatzsteuerImErstenJahr: z.int().openapi({
+      example: 100,
+      description:
+        "Voraussichtliche Umsatzsteuer im ersten Jahr. (Größer als 0 => Nutzer hat 'Zahllast' => muss was bezahlen; kleiner als 0 => 'Überschuss' => Rückzahlung vom / Guthaben beim Finanzamt.)",
     }),
   })
   .refine(
