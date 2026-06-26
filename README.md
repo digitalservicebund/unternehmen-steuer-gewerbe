@@ -31,5 +31,5 @@ _¹ Sending the tax registration questionnaire requires proprietary code ([ERiC]
 ## 🇬🇧 Further Information
 
 - [SECURITY.md](./SECURITY.md) - For vulnerability reports
-- [./DEVELOPING.md](./DEVELOPING.md) - For Software-Engineers
+- [DEVELOPING.md](./DEVELOPING.md) - For Software-Engineers
 - [CONTRIBUTING.md](./CONTRIBUTING.md) - For anyone interested in improving the project
