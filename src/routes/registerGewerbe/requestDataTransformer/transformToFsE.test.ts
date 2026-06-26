@@ -31,7 +31,8 @@ describe("transformToEUnFsE", () => {
       "18.05.2026",
     );
     expect(result.eUn?.umsatzsteuer?.sollIstVersteuerung?.auswahlSollIstVerst).toBe("1");
-    expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toBe("1");
+    expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toBe("2"); // 1 means "zahllast", 2 means "überschuss"
+    expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toBe("111");
 
     expect(
       result.eUn?.festsetzungsAngaben?.voraussichtlicheEinkuenfte?.einkGewBetr?.gruendJahrA,

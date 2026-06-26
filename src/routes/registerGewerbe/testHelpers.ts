@@ -33,8 +33,9 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
     gewinnGründungsjahr: 1,
     gewinnFolgejahr: 1,
     sollIstVersteuerung: "sollVersteuerung",
-    zahllastUeberschussAuswahl: "zahllast",
-    zahllastUeberschussBetrag: 0,
+    // zahllastUeberschussAuswahl: "zahllast",
+    // zahllastUeberschussBetrag: 0,
+    umsatzsteuerImErstenJahr: -111,
     adresseAbweichend: {
       strasseUndHausnummer: "Musterstraße 2",
       postleitzahl: "96450",
