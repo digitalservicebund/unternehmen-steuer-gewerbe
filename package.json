@@ -33,7 +33,7 @@
     "@hono/zod-openapi": "^1.4.0",
     "dotenv": "^17.4.2",
     "fast-xml-parser": "^5.9.3",
-    "hono": "^4.12.26",
+    "hono": "^4.12.27",
     "jose": "^6.2.3",
     "koffi": "^3.0.2",
     "pdfkit": "^0.19.1",
