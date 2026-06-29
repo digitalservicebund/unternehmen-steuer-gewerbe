@@ -1,13 +1,26 @@
-import { createRoute } from "@hono/zod-openapi";
+import { createRoute, z } from "@hono/zod-openapi";
 import {
   RegisterGewerbeRequestSchema,
   RegisterGewerbeResponseSchema,
 } from "./registerGewerbeInterfaces";
 
+const RegisterGewerbeQuerySchema = z.object({
+  only: z
+    .enum(["gewerbeanmeldung", "fseÜbermittlung"])
+    .optional()
+    .openapi({
+      param: { name: "only", in: "query" },
+      // example: "gewerbeanmeldung",
+      description:
+        "Nur einen Teil des Kombiantrags absenden. Ohne Angabe werden beide Teile gesendet.",
+    }),
+});
+
 export const registerGewerbeRoute = createRoute({
   method: "post",
   path: "/api/v1/register-gewerbe",
   request: {
+    query: RegisterGewerbeQuerySchema,
     body: {
       content: {
         "application/json": {

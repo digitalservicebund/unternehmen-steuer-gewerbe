@@ -47,6 +47,7 @@ import app from "../../app";
 import {
   validateFsE as mockValidateFsE,
   sendFsE as mockSendFsE,
+  getFinanzamtId as mockGetFinanzamtId,
 } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 
@@ -56,8 +57,8 @@ import { HttpStatusCode } from "../../helpers/httpStatusCodes";
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
 
-function postRegisterGewerbe(data = registerGewerbeSampleRequestAllFieldsFilled) {
-  return app.request("/api/v1/register-gewerbe", {
+function postRegisterGewerbe(data = registerGewerbeSampleRequestAllFieldsFilled, queryString = "") {
+  return app.request(`/api/v1/register-gewerbe${queryString}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -190,6 +191,76 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
         },
       });
       expect(response.status).toEqual(HttpStatusCode.BadRequest);
+    });
+  });
+
+  describe("partial submission via ?only=gewerbeanmeldung or ?only=fseÜbermittlung", () => {
+    it("submits only the Gewerbeanmeldung and skips the FsE with ?only=gewerbeanmeldung", async () => {
+      mockGetGewerbeRoutingInfo.mockClear();
+      vi.mocked(mockGetFinanzamtId).mockClear();
+
+      const response = await postRegisterGewerbe(
+        registerGewerbeSampleRequestAllFieldsFilled,
+        "?only=gewerbeanmeldung",
+      );
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+      expect(json.gewerbeanmeldung.success).toBe(true);
+      expect(json.fseÜbermittlung).toBeUndefined();
+      expect(mockGetGewerbeRoutingInfo).toHaveBeenCalledOnce();
+      expect(mockGetFinanzamtId).not.toHaveBeenCalled();
+    });
+
+    it("submits only the FsE and skips the Gewerbeanmeldung with ?only=fseÜbermittlung", async () => {
+      mockGetGewerbeRoutingInfo.mockClear();
+      vi.mocked(mockGetFinanzamtId).mockClear();
+
+      const response = await postRegisterGewerbe(
+        registerGewerbeSampleRequestAllFieldsFilled,
+        "?only=fseÜbermittlung",
+      );
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+      expect(json.fseÜbermittlung.success).toBe(true);
+      expect(json.gewerbeanmeldung).toBeUndefined();
+      expect(mockGetFinanzamtId).toHaveBeenCalledOnce();
+      expect(mockGetGewerbeRoutingInfo).not.toHaveBeenCalled();
+    });
+
+    it("Returns 400 BAD REQUEST when the only requested part fails with a validation_error", async () => {
+      vi.mocked(mockGetFinanzamtId).mockClear();
+      vi.spyOn(gewerbeanmeldung, "createGewerbeanmeldungXml").mockRejectedValue(
+        new Error("XML not valid"),
+      );
+
+      const response = await postRegisterGewerbe(
+        registerGewerbeSampleRequestAllFieldsFilled,
+        "?only=gewerbeanmeldung",
+      );
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+      expect(json.gewerbeanmeldung.success).toBe(false);
+      expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
+      expect(mockGetFinanzamtId).not.toHaveBeenCalled();
+    });
+
+    it("Returns 500 INTERNAL SERVER ERROR when the only requested part fails upstream_error", async () => {
+      vi.mocked(mockGetFinanzamtId).mockClear();
+      mockSubmitData.mockRejectedValueOnce(new Error("Timeout"));
+
+      const response = await postRegisterGewerbe(
+        registerGewerbeSampleRequestAllFieldsFilled,
+        "?only=gewerbeanmeldung",
+      );
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.InternalServerError);
+      expect(json.gewerbeanmeldung.success).toBe(false);
+      expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
+      expect(mockGetFinanzamtId).not.toHaveBeenCalled();
     });
   });
 

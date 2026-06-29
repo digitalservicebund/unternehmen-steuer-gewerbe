@@ -180,20 +180,23 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
   }
 }
 
-function determineHttpStatus(
-  gewerbeanmeldung: { success: boolean; errorType?: string },
-  fseÜbermittlung: { success: boolean; errorType?: string },
-) {
-  if (gewerbeanmeldung.success && fseÜbermittlung.success) {
+function determineHttpStatus(...parts: (RegisterGewerbeResponseItem | undefined)[]) {
+  // Skipped parts (undefined) don't count towards the status.
+  const results = parts.filter((result) => result !== undefined);
+
+  const allSucceeded = results.every((result) => result.success);
+  const someSucceeded = results.some((result) => result.success);
+  const allValidationErrors = results.every(
+    (result) => result.errorType === ErrorTypeSchema.enum.validation_error,
+  );
+
+  if (allSucceeded) {
     return 200;
   }
-  if (gewerbeanmeldung.success || fseÜbermittlung.success) {
-    return 207;
+  if (someSucceeded) {
+    return 207; // only reachable when both parts were submitted
   }
-  if (
-    gewerbeanmeldung.errorType === ErrorTypeSchema.enum.validation_error &&
-    fseÜbermittlung.errorType === ErrorTypeSchema.enum.validation_error
-  ) {
+  if (allValidationErrors) {
     return 400;
   }
   return 500;
@@ -202,11 +205,12 @@ function determineHttpStatus(
 export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
   app.openapi(registerGewerbeRoute, async (c) => {
     try {
+      const { only } = c.req.valid("query");
       const data = c.req.valid("json");
 
       const [gewerbeanmeldung, fseÜbermittlung] = await Promise.all([
-        submitGewerbeanmeldung(data),
-        submitFsE(data),
+        only === "fseÜbermittlung" ? undefined : submitGewerbeanmeldung(data),
+        only === "gewerbeanmeldung" ? undefined : submitFsE(data),
       ]);
 
       return c.json(

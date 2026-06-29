@@ -223,7 +223,7 @@ export type RegisterGewerbeResponseItem = z.infer<typeof RegisterGewerbeResponse
 
 export const RegisterGewerbeResponseSchema = z
   .object({
-    gewerbeanmeldung: RegisterGewerbeResponseItemSchema,
-    fseÜbermittlung: RegisterGewerbeResponseItemSchema,
+    gewerbeanmeldung: RegisterGewerbeResponseItemSchema.optional(),
+    fseÜbermittlung: RegisterGewerbeResponseItemSchema.optional(),
   })
   .openapi("RegisterGewerbeResponse");
