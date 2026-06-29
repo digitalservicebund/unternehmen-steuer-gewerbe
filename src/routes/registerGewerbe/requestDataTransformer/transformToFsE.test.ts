@@ -184,7 +184,7 @@ describe("transformToEUnFsE", () => {
     ).toBeUndefined();
   });
 
-  // TODO: temporary — the gründungsdatum default exists only to give the OSS time to
+  // Note: temporary — the gründungsdatum default exists only to give the OSS time to
   // start sending the field. Remove this test together with the schema default once
   // gründungsdatum is always provided (field made required).
   it("falls back to today's date for uebertrStichtag when gründungsdatum is omitted", () => {
