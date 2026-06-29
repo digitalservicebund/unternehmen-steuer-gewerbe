@@ -75,9 +75,9 @@ function getZahllastUeberschuss(data: RegisterGewerbeRequest) {
         ? "1"
         : "2",
     betrag:
-      data.unternehmensDaten.umsatzsteuerImErstenJahr !== undefined
-        ? Math.abs(data.unternehmensDaten.umsatzsteuerImErstenJahr)
-        : 0,
+      data.unternehmensDaten.umsatzsteuerImErstenJahr === undefined
+        ? 0
+        : Math.abs(data.unternehmensDaten.umsatzsteuerImErstenJahr),
   };
 }
 
