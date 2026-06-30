@@ -449,6 +449,8 @@ jobs:
     needs: smoke-test-development
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Deploy to production
         uses: digitalservicebund/argocd-deploy@753647aee2ae99081829cf103e33ca4d7a2266c4
