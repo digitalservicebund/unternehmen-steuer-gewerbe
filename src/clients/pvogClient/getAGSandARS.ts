@@ -1,15 +1,13 @@
-import { fetchJson } from "../../helpers/fetchJson";
+import { getLocations, type PvogLocation } from "./getLocations";
 
-interface PvogResult {
-  ags: string;
-  ars: string;
-}
-
-export async function getAGSandARS(zipCode: string): Promise<PvogResult> {
-  // There is a deprecation note at
-  // https://produktportal.pvog.fitko.de/api/suchdienst/get-locations-v-2/
-  const url = "https://pvog.fitko.net/suchdienst/api/v2/locations";
-  const data = await fetchJson<PvogResult[]>(url, { params: { q: zipCode } });
-  if (!data[0]) throw new Error(`No location found for zip code ${zipCode}`);
-  return data[0];
+export async function getAGSandARS(
+  plz: string,
+  strasse?: string,
+  hausnummer?: string,
+): Promise<PvogLocation> {
+  const [location] = await getLocations(plz, strasse, hausnummer);
+  if (location === undefined) {
+    throw new Error(`No location found for zip code ${plz}`);
+  }
+  return location;
 }
