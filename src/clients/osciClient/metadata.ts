@@ -1,6 +1,7 @@
 export interface CreateMetadataOptions {
   targetId: string;
   sourceId: string;
+  sourceTimestamp?: string;
 }
 
 interface OsciMetadataTarget {
@@ -13,6 +14,7 @@ interface OsciMetadataTarget {
 interface OsciMetadataSource {
   sourceProcessType: string;
   sourceId: string;
+  sourceTimestamp: string;
 }
 
 interface OsciMetadataMessage {
@@ -36,6 +38,7 @@ export interface OsciMetadata {
 export function createMetadata({
   targetId,
   sourceId,
+  sourceTimestamp,
 }: CreateMetadataOptions): OsciMetadata {
   return {
     $schema: "https://www.akdb.net/ok.komm/zkocjson-1.0.0.schema.json",
@@ -50,6 +53,8 @@ export function createMetadata({
       source: {
         sourceProcessType: "XGA", // TODO: we need to change this probably
         sourceId,
+        // AKDB rejects sub-second precision, so emit seconds-only ISO 8601 (e.g. 2026-06-30T09:29:06Z).
+        sourceTimestamp: sourceTimestamp ?? new Date().toISOString().replace(/\.\d{3}Z$/, "Z"),
       },
     },
     payload: {
