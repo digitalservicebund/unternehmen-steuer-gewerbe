@@ -44,35 +44,48 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.umsatzsteuer?.uStIdNr?.uStIdAntrag?.merkerAntragUStId).toBe(true);
   });
 
-  it("maps a positive number to zahllast and it's absolute value", () => {
-    const dataWithNegativeNumberAsUmsatzImErstenJahr = structuredClone(
-      registerGewerbeSampleRequestAllFieldsFilled,
-    );
-    // set deprecated values to the opposite of what we expect the new value to result in
-    dataWithNegativeNumberAsUmsatzImErstenJahr.unternehmensDaten.zahllastUeberschussAuswahl =
-      "ueberschuss";
-    dataWithNegativeNumberAsUmsatzImErstenJahr.unternehmensDaten.zahllastUeberschussBetrag = 0;
-    // set the new value
-    dataWithNegativeNumberAsUmsatzImErstenJahr.unternehmensDaten.umsatzsteuerImErstenJahr = 111;
+  describe("umsatzsteuer", () => {
+    it("maps a positive number to zahllast and it's absolute value", () => {
+      const dataWithNegativeNumberAsUmsatzImErstenJahr = structuredClone(
+        registerGewerbeSampleRequestAllFieldsFilled,
+      );
+      // set deprecated values to the opposite of what we expect the new value to result in
+      dataWithNegativeNumberAsUmsatzImErstenJahr.unternehmensDaten.zahllastUeberschussAuswahl =
+        "ueberschuss";
+      dataWithNegativeNumberAsUmsatzImErstenJahr.unternehmensDaten.zahllastUeberschussBetrag = 0;
+      // set the new value
+      dataWithNegativeNumberAsUmsatzImErstenJahr.unternehmensDaten.umsatzsteuerImErstenJahr = 111;
 
-    const result = transformToEUnFsE(dataWithNegativeNumberAsUmsatzImErstenJahr);
+      const result = transformToEUnFsE(dataWithNegativeNumberAsUmsatzImErstenJahr);
 
-    expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toEqual("1"); // 1 for zahllast
-    expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toEqual(111);
-  });
+      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toEqual("1"); // 1 for zahllast
+      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toEqual(111);
+    });
 
-  it("maps uStIdNr to undefined if umsatzsteuerIdMitbeantragen=false or undefined", () => {
-    const caseFalse = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
-    caseFalse.unternehmensDaten.umsatzsteuerIdMitbeantragen = false;
+    it("maps undefined umsatzSteuerImErstenJahr to a betrag of 0", () => {
+      const dataWithUndefined = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
 
-    const caseUndefined = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
-    caseUndefined.unternehmensDaten.umsatzsteuerIdMitbeantragen = undefined;
+      dataWithUndefined.unternehmensDaten.umsatzsteuerImErstenJahr = undefined;
 
-    const resultForFalse = transformToEUnFsE(caseUndefined);
-    const resultForUndefined = transformToEUnFsE(caseFalse);
+      const result = transformToEUnFsE(dataWithUndefined);
 
-    expect(resultForFalse.eUn?.umsatzsteuer?.uStIdNr).toBeUndefined();
-    expect(resultForUndefined.eUn?.umsatzsteuer?.uStIdNr).toBeUndefined();
+      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toEqual("2"); // 2 for ueberschuss
+      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toEqual(0);
+    });
+
+    it("maps uStIdNr to undefined if umsatzsteuerIdMitbeantragen=false or undefined", () => {
+      const caseFalse = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+      caseFalse.unternehmensDaten.umsatzsteuerIdMitbeantragen = false;
+
+      const caseUndefined = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+      caseUndefined.unternehmensDaten.umsatzsteuerIdMitbeantragen = undefined;
+
+      const resultForFalse = transformToEUnFsE(caseUndefined);
+      const resultForUndefined = transformToEUnFsE(caseFalse);
+
+      expect(resultForFalse.eUn?.umsatzsteuer?.uStIdNr).toBeUndefined();
+      expect(resultForUndefined.eUn?.umsatzsteuer?.uStIdNr).toBeUndefined();
+    });
   });
 
   it("maps geschlecht 'm' to anredeId '1' and 'w' to '2'", () => {
