@@ -31,7 +31,7 @@ export function joinStrasseUndHausnummer(
 }
 
 export function splitTelefonnummer(telefonnummer: string) {
-  const match = /^(\+[0-9]{1,5})\s([0-9]{1,5})\s([0-9]{1,13})(-([0-9]{1,5}))?$/.exec(telefonnummer);
+  const match = /^(\+\d{1,5})\s(\d{1,5})\s(\d{1,13})(-(\d{1,5}))?$/.exec(telefonnummer);
 
   if (!match) {
     throw new Error("The given Phone number format is not supported");

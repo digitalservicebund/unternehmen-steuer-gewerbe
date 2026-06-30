@@ -54,7 +54,7 @@ const PersönlicheDatenSchema = z.object({
   adresse: AdresseSchema,
   telefon: z
     .string()
-    .regex(/^\+[0-9]{1,5}\s[0-9]{1,5}\s[0-9]{1,13}(-[0-9]{1,5})?$/)
+    .regex(/^\+\d{1,5}\s\d{1,5}\s\d{1,13}(-\d{1,5})?$/)
     .openapi({
       example: "+49 234 121314",
       description:
@@ -63,7 +63,7 @@ const PersönlicheDatenSchema = z.object({
   email: z.email().openapi({ example: "e.mustermann@example.org" }),
   steuernummer: z
     .string()
-    .regex(/^[0-9]{4}0[0-9]{8}$/)
+    .regex(/^\d{4}0\d{8}$/)
     .optional()
     .openapi({
       example: "2695002219428",
