@@ -201,15 +201,16 @@ jobs:
           exit-code: 0
           scanners: "vuln,config,secret"
 
-      - name: Convert Trivy results to sarif
-        run: trivy convert --format sarif --output trivy-image-results.sarif trivy-image-results.json
+      # Not possible in public repo
+      # - name: Convert Trivy results to sarif
+      #   run: trivy convert --format sarif --output trivy-image-results.sarif trivy-image-results.json
 
-      - name: Upload Trivy scan results to GitHub Security tab (on `main`)
-        uses: github/codeql-action/upload-sarif@c35d1b164463ee62a100735382aaaa525c5d3496
-        # only on `main`
-        if: ${{ github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
-        with:
-          sarif_file: "trivy-image-results.sarif"
+      # - name: Upload Trivy scan results to GitHub Security tab (on `main`)
+      #   uses: github/codeql-action/upload-sarif@c35d1b164463ee62a100735382aaaa525c5d3496
+      #   # only on `main`
+      #   if: ${{ github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
+      #   with:
+      #     sarif_file: "trivy-image-results.sarif"
       - name: Fail build on High/Criticial Vulnerabilities (on branches)
         # ignore on `main`
         if: ${{ github.ref != 'refs/heads/main' }}
