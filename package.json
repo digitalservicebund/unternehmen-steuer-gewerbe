@@ -27,7 +27,7 @@
     "test:watch": "op run --env-file .env -- vitest"
   },
   "dependencies": {
-    "@digitalservicebund/unternehmen-steuer-gewerbe-privat": "3.3.0-232",
+    "@digitalservicebund/unternehmen-steuer-gewerbe-privat": "3.3.0-236",
     "@hono/node-server": "^2.0.6",
     "@hono/swagger-ui": "^0.6.1",
     "@hono/zod-openapi": "^1.4.0",
