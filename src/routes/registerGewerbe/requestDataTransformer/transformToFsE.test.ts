@@ -39,6 +39,22 @@ describe("transformToEUnFsE", () => {
     expect(
       result.eUn?.festsetzungsAngaben?.voraussichtlicheEinkuenfte?.einkGewBetr?.folgeJahrA,
     ).toBe(1);
+
+    expect(result.eUn?.umsatzsteuer?.uStIdNr?.uStIdAntrag?.merkerAntragUStId).toBe(true);
+  });
+
+  it("maps uStIdNr to undefined if umsatzsteuerIdMitbeantragen=false or undefined", () => {
+    const caseFalse = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+    caseFalse.unternehmensDaten.umsatzsteuerIdMitbeantragen = false;
+
+    const caseUndefined = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+    caseUndefined.unternehmensDaten.umsatzsteuerIdMitbeantragen = undefined;
+
+    const resultForFalse = transformToEUnFsE(caseUndefined);
+    const resultForUndefined = transformToEUnFsE(caseFalse);
+
+    expect(resultForFalse.eUn?.umsatzsteuer?.uStIdNr).toBeUndefined();
+    expect(resultForUndefined.eUn?.umsatzsteuer?.uStIdNr).toBeUndefined();
   });
 
   it("maps geschlecht 'm' to anredeId '1' and 'w' to '2'", () => {
@@ -78,6 +94,32 @@ describe("transformToEUnFsE", () => {
     });
     expect(ueberschuss.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toBe("2");
   });
+
+  it.each([
+    ["unterschreitungUmsatzgrenze", "istVerstUStGrundUmsatz"],
+    ["befreiungBuchführungspflicht", "istVerstUStGrundAO"],
+    ["freiberuflicheTätigkeit", "istVerstUStGrundFreierBeruf"],
+  ] as const)(
+    "maps istVersteuerungGrund '%s' to the %s flag and leaves the others unset",
+    (grund, expectedFlag) => {
+      const result = transformToEUnFsE({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          sollIstVersteuerung: "istVersteuerung",
+          istVersteuerungGrund: grund,
+        },
+      });
+      const sollIstVersteuerung = result.eUn?.umsatzsteuer?.sollIstVersteuerung;
+      for (const flag of [
+        "istVerstUStGrundUmsatz",
+        "istVerstUStGrundAO",
+        "istVerstUStGrundFreierBeruf",
+      ] as const) {
+        expect(sollIstVersteuerung?.[flag]).toBe(flag === expectedFlag ? true : undefined);
+      }
+    },
+  );
 
   it("sets entsprichtWohnanschrift: true when adresseAbweichend is not set", () => {
     const { adresseAbweichend: _, ...unternehmensDatenOhneAbweichung } =

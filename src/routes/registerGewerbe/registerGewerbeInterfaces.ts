@@ -9,6 +9,7 @@ import {
   RELIGIONSSCHLUESSEL_KEYS,
   GEWINN_ERMITTLUNG_KEYS,
   SOLL_IST_VERSTEUERUNG_KEYS,
+  IST_VERSTEUERUNG_GRUND_KEYS,
   ZAHLLAST_UEBERSCHUSS_KEYS,
 } from "./requestDataTransformer/fsECodes";
 
@@ -78,66 +79,98 @@ const PersönlicheDatenSchema = z.object({
   }),
 });
 
-const UnternehmensDatenSchema = z.object({
-  adresseAbweichend: AdresseSchema.openapi({
-    example: {
-      strasseUndHausnummer: "Musterstraße 2",
-      postleitzahl: "36037",
-      ort: "Fulda",
-    },
-  }).optional(),
-  tätigkeitsbeschreibung: z.string().openapi({ example: "Vertrieb von Vertriebsmustern" }),
-  tätigkeitsbereich: z
-    .enum(["industrie", "handwerk", "handel", "sonstiges"])
-    .openapi({ example: "handwerk" }),
-  tätigkeitsbeginn: z.iso.date().openapi({ example: "2026-04-17" }),
-  // TODO: temporary default — remove it (make gründungsdatum required) once the OSS
-  // always sends the field.
-  gründungsdatum: z.iso
-    .date()
-    .default(() => new Date().toISOString().split("T")[0]!)
-    .openapi({
-      example: "2026-04-17",
-      description: "Founding date of the business.",
+const UnternehmensDatenSchema = z
+  .object({
+    adresseAbweichend: AdresseSchema.openapi({
+      example: {
+        strasseUndHausnummer: "Musterstraße 2",
+        postleitzahl: "36037",
+        ort: "Fulda",
+      },
+    }).optional(),
+    tätigkeitsbeschreibung: z.string().openapi({ example: "Vertrieb von Vertriebsmustern" }),
+    tätigkeitsbereich: z
+      .enum(["industrie", "handwerk", "handel", "sonstiges"])
+      .openapi({ example: "handwerk" }),
+    tätigkeitsbeginn: z.iso.date().openapi({ example: "2026-04-17" }),
+    // TODO: temporary default — remove it (make gründungsdatum required) once the OSS
+    // always sends the field.
+    gründungsdatum: z.iso
+      .date()
+      .default(() => new Date().toISOString().split("T")[0]!)
+      .openapi({
+        example: "2026-04-17",
+        description: "Founding date of the business.",
+      }),
+    gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
+    gewinnErmittlung: z.enum(GEWINN_ERMITTLUNG_KEYS).openapi({
+      example: "einnahmenüberschussrechnung",
     }),
-  gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
-  gewinnErmittlung: z.enum(GEWINN_ERMITTLUNG_KEYS).openapi({
-    example: "einnahmenüberschussrechnung",
-  }),
-  kleinunternehmerRegelung: z.boolean().default(false).openapi({
-    example: false,
-    description: "Wird die Kleinunternehmer-Regelung (§ 19 UStG) in Anspruch genommen?",
-  }),
-  umsatzGruendungsjahr: z.number().int().min(0).default(1).openapi({
-    example: 25000,
-    description: "Voraussichtlicher Gesamtumsatz (in Euro) im Jahr der Betriebseröffnung.",
-  }),
-  umsatzFolgejahr: z.number().int().min(0).default(1).openapi({
-    example: 26000,
-    description: "Voraussichtlicher Gesamtumsatz (in Euro) im Folgejahr.",
-  }),
-  gewinnGründungsjahr: z.number().int().min(0).default(1).openapi({
-    example: 25000,
-    description: "Voraussichtlicher Gewinn (in Euro) im Jahr der Betriebseröffnung.",
-  }),
-  gewinnFolgejahr: z.number().int().min(0).default(1).openapi({
-    example: 26000,
-    description: "Voraussichtlicher Gewinn (in Euro) im Folgejahr.",
-  }),
-  sollIstVersteuerung: z.enum(SOLL_IST_VERSTEUERUNG_KEYS).default("sollVersteuerung").openapi({
-    example: "sollVersteuerung",
-    description:
-      "Art der Umsatzbesteuerung gemäß § 16 bzw. § 20 UStG. Standard ist Sollversteuerung (nach vereinbarten Entgelten).",
-  }),
-  zahllastUeberschussAuswahl: z.enum(ZAHLLAST_UEBERSCHUSS_KEYS).default("zahllast").openapi({
-    example: "zahllast",
-    description: "Ob voraussichtlich eine Zahllast oder ein Überschuss erwartet wird.",
-  }),
-  zahllastUeberschussBetrag: z.number().int().min(0).default(0).openapi({
-    example: 0,
-    description: "Voraussichtliche Zahllast oder Überschuss in Euro.",
-  }),
-});
+    kleinunternehmerRegelung: z.boolean().default(false).openapi({
+      example: false,
+      description: "Wird die Kleinunternehmer-Regelung (§ 19 UStG) in Anspruch genommen?",
+    }),
+    umsatzGruendungsjahr: z.number().int().min(0).default(1).openapi({
+      example: 25000,
+      description: "Voraussichtlicher Gesamtumsatz (in Euro) im Jahr der Betriebseröffnung.",
+    }),
+    umsatzFolgejahr: z.number().int().min(0).default(1).openapi({
+      example: 26000,
+      description: "Voraussichtlicher Gesamtumsatz (in Euro) im Folgejahr.",
+    }),
+    umsatzsteuerIdMitbeantragen: z.boolean().default(false).optional().openapi({
+      description: "Soll mit dem FsE auch eine UmsatzsteuerId mitbeantragt werden?",
+    }),
+    gewinnGründungsjahr: z.number().int().min(0).default(1).openapi({
+      example: 25000,
+      description: "Voraussichtlicher Gewinn (in Euro) im Jahr der Betriebseröffnung.",
+    }),
+    gewinnFolgejahr: z.number().int().min(0).default(1).openapi({
+      example: 26000,
+      description: "Voraussichtlicher Gewinn (in Euro) im Folgejahr.",
+    }),
+    sollIstVersteuerung: z.enum(SOLL_IST_VERSTEUERUNG_KEYS).default("sollVersteuerung").openapi({
+      example: "istVersteuerung",
+      description:
+        "Art der Umsatzbesteuerung gemäß § 16 bzw. § 20 UStG. Standard ist Sollversteuerung (nach vereinbarten Entgelten).",
+    }),
+    istVersteuerungGrund: z.enum(IST_VERSTEUERUNG_GRUND_KEYS).optional().openapi({
+      example: "unterschreitungUmsatzgrenze",
+      description:
+        "Begründung für die beantragte Istversteuerung. Verpflichtend, wenn `sollIstVersteuerung` auf `istVersteuerung` gesetzt ist; andernfalls weglassen.",
+    }),
+    zahllastUeberschussAuswahl: z.enum(ZAHLLAST_UEBERSCHUSS_KEYS).default("zahllast").openapi({
+      example: "zahllast",
+      description: "Ob voraussichtlich eine Zahllast oder ein Überschuss erwartet wird.",
+    }),
+    zahllastUeberschussBetrag: z.number().int().min(0).default(0).openapi({
+      example: 0,
+      description: "Voraussichtliche Zahllast oder Überschuss in Euro.",
+    }),
+  })
+  .refine(
+    (data) => {
+      return (
+        data.sollIstVersteuerung !== "istVersteuerung" || data.istVersteuerungGrund !== undefined
+      );
+    },
+    {
+      error:
+        "istVersteuerungGrund is required when sollIstVersteuerung is set to 'istVersteuerung'.",
+      path: ["istVersteuerungGrund"],
+    },
+  )
+  .refine(
+    (data) => {
+      return (
+        data.sollIstVersteuerung === "istVersteuerung" || data.istVersteuerungGrund === undefined
+      );
+    },
+    {
+      error: "istVersteuerungGrund must only be set when sollIstVersteuerung is 'istVersteuerung'.",
+      path: ["istVersteuerungGrund"],
+    },
+  );
 
 const unfallversicherungstraegerCodesDescription = Object.entries(UNFALLVERSICHERUNGSTRAEGER)
   .map(([name, code]) => `- \`${name}\` (${code})`)
@@ -190,7 +223,7 @@ export type RegisterGewerbeResponseItem = z.infer<typeof RegisterGewerbeResponse
 
 export const RegisterGewerbeResponseSchema = z
   .object({
-    gewerbeanmeldung: RegisterGewerbeResponseItemSchema,
-    fseÜbermittlung: RegisterGewerbeResponseItemSchema,
+    gewerbeanmeldung: RegisterGewerbeResponseItemSchema.optional(),
+    fseÜbermittlung: RegisterGewerbeResponseItemSchema.optional(),
   })
   .openapi("RegisterGewerbeResponse");

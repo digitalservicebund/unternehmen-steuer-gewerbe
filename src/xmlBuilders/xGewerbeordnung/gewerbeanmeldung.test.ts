@@ -415,6 +415,43 @@ describe("createGewerbeanmeldungXml", () => {
     expect(xml).toContain("<bk:unternehmensnummer>123456789012345</bk:unternehmensnummer>");
   });
 
+  it("includes gemeindeschluesselErgaenzung for Hamburg (schematron rule SCH-0189)", async () => {
+    const hamburg: DataForCreateGewerbeanmeldungXml = {
+      ...gewerbeanmeldung,
+      autor: { ...gewerbeanmeldung.autor, kennung: "MELDID:02000000" },
+      gemeindeSchluessel: "02000000",
+      gemeindeschluesselErgaenzung: "02100000",
+      gewerbebetrieb: {
+        ...gewerbeanmeldung.gewerbebetrieb,
+        betriebsstaette: {
+          ...gewerbeanmeldung.gewerbebetrieb!.betriebsstaette,
+          anschrift: {
+            ...gewerbeanmeldung.gewerbebetrieb!.betriebsstaette!.anschrift,
+            postleitzahl: "22767",
+            ort: "Hamburg",
+          },
+        },
+      },
+    };
+
+    const xml = await createGewerbeanmeldungXml(hamburg);
+    expect(xml).toContain(
+      '<xga:gemeindeschluesselErgaenzung listVersionID="1"><code>02100000</code></xga:gemeindeschluesselErgaenzung>',
+    );
+  });
+
+  it("rejects a Hamburg Gewerbeanmeldung without gemeindeschluesselErgaenzung (schematron rule SCH-0189 violation)", async () => {
+    const hamburgWithoutErgaenzung: DataForCreateGewerbeanmeldungXml = {
+      ...gewerbeanmeldung,
+      autor: { ...gewerbeanmeldung.autor, kennung: "MELDID:02000000" },
+      gemeindeSchluessel: "02000000",
+    };
+
+    await expect(createGewerbeanmeldungXml(hamburgWithoutErgaenzung)).rejects.toThrow(
+      "Generated XGewerbeanmeldung is invalid.",
+    );
+  });
+
   it("includes bisherigeUnfallversicherung without unternehmensnummer when omitted", async () => {
     const withUnfallversicherungButNoUnternehmensummer: DataForCreateGewerbeanmeldungXml = {
       ...gewerbeanmeldung,

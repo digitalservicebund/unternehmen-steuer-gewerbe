@@ -37,6 +37,8 @@ export interface CreateGewerbeanmeldungXmlData {
   istStorno?: boolean;
   /** Amtlicher Gemeindeschlüssel der Sitzgemeinde der Betriebsstätte */
   gemeindeSchluessel?: string;
+  /** Stadtbezirk der Betriebsstätte (Stadtstaaten); Pflicht für Hamburg und Berlin (schematron rule SCH-0189). */
+  gemeindeschluesselErgaenzung?: string;
   /** Eindeutige Kennzeichnung der Gewerbeanzeige als UUID. */
   uuid?: string;
   /** Datum des Beginns, der meldepflichtigen Änderung, der Aufgabe des Gewerbes oder der Datenaktualisierung */
@@ -105,6 +107,7 @@ export async function createGewerbeanmeldungXml(
             ${isDefinedInput(gewerbeanmeldung.ereigniszeitpunkt) ? `<xga:ereigniszeitpunkt>${escapeXml(gewerbeanmeldung.ereigniszeitpunkt)}</xga:ereigniszeitpunkt>` : ""}
             ${isDefinedInput(gewerbeanmeldung.istStorno) ? `<xga:istStorno>${escapeXml(gewerbeanmeldung.istStorno)}</xga:istStorno>` : ""}
             ${isDefinedInput(gewerbeanmeldung.gemeindeSchluessel) ? `<xga:gemeindeSchluessel listVersionID="2020-03-31"><code>${escapeXml(gewerbeanmeldung.gemeindeSchluessel)}</code></xga:gemeindeSchluessel>` : ""}
+            ${isDefinedInput(gewerbeanmeldung.gemeindeschluesselErgaenzung) ? `<xga:gemeindeschluesselErgaenzung listVersionID="1"><code>${escapeXml(gewerbeanmeldung.gemeindeschluesselErgaenzung)}</code></xga:gemeindeschluesselErgaenzung>` : ""}
             ${isDefinedInput(gewerbeanmeldung.uuid) ? `<xga:uuid>${escapeXml(gewerbeanmeldung.uuid)}</xga:uuid>` : ""}
             ${isDefinedInput(gewerbeanmeldung.gueltigAb) ? `<xga:gueltigAb>${escapeXml(gewerbeanmeldung.gueltigAb)}</xga:gueltigAb>` : ""}
             ${isDefinedInput(gewerbeanmeldung.datumMeldung) ? `<xga:datumMeldung>${escapeXml(gewerbeanmeldung.datumMeldung)}</xga:datumMeldung>` : ""}
