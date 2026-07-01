@@ -21,8 +21,8 @@ describe("getLocationsDetails", () => {
   it("narrows ARS down to 010540056056 (single municipality Husum) when not only the zip code 25813, but also the street name Marktstraße 1 is given", async () => {
     const result = await getLocationsDetails("25813", "Marktstraße", "1");
 
-    expect(result.length).toBe(1);
-    expect(result[0]!.ars === "010540056056").toBe(true);
+    expect(result).toHaveLength(1);
+    expect(result[0]!.ars).toBe("010540056056");
   });
 
   it("returns an empty array for the non-existent zip code 00000 instead of throwing", async () => {
