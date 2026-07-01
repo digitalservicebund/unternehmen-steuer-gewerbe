@@ -1,4 +1,4 @@
-import { getLocations } from "./getLocations";
+import { getLocationsDetails } from "./getLocationsDetails";
 
 export interface AGSandARS {
   ars: string;
@@ -13,24 +13,29 @@ export interface AGSandARS {
 //
 // The ARS (12 digits) embeds the AGS (8 digits): ARS digits 1-5 (state + Regierungsbezirk + Kreis)
 // map to AGS 1-5, ARS digits 10-12 (Gemeinde) to AGS 6-8.
-function createAgsFromArs(ars: string): string {
+function getAgsFromArs(ars: string): string {
   return ars.slice(0, 5) + ars.slice(9);
 }
 
 /**
  * Returns the single best (first) match for an address, throwing if none is found.
- * Use getLocations directly when all municipalities a PLZ spans are needed.
+ * Use getLocationsDetails directly when all municipalities a PLZ spans are needed.
  */
 export async function getAGSandARS(
   plz: string,
   strasse?: string,
   hausnummer?: string,
 ): Promise<AGSandARS> {
-  const [location] = await getLocations(plz, strasse, hausnummer);
-  if (location === undefined) {
+  const [firstMatchingLocation] = await getLocationsDetails(plz, strasse, hausnummer);
+  if (firstMatchingLocation === undefined) {
     throw new Error(`No location found for zip code ${plz}`);
   }
+  if (!/^\d{12}$/.test(firstMatchingLocation.ars)) {
+    throw new Error(
+      `No valid AGS and ARS fround for "${[plz, strasse, hausnummer].filter(Boolean).join(" ")}"`,
+    );
+  }
 
-  const ags = createAgsFromArs(location.ars);
-  return { ars: location.ars, ags };
+  const ags = getAgsFromArs(firstMatchingLocation.ars);
+  return { ars: firstMatchingLocation.ars, ags };
 }

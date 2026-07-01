@@ -1,6 +1,6 @@
 import { fetchJson } from "../../helpers/fetchJson";
 
-export interface PvogLocation {
+interface LocationDetails {
   ars: string;
   name: string;
   plz?: string;
@@ -13,13 +13,13 @@ export interface PvogLocation {
  * A single PLZ can span several municipalities, so the result is a list. Uses the v3 locations
  * endpoint, which is street/house-number aware.
  */
-export async function getLocations(
+export async function getLocationsDetails(
   plz: string,
   strasse?: string,
   hausnummer?: string,
-): Promise<PvogLocation[]> {
+): Promise<LocationDetails[]> {
   const q = [plz, strasse, hausnummer].filter(Boolean).join(" ");
-  const data = await fetchJson<PvogLocation[]>(
+  const data = await fetchJson<LocationDetails[]>(
     "https://pvog.fitko.net/suchdienst/api/v3/locations",
     { params: { q } },
   );
