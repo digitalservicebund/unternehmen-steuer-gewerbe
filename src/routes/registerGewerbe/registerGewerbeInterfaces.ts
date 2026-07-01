@@ -143,11 +143,13 @@ const UnternehmensDatenSchema = z
       example: "zahllast",
       description:
         "Deprecated. Use 'umsatzsteuerImErstenJahr instead. (Ob voraussichtlich eine Zahllast oder ein Überschuss erwartet wird.)",
+      deprecated: true,
     }),
     zahllastUeberschussBetrag: z.number().int().min(0).default(0).openapi({
       example: 0,
       description:
         "Deprecated. Use 'umsatzsteuerImErstenJahr instead. (Voraussichtliche Zahllast oder Überschuss in Euro.)",
+      deprecated: true,
     }),
     umsatzsteuerImErstenJahr: z.int().optional().openapi({
       example: 100,
