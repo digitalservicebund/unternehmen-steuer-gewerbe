@@ -62,10 +62,21 @@ describe("transformToEUnFsE", () => {
       expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toEqual(111);
     });
 
-    it("maps undefined umsatzSteuerImErstenJahr to a betrag of 0", () => {
+    it("maps undefined umsatzSteuerImErstenJahr to ueberschuss and a betrag of 0", () => {
       const dataWithUndefined = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
 
       dataWithUndefined.unternehmensDaten.umsatzsteuerImErstenJahr = undefined;
+
+      const result = transformToEUnFsE(dataWithUndefined);
+
+      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toEqual("2"); // 2 for ueberschuss
+      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toEqual(0);
+    });
+
+    it("maps 0 umsatzSteuerImErstenJahr to ueberschuss and a betrag of 0", () => {
+      const dataWithUndefined = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+
+      dataWithUndefined.unternehmensDaten.umsatzsteuerImErstenJahr = 0;
 
       const result = transformToEUnFsE(dataWithUndefined);
 
