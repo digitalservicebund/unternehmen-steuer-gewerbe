@@ -23,7 +23,5 @@ export async function getLocationsDetails(
     "https://pvog.fitko.net/suchdienst/api/v3/locations",
     { params: { q } },
   );
-
-  // The v3 search is fuzzy and can return neighbouring PLZ, so keep only items matching the searched PLZ.
-  return data.filter((item) => item.plz === undefined || item.plz === plz);
+  return data;
 }
