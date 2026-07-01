@@ -36,6 +36,8 @@ describe("getGewerbeRoutingInfo", () => {
 
       expect(mockGetAGSandARS).toHaveBeenCalledWith(
         registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten.adresse.postleitzahl,
+        "Musterstraße",
+        "1",
       );
     });
 
@@ -51,7 +53,7 @@ describe("getGewerbeRoutingInfo", () => {
         },
       });
 
-      expect(mockGetAGSandARS).toHaveBeenCalledWith("10969");
+      expect(mockGetAGSandARS).toHaveBeenCalledWith("10969", "Musterstraße", "2");
     });
   });
 

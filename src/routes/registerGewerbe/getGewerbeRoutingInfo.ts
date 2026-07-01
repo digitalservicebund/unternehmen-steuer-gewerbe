@@ -1,5 +1,6 @@
 import { getAGSandARS, getGewerbeamt, type Gewerbeamt } from "../../clients/pvogClient";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
+import { splitStrasseHausnummer } from "../../helpers/formFieldTransformations";
 import { type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 
 const GEWERBEANMELDUNG_LEIKA_KEY = "99050012104000";
@@ -19,17 +20,16 @@ export interface GewerbeRoutingInfo {
 export async function getGewerbeRoutingInfo(
   data: RegisterGewerbeRequest,
 ): Promise<GewerbeRoutingInfo> {
-  const postleitzahl =
-    data.unternehmensDaten.adresseAbweichend?.postleitzahl ??
-    data.persönlicheDaten.adresse.postleitzahl;
+  const address = data.unternehmensDaten.adresseAbweichend ?? data.persönlicheDaten.adresse;
+  const { strasse, hausnummer } = splitStrasseHausnummer(address.strasseUndHausnummer);
 
-  const { ags, ars } = await getAGSandARS(postleitzahl);
+  const { ags, ars } = await getAGSandARS(address.postleitzahl, strasse, hausnummer);
 
   const gewerbeamt = await getGewerbeamt(ars);
 
   let fitConnectDestinationInformation = null;
 
-  if (isSupportingFitConnect(postleitzahl)) {
+  if (isSupportingFitConnect(address.postleitzahl)) {
     const fitConnectClient = getFitConnectClient();
     const res = await fitConnectClient.getRoutes(GEWERBEANMELDUNG_LEIKA_KEY, ags);
 
