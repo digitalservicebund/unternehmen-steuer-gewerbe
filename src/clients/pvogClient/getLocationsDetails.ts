@@ -1,4 +1,5 @@
 import { fetchJson } from "../../helpers/fetchJson";
+import { PVOG_SUCHDIENST_API_URL } from "./constants";
 
 interface LocationDetails {
   ars: string;
@@ -19,9 +20,5 @@ export async function getLocationsDetails(
   hausnummer?: string,
 ): Promise<LocationDetails[]> {
   const q = [plz, strasse, hausnummer].filter(Boolean).join(" ");
-  const data = await fetchJson<LocationDetails[]>(
-    "https://pvog.fitko.net/suchdienst/api/v3/locations",
-    { params: { q } },
-  );
-  return data;
+  return fetchJson<LocationDetails[]>(`${PVOG_SUCHDIENST_API_URL}/v3/locations`, { params: { q } });
 }

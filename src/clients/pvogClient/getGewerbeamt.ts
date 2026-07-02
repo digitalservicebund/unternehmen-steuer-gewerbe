@@ -1,6 +1,6 @@
 import { fetchJson } from "../../helpers/fetchJson";
+import { PVOG_SUCHDIENST_API_URL } from "./constants";
 
-const PVOG_SUCHDIENST_API_URL = "https://pvog.fitko.net/suchdienst/api";
 const GEWERBEANMELDUNG_LEIKA_ID = "99050012104000";
 // see https://www.xrepository.de/details/urn:de:xzufi:codeliste:zustaendigkeitsrolle
 const ROLE_CODE_ZUSTAENDIGE_STELLE_UND_ANSPRECHPUNKT = "01";
