@@ -369,7 +369,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to development
-        uses: digitalservicebund/argocd-deploy@753647aee2ae99081829cf103e33ca4d7a2266c4
+        uses: digitalservicebund/argocd-deploy@e8f6b8f77c8b8eeef3f67fc5bba9521f89145645
         with:
           environment: development/unternehmen-steuer-gewerbe
           version: ${{ github.sha }}
@@ -455,7 +455,7 @@ jobs:
       contents: read
     steps:
       - name: Deploy to production
-        uses: digitalservicebund/argocd-deploy@753647aee2ae99081829cf103e33ca4d7a2266c4
+        uses: digitalservicebund/argocd-deploy@e8f6b8f77c8b8eeef3f67fc5bba9521f89145645
         with:
           environment: production/unternehmen-steuer-gewerbe
           version: ${{ github.sha }}
