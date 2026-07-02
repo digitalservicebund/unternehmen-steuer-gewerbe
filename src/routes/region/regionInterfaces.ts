@@ -1,4 +1,5 @@
 import { z } from "@hono/zod-openapi";
+import { type OfficeDetails } from "../../helpers/createOfficeDetails";
 
 export const RegionParamsSchema = z.object({
   plz: z
@@ -50,8 +51,7 @@ export const OfficeDetailsSchema = z
     email: z.string().optional(),
     onlineServices: z.array(OnlineServiceLinkSchema).optional(),
   })
-
-export type OfficeDetails = z.infer<typeof OfficeDetailsSchema>;
+  .openapi("OfficeDetails") satisfies z.ZodType<OfficeDetails>;
 
 export const RegionResponseSchema = z
   .object({
