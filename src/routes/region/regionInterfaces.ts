@@ -32,7 +32,7 @@ export const RegionQuerySchema = z.object({
     }),
 });
 
-export const onlineServicesSchema = z
+export const OnlineServiceLinkSchema = z
   .object({
     title: z.string().optional(),
     description: z.string().optional(),
@@ -48,9 +48,8 @@ export const OfficeDetailsSchema = z
     ort: z.string().optional(),
     telefon: z.string().optional(),
     email: z.string().optional(),
-    onlineServices: z.array(onlineServicesSchema).optional(),
+    onlineServices: z.array(OnlineServiceLinkSchema).optional(),
   })
-  .openapi("OfficeDetails");
 
 export type OfficeDetails = z.infer<typeof OfficeDetailsSchema>;
 

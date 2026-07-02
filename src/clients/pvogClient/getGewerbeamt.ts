@@ -28,7 +28,7 @@ export interface Gewerbeamt {
   adresse?: GewerbeamtAdresse;
   telefon?: string;
   email?: string;
-  onlineServiceLinks: OnlineServiceLink[];
+  onlineServices: OnlineServiceLink[];
 }
 
 interface ServiceDescription {
@@ -199,7 +199,7 @@ export async function getGewerbeamt(ars: string): Promise<Gewerbeamt> {
     )?.trim(),
     email: findCommunicationValue(detail.location.communications, COMMUNICATION_CODE_EMAIL)?.trim(),
     // map explicitly so additional response fields (id, validity periods, ...) don't leak through
-    onlineServiceLinks: serviceDescriptionDetail.onlineServiceLinks.map(
+    onlineServices: serviceDescriptionDetail.onlineServiceLinks.map(
       ({ title, description, uri }) => ({
         title: title?.trim(),
         description: description?.trim(),

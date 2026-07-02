@@ -40,7 +40,7 @@ const GEWERBEAMT = {
   adresse: { strasse: "Amtstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
   telefon: "0661 102-0",
   email: "amt@fulda.de",
-  onlineServiceLinks: [{ uri: "https://example.org" }],
+  onlineServices: [{ uri: "https://example.org" }],
 };
 
 interface RegionResponseBody {
