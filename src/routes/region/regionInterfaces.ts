@@ -32,6 +32,14 @@ export const RegionQuerySchema = z.object({
     }),
 });
 
+export const onlineServicesSchema = z
+  .object({
+    title: z.string().optional(),
+    description: z.string().optional(),
+    uri: z.string(),
+  })
+  .openapi("OnlineServiceLink");
+
 export const OfficeDetailsSchema = z
   .object({
     name: z.string(),
@@ -39,6 +47,8 @@ export const OfficeDetailsSchema = z
     postleitzahl: z.string().optional(),
     ort: z.string().optional(),
     telefon: z.string().optional(),
+    email: z.string().optional(),
+    onlineServices: z.array(onlineServicesSchema).optional(),
   })
   .openapi("OfficeDetails");
 
