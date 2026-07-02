@@ -1,7 +1,7 @@
 import { fetchJson } from "../../helpers/fetchJson";
 import { PVOG_SUCHDIENST_API_URL } from "./constants";
 
-interface LocationDetails {
+export interface LocationDetails {
   ars: string;
   name: string;
   plz?: string;
