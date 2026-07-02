@@ -1,22 +1,18 @@
 import { createRoute } from "@hono/zod-openapi";
-import {
-  RegionQuerySchema,
-  SupportedRegionParamsSchema,
-  SupportedRegionResponseSchema,
-} from "./regionInterfaces";
+import { RegionParamsSchema, RegionQuerySchema, RegionResponseSchema } from "./regionInterfaces";
 
 export const regionRoute = createRoute({
   method: "get",
   path: "/api/v1/region/{plz}",
   request: {
-    params: SupportedRegionParamsSchema,
+    params: RegionParamsSchema,
     query: RegionQuerySchema,
   },
   responses: {
     200: {
       content: {
         "application/json": {
-          schema: SupportedRegionResponseSchema,
+          schema: RegionResponseSchema,
         },
       },
       description:

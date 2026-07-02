@@ -1,6 +1,6 @@
 import { z } from "@hono/zod-openapi";
 
-export const SupportedRegionParamsSchema = z.object({
+export const RegionParamsSchema = z.object({
   plz: z
     .string()
     .regex(/^\d{5}$/, "plz must be a 5-digit number")
@@ -53,10 +53,10 @@ export const OfficeDetailsSchema = z
 
 export type OfficeDetails = z.infer<typeof OfficeDetailsSchema>;
 
-export const SupportedRegionResponseSchema = z
+export const RegionResponseSchema = z
   .object({
     supported: z.boolean(),
     finanzaemter: z.array(OfficeDetailsSchema),
     gewerbeaemter: z.array(OfficeDetailsSchema),
   })
-  .openapi("SupportedRegionResponse");
+  .openapi("RegionResponse");
