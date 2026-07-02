@@ -23,9 +23,9 @@ describe("Route /api/v1/region/{plz}", () => {
     expect(body.supported).toBe(true);
     expect(Array.isArray(body.finanzaemter)).toBe(true);
     expect(Array.isArray(body.gewerbeaemter)).toBe(true);
-    expect(body.gewerbeaemter.length).toBeGreaterThanOrEqual(1);
+    expect(body.gewerbeaemter).toHaveLength(4);
     expect(body.gewerbeaemter[0]).toMatchObject({ name: expect.any(String) });
-    expect(body.finanzaemter.length).toBe(1);
+    expect(body.finanzaemter).toHaveLength(1);
     expect(body.finanzaemter[0]).toMatchObject({ name: expect.any(String) });
   });
 
@@ -34,8 +34,8 @@ describe("Route /api/v1/region/{plz}", () => {
 
     expect(response.status).toEqual(HttpStatusCode.Ok);
     expect(body.supported).toBe(false);
-    expect(body.gewerbeaemter.length).toBeGreaterThanOrEqual(1);
-    expect(body.finanzaemter.length).toBeGreaterThanOrEqual(1);
+    expect(body.gewerbeaemter).toHaveLength(1);
+    expect(body.finanzaemter).toHaveLength(1);
   });
 
   it("Returns supported:false and empty arrays for the non-existent PLZ 00000", async () => {
@@ -49,7 +49,7 @@ describe("Route /api/v1/region/{plz}", () => {
   it("Returns 4 Gewerbeämter for every municipality a PLZ 25813 spans", async () => {
     const { body } = await requestRegion("/api/v1/region/25813");
 
-    expect(body.gewerbeaemter.length).toEqual(4);
+    expect(body.gewerbeaemter).toHaveLength(4);
   });
 
   it("Narrows the Gewerbe- and Finanzamt when street and house number are given", async () => {
@@ -57,8 +57,8 @@ describe("Route /api/v1/region/{plz}", () => {
       "/api/v1/region/25813?strasse=Marktstraße&hausnummer=1",
     );
     expect(response.status).toEqual(HttpStatusCode.Ok);
-    expect(body.gewerbeaemter.length).toEqual(1);
-    expect(body.finanzaemter.length).toBeGreaterThanOrEqual(1);
+    expect(body.gewerbeaemter).toHaveLength(1);
+    expect(body.finanzaemter).toHaveLength(1);
   });
 
   it('Returns 400 for an invalid PLZ "abc"', async () => {

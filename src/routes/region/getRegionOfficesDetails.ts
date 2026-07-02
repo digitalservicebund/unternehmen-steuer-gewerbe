@@ -11,7 +11,6 @@ interface RegionOfficesDetails {
   gewerbeaemter: OfficeDetails[];
 }
 
-// getFinanzamtId / getFinanzamtDetailsById are synchronous; street and house number narrow the match.
 function getFinanzaemter(plz: string, strasse?: string, hausnummer?: string): OfficeDetails[] {
   try {
     const finanzamtIds = getFinanzamtId({
