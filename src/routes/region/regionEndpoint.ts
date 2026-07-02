@@ -1,11 +1,17 @@
 import { HonoAppType } from "../../honoApp";
+import { getRegionOfficesDetails } from "./getRegionOfficesDetails";
 import { regionRoute } from "./regionRoute";
 import { isSupportedRegion } from "./supportedRegions";
 
 export function addRegionEndpoint(app: HonoAppType): HonoAppType {
-  app.openapi(regionRoute, (c) => {
-    const plz = Number(c.req.valid("param").plz);
-    return c.json({ supported: isSupportedRegion(plz) }, 200);
+  app.openapi(regionRoute, async (c) => {
+    const plz = c.req.valid("param").plz;
+    const { strasse, hausnummer } = c.req.valid("query");
+
+    const supported = isSupportedRegion(Number(plz));
+    const { finanzaemter, gewerbeaemter } = await getRegionOfficesDetails(plz, strasse, hausnummer);
+
+    return c.json({ supported, finanzaemter, gewerbeaemter }, 200);
   });
   return app;
 }

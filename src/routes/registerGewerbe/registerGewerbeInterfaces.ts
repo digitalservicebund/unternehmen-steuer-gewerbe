@@ -1,4 +1,5 @@
 import { z } from "@hono/zod-openapi";
+import { OfficeDetailsSchema } from "../region/regionInterfaces";
 import {
   UNFALLVERSICHERUNGSTRAEGER,
   UNFALLVERSICHERUNGSTRAEGER_KEYS,
@@ -217,15 +218,7 @@ const RegisterGewerbeResponseItemSchema = z.object({
   info: z.string().optional(),
   errorType: ErrorTypeSchema.optional(),
   pdfReceiptBase64: z.base64().optional(),
-  officeDetails: z
-    .object({
-      name: z.string(),
-      strasseUndHausnummer: z.string().optional(),
-      postleitzahl: z.string().optional(),
-      ort: z.string().optional(),
-      telefon: z.string().optional(),
-    })
-    .optional(),
+  officeDetails: OfficeDetailsSchema.optional(),
 });
 
 export type RegisterGewerbeResponseItem = z.infer<typeof RegisterGewerbeResponseItemSchema>;
