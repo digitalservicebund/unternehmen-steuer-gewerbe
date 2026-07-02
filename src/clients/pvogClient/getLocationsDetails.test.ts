@@ -25,6 +25,13 @@ describe("getLocationsDetails", () => {
     expect(result[0]!.ars).toBe("010540056056");
   });
 
+  it("returns one entry per ARS for the zip code 17337 without duplicates", async () => {
+    const result = await getLocationsDetails("17337");
+    const allArs = result.map((location) => location.ars);
+
+    expect(allArs.toSorted()).toEqual(["120730579579", "130715164132", "130755560042"]);
+  });
+
   it("returns an empty array for the non-existent zip code 00000 instead of throwing", async () => {
     await expect(getLocationsDetails("00000")).resolves.toEqual([]);
   });

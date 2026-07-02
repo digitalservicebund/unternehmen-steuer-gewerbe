@@ -45,13 +45,10 @@ async function getGewerbeaemter(
     return [];
   }
 
-  // A PLZ can return several entries per municipality, so we need to deduplicate
-  // the results by ARS to look up each Gewerbeamt only once
-  const arsList = [...new Set(locations.map((location) => location.ars))];
-
   const gewerbeaemter: OfficeDetails[] = [];
 
-  for (const ars of arsList) {
+  // getLocationsDetails returns one entry per municipality (ARS), so each Gewerbeamt is looked up only once
+  for (const { ars } of locations) {
     try {
       const gewerbeamt = await getGewerbeamt(ars);
       gewerbeaemter.push(createOfficeDetailsFromGewerbeamt(gewerbeamt));

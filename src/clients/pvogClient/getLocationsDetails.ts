@@ -20,5 +20,7 @@ export async function getLocationsDetails(
   hausnummer?: string,
 ): Promise<LocationDetails[]> {
   const q = [plz, strasse, hausnummer].filter(Boolean).join(" ");
-  return fetchJson<LocationDetails[]>(`${PVOG_SUCHDIENST_API_URL}/v3/locations`, { params: { q } });
+  return fetchJson<LocationDetails[]>(`${PVOG_SUCHDIENST_API_URL}/v3/locations`, {
+    params: { q, distinctBy: "ars", limit: 25 },
+  });
 }

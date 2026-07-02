@@ -103,19 +103,6 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
     expect(body.gewerbeaemter[0]).toMatchObject({ name: "Gewerbeamt Nr. 2" });
   });
 
-  it("looks up each Gewerbeamt only once when a PLZ returns several entries with the same ARS", async () => {
-    mockGetLocationsDetails.mockResolvedValue([
-      { ars: "066310009009", name: "Gewerbeamt Nr. 1", plz: "36037", strasse: "Amtstraße" },
-      { ars: "066310009009", name: "Gewerbeamt Nr. 2", plz: "36037", strasse: "Bahnhofstraße" },
-    ]);
-
-    const { body } = await requestRegion();
-
-    expect(mockGetGewerbeamt).toHaveBeenCalledTimes(1);
-    expect(mockGetGewerbeamt).toHaveBeenCalledWith("066310009009");
-    expect(body.gewerbeaemter).toHaveLength(1);
-  });
-
   it("includes email and online service links and joins street with house number for Gewerbeämter", async () => {
     const { body } = await requestRegion();
 
