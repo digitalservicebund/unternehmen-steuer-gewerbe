@@ -375,7 +375,7 @@ jobs:
           version: ${{ github.sha }}
           deploying_repo: ${{ github.event.repository.name }}
           infra_repo: ${{ env.INFRA_REPO }}
-          github_app_id: ${{ secrets.GITOPS_GRUENDEN_APP_ID }}
+          github_app_client_id: ${{ secrets.GITOPS_GRUENDEN_APP_CLIENT_ID}}
           github_app_private_key: ${{ secrets.GITOPS_GRUENDEN_APP_PRIVATE_KEY }}
           app: ${{ env.PROJECT_NAME }}-development
           argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
@@ -461,7 +461,7 @@ jobs:
           version: ${{ github.sha }}
           deploying_repo: ${{ github.event.repository.name }}
           infra_repo: ${{ env.INFRA_REPO }}
-          github_app_id: ${{ secrets.GITOPS_GRUENDEN_APP_ID }}
+          github_app_client_id: ${{ secrets.GITOPS_GRUENDEN_APP_CLIENT_ID}}
           github_app_private_key: ${{ secrets.GITOPS_GRUENDEN_APP_PRIVATE_KEY }}
           app: ${{ env.PROJECT_NAME }}-production
           argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
