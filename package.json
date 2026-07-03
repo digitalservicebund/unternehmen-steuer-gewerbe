@@ -38,7 +38,7 @@
     "koffi": "^3.0.2",
     "pdfkit": "^0.19.1",
     "saxonjs-he": "3.0.0-beta2",
-    "vite": "8.1.0",
+    "vite": "8.1.2",
     "xmllint-wasm": "^5.2.0",
     "zod": "^4.4.3"
   },
