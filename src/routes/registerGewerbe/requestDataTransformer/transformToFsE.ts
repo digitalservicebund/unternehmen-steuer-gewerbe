@@ -81,6 +81,12 @@ function getZahllastUeberschuss(data: RegisterGewerbeRequest) {
   };
 }
 
+function ensureEricHerstellerId() {
+  if (getSecret("ERIC_HERSTELLERID") === "") throw new Error("ERIC_HERSTELLERID not set");
+}
+// run once so we fail on start if not set
+ensureEricHerstellerId();
+
 export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
   const persönlicheStrasseHausnummer = splitStrasseHausnummer(
     data.persönlicheDaten.adresse.strasseUndHausnummer,
