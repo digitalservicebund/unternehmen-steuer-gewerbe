@@ -296,7 +296,7 @@ jobs:
           name: vulnerabilities-attestation
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -369,13 +369,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to development
-        uses: digitalservicebund/argocd-deploy@753647aee2ae99081829cf103e33ca4d7a2266c4
+        uses: digitalservicebund/argocd-deploy@e8f6b8f77c8b8eeef3f67fc5bba9521f89145645
         with:
           environment: development/unternehmen-steuer-gewerbe
           version: ${{ github.sha }}
           deploying_repo: ${{ github.event.repository.name }}
           infra_repo: ${{ env.INFRA_REPO }}
-          github_app_id: ${{ secrets.GITOPS_GRUENDEN_APP_ID }}
+          github_app_client_id: ${{ secrets.GITOPS_GRUENDEN_APP_CLIENT_ID}}
           github_app_private_key: ${{ secrets.GITOPS_GRUENDEN_APP_PRIVATE_KEY }}
           app: ${{ env.PROJECT_NAME }}-development
           argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
@@ -455,13 +455,13 @@ jobs:
       contents: read
     steps:
       - name: Deploy to production
-        uses: digitalservicebund/argocd-deploy@753647aee2ae99081829cf103e33ca4d7a2266c4
+        uses: digitalservicebund/argocd-deploy@e8f6b8f77c8b8eeef3f67fc5bba9521f89145645
         with:
           environment: production/unternehmen-steuer-gewerbe
           version: ${{ github.sha }}
           deploying_repo: ${{ github.event.repository.name }}
           infra_repo: ${{ env.INFRA_REPO }}
-          github_app_id: ${{ secrets.GITOPS_GRUENDEN_APP_ID }}
+          github_app_client_id: ${{ secrets.GITOPS_GRUENDEN_APP_CLIENT_ID}}
           github_app_private_key: ${{ secrets.GITOPS_GRUENDEN_APP_PRIVATE_KEY }}
           app: ${{ env.PROJECT_NAME }}-production
           argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
