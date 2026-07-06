@@ -14,7 +14,11 @@ interface RegionOfficesDetails {
   gewerbeaemter: OfficeDetails[];
 }
 
-function getFinanzaemter(plz: string, strasse?: string, hausnummer?: string): OfficeDetails[] {
+function getFinanzaemterOfficeDetails(
+  plz: string,
+  strasse?: string,
+  hausnummer?: string,
+): OfficeDetails[] {
   try {
     const finanzamtIds = getFinanzamtId({
       postleitzahl: plz,
@@ -32,7 +36,7 @@ function getFinanzaemter(plz: string, strasse?: string, hausnummer?: string): Of
   }
 }
 
-async function getGewerbeaemter(
+async function getGewerbeaemterOfficeDetails(
   plz: string,
   strasse?: string,
   hausnummer?: string,
@@ -69,7 +73,7 @@ export async function getRegionOfficesDetails(
   strasse?: string,
   hausnummer?: string,
 ): Promise<RegionOfficesDetails> {
-  const finanzaemter = getFinanzaemter(plz, strasse, hausnummer);
-  const gewerbeaemter = await getGewerbeaemter(plz, strasse, hausnummer);
+  const finanzaemter = getFinanzaemterOfficeDetails(plz, strasse, hausnummer);
+  const gewerbeaemter = await getGewerbeaemterOfficeDetails(plz, strasse, hausnummer);
   return { finanzaemter, gewerbeaemter };
 }
