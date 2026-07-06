@@ -1,12 +1,10 @@
 import { describe, it, expect } from "vitest";
+import { type z } from "@hono/zod-openapi";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
 import app from "../../app";
+import { type RegionResponseSchema } from "./regionInterfaces";
 
-interface RegionResponseBody {
-  supported: boolean;
-  finanzaemter: Record<string, unknown>[];
-  gewerbeaemter: Record<string, unknown>[];
-}
+type RegionResponseBody = z.infer<typeof RegionResponseSchema>;
 
 async function requestRegion(path: string) {
   const response = await app.request(path);

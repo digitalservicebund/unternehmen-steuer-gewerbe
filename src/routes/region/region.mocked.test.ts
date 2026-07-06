@@ -26,8 +26,10 @@ vi.mock("@digitalservicebund/unternehmen-steuer-gewerbe-privat", () => ({
   validateFsE: vi.fn(),
 }));
 
+import { type z } from "@hono/zod-openapi";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
 import app from "../../app";
+import { type RegionResponseSchema } from "./regionInterfaces";
 
 const FINANZAMT_DETAILS = {
   name: "Finanzamt Fulda",
@@ -43,11 +45,7 @@ const GEWERBEAMT = {
   onlineServices: [{ uri: "https://example.org" }],
 };
 
-interface RegionResponseBody {
-  supported: boolean;
-  finanzaemter: Record<string, unknown>[];
-  gewerbeaemter: Record<string, unknown>[];
-}
+type RegionResponseBody = z.infer<typeof RegionResponseSchema>;
 
 async function requestRegion(path = "/api/v1/region/36037") {
   const response = await app.request(path);
