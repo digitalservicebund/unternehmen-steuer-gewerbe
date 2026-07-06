@@ -38,9 +38,20 @@ describe("osciClient.sendMessage", () => {
   });
 
   it("throws for an invalid Gewerbemeldung", async () => {
+    const metadata = createMetadata({
+      targetId: "MELDID:12052000",
+      sourceId: "xga:090010050000",
+    });
+
+    // createMetadata defaults to ext.0400; override the message-type-specific fields for alg.0300.
+    metadata.metadata.target.targetOperation =
+      "alg.gewerbemeldung.0300##http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-alg-Aufsichtsbehoerden.wsdl##xga";
+    metadata.payload.request.message.contentReference =
+      "form-data://message/payload.nok.alg.gewerbemeldung.0300.xml";
+
     await expect(
       osciClient.sendMessage({
-        metadata: createMetadata({ targetId: "MELDID:12052000", sourceId: "xga:090010050000" }),
+        metadata,
         message: readSample("payload.nok.alg.gewerbemeldung.0300.xml"),
       }),
     ).rejects.toThrow();

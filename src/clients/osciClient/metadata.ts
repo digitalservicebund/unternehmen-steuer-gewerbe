@@ -46,8 +46,9 @@ export function createMetadata({
       target: {
         targetProcessType: "XGA",
         targetActionType: "http://www.xgewerbeordnung.de/spezifikation/xga/1.6",
+        // see WSLD-Vorlagsdatein on https://www.xrepository.de/details/urn:xoev-de:kosit:standard:xgewerbeordnung
         targetOperation:
-          "ext.gewerbemeldung.0400##http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-alg-Aufsichtsbehoerden.wsdl##xga",
+          "ext.gewerbemeldung.0400##http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-ext.wsdl##xga",
         targetId,
       },
       source: {
