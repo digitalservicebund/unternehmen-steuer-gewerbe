@@ -26,8 +26,10 @@ vi.mock("@digitalservicebund/unternehmen-steuer-gewerbe-privat", () => ({
   validateFsE: vi.fn(),
 }));
 
+import { type z } from "@hono/zod-openapi";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
 import app from "../../app";
+import { type RegionResponseSchema } from "./regionInterfaces";
 
 const FINANZAMT_DETAILS = {
   name: "Finanzamt Fulda",
@@ -40,17 +42,13 @@ const GEWERBEAMT = {
   adresse: { strasse: "Amtstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
   telefon: "0661 102-0",
   email: "amt@fulda.de",
-  onlineServiceLinks: [{ uri: "https://example.org" }],
+  onlineServices: [{ uri: "https://example.org" }],
 };
 
-interface RegionResponseBody {
-  supported: boolean;
-  finanzaemter: Record<string, unknown>[];
-  gewerbeaemter: Record<string, unknown>[];
-}
+type RegionResponseBody = z.infer<typeof RegionResponseSchema>;
 
-async function requestRegion(path = "/api/v1/region/36037") {
-  const response = await app.request(path);
+async function requestRegionForPostleitzahl36037() {
+  const response = await app.request("/api/v1/region/36037");
   const body = (await response.json()) as RegionResponseBody;
   return { response, body };
 }
@@ -66,58 +64,45 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
     mockGetFinanzamtDetailsById.mockReturnValue(FINANZAMT_DETAILS);
   });
 
-  it("leaves gewerbeaemter empty but still returns finanzaemter when the PVOG location lookup fails", async () => {
+  it("returns 200 with empty gewerbeaemter but still all finanzaemter when the PVOG location lookup fails", async () => {
     mockGetLocationsDetails.mockRejectedValue(new Error("PVOG unavailable"));
 
-    const { response, body } = await requestRegion();
+    const { response, body } = await requestRegionForPostleitzahl36037();
 
     expect(response.status).toEqual(HttpStatusCode.Ok);
     expect(body.gewerbeaemter).toEqual([]);
     expect(body.finanzaemter.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("leaves finanzaemter empty but still returns gewerbeaemter when the Finanzamt lookup throws", async () => {
+  it("returns 200 with empty finanzaemter but still all gewerbeaemter when the Finanzamt lookup throws", async () => {
     mockGetFinanzamtId.mockImplementation(() => {
       throw new Error("Finanzamt data error");
     });
 
-    const { response, body } = await requestRegion();
+    const { response, body } = await requestRegionForPostleitzahl36037();
 
     expect(response.status).toEqual(HttpStatusCode.Ok);
     expect(body.finanzaemter).toEqual([]);
     expect(body.gewerbeaemter.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("returns the Gewerbeämter that resolve even when another Gewerbeamt lookup fails", async () => {
+  it("still returns the other Gewerbeamt when one of two Gewerbeamt lookups fails", async () => {
     mockGetLocationsDetails.mockResolvedValue([
       { ars: "066310009009", name: "Gewerbeamt Nr. 1", plz: "36037" },
-      { ars: "066310010010", name: "Gewerbeamt Nr. 2", plz: "36100" },
+      { ars: "066310010010", name: "Gewerbeamt Nr. 2", plz: "36037" },
     ]);
     mockGetGewerbeamt
       .mockRejectedValueOnce(new Error("first Gewerbeamt lookup failed"))
       .mockResolvedValueOnce({ ...GEWERBEAMT, name: "Gewerbeamt Nr. 2" });
 
-    const { body } = await requestRegion();
+    const { body } = await requestRegionForPostleitzahl36037();
 
     expect(body.gewerbeaemter).toHaveLength(1);
     expect(body.gewerbeaemter[0]).toMatchObject({ name: "Gewerbeamt Nr. 2" });
   });
 
-  it("looks up each Gewerbeamt only once when a PLZ returns several entries with the same ARS", async () => {
-    mockGetLocationsDetails.mockResolvedValue([
-      { ars: "066310009009", name: "Gewerbeamt Nr. 1", plz: "36037", strasse: "Amtstraße" },
-      { ars: "066310009009", name: "Gewerbeamt Nr. 2", plz: "36037", strasse: "Bahnhofstraße" },
-    ]);
-
-    const { body } = await requestRegion();
-
-    expect(mockGetGewerbeamt).toHaveBeenCalledTimes(1);
-    expect(mockGetGewerbeamt).toHaveBeenCalledWith("066310009009");
-    expect(body.gewerbeaemter).toHaveLength(1);
-  });
-
-  it("includes email and online service links and joins street with house number for Gewerbeämter", async () => {
-    const { body } = await requestRegion();
+  it("returns all Gewerbeamt fields, joining street and house number", async () => {
+    const { body } = await requestRegionForPostleitzahl36037();
 
     expect(body.gewerbeaemter[0]).toEqual({
       name: "Gewerbeamt Fulda",

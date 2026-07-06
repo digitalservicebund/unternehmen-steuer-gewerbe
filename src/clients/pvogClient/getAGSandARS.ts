@@ -32,7 +32,7 @@ export async function getAGSandARS(
   }
   if (!/^\d{12}$/.test(firstMatchingLocation.ars)) {
     throw new Error(
-      `No valid AGS and ARS fround for "${[plz, strasse, hausnummer].filter(Boolean).join(" ")}"`,
+      `No valid AGS and ARS found for "${[plz, strasse, hausnummer].filter(Boolean).join(" ")}"`,
     );
   }
 

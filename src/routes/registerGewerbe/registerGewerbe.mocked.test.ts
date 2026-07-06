@@ -29,7 +29,7 @@ const { mockSubmitData, mockGetGewerbeRoutingInfo } = vi.hoisted(() => ({
       name: "Stadt Fulda",
       adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
       telefon: "0661 102-0",
-      onlineServiceLinks: [],
+      onlineServices: [],
     },
     fitConnectDestinationInformation: { destinationId: "mock-destination-id" },
   }),
@@ -276,6 +276,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
         postleitzahl: "36037",
         ort: "Fulda",
         telefon: "0661 102-0",
+        onlineServices: [],
       });
     });
 
@@ -283,7 +284,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       mockGetGewerbeRoutingInfo.mockResolvedValueOnce({
         ags: "03046001",
         ars: "084210000000",
-        gewerbeamt: { name: "Gewerbeamt Minimal", onlineServiceLinks: [] },
+        gewerbeamt: { name: "Gewerbeamt Minimal", onlineServices: [] },
         fitConnectDestinationInformation: { destinationId: "mock-destination-id" },
       });
 
@@ -291,7 +292,10 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       const json = await response.json();
 
       expect(response.status).toEqual(HttpStatusCode.Ok);
-      expect(json.gewerbeanmeldung.officeDetails).toEqual({ name: "Gewerbeamt Minimal" });
+      expect(json.gewerbeanmeldung.officeDetails).toEqual({
+        name: "Gewerbeamt Minimal",
+        onlineServices: [],
+      });
     });
 
     it("returns only the street when the Gewerbeamt address has no house number", async () => {
@@ -301,7 +305,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
         gewerbeamt: {
           name: "Stadt Fulda",
           adresse: { strasse: "Schlossstraße", postleitzahl: "36037", ort: "Fulda" },
-          onlineServiceLinks: [],
+          onlineServices: [],
         },
         fitConnectDestinationInformation: { destinationId: "mock-destination-id" },
       });
@@ -348,7 +352,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
             postleitzahl: "20095",
             ort: "Hamburg",
           },
-          onlineServiceLinks: [],
+          onlineServices: [],
         },
       });
 

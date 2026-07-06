@@ -1,13 +1,13 @@
 import { z } from "@hono/zod-openapi";
+import { type OfficeDetails } from "../../helpers/createOfficeDetails";
 
-export const SupportedRegionParamsSchema = z.object({
+export const RegionParamsSchema = z.object({
   plz: z
     .string()
     .regex(/^\d{5}$/, "plz must be a 5-digit number")
     .openapi({
       param: { name: "plz", in: "path" },
       example: "25813",
-      type: "number",
     }),
 });
 
@@ -32,7 +32,7 @@ export const RegionQuerySchema = z.object({
     }),
 });
 
-export const onlineServicesSchema = z
+export const OnlineServiceSchema = z
   .object({
     title: z.string().optional(),
     description: z.string().optional(),
@@ -48,16 +48,14 @@ export const OfficeDetailsSchema = z
     ort: z.string().optional(),
     telefon: z.string().optional(),
     email: z.string().optional(),
-    onlineServices: z.array(onlineServicesSchema).optional(),
+    onlineServices: z.array(OnlineServiceSchema).optional(),
   })
-  .openapi("OfficeDetails");
+  .openapi("OfficeDetails") satisfies z.ZodType<OfficeDetails>;
 
-export type OfficeDetails = z.infer<typeof OfficeDetailsSchema>;
-
-export const SupportedRegionResponseSchema = z
+export const RegionResponseSchema = z
   .object({
     supported: z.boolean(),
     finanzaemter: z.array(OfficeDetailsSchema),
     gewerbeaemter: z.array(OfficeDetailsSchema),
   })
-  .openapi("SupportedRegionResponse");
+  .openapi("RegionResponse");

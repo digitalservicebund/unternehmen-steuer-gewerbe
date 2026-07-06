@@ -1,6 +1,6 @@
 import { fetchJson } from "../../helpers/fetchJson";
+import { PVOG_SUCHDIENST_API_URL } from "./constants";
 
-const PVOG_SUCHDIENST_API_URL = "https://pvog.fitko.net/suchdienst/api";
 const GEWERBEANMELDUNG_LEIKA_ID = "99050012104000";
 // see https://www.xrepository.de/details/urn:de:xzufi:codeliste:zustaendigkeitsrolle
 const ROLE_CODE_ZUSTAENDIGE_STELLE_UND_ANSPRECHPUNKT = "01";
@@ -28,7 +28,7 @@ export interface Gewerbeamt {
   adresse?: GewerbeamtAdresse;
   telefon?: string;
   email?: string;
-  onlineServiceLinks: OnlineServiceLink[];
+  onlineServices: OnlineServiceLink[];
 }
 
 interface ServiceDescription {
@@ -199,7 +199,7 @@ export async function getGewerbeamt(ars: string): Promise<Gewerbeamt> {
     )?.trim(),
     email: findCommunicationValue(detail.location.communications, COMMUNICATION_CODE_EMAIL)?.trim(),
     // map explicitly so additional response fields (id, validity periods, ...) don't leak through
-    onlineServiceLinks: serviceDescriptionDetail.onlineServiceLinks.map(
+    onlineServices: serviceDescriptionDetail.onlineServiceLinks.map(
       ({ title, description, uri }) => ({
         title: title?.trim(),
         description: description?.trim(),
