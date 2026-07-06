@@ -26,5 +26,5 @@ export const regionRoute = createRoute({
   },
   tags: ["Active Development"],
   summary:
-    "Get whether a region with the given PLZ is supported, plus the responsible Finanzämter and Gewerbeämter",
+    "Get whether a region with the given PLZ is currently supported by our application, plus the responsible Finanzämter and Gewerbeämter",
 });
