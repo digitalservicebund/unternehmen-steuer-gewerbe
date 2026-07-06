@@ -64,7 +64,7 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
     mockGetFinanzamtDetailsById.mockReturnValue(FINANZAMT_DETAILS);
   });
 
-  it("leaves gewerbeaemter empty but still returns finanzaemter when the PVOG location lookup fails", async () => {
+  it("returns 200 with empty gewerbeaemter but still all finanzaemter when the PVOG location lookup fails", async () => {
     mockGetLocationsDetails.mockRejectedValue(new Error("PVOG unavailable"));
 
     const { response, body } = await requestRegion();
@@ -74,7 +74,7 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
     expect(body.finanzaemter.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("leaves finanzaemter empty but still returns gewerbeaemter when the Finanzamt lookup throws", async () => {
+  it("returns 200 with empty finanzaemter but still all gewerbeaemter when the Finanzamt lookup throws", async () => {
     mockGetFinanzamtId.mockImplementation(() => {
       throw new Error("Finanzamt data error");
     });
