@@ -101,7 +101,7 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
     expect(body.gewerbeaemter[0]).toMatchObject({ name: "Gewerbeamt Nr. 2" });
   });
 
-  it("includes email and online service links and joins street with house number for Gewerbeämter", async () => {
+  it("returns all Gewerbeamt fields, joining street and house number", async () => {
     const { body } = await requestRegionForPostleitzahl36037();
 
     expect(body.gewerbeaemter[0]).toEqual({
