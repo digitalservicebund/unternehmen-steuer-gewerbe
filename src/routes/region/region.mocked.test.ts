@@ -47,7 +47,7 @@ const GEWERBEAMT = {
 
 type RegionResponseBody = z.infer<typeof RegionResponseSchema>;
 
-async function requestRegion(path = "/api/v1/region/36037") {
+async function requestRegionForPostleitzahl36037(path = "/api/v1/region/36037") {
   const response = await app.request(path);
   const body = (await response.json()) as RegionResponseBody;
   return { response, body };
@@ -67,7 +67,7 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
   it("returns 200 with empty gewerbeaemter but still all finanzaemter when the PVOG location lookup fails", async () => {
     mockGetLocationsDetails.mockRejectedValue(new Error("PVOG unavailable"));
 
-    const { response, body } = await requestRegion();
+    const { response, body } = await requestRegionForPostleitzahl36037();
 
     expect(response.status).toEqual(HttpStatusCode.Ok);
     expect(body.gewerbeaemter).toEqual([]);
@@ -79,7 +79,7 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
       throw new Error("Finanzamt data error");
     });
 
-    const { response, body } = await requestRegion();
+    const { response, body } = await requestRegionForPostleitzahl36037();
 
     expect(response.status).toEqual(HttpStatusCode.Ok);
     expect(body.finanzaemter).toEqual([]);
@@ -95,14 +95,14 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
       .mockRejectedValueOnce(new Error("first Gewerbeamt lookup failed"))
       .mockResolvedValueOnce({ ...GEWERBEAMT, name: "Gewerbeamt Nr. 2" });
 
-    const { body } = await requestRegion();
+    const { body } = await requestRegionForPostleitzahl36037();
 
     expect(body.gewerbeaemter).toHaveLength(1);
     expect(body.gewerbeaemter[0]).toMatchObject({ name: "Gewerbeamt Nr. 2" });
   });
 
   it("includes email and online service links and joins street with house number for Gewerbeämter", async () => {
-    const { body } = await requestRegion();
+    const { body } = await requestRegionForPostleitzahl36037();
 
     expect(body.gewerbeaemter[0]).toEqual({
       name: "Gewerbeamt Fulda",
