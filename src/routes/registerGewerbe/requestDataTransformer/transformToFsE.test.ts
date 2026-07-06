@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { transformToEUnFsE } from "./transformToFsE";
 import { registerGewerbeSampleRequestAllFieldsFilled } from "../testHelpers";
 import { RegisterGewerbeRequestSchema } from "../registerGewerbeInterfaces";
@@ -43,6 +43,12 @@ describe("transformToEUnFsE", () => {
 
     expect(result.eUn?.umsatzsteuer?.uStIdNr?.uStIdAntrag?.merkerAntragUStId).toBe(true);
   });
+
+  describe("maps finanzamtId if enabled through environment variable", () => {
+    it("uses default testfinanzamt if ERIC_ENABLE_CUSTOM_FINANZAMT_IDS is not set", () => {
+      vi.stubEnv("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS", undefined);
+    })
+  })
 
   describe("umsatzsteuer", () => {
     it("maps a positive number to zahllast and it's absolute value", () => {
