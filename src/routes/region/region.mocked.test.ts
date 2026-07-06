@@ -86,10 +86,10 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
     expect(body.gewerbeaemter.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("returns the Gewerbeämter that resolve even when another Gewerbeamt lookup fails", async () => {
+  it("still returns the other Gewerbeamt when one of two Gewerbeamt lookups fails", async () => {
     mockGetLocationsDetails.mockResolvedValue([
       { ars: "066310009009", name: "Gewerbeamt Nr. 1", plz: "36037" },
-      { ars: "066310010010", name: "Gewerbeamt Nr. 2", plz: "36100" },
+      { ars: "066310010010", name: "Gewerbeamt Nr. 2", plz: "36037" },
     ]);
     mockGetGewerbeamt
       .mockRejectedValueOnce(new Error("first Gewerbeamt lookup failed"))
