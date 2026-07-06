@@ -1,4 +1,5 @@
 import { z } from "@hono/zod-openapi";
+import { OfficeDetailsSchema } from "../region/regionInterfaces";
 import {
   UNFALLVERSICHERUNGSTRAEGER,
   UNFALLVERSICHERUNGSTRAEGER_KEYS,
@@ -54,7 +55,7 @@ const PersönlicheDatenSchema = z.object({
   adresse: AdresseSchema,
   telefon: z
     .string()
-    .regex(/^\+[0-9]{1,5}\s[0-9]{1,5}\s[0-9]{1,13}(-[0-9]{1,5})?$/)
+    .regex(/^\+\d{1,5}\s\d{1,5}\s\d{1,13}(-\d{1,5})?$/)
     .openapi({
       example: "+49 234 121314",
       description:
@@ -63,7 +64,7 @@ const PersönlicheDatenSchema = z.object({
   email: z.email().openapi({ example: "e.mustermann@example.org" }),
   steuernummer: z
     .string()
-    .regex(/^[0-9]{4}0[0-9]{8}$/)
+    .regex(/^\d{4}0\d{8}$/)
     .optional()
     .openapi({
       example: "2695002219428",
@@ -141,11 +142,20 @@ const UnternehmensDatenSchema = z
     }),
     zahllastUeberschussAuswahl: z.enum(ZAHLLAST_UEBERSCHUSS_KEYS).default("zahllast").openapi({
       example: "zahllast",
-      description: "Ob voraussichtlich eine Zahllast oder ein Überschuss erwartet wird.",
+      description:
+        "Deprecated. Use 'umsatzsteuerImErstenJahr instead. (Ob voraussichtlich eine Zahllast oder ein Überschuss erwartet wird.)",
+      deprecated: true,
     }),
     zahllastUeberschussBetrag: z.number().int().min(0).default(0).openapi({
       example: 0,
-      description: "Voraussichtliche Zahllast oder Überschuss in Euro.",
+      description:
+        "Deprecated. Use 'umsatzsteuerImErstenJahr instead. (Voraussichtliche Zahllast oder Überschuss in Euro.)",
+      deprecated: true,
+    }),
+    umsatzsteuerImErstenJahr: z.int().optional().openapi({
+      example: 100,
+      description:
+        "Voraussichtliche Umsatzsteuer im ersten Jahr. (Größer als 0 => Nutzer hat 'Zahllast' => muss was bezahlen; kleiner als 0 => 'Überschuss' => Rückzahlung vom / Guthaben beim Finanzamt.)",
     }),
   })
   .refine(
@@ -208,15 +218,7 @@ const RegisterGewerbeResponseItemSchema = z.object({
   info: z.string().optional(),
   errorType: ErrorTypeSchema.optional(),
   pdfReceiptBase64: z.base64().optional(),
-  officeDetails: z
-    .object({
-      name: z.string(),
-      strasseUndHausnummer: z.string().optional(),
-      postleitzahl: z.string().optional(),
-      ort: z.string().optional(),
-      telefon: z.string().optional(),
-    })
-    .optional(),
+  officeDetails: OfficeDetailsSchema.optional(),
 });
 
 export type RegisterGewerbeResponseItem = z.infer<typeof RegisterGewerbeResponseItemSchema>;

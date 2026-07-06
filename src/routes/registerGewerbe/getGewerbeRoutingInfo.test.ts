@@ -6,7 +6,7 @@ const { mockGetAGSandARS, mockGetGewerbeamt, mockGetRoutes } = vi.hoisted(() => 
     name: "Stadt Fulda",
     adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
     telefon: "0661 102-0",
-    onlineServiceLinks: [],
+    onlineServices: [],
   }),
   mockGetRoutes: vi.fn(),
 }));
@@ -36,6 +36,8 @@ describe("getGewerbeRoutingInfo", () => {
 
       expect(mockGetAGSandARS).toHaveBeenCalledWith(
         registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten.adresse.postleitzahl,
+        "Musterstraße",
+        "1",
       );
     });
 
@@ -51,7 +53,7 @@ describe("getGewerbeRoutingInfo", () => {
         },
       });
 
-      expect(mockGetAGSandARS).toHaveBeenCalledWith("10969");
+      expect(mockGetAGSandARS).toHaveBeenCalledWith("10969", "Musterstraße", "2");
     });
   });
 
@@ -64,7 +66,7 @@ describe("getGewerbeRoutingInfo", () => {
         name: "Stadt Fulda",
         adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
         telefon: "0661 102-0",
-        onlineServiceLinks: [],
+        onlineServices: [],
       });
     });
 

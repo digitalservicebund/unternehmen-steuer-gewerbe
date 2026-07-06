@@ -207,7 +207,7 @@ describe("getGewerbeamt with mocked PVOG responses", () => {
       ort: "Fulda",
     });
     expect(gewerbeamt.telefon).toBe("0661 102-0");
-    expect(gewerbeamt.onlineServiceLinks).toEqual([
+    expect(gewerbeamt.onlineServices).toEqual([
       { title: "Online-Dienst", description: undefined, uri: "https://example.org" },
     ]);
   });

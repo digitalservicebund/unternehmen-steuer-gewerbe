@@ -160,6 +160,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      security-events: write
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
@@ -181,7 +182,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
-      - name: Run Trivy vulnerability image scanner
+      - name: Run Trivy vulnerability image scanner (all severities)
         # Note: Results are shown in the GitHub Security tab
         #       cf. step "Upload Trivy scan results to GitHub Security tab"
         # Third-party action, pin to commit SHA!
@@ -190,8 +191,8 @@ jobs:
         env:
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
           TRIVY_SKIP_FILES: "**/generated.spezifikation.sef.json"
-          TRIVY_SEVERITY: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
           TRIVY_JAVA_DB_REPOSITORY: ""
+          TRIVY_SEVERITY: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
           TRIVY_SKIP_UPDATE: "true"
         with:
           image-ref: unternehmen-steuer-gewerbe
@@ -201,36 +202,36 @@ jobs:
           scanners: "vuln,config,secret"
 
       - name: Convert Trivy results to sarif
-        run: trivy convert --format sarif --output trivy-image-results.sarif trivy-image-results.json
+        run:
+          trivy convert --format sarif --output trivy-image-results.sarif trivy-image-results.json
 
-      # disabled as we don't have "advanced security" available, being a private repository
+          # Not possible in public repo
       # - name: Upload Trivy scan results to GitHub Security tab (on `main`)
-      #   uses: github/codeql-action/upload-sarif@v4
+      #   uses: github/codeql-action/upload-sarif@c35d1b164463ee62a100735382aaaa525c5d3496
       #   # only on `main`
       #   if: ${{ github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
       #   with:
       #     sarif_file: "trivy-image-results.sarif"
-
-      # disabled as we don't have "advanced security" available
-      # - name: Fail build on High/Criticial Vulnerabilities (on branches)
-      #   # ignore on `main`
-      #   if: ${{ github.ref != 'refs/heads/main' }}
-      #   uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
-      #   env:
-      #     TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
-      #     TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
-      #     TRIVY_FORMAT: table
-      #     TRIVY_SEVERITY: HIGH,CRITICAL
-      #     TRIVY_EXIT_CODE: 1
-      #   with:
-      #     image-ref: unternehmen-steuer-gewerbe
-      #     # following three are ignored unfortunately -> therefore using ENV vars directly
-      #     # https://github.com/aquasecurity/trivy-action/issues/435
-      #     format: table
-      #     severity: HIGH,CRITICAL
-      #     exit-code: 1
-      #     # On a subsequent call to the action we know trivy is already installed so can skip this
-      #     skip-setup-trivy: true
+      - name: Fail build on High/Criticial Vulnerabilities (on branches)
+        # ignore on `main`
+        if: ${{ github.ref != 'refs/heads/main' }}
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+        env:
+          TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
+          TRIVY_SKIP_FILES: "**/generated.spezifikation.sef.json"
+          TRIVY_JAVA_DB_REPOSITORY: ""
+          TRIVY_FORMAT: table
+          TRIVY_SEVERITY: HIGH,CRITICAL
+          TRIVY_EXIT_CODE: 1
+        with:
+          image-ref: unternehmen-steuer-gewerbe
+          # following three are ignored unfortunately -> therefore using ENV vars directly
+          # https://github.com/aquasecurity/trivy-action/issues/435
+          format: table
+          severity: HIGH,CRITICAL
+          exit-code: 1
+          # On a subsequent call to the action we know trivy is already installed so can skip this
+          skip-setup-trivy: true
 
       - name: Convert Trivy results to cosign-vuln
         run: trivy convert --format cosign-vuln --output ${{ env.PROJECT_NAME }}-vulnerabilities.json trivy-image-results.json
@@ -295,7 +296,7 @@ jobs:
           name: vulnerabilities-attestation
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -368,13 +369,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to development
-        uses: digitalservicebund/argocd-deploy@753647aee2ae99081829cf103e33ca4d7a2266c4
+        uses: digitalservicebund/argocd-deploy@e8f6b8f77c8b8eeef3f67fc5bba9521f89145645
         with:
           environment: development/unternehmen-steuer-gewerbe
           version: ${{ github.sha }}
           deploying_repo: ${{ github.event.repository.name }}
           infra_repo: ${{ env.INFRA_REPO }}
-          github_app_id: ${{ secrets.GITOPS_GRUENDEN_APP_ID }}
+          github_app_client_id: ${{ secrets.GITOPS_GRUENDEN_APP_CLIENT_ID}}
           github_app_private_key: ${{ secrets.GITOPS_GRUENDEN_APP_PRIVATE_KEY }}
           app: ${{ env.PROJECT_NAME }}-development
           argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
@@ -450,15 +451,17 @@ jobs:
     needs: smoke-test-development
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Deploy to production
-        uses: digitalservicebund/argocd-deploy@753647aee2ae99081829cf103e33ca4d7a2266c4
+        uses: digitalservicebund/argocd-deploy@e8f6b8f77c8b8eeef3f67fc5bba9521f89145645
         with:
           environment: production/unternehmen-steuer-gewerbe
           version: ${{ github.sha }}
           deploying_repo: ${{ github.event.repository.name }}
           infra_repo: ${{ env.INFRA_REPO }}
-          github_app_id: ${{ secrets.GITOPS_GRUENDEN_APP_ID }}
+          github_app_client_id: ${{ secrets.GITOPS_GRUENDEN_APP_CLIENT_ID}}
           github_app_private_key: ${{ secrets.GITOPS_GRUENDEN_APP_PRIVATE_KEY }}
           app: ${{ env.PROJECT_NAME }}-production
           argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}

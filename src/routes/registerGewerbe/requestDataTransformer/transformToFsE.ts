@@ -11,7 +11,6 @@ import {
   GEWINN_ERMITTLUNG,
   SOLL_IST_VERSTEUERUNG,
   IST_VERSTEUERUNG_GRUND,
-  ZAHLLAST_UEBERSCHUSS,
 } from "./fsECodes";
 
 function toAnredeId(geschlecht: "d" | "w" | "m" | undefined): string | undefined {
@@ -66,6 +65,27 @@ function getIstVersteuerungGrund({
   }
   return { [IST_VERSTEUERUNG_GRUND[istVersteuerungGrund]]: true };
 }
+
+function getZahllastUeberschuss(data: RegisterGewerbeRequest) {
+  return {
+    // 1 for zahllast (user needs to pay), 2 for Überschuss (tax office ows the user)
+    auswahl:
+      data.unternehmensDaten.umsatzsteuerImErstenJahr !== undefined &&
+      data.unternehmensDaten.umsatzsteuerImErstenJahr > 0
+        ? "1"
+        : "2",
+    betrag:
+      data.unternehmensDaten.umsatzsteuerImErstenJahr === undefined
+        ? 0
+        : Math.abs(data.unternehmensDaten.umsatzsteuerImErstenJahr),
+  };
+}
+
+function ensureEricHerstellerId() {
+  if (getSecret("ERIC_HERSTELLERID") === "") throw new Error("ERIC_HERSTELLERID not set");
+}
+// run once so we fail on start if not set
+ensureEricHerstellerId();
 
 export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
   const persönlicheStrasseHausnummer = splitStrasseHausnummer(
@@ -270,10 +290,7 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest): ElsterFsEEUn {
           auswahlSollIstVerst: SOLL_IST_VERSTEUERUNG[data.unternehmensDaten.sollIstVersteuerung],
           ...getIstVersteuerungGrund(data.unternehmensDaten),
         },
-        zahllastUeberschuss: {
-          auswahl: ZAHLLAST_UEBERSCHUSS[data.unternehmensDaten.zahllastUeberschussAuswahl],
-          betrag: data.unternehmensDaten.zahllastUeberschussBetrag,
-        },
+        zahllastUeberschuss: getZahllastUeberschuss(data),
         uStIdNr: getUstIdNr(data),
       },
     },

@@ -27,7 +27,7 @@
     "test:watch": "NODE_EXTRA_CA_CERTS=akdb-ca.pem op run --env-file .env -- vitest"
   },
   "dependencies": {
-    "@digitalservicebund/unternehmen-steuer-gewerbe-privat": "3.3.0-236",
+    "@digitalservicebund/unternehmen-steuer-gewerbe-privat": "5.0.0-248",
     "@hono/node-server": "^2.0.6",
     "@hono/swagger-ui": "^0.6.1",
     "@hono/zod-openapi": "^1.4.0",
@@ -38,7 +38,7 @@
     "koffi": "^3.0.2",
     "pdfkit": "^0.19.1",
     "saxonjs-he": "3.0.0-beta2",
-    "vite": "8.0.16",
+    "vite": "8.1.2",
     "xmllint-wasm": "^5.2.0",
     "zod": "^4.4.3"
   },
@@ -58,7 +58,7 @@
     "xslt3-he": "3.0.0-beta2"
   },
   "engines": {
-    "node": "26.0.0"
+    "node": "26.4.0"
   },
   "packageManager": "pnpm@11.5.1"
 }
