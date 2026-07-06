@@ -6,15 +6,15 @@ import { type RegionResponseSchema } from "./regionInterfaces";
 
 type RegionResponseBody = z.infer<typeof RegionResponseSchema>;
 
-async function requestRegion(path: string) {
-  const response = await app.request(path);
+async function requestRegion(plz: string, queryString = "") {
+  const response = await app.request(`/api/v1/region/${plz}${queryString}`);
   const body = (await response.json()) as RegionResponseBody;
   return { response, body };
 }
 
 describe("Route /api/v1/region/{plz}", () => {
   it("Returns supported:true and the responsible Finanz- & Gewerbeamt for a supported region with the PLZ 25811", async () => {
-    const { response, body } = await requestRegion("/api/v1/region/25813");
+    const { response, body } = await requestRegion("25813");
 
     expect(response.status).toEqual(HttpStatusCode.Ok);
     expect(response.headers.get("content-type")).toMatch(/json/);
@@ -28,7 +28,7 @@ describe("Route /api/v1/region/{plz}", () => {
   });
 
   it("Returns supported:false and the responsible Finanz- & Gewerbeamt for a unsupported region with the PLZ 89073", async () => {
-    const { response, body } = await requestRegion("/api/v1/region/89073");
+    const { response, body } = await requestRegion("89073");
 
     expect(response.status).toEqual(HttpStatusCode.Ok);
     expect(body.supported).toBe(false);
@@ -37,7 +37,7 @@ describe("Route /api/v1/region/{plz}", () => {
   });
 
   it("Returns supported:false and empty arrays for the non-existent PLZ 00000", async () => {
-    const { response, body } = await requestRegion("/api/v1/region/00000");
+    const { response, body } = await requestRegion("00000");
 
     expect(response.status).toEqual(HttpStatusCode.Ok);
     expect(body.supported).toBe(false);
@@ -45,15 +45,13 @@ describe("Route /api/v1/region/{plz}", () => {
   });
 
   it("Returns 4 Gewerbeämter for every municipality a PLZ 25813 spans", async () => {
-    const { body } = await requestRegion("/api/v1/region/25813");
+    const { body } = await requestRegion("25813");
 
     expect(body.gewerbeaemter).toHaveLength(4);
   });
 
   it("Narrows the Gewerbe- and Finanzamt when street and house number are given", async () => {
-    const { response, body } = await requestRegion(
-      "/api/v1/region/25813?strasse=Marktstraße&hausnummer=1",
-    );
+    const { response, body } = await requestRegion("25813", "?strasse=Marktstraße&hausnummer=1");
     expect(response.status).toEqual(HttpStatusCode.Ok);
     expect(body.gewerbeaemter).toHaveLength(1);
     expect(body.finanzaemter).toHaveLength(1);

@@ -47,8 +47,8 @@ const GEWERBEAMT = {
 
 type RegionResponseBody = z.infer<typeof RegionResponseSchema>;
 
-async function requestRegionForPostleitzahl36037(path = "/api/v1/region/36037") {
-  const response = await app.request(path);
+async function requestRegionForPostleitzahl36037() {
+  const response = await app.request("/api/v1/region/36037");
   const body = (await response.json()) as RegionResponseBody;
   return { response, body };
 }
