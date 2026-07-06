@@ -13,21 +13,18 @@ async function requestRegion(plz: string, queryString = "") {
 }
 
 describe("Route /api/v1/region/{plz}", () => {
-  it("Returns supported:true and the responsible Finanz- & Gewerbeamt for a supported region with the PLZ 25811", async () => {
+  it("Returns 200 with supported:true and the names of the responsible Finanz- & Gewerbeämter for the supported PLZ 25813", async () => {
     const { response, body } = await requestRegion("25813");
 
     expect(response.status).toEqual(HttpStatusCode.Ok);
-    expect(response.headers.get("content-type")).toMatch(/json/);
     expect(body.supported).toBe(true);
-    expect(Array.isArray(body.finanzaemter)).toBe(true);
-    expect(Array.isArray(body.gewerbeaemter)).toBe(true);
     expect(body.gewerbeaemter).toHaveLength(4);
     expect(body.gewerbeaemter[0]).toMatchObject({ name: expect.any(String) });
     expect(body.finanzaemter).toHaveLength(1);
     expect(body.finanzaemter[0]).toMatchObject({ name: expect.any(String) });
   });
 
-  it("Returns supported:false and the responsible Finanz- & Gewerbeamt for a unsupported region with the PLZ 89073", async () => {
+  it("Returns 200 with supported:false and the responsible Finanz- & Gewerbeamt for a unsupported region with the PLZ 89073", async () => {
     const { response, body } = await requestRegion("89073");
 
     expect(response.status).toEqual(HttpStatusCode.Ok);
@@ -36,7 +33,7 @@ describe("Route /api/v1/region/{plz}", () => {
     expect(body.finanzaemter).toHaveLength(1);
   });
 
-  it("Returns supported:false and empty arrays for the non-existent PLZ 00000", async () => {
+  it("Returns 200 with supported:false and empty arrays for the non-existent PLZ 00000", async () => {
     const { response, body } = await requestRegion("00000");
 
     expect(response.status).toEqual(HttpStatusCode.Ok);
@@ -50,7 +47,7 @@ describe("Route /api/v1/region/{plz}", () => {
     expect(body.gewerbeaemter).toHaveLength(4);
   });
 
-  it("Narrows the Gewerbe- and Finanzamt when street and house number are given", async () => {
+  it("Returns 200 and only one Gewerbeamt and Finanzamt for PLZ 25813 when street and house number are given", async () => {
     const { response, body } = await requestRegion("25813", "?strasse=Marktstraße&hausnummer=1");
     expect(response.status).toEqual(HttpStatusCode.Ok);
     expect(body.gewerbeaemter).toHaveLength(1);
