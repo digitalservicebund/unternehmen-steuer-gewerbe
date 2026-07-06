@@ -25,7 +25,7 @@ describe("getLocationsDetails", () => {
     expect(result[0]!.ars).toBe("010540056056");
   });
 
-  it("returns one entry per ARS for the zip code 17337 without duplicates", async () => {
+  it("returns three entries (one entry per ARS) for the zip code 17337 without duplicates", async () => {
     const result = await getLocationsDetails("17337");
     const allArs = result.map((location) => location.ars);
 
