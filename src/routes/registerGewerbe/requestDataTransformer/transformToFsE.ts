@@ -87,10 +87,20 @@ function ensureEricHerstellerId() {
 // run once so we fail on start if not set
 ensureEricHerstellerId();
 
+function determineFinanzamtIdOrDefault(id?: string): string {
+  if (!id) return defaultFinanzamtId;
+  if (!getSecret("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS")) return defaultFinanzamtId;
+
+  return id;
+}
+
 // default from ERiC docs
 export const defaultFinanzamtId = "9198";
 
-export function transformToEUnFsE(data: RegisterGewerbeRequest, finanzamtId: string): ElsterFsEEUn {
+export function transformToEUnFsE(
+  data: RegisterGewerbeRequest,
+  finanzamtId?: string,
+): ElsterFsEEUn {
   const persönlicheStrasseHausnummer = splitStrasseHausnummer(
     data.persönlicheDaten.adresse.strasseUndHausnummer,
   );
@@ -114,7 +124,7 @@ export function transformToEUnFsE(data: RegisterGewerbeRequest, finanzamtId: str
       nutzdatenTicket: "11",
       empfaenger: {
         id: "F",
-        value: getSecret("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS") ? finanzamtId : defaultFinanzamtId,
+        value: determineFinanzamtIdOrDefault(finanzamtId),
       },
     },
     eUn: {
