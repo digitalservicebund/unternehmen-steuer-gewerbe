@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { transformToEUnFsE } from "./transformToFsE";
+import { defaultFinanzamtId, transformToEUnFsE } from "./transformToFsE";
 import { registerGewerbeSampleRequestAllFieldsFilled } from "../testHelpers";
 import { RegisterGewerbeRequestSchema } from "../registerGewerbeInterfaces";
 import { formatDatumDE } from "../../../helpers/formFieldTransformations";
@@ -45,9 +45,6 @@ describe("transformToEUnFsE", () => {
   });
 
   describe("finanzamtId", () => {
-    // default from ERiC docs
-    const defaultFinanzamtId = "9198";
-
     it("uses default testfinanzamt if ERIC_ENABLE_CUSTOM_FINANZAMT_IDS is not set", () => {
       vi.stubEnv("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS", "");
 
