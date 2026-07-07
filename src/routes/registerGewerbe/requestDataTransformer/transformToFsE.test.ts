@@ -44,11 +44,26 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.umsatzsteuer?.uStIdNr?.uStIdAntrag?.merkerAntragUStId).toBe(true);
   });
 
-  describe("maps finanzamtId if enabled through environment variable", () => {
+  describe("finanzamtId", () => {
+    // default from ERiC docs
+    const defaultFinanzamtId = "9198";
+
     it("uses default testfinanzamt if ERIC_ENABLE_CUSTOM_FINANZAMT_IDS is not set", () => {
-      vi.stubEnv("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS", undefined);
-    })
-  })
+      vi.stubEnv("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS", "");
+
+      const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+
+      expect(result.nutzdatenHeader?.empfaenger?.value).toEqual(defaultFinanzamtId);
+    });
+
+    it("uses the given id 1111 if CUSTOM_FINANZAMT_ID_ENABLED=true set in environment", () => {
+      vi.stubEnv("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS", "true");
+
+      const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+
+      expect(result.nutzdatenHeader?.empfaenger?.value).toEqual("9212");
+    });
+  });
 
   describe("umsatzsteuer", () => {
     it("maps a positive number to zahllast and it's absolute value", () => {
