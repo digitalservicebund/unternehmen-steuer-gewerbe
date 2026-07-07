@@ -45,7 +45,7 @@ describe("transformToEUnFsE", () => {
   });
 
   describe("finanzamtId", () => {
-    it("uses default testfinanzamt if ERIC_ENABLE_CUSTOM_FINANZAMT_IDS is not set", () => {
+    it("uses default testfinanzamt if ERIC_ENABLE_CUSTOM_FINANZAMT_IDS is not set and not the given 0000", () => {
       vi.stubEnv("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS", "");
 
       const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled, "0000");
