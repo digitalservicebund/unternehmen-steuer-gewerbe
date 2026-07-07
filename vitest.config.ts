@@ -15,5 +15,6 @@ export default defineConfig({
     coverage: {
       reporter: ["text", "lcov"],
     },
+    maxWorkers: 4,
   },
 });
