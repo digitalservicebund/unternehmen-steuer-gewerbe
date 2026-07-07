@@ -157,7 +157,7 @@ jobs:
           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
   build-image:
-    name: Build image and run Trivy scan
+    name: Build image, run Trivy scan, push as candidate
     runs-on: ubuntu-latest
     permissions:
       contents: read
