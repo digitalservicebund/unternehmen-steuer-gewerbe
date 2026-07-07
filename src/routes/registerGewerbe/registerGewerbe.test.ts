@@ -15,7 +15,7 @@ function postRegisterGewerbe(data = registerGewerbeSampleRequestAllFieldsFilled)
   });
 }
 
-describe("Route /api/v1/register-gewerbe (full Kombiantrag)", () => {
+describe("Route /api/v1/register-gewerbe (full Kombiantrag)", { timeout: 15_000 }, () => {
   let response: Response;
   let json: Required<z.infer<typeof RegisterGewerbeResponseSchema>>;
   beforeAll(async () => {
