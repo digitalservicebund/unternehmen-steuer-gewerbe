@@ -1,4 +1,4 @@
-import { type OsciMetadata } from "./metadata";
+import { createMetadata } from "./metadata";
 import { fetchJson } from "../../helpers/fetchJson";
 import { getSecret } from "../../secrets";
 
@@ -15,7 +15,7 @@ interface TokenResponse {
 }
 
 interface SendMessageOptions {
-  metadata: OsciMetadata;
+  targetId: string;
   message: string;
 }
 
@@ -80,18 +80,19 @@ export function getOsciClient() {
 
   async function sendMessage(options: SendMessageOptions): Promise<SendMessageResponse> {
     const accessToken = await getAccessToken();
+    const metadata = createMetadata({ targetId: options.targetId });
 
     const form = new FormData();
     form.append(
       "metadata",
-      new Blob([JSON.stringify(options.metadata)], { type: "application/json" }),
+      new Blob([JSON.stringify(metadata)], { type: "application/json" }),
       "control.json",
     );
     form.append(
       "message",
       new Blob([options.message], { type: "application/xml" }),
       // the message part filename must match the contentReference in the metadata
-      options.metadata.payload.request.message.contentReference.replace("form-data://message/", ""),
+      metadata.payload.request.message.contentReference.replace("form-data://message/", ""),
     );
 
     const url = `${config.baseUrl}/restapi/v3.0/messages/zko/json/multipart`;

@@ -9,7 +9,6 @@ describe("createMetadata", () => {
   it("returns the expected metadata structure for the given target, source and timestamp", () => {
     const result = createMetadata({
       targetId: "MELDID:09000099",
-      sourceId: "ds:schnellergruenden",
       sourceTimestamp: "2024-10-24T15:00:39+02:00",
     });
 
@@ -44,7 +43,7 @@ describe("createMetadata", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2024-10-24T13:00:39.123Z"));
 
-    const result = createMetadata({ targetId: "MELDID:09000099", sourceId: "xga:090010030000" });
+    const result = createMetadata({ targetId: "MELDID:09000099" });
 
     expect(result.metadata.source.sourceTimestamp).toBe("2024-10-24T13:00:39Z");
   });
