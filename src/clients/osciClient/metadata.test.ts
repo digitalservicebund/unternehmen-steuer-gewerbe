@@ -28,7 +28,7 @@ describe("createMetadata", () => {
       payload: {
         request: {
           message: {
-            contentReference: "form-data://message/payload.ok.ext.gewerbemeldung.0400.xml",
+            contentReference: "form-data://message/payload.ext.gewerbemeldung.0400.xml",
             contentMediaType: "text/plain",
           },
         },

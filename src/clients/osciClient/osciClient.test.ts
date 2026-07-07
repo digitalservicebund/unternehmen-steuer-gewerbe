@@ -37,6 +37,18 @@ describe("osciClient.sendMessage", () => {
     expect(result!.metadata.reply!.replyType).toBe("OK");
   });
 
+  it("sends a valid ext.gewerbemeldung.0400", async () => {
+    const result = await osciClient.sendMessage({
+      metadata: createMetadata({
+        targetId: "MELDID:09000099",
+        sourceId: "xga:090010030000",
+      }),
+      message: readSample("custom-xgewo-1.6-valid-0400.xml"),
+    });
+
+    expect(result.metadata.reply.replyType).toBe("OK");
+  });
+
   it("throws for an invalid Gewerbemeldung", async () => {
     const metadata = createMetadata({
       targetId: "MELDID:12052000",
