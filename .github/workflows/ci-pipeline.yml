@@ -157,7 +157,7 @@ jobs:
           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
   build-image:
-    name: Build image, run Trivy scan, push as candidate
+    name: Build image, run Trivy scan, push as candidate (on main)
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -257,7 +257,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push scanned image candidate to registry
+      - name: Push scanned image candidate to registry (on main)
         if: github.ref == 'refs/heads/main'
         run: |
           docker tag unternehmen-steuer-gewerbe ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_CANDIDATES_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
