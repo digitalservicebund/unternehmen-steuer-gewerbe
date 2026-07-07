@@ -155,7 +155,7 @@ const UnternehmensDatenSchema = z
     umsatzsteuerImErstenJahr: z.int().optional().openapi({
       example: 100,
       description:
-        "Voraussichtliche Umsatzsteuer im ersten Jahr. (Größer als 0 => Nutzer hat 'Zahllast' => muss was bezahlen; kleiner als 0 => 'Überschuss' => Rückzahlung vom / Guthaben beim Finanzamt.)",
+        "Voraussichtliche Umsatzsteuer im ersten Jahr. (Größer als 0 => Nutzer hat 'Zahllast' => muss was bezahlen; kleiner oder gleich 0 => 'Überschuss' => Rückzahlung vom / Guthaben beim Finanzamt.)",
     }),
   })
   .refine(
