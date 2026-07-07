@@ -70,7 +70,7 @@ async function getGewerbeaemterOfficeDetails(
 }
 
 /**
- * Get the responsible Finanzämter and Gewerbeämter for a given PLZ, street and house number.
+ * Get the responsible Finanzämter and Gewerbeämter for a given PLZ, ort, street and house number.
  * Best-effort: a failing upstream lookup results in an empty array
  */
 export async function getRegionOfficesDetails(
