@@ -1,7 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { createMetadata } from "./metadata";
 
 describe("createMetadata", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("returns the expected metadata structure for the given target, source and timestamp", () => {
     const result = createMetadata({
       targetId: "MELDID:09000099",
@@ -37,12 +41,15 @@ describe("createMetadata", () => {
   });
 
   it("defaults sourceTimestamp to the current time when none is given", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2024-10-24T13:00:39.123Z"));
+
     const result = createMetadata({ targetId: "MELDID:09000099", sourceId: "xga:090010030000" });
 
-    expect(Date.parse(result.metadata.source.sourceTimestamp)).not.toBeNaN();
+    expect(result.metadata.source.sourceTimestamp).toBe("2024-10-24T13:00:39Z");
   });
 
-  it("emits the default sourceTimestamp with seconds precision (AKDB rejects milliseconds)", () => {
+  it("sets the default sourceTimestamp with only seconds precision (AKDB rejects milliseconds)", () => {
     const result = createMetadata({ targetId: "MELDID:09000099", sourceId: "xga:090010030000" });
 
     expect(result.metadata.source.sourceTimestamp).toMatch(

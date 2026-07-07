@@ -62,7 +62,7 @@ export function getOsciClient() {
     password: getSecret("AKDB_PASSWORD"),
   };
 
-  async function authenticate(): Promise<string> {
+  async function getAccessToken(): Promise<string> {
     const body = new URLSearchParams({
       grant_type: "client_credentials",
       client_id: config.username,
@@ -79,7 +79,7 @@ export function getOsciClient() {
   }
 
   async function sendMessage(options: SendMessageOptions): Promise<SendMessageResponse> {
-    const accessToken = await authenticate();
+    const accessToken = await getAccessToken();
 
     const form = new FormData();
     form.append(
