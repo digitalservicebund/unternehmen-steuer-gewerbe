@@ -88,6 +88,9 @@ jobs:
           ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
           ERIC_CERTIFICATE_BASE64: ${{ secrets.ERIC_CERTIFICATE_BASE64 }}
           ERIC_CERTIFICATE_PIN: ${{ secrets.ERIC_CERTIFICATE_PIN }}
+          AKDB_BASE_URL: ${{ secrets.AKDB_BASE_URL }}
+          AKDB_USERNAME: ${{ secrets.AKDB_USERNAME }}
+          AKDB_PASSWORD: ${{ secrets.AKDB_PASSWORD }}
 
       - name: Upload coverage report
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
