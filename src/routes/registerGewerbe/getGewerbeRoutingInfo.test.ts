@@ -6,7 +6,7 @@ const { mockGetAGSandARS, mockGetGewerbeamt, mockGetRoutes } = vi.hoisted(() => 
     name: "Stadt Fulda",
     adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
     telefon: "0661 102-0",
-    onlineServiceLinks: [],
+    onlineServices: [],
   }),
   mockGetRoutes: vi.fn(),
 }));
@@ -66,7 +66,7 @@ describe("getGewerbeRoutingInfo", () => {
         name: "Stadt Fulda",
         adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
         telefon: "0661 102-0",
-        onlineServiceLinks: [],
+        onlineServices: [],
       });
     });
 

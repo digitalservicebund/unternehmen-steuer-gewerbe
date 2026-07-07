@@ -16,5 +16,6 @@ export default defineConfig({
       reporter: ["text", "lcov"],
     },
     unstubEnvs: true,
+    maxWorkers: 4,
   },
 });

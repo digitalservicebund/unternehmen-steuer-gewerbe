@@ -15,18 +15,18 @@ describe("getGewerbeamt", () => {
       telefon: "+49 731 161 3216",
       email: "gewerbe@ulm.de",
     });
-    expect(gewerbeamt.onlineServiceLinks.length).toBeGreaterThan(0);
-    for (const link of gewerbeamt.onlineServiceLinks) {
+    expect(gewerbeamt.onlineServices.length).toBeGreaterThan(0);
+    for (const link of gewerbeamt.onlineServices) {
       expect(link).toMatchObject({ uri: expect.any(String) });
     }
   });
 
   // temporarily skipped because of unstable API - proper fix (separate contract and unit tests) is in our backlog
-  it.skip("returns an empty onlineServiceLinks list for Fraureuth (ARS 146120000000), which has no online services", async () => {
+  it.skip("returns an empty onlineServices list for Fraureuth (ARS 146120000000), which has no online services", async () => {
     const gewerbeamt = await getGewerbeamt("146120000000");
 
     expect(gewerbeamt.name).toBe("Gewerbeamt");
-    expect(gewerbeamt.onlineServiceLinks).toEqual([]);
+    expect(gewerbeamt.onlineServices).toEqual([]);
   });
 
   it("throws if no service description was found for ARS 000000000000", async () => {
