@@ -40,20 +40,12 @@ describe("createMetadata", () => {
     });
   });
 
-  it("defaults sourceTimestamp to the current time when none is given", () => {
+  it("defaults sourceTimestamp to the current time when none is given with only seconds precision (AKDB rejects milliseconds)", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2024-10-24T13:00:39.123Z"));
 
     const result = createMetadata({ targetId: "MELDID:09000099", sourceId: "xga:090010030000" });
 
     expect(result.metadata.source.sourceTimestamp).toBe("2024-10-24T13:00:39Z");
-  });
-
-  it("sets the default sourceTimestamp with only seconds precision (AKDB rejects milliseconds)", () => {
-    const result = createMetadata({ targetId: "MELDID:09000099", sourceId: "xga:090010030000" });
-
-    expect(result.metadata.source.sourceTimestamp).toMatch(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/,
-    );
   });
 });
