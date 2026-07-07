@@ -60,6 +60,14 @@ describe("transformToEUnFsE", () => {
 
       expect(result.nutzdatenHeader?.empfaenger?.value).toEqual("1111");
     });
+
+    it("uses default testfinanzamt if no finanzamt is given", () => {
+      vi.stubEnv("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS", "true");
+
+      const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+
+      expect(result.nutzdatenHeader?.empfaenger?.value).toEqual(defaultFinanzamtId);
+    });
   });
 
   describe("umsatzsteuer", () => {
