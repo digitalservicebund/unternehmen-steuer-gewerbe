@@ -89,7 +89,7 @@ ensureEricHerstellerId();
 
 function determineFinanzamtIdOrDefault(id?: string): string {
   if (!id) return defaultFinanzamtId;
-  if (!getSecret("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS")) return defaultFinanzamtId;
+  if (getSecret("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS") !== "true") return defaultFinanzamtId;
 
   return id;
 }
