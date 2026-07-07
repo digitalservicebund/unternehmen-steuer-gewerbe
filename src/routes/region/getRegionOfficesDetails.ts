@@ -46,8 +46,6 @@ function getFinanzaemterOfficeDetails({
 async function getGewerbeaemterOfficeDetails(
   locationQuery: LocationQuery,
 ): Promise<OfficeDetails[]> {
-  const { strasse, hausnummer } = locationQuery;
-
   let locations: LocationDetails[];
   try {
     locations = await getLocationsDetails(locationQuery);
