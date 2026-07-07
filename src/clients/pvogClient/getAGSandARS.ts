@@ -1,4 +1,4 @@
-import { getLocationsDetails } from "./getLocationsDetails";
+import { getLocationsDetails, type LocationQuery } from "./getLocationsDetails";
 
 export interface AGSandARS {
   ars: string;
@@ -21,18 +21,16 @@ function getAgsFromArs(ars: string): string {
  * Returns the single best (first) match for an address, throwing if none is found.
  * Use getLocationsDetails directly when all municipalities a PLZ spans are needed.
  */
-export async function getAGSandARS(
-  plz: string,
-  strasse?: string,
-  hausnummer?: string,
-): Promise<AGSandARS> {
-  const [firstMatchingLocation] = await getLocationsDetails(plz, strasse, hausnummer);
+export async function getAGSandARS(locationQuery: LocationQuery): Promise<AGSandARS> {
+  const { plz, ort, strasse, hausnummer } = locationQuery;
+
+  const [firstMatchingLocation] = await getLocationsDetails(locationQuery);
   if (firstMatchingLocation === undefined) {
     throw new Error(`No location found for zip code ${plz}`);
   }
   if (!/^\d{12}$/.test(firstMatchingLocation.ars)) {
     throw new Error(
-      `No valid AGS and ARS found for "${[plz, strasse, hausnummer].filter(Boolean).join(" ")}"`,
+      `No valid AGS and ARS found for "${[plz, ort, strasse, hausnummer].filter(Boolean).join(" ")}"`,
     );
   }
 

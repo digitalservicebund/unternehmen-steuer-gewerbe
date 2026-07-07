@@ -2,7 +2,12 @@ import {
   getFinanzamtDetailsById,
   getFinanzamtId,
 } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
-import { getGewerbeamt, getLocationsDetails, type LocationDetails } from "../../clients/pvogClient";
+import {
+  getGewerbeamt,
+  getLocationsDetails,
+  type LocationDetails,
+  type LocationQuery,
+} from "../../clients/pvogClient";
 import {
   createOfficeDetailsFromFinanzamt,
   createOfficeDetailsFromGewerbeamt,
@@ -14,14 +19,16 @@ interface RegionOfficesDetails {
   gewerbeaemter: OfficeDetails[];
 }
 
-function getFinanzaemterOfficeDetails(
-  plz: string,
-  strasse?: string,
-  hausnummer?: string,
-): OfficeDetails[] {
+function getFinanzaemterOfficeDetails({
+  plz,
+  ort,
+  strasse,
+  hausnummer,
+}: LocationQuery): OfficeDetails[] {
   try {
     const finanzamtIds = getFinanzamtId({
       postleitzahl: plz,
+      ort,
       strassenName: strasse,
       hausnummerVon: hausnummer,
     });
@@ -37,13 +44,13 @@ function getFinanzaemterOfficeDetails(
 }
 
 async function getGewerbeaemterOfficeDetails(
-  plz: string,
-  strasse?: string,
-  hausnummer?: string,
+  locationQuery: LocationQuery,
 ): Promise<OfficeDetails[]> {
+  const { strasse, hausnummer } = locationQuery;
+
   let locations: LocationDetails[];
   try {
-    locations = await getLocationsDetails(plz, strasse, hausnummer);
+    locations = await getLocationsDetails(locationQuery);
   } catch (error) {
     console.error("Location lookup failed", error);
     return [];
@@ -69,11 +76,9 @@ async function getGewerbeaemterOfficeDetails(
  * Best-effort: a failing upstream lookup results in an empty array
  */
 export async function getRegionOfficesDetails(
-  plz: string,
-  strasse?: string,
-  hausnummer?: string,
+  locationQuery: LocationQuery,
 ): Promise<RegionOfficesDetails> {
-  const finanzaemter = getFinanzaemterOfficeDetails(plz, strasse, hausnummer);
-  const gewerbeaemter = await getGewerbeaemterOfficeDetails(plz, strasse, hausnummer);
+  const finanzaemter = getFinanzaemterOfficeDetails(locationQuery);
+  const gewerbeaemter = await getGewerbeaemterOfficeDetails(locationQuery);
   return { finanzaemter, gewerbeaemter };
 }

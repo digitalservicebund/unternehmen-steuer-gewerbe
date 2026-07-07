@@ -54,6 +54,18 @@ describe("Route /api/v1/region/{plz}", () => {
     expect(body.finanzaemter).toHaveLength(1);
   });
 
+  it("Returns 200 and one Gewerbeamt for Dorfstraße 1 in 25842 when the ort is given", async () => {
+    const { response, body } = await requestRegion(
+      "25842",
+      "?strasse=Dorfstraße&hausnummer=1&ort=Lütjenholm",
+    );
+    expect(response.status).toEqual(HttpStatusCode.Ok);
+    expect(body.gewerbeaemter).toHaveLength(1);
+    expect(body.gewerbeaemter[0]).toMatchObject({
+      name: "Amt Mittleres Nordfriesland - Ordnungsabteilung",
+    });
+  });
+
   it('Returns 400 for an invalid PLZ "abc"', async () => {
     const response = await app.request("/api/v1/region/abc");
     expect(response.status).toEqual(HttpStatusCode.BadRequest);

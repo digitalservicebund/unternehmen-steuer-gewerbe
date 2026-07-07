@@ -12,6 +12,15 @@ export const RegionParamsSchema = z.object({
 });
 
 export const RegionQuerySchema = z.object({
+  ort: z
+    .string()
+    .min(1)
+    .optional()
+    .openapi({
+      param: { name: "ort", in: "query" },
+      example: "Husum",
+      description: "Optional city/municipality name to narrow down the responsible offices",
+    }),
   strasse: z
     .string()
     .min(1)
