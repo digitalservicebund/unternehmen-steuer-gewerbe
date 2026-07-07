@@ -79,7 +79,7 @@ We strive for a change lead time (cf. [DORA metrics](https://dora.dev/guides/dor
 Besides the tooling, the following processes work towards engineering quality:
 
 1. We have a round-robin "maintenance shift" that assures our repositories stay in good health:
-   1. Security updates get handled
+   1. Security updates get handled quickly
    1. Branches are handled through PRs
    1. We do a lot of code reviews
    1. We following "[ship, show, ask](https://martinfowler.com/articles/ship-show-ask.html)" in order to foster fast feedback loops.
@@ -88,4 +88,11 @@ Besides the tooling, the following processes work towards engineering quality:
 
 ## Consequences
 
-## Alternatives Considered
+1. Continuous integration and continuous deployment come with some real complexity and have implications on our workflow:
+   1. A broken pipeline blocks both, deployment of `main` and development in branches, so it needs to be fixed as soon as possible.
+   1. Flakyness has immediate consequences. We need to be extra vigilant to avoid it.
+   1. Speed is of the essence. A slow pipeline creates drag in many places.
+
+1. As all checks are breaking the pipeline if they fail, it's desirable to not fail them in the first place.
+   1. Git hooks are a possible solution and we have configured some in the repository that try to fix formatting and linting on push. The trade-off is a delay during `git push`.
+   1. Some devs have even added `build` and `test` to their `pre-push` hook trading local delay for getting the change merged faster.
