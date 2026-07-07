@@ -9,12 +9,23 @@ describe("getAGSandARS", () => {
     expect(result.ars).toBe("084210000000");
   });
 
-  it("returns AGS 01054080 and ARS 010545494080 of Lütjenholm for Dorfstraße 1 in 25842 when the ort is given", async () => {
+  it("returns AGS 01054093 and ARS 010545494093 of Ockholm (the first of several matches) for Dorfstraße 1 in 25842 without an ort", async () => {
     const result = await getAGSandARS({
       plz: "25842",
-      ort: "Lütjenholm",
       strasse: "Dorfstraße",
       hausnummer: "1",
+    });
+
+    expect(result.ars).toBe("010545494093");
+    expect(result.ags).toBe("01054093");
+  });
+
+  it("returns AGS 01054080 and ARS 010545494080 of Lütjenholm for the same Dorfstraße 1 in 25842 as soon as the ort Lütjenholm is added", async () => {
+    const result = await getAGSandARS({
+      plz: "25842",
+      strasse: "Dorfstraße",
+      hausnummer: "1",
+      ort: "Lütjenholm",
     });
 
     expect(result.ars).toBe("010545494080");

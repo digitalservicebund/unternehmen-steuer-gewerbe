@@ -29,7 +29,7 @@ describe("getLocationsDetails", () => {
     expect(result[0]!.ars).toBe("010540056056");
   });
 
-  it("returns the municipalities Langenhorn, Lütjenholm and Ockholm for Dorfstraße 1 in 25842 when no ort is given", async () => {
+  it("returns the municipalities Langenhorn, Lütjenholm and Ockholm for Dorfstraße 1 in 25842 without an ort", async () => {
     const result = await getLocationsDetails({
       plz: "25842",
       strasse: "Dorfstraße",
@@ -40,7 +40,7 @@ describe("getLocationsDetails", () => {
     expect(allArs.toSorted()).toEqual(["010545494075", "010545494080", "010545494093"]);
   });
 
-  it("narrows ARS down to 010545494080 (single municipality Lütjenholm) for Dorfstraße 1 in 25842 when the ort is given", async () => {
+  it("returns only the ARS 010545494080 (single municipality Lütjenholm) for the same Dorfstraße 1 in 25842 as soon as the ort Lütjenholm is added", async () => {
     const result = await getLocationsDetails({
       plz: "25842",
       ort: "Lütjenholm",
