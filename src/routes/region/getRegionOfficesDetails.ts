@@ -19,18 +19,13 @@ interface RegionOfficesDetails {
   gewerbeaemter: OfficeDetails[];
 }
 
-function getFinanzaemterOfficeDetails({
-  plz,
-  ort,
-  strasse,
-  hausnummer,
-}: LocationQuery): OfficeDetails[] {
+function getFinanzaemterOfficeDetails(locationQuery: LocationQuery): OfficeDetails[] {
   try {
     const finanzamtIds = getFinanzamtId({
-      postleitzahl: plz,
-      ort,
-      strassenName: strasse,
-      hausnummerVon: hausnummer,
+      postleitzahl: locationQuery.plz,
+      ort: locationQuery.ort,
+      strassenName: locationQuery.strasse,
+      hausnummerVon: locationQuery.hausnummer,
     });
 
     return finanzamtIds
