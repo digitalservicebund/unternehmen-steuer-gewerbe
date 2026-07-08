@@ -117,11 +117,8 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
     }
     const finanzamtId = finanzamtIds[0]!;
 
-    // ***** WARNING, DANGEROUS *****
-    // Missing piece: Only on prod(!) set Finanzamt-ID in data for fse creation
-    // ***** WARNING, DANGEROUS *****
-
-    const fse = createElsterFsEEUnXml(transformToEUnFsE(data));
+    // Note: finanzamtId is disregarded if ERIC_ENABLE_CUSTOM_FINANZAMT_IDS not "true"
+    const fse = createElsterFsEEUnXml(transformToEUnFsE(data, finanzamtId));
 
     const validation = validateFsE(fse);
     if (!validation.valid) {

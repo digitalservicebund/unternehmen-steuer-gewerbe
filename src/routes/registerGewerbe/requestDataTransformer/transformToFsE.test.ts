@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { transformToEUnFsE } from "./transformToFsE";
+import { describe, it, expect, vi } from "vitest";
+import { defaultFinanzamtId, transformToEUnFsE } from "./transformToFsE";
 import { registerGewerbeSampleRequestAllFieldsFilled } from "../testHelpers";
 import { RegisterGewerbeRequestSchema } from "../registerGewerbeInterfaces";
 import { formatDatumDE } from "../../../helpers/formFieldTransformations";
@@ -42,6 +42,32 @@ describe("transformToEUnFsE", () => {
     ).toBe(1);
 
     expect(result.eUn?.umsatzsteuer?.uStIdNr?.uStIdAntrag?.merkerAntragUStId).toBe(true);
+  });
+
+  describe("finanzamtId", () => {
+    it("uses default testfinanzamt (instead of the given 0000) if ERIC_ENABLE_CUSTOM_FINANZAMT_IDS is not set", () => {
+      vi.stubEnv("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS", "");
+
+      const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled, "0000");
+
+      expect(result.nutzdatenHeader?.empfaenger?.value).toEqual(defaultFinanzamtId); // not 0000
+    });
+
+    it("uses the given id 1111 if CUSTOM_FINANZAMT_ID_ENABLED=true set in environment", () => {
+      vi.stubEnv("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS", "true");
+
+      const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled, "1111");
+
+      expect(result.nutzdatenHeader?.empfaenger?.value).toEqual("1111");
+    });
+
+    it("uses default testfinanzamt if no finanzamt is given", () => {
+      vi.stubEnv("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS", "true");
+
+      const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled); // no finanzamtId
+
+      expect(result.nutzdatenHeader?.empfaenger?.value).toEqual(defaultFinanzamtId);
+    });
   });
 
   describe("umsatzsteuer", () => {
