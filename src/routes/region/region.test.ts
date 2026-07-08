@@ -14,7 +14,7 @@ async function requestRegion(plz: string, queryString = "") {
 
 describe("Route /api/v1/region/{plz}", () => {
   it("Returns 200 with supported:true and the names of the responsible Finanz- & Gewerbeämter for the supported PLZ 25813", async () => {
-    const { response, body } = await requestRegion("25813");
+    const { response, body } = await requestRegion("25813", "?onlyBestMatch=false");
 
     expect(response.status).toEqual(HttpStatusCode.Ok);
     expect(body.supported).toBe(true);
@@ -41,10 +41,16 @@ describe("Route /api/v1/region/{plz}", () => {
     expect(body.gewerbeaemter).toEqual([]);
   });
 
-  it("Returns 4 Gewerbeämter for every municipality a PLZ 25813 spans", async () => {
-    const { body } = await requestRegion("25813");
+  it("Returns 4 Gewerbeämter for every municipality a PLZ 25813 spans when onlyBestMatch is false", async () => {
+    const { body } = await requestRegion("25813", "?onlyBestMatch=false");
 
     expect(body.gewerbeaemter).toHaveLength(4);
+  });
+
+  it("Returns only one Gewerbeamt for PLZ 25813 by default", async () => {
+    const { body } = await requestRegion("25813");
+
+    expect(body.gewerbeaemter).toHaveLength(1);
   });
 
   it("Returns 200 and only one Gewerbeamt and Finanzamt for PLZ 25813 when street and house number are given", async () => {

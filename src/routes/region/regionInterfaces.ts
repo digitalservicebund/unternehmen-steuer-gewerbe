@@ -39,6 +39,15 @@ export const RegionQuerySchema = z.object({
       example: "1",
       description: "Optional house number to narrow down the responsible offices",
     }),
+  onlyBestMatch: z
+    .stringbool()
+    .default(true)
+    .openapi({
+      param: { name: "onlyBestMatch", in: "query" },
+      example: "false",
+      description:
+        "Set to false to return all matches. When true (default), each list contains only the best matching office — the same office the submission would use.",
+    }),
 });
 
 export const OnlineServiceSchema = z
