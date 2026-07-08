@@ -45,12 +45,12 @@ describe("transformToEUnFsE", () => {
   });
 
   describe("finanzamtId", () => {
-    it("uses default testfinanzamt if ERIC_ENABLE_CUSTOM_FINANZAMT_IDS is not set and not the given 0000", () => {
+    it("uses default testfinanzamt (instead of the given 0000) if ERIC_ENABLE_CUSTOM_FINANZAMT_IDS is not set", () => {
       vi.stubEnv("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS", "");
 
       const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled, "0000");
 
-      expect(result.nutzdatenHeader?.empfaenger?.value).toEqual(defaultFinanzamtId);
+      expect(result.nutzdatenHeader?.empfaenger?.value).toEqual(defaultFinanzamtId); // not 0000
     });
 
     it("uses the given id 1111 if CUSTOM_FINANZAMT_ID_ENABLED=true set in environment", () => {
@@ -64,7 +64,7 @@ describe("transformToEUnFsE", () => {
     it("uses default testfinanzamt if no finanzamt is given", () => {
       vi.stubEnv("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS", "true");
 
-      const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+      const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled); // no finanzamtId
 
       expect(result.nutzdatenHeader?.empfaenger?.value).toEqual(defaultFinanzamtId);
     });
