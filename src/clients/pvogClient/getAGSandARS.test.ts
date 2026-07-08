@@ -9,27 +9,25 @@ describe("getAGSandARS", () => {
     expect(result.ars).toBe("084210000000");
   });
 
-  it("returns AGS 01054093 and ARS 010545494093 of Ockholm (the first of several matches) for Dorfstraße 1 in 25842 without an ort", async () => {
-    const result = await getAGSandARS({
+  it("returns different AGS and ARS for Dorfstraße 1 in 25842 depending on whether an ort is given", async () => {
+    const withoutOrt = await getAGSandARS({
       plz: "25842",
       strasse: "Dorfstraße",
       hausnummer: "1",
     });
-
-    expect(result.ars).toBe("010545494093");
-    expect(result.ags).toBe("01054093");
-  });
-
-  it("returns AGS 01054080 and ARS 010545494080 of Lütjenholm for the same Dorfstraße 1 in 25842 as soon as the ort Lütjenholm is added", async () => {
-    const result = await getAGSandARS({
+    const withOrt = await getAGSandARS({
       plz: "25842",
       strasse: "Dorfstraße",
       hausnummer: "1",
       ort: "Lütjenholm",
     });
 
-    expect(result.ars).toBe("010545494080");
-    expect(result.ags).toBe("01054080");
+    // without ort, the API returns Ockholm as the first of several matches
+    expect(withoutOrt.ags).toBe("01054093");
+    expect(withoutOrt.ars).toBe("010545494093");
+
+    expect(withOrt.ags).toBe("01054080");
+    expect(withOrt.ars).toBe("010545494080");
   });
 
   it("throws if nothing was found for ZIP 00000", async () => {

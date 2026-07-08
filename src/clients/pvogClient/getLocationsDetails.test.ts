@@ -29,27 +29,25 @@ describe("getLocationsDetails", () => {
     expect(result[0]!.ars).toBe("010540056056");
   });
 
-  it("returns the municipalities Langenhorn, Lütjenholm and Ockholm for Dorfstraße 1 in 25842 without an ort", async () => {
-    const result = await getLocationsDetails({
+  it("returns different municipalities for Dorfstraße 1 in 25842 depending on whether an ort is given", async () => {
+    const withoutOrt = await getLocationsDetails({
       plz: "25842",
       strasse: "Dorfstraße",
       hausnummer: "1",
     });
-    const allArs = result.map((location) => location.ars);
-
-    expect(allArs.toSorted()).toEqual(["010545494075", "010545494080", "010545494093"]);
-  });
-
-  it("returns only the ARS 010545494080 (single municipality Lütjenholm) for the same Dorfstraße 1 in 25842 as soon as the ort Lütjenholm is added", async () => {
-    const result = await getLocationsDetails({
+    const withOrt = await getLocationsDetails({
       plz: "25842",
       ort: "Lütjenholm",
       strasse: "Dorfstraße",
       hausnummer: "1",
     });
 
-    expect(result).toHaveLength(1);
-    expect(result[0]!.ars).toBe("010545494080");
+    // without ort: Langenhorn, Lütjenholm and Ockholm all match
+    const allArs = withoutOrt.map((location) => location.ars);
+    expect(allArs.toSorted()).toEqual(["010545494075", "010545494080", "010545494093"]);
+
+    expect(withOrt).toHaveLength(1);
+    expect(withOrt[0]!.ars).toBe("010545494080");
   });
 
   it("returns three entries (one entry per ARS) for the zip code 17337 without duplicates", async () => {
