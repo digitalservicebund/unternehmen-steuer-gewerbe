@@ -3,6 +3,7 @@ import {
   getFinanzamtId,
 } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 import {
+  getAGSandARS,
   getGewerbeamt,
   getLocationsDetails,
   type LocationDetails,
@@ -13,20 +14,29 @@ import {
   createOfficeDetailsFromGewerbeamt,
   type OfficeDetails,
 } from "../../helpers/createOfficeDetails";
+import { getBestMatch } from "../../helpers/getBestMatch";
 
 interface RegionOfficesDetails {
   finanzaemter: OfficeDetails[];
   gewerbeaemter: OfficeDetails[];
 }
 
-function getFinanzaemterOfficeDetails(locationQuery: LocationQuery): OfficeDetails[] {
+function getFinanzaemterOfficeDetails(
+  locationQuery: LocationQuery,
+  onlyBestMatch: boolean,
+): OfficeDetails[] {
   try {
-    const finanzamtIds = getFinanzamtId({
+    let finanzamtIds = getFinanzamtId({
       postleitzahl: locationQuery.plz,
       ort: locationQuery.ort,
       strassenName: locationQuery.strasse,
       hausnummerVon: locationQuery.hausnummer,
     });
+
+    if (onlyBestMatch) {
+      const bestMatchingFinanzamtId = getBestMatch(finanzamtIds);
+      finanzamtIds = bestMatchingFinanzamtId === undefined ? [] : [bestMatchingFinanzamtId];
+    }
 
     return finanzamtIds
       .map((id) => getFinanzamtDetailsById(id))
@@ -40,7 +50,20 @@ function getFinanzaemterOfficeDetails(locationQuery: LocationQuery): OfficeDetai
 
 async function getGewerbeaemterOfficeDetails(
   locationQuery: LocationQuery,
+  onlyBestMatch: boolean,
 ): Promise<OfficeDetails[]> {
+  if (onlyBestMatch) {
+    // same first-match code path the XML submission uses (see getGewerbeRoutingInfo)
+    try {
+      const { ars } = await getAGSandARS(locationQuery);
+      const gewerbeamt = await getGewerbeamt(ars);
+      return [createOfficeDetailsFromGewerbeamt(gewerbeamt)];
+    } catch (error) {
+      console.error("Best matching Gewerbeamt lookup failed", error);
+      return [];
+    }
+  }
+
   let locations: LocationDetails[];
   try {
     locations = await getLocationsDetails(locationQuery);
@@ -66,12 +89,15 @@ async function getGewerbeaemterOfficeDetails(
 
 /**
  * Get the responsible Finanzämter and Gewerbeämter for a given PLZ, ort, street and house number.
+ * With onlyBestMatch, each list contains only the best match — the same office the XML
+ * submission would use.
  * Best-effort: a failing upstream lookup results in an empty array
  */
 export async function getRegionOfficesDetails(
   locationQuery: LocationQuery,
+  onlyBestMatch: boolean,
 ): Promise<RegionOfficesDetails> {
-  const finanzaemter = getFinanzaemterOfficeDetails(locationQuery);
-  const gewerbeaemter = await getGewerbeaemterOfficeDetails(locationQuery);
+  const finanzaemter = getFinanzaemterOfficeDetails(locationQuery, onlyBestMatch);
+  const gewerbeaemter = await getGewerbeaemterOfficeDetails(locationQuery, onlyBestMatch);
   return { finanzaemter, gewerbeaemter };
 }

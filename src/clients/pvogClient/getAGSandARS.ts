@@ -1,3 +1,4 @@
+import { getBestMatch } from "../../helpers/getBestMatch";
 import { getLocationsDetails, type LocationQuery } from "./getLocationsDetails";
 
 export interface AGSandARS {
@@ -24,16 +25,17 @@ function getAgsFromArs(ars: string): string {
 export async function getAGSandARS(locationQuery: LocationQuery): Promise<AGSandARS> {
   const { plz, ort, strasse, hausnummer } = locationQuery;
 
-  const [firstMatchingLocation] = await getLocationsDetails(locationQuery);
-  if (firstMatchingLocation === undefined) {
+  const locationsDetails = await getLocationsDetails(locationQuery);
+  const bestMatchingLocation = getBestMatch(locationsDetails);
+  if (bestMatchingLocation === undefined) {
     throw new Error(`No location found for zip code ${plz}`);
   }
-  if (!/^\d{12}$/.test(firstMatchingLocation.ars)) {
+  if (!/^\d{12}$/.test(bestMatchingLocation.ars)) {
     throw new Error(
       `No valid AGS and ARS found for "${[plz, ort, strasse, hausnummer].filter(Boolean).join(" ")}"`,
     );
   }
 
-  const ags = getAgsFromArs(firstMatchingLocation.ars);
-  return { ars: firstMatchingLocation.ars, ags };
+  const ags = getAgsFromArs(bestMatchingLocation.ars);
+  return { ars: bestMatchingLocation.ars, ags };
 }

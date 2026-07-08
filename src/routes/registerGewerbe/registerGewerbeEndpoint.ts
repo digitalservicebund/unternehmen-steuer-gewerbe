@@ -23,6 +23,7 @@ import {
   createOfficeDetailsFromFinanzamt,
   createOfficeDetailsFromGewerbeamt,
 } from "../../helpers/createOfficeDetails";
+import { getBestMatch } from "../../helpers/getBestMatch";
 
 const GEWERBEANMELDUNG_LEIKA_KEY_URN = "urn:de:fim:leika:leistung:99050012104000";
 
@@ -108,14 +109,14 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
       hausnummerBis: hausnummerBis,
     });
 
-    if (finanzamtIds.length === 0) {
+    const finanzamtId = getBestMatch(finanzamtIds);
+    if (finanzamtId === undefined) {
       return {
         success: false,
         errorType: ErrorTypeSchema.enum.invalid_data,
         info: "No Finanzamt found for address",
       };
     }
-    const finanzamtId = finanzamtIds[0]!;
 
     // Note: finanzamtId is disregarded if ERIC_ENABLE_CUSTOM_FINANZAMT_IDS not "true"
     const fse = createElsterFsEEUnXml(transformToEUnFsE(data, finanzamtId));
