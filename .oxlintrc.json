@@ -9,7 +9,7 @@
     "builtin": true
   },
   "ignorePatterns": [
-    "src/private/eric/ERiC-43.4.6.0/**",
+    "src/private/eric/ERiC-44.2.4.0/**",
     "**/schemaXsd/**/*.xsd",
     "**/schematron/**/spezifikation.xsl"
   ]
