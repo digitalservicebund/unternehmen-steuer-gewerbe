@@ -28,17 +28,22 @@ describe("getGewerbeRoutingInfo", () => {
     it("uses persönlicheDaten.adresse.postleitzahl when no adresseAbweichend", async () => {
       await getGewerbeRoutingInfo({
         ...registerGewerbeSampleRequestAllFieldsFilled,
+        persönlicheDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
+          adresse: { strasseUndHausnummer: "Marktstraße 1", postleitzahl: "25813", ort: "Husum" },
+        },
         unternehmensDaten: {
           ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
           adresseAbweichend: undefined,
         },
       });
 
-      expect(mockGetAGSandARS).toHaveBeenCalledWith(
-        registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten.adresse.postleitzahl,
-        "Musterstraße",
-        "1",
-      );
+      expect(mockGetAGSandARS).toHaveBeenCalledWith({
+        plz: "25813",
+        ort: "Husum",
+        strasse: "Marktstraße",
+        hausnummer: "1",
+      });
     });
 
     it("uses adresseAbweichend.postleitzahl when provided", async () => {
@@ -47,13 +52,19 @@ describe("getGewerbeRoutingInfo", () => {
         unternehmensDaten: {
           ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
           adresseAbweichend: {
-            ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten.adresseAbweichend!,
-            postleitzahl: "10969",
+            strasseUndHausnummer: "Dorfstraße 1",
+            postleitzahl: "25842",
+            ort: "Lütjenholm",
           },
         },
       });
 
-      expect(mockGetAGSandARS).toHaveBeenCalledWith("10969", "Musterstraße", "2");
+      expect(mockGetAGSandARS).toHaveBeenCalledWith({
+        plz: "25842",
+        ort: "Lütjenholm",
+        strasse: "Dorfstraße",
+        hausnummer: "1",
+      });
     });
   });
 

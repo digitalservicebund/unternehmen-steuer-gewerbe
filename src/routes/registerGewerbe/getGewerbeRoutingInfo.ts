@@ -23,7 +23,12 @@ export async function getGewerbeRoutingInfo(
   const address = data.unternehmensDaten.adresseAbweichend ?? data.persönlicheDaten.adresse;
   const { strasse, hausnummer } = splitStrasseHausnummer(address.strasseUndHausnummer);
 
-  const { ags, ars } = await getAGSandARS(address.postleitzahl, strasse, hausnummer);
+  const { ags, ars } = await getAGSandARS({
+    plz: address.postleitzahl,
+    ort: address.ort,
+    strasse,
+    hausnummer,
+  });
 
   const gewerbeamt = await getGewerbeamt(ars);
 

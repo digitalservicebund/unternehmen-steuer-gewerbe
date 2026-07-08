@@ -9,17 +9,26 @@ export interface LocationDetails {
   gemeinde?: string;
 }
 
+export interface LocationQuery {
+  plz: string;
+  ort?: string;
+  strasse?: string;
+  hausnummer?: string;
+}
+
 /**
- * Resolves a PLZ (optionally narrowed by street and house number) to the matching locations.
+ * Resolves a PLZ (optionally narrowed by ort, street and house number) to the matching locations.
  * A single PLZ can span several municipalities, so the result is a list. Uses the v3 locations
- * endpoint, which is street/house-number aware.
+ * endpoint, which is street/house-number aware. The ort disambiguates street names that exist
+ * in several municipalities of the same PLZ.
  */
-export async function getLocationsDetails(
-  plz: string,
-  strasse?: string,
-  hausnummer?: string,
-): Promise<LocationDetails[]> {
-  const q = [plz, strasse, hausnummer].filter(Boolean).join(" ");
+export async function getLocationsDetails({
+  plz,
+  ort,
+  strasse,
+  hausnummer,
+}: LocationQuery): Promise<LocationDetails[]> {
+  const q = [plz, ort, strasse, hausnummer].filter(Boolean).join(" ");
   return fetchJson<LocationDetails[]>(`${PVOG_SUCHDIENST_API_URL}/v3/locations`, {
     params: { q, distinctBy: "ars", limit: 25 },
   });
