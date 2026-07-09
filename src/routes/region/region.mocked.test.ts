@@ -71,29 +71,31 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
     mockGetFinanzamtDetailsById.mockReturnValue(FINANZAMT_DETAILS);
   });
 
-  it("returns only the best matching Gewerbeamt by default", async () => {
-    const { body } = await requestRegionForPostleitzahl36037();
+  describe("returning only the single best match by default", () => {
+    it("returns only the single best matching Gewerbeamt", async () => {
+      const { body } = await requestRegionForPostleitzahl36037();
 
-    expect(body.gewerbeaemter).toHaveLength(1);
-  });
+      expect(body.gewerbeaemter).toHaveLength(1);
+    });
 
-  it("returns only the best matching Finanzamt by default", async () => {
-    mockGetFinanzamtId.mockReturnValue(["FA1", "FA2"]);
+    it("returns only the single best matching Finanzamt", async () => {
+      mockGetFinanzamtId.mockReturnValue(["FA1", "FA2"]);
 
-    const { body } = await requestRegionForPostleitzahl36037();
+      const { body } = await requestRegionForPostleitzahl36037();
 
-    expect(body.finanzaemter).toHaveLength(1);
-    expect(mockGetFinanzamtDetailsById).toHaveBeenCalledTimes(1);
-    expect(mockGetFinanzamtDetailsById).toHaveBeenCalledWith("FA1");
-  });
+      expect(body.finanzaemter).toHaveLength(1);
+      expect(mockGetFinanzamtDetailsById).toHaveBeenCalledTimes(1);
+      expect(mockGetFinanzamtDetailsById).toHaveBeenCalledWith("FA1");
+    });
 
-  it("returns 200 with empty gewerbeaemter when the best matching Gewerbeamt lookup fails", async () => {
-    mockGetGewerbeamt.mockRejectedValue(new Error("Gewerbeamt lookup failed"));
+    it("returns 200 with empty gewerbeaemter when the Gewerbeamt lookup fails", async () => {
+      mockGetGewerbeamt.mockRejectedValue(new Error("Gewerbeamt lookup failed"));
 
-    const { response, body } = await requestRegionForPostleitzahl36037();
+      const { response, body } = await requestRegionForPostleitzahl36037();
 
-    expect(response.status).toEqual(HttpStatusCode.Ok);
-    expect(body.gewerbeaemter).toEqual([]);
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+      expect(body.gewerbeaemter).toEqual([]);
+    });
   });
 
   it("returns all Gewerbeaemter when getAllOffices is true", async () => {
