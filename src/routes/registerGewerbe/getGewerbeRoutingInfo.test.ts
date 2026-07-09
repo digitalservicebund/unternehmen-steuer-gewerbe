@@ -1,7 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
 
-const { mockGetAGSandARS, mockGetGewerbeamt, mockGetRoutes } = vi.hoisted(() => ({
-  mockGetAGSandARS: vi.fn().mockResolvedValue({ ags: "03046001", ars: "030460014004" }),
+const { mockGetLocationsDetails, mockGetGewerbeamt, mockGetRoutes } = vi.hoisted(() => ({
+  mockGetLocationsDetails: vi
+    .fn()
+    .mockResolvedValue([{ ars: "030460014004", name: "Cottbus, Stadt", plz: "03046" }]),
   mockGetGewerbeamt: vi.fn().mockResolvedValue({
     name: "Stadt Fulda",
     adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
@@ -11,8 +13,9 @@ const { mockGetAGSandARS, mockGetGewerbeamt, mockGetRoutes } = vi.hoisted(() => 
   mockGetRoutes: vi.fn(),
 }));
 
-vi.mock("../../clients/pvogClient", () => ({
-  getAGSandARS: mockGetAGSandARS,
+vi.mock("../../clients/pvogClient", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../../clients/pvogClient")>()),
+  getLocationsDetails: mockGetLocationsDetails,
   getGewerbeamt: mockGetGewerbeamt,
 }));
 
@@ -38,7 +41,7 @@ describe("getGewerbeRoutingInfo", () => {
         },
       });
 
-      expect(mockGetAGSandARS).toHaveBeenCalledWith({
+      expect(mockGetLocationsDetails).toHaveBeenCalledWith({
         plz: "25813",
         ort: "Husum",
         strasse: "Marktstraße",
@@ -59,12 +62,20 @@ describe("getGewerbeRoutingInfo", () => {
         },
       });
 
-      expect(mockGetAGSandARS).toHaveBeenCalledWith({
+      expect(mockGetLocationsDetails).toHaveBeenCalledWith({
         plz: "25842",
         ort: "Lütjenholm",
         strasse: "Dorfstraße",
         hausnummer: "1",
       });
+    });
+
+    it("throws when no location is found for the address", async () => {
+      mockGetLocationsDetails.mockResolvedValueOnce([]);
+
+      await expect(
+        getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled),
+      ).rejects.toThrow("No location found for zip code");
     });
   });
 
@@ -120,14 +131,14 @@ describe("getGewerbeRoutingInfo", () => {
       const result = await getGewerbeRoutingInfo(requestWithFitConnectSupport);
 
       expect(result.fitConnectDestinationInformation!.destinationId).toBe("mock-destination-id");
-      expect(result.ags).toBe("03046001");
+      expect(result.ags).toBe("03046004");
     });
 
     it("throws when FIT-Connect returns no routes for the AGS", async () => {
       mockGetRoutes.mockResolvedValueOnce({ count: 0, offset: 0, totalCount: 0, routes: [] });
 
       await expect(getGewerbeRoutingInfo(requestWithFitConnectSupport)).rejects.toThrow(
-        "No FIT-Connect destination found for AGS 03046001",
+        "No FIT-Connect destination found for AGS 03046004",
       );
     });
   });

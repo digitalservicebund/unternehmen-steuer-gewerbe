@@ -1,6 +1,8 @@
-import { getAGSandARS, getGewerbeamt, type Gewerbeamt } from "../../clients/pvogClient";
+import { getGewerbeamt, getLocationsDetails, type Gewerbeamt } from "../../clients/pvogClient";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
 import { splitStrasseHausnummer } from "../../helpers/formFieldTransformations";
+import { getAGS } from "../../helpers/getAGS";
+import { getFirstAssumingItsTheBestMatch } from "../../helpers/getFirstAssumingItsTheBestMatch";
 import { type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 
 const GEWERBEANMELDUNG_LEIKA_KEY = "99050012104000";
@@ -23,12 +25,18 @@ export async function getGewerbeRoutingInfo(
   const address = data.unternehmensDaten.adresseAbweichend ?? data.persönlicheDaten.adresse;
   const { strasse, hausnummer } = splitStrasseHausnummer(address.strasseUndHausnummer);
 
-  const { ags, ars } = await getAGSandARS({
+  const locations = await getLocationsDetails({
     plz: address.postleitzahl,
     ort: address.ort,
     strasse,
     hausnummer,
   });
+  const bestMatchingLocation = getFirstAssumingItsTheBestMatch(locations);
+  if (bestMatchingLocation === undefined) {
+    throw new Error(`No location found for zip code ${address.postleitzahl}`);
+  }
+  const { ars } = bestMatchingLocation;
+  const ags = getAGS(ars);
 
   const gewerbeamt = await getGewerbeamt(ars);
 
