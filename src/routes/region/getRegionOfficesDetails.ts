@@ -13,7 +13,7 @@ import {
   createOfficeDetailsFromGewerbeamt,
   type OfficeDetails,
 } from "../../helpers/createOfficeDetails";
-import { getBestMatch } from "../../helpers/getBestMatch";
+import { getFirstAssumingItsTheBestMatch } from "../../helpers/getFirstAssumingItsTheBestMatch";
 
 interface RegionOfficesDetails {
   finanzaemter: OfficeDetails[];
@@ -22,7 +22,7 @@ interface RegionOfficesDetails {
 
 function getFinanzaemterOfficeDetails(
   locationQuery: LocationQuery,
-  onlyBestMatch: boolean,
+  getAllOffices: boolean,
 ): OfficeDetails[] {
   try {
     let finanzamtIds = getFinanzamtId({
@@ -32,8 +32,8 @@ function getFinanzaemterOfficeDetails(
       hausnummerVon: locationQuery.hausnummer,
     });
 
-    if (onlyBestMatch) {
-      const bestMatchingFinanzamtId = getBestMatch(finanzamtIds);
+    if (!getAllOffices) {
+      const bestMatchingFinanzamtId = getFirstAssumingItsTheBestMatch(finanzamtIds);
       finanzamtIds = bestMatchingFinanzamtId === undefined ? [] : [bestMatchingFinanzamtId];
     }
 
@@ -49,7 +49,7 @@ function getFinanzaemterOfficeDetails(
 
 async function getGewerbeaemterOfficeDetails(
   locationQuery: LocationQuery,
-  onlyBestMatch: boolean,
+  getAllOffices: boolean,
 ): Promise<OfficeDetails[]> {
   let locations: LocationDetails[];
   try {
@@ -59,8 +59,8 @@ async function getGewerbeaemterOfficeDetails(
     return [];
   }
 
-  if (onlyBestMatch) {
-    const bestMatchingLocation = getBestMatch(locations);
+  if (!getAllOffices) {
+    const bestMatchingLocation = getFirstAssumingItsTheBestMatch(locations);
     locations = bestMatchingLocation === undefined ? [] : [bestMatchingLocation];
   }
 
@@ -81,15 +81,15 @@ async function getGewerbeaemterOfficeDetails(
 
 /**
  * Get the responsible Finanzämter and Gewerbeämter for a given PLZ, ort, street and house number.
- * With onlyBestMatch, each list contains only the best match — the same office the XML
+ * Unless getAllOffices is set, each list contains only the best match — the same office the XML
  * submission would use.
  * Best-effort: a failing upstream lookup results in an empty array
  */
 export async function getRegionOfficesDetails(
   locationQuery: LocationQuery,
-  onlyBestMatch: boolean,
+  getAllOffices: boolean,
 ): Promise<RegionOfficesDetails> {
-  const finanzaemter = getFinanzaemterOfficeDetails(locationQuery, onlyBestMatch);
-  const gewerbeaemter = await getGewerbeaemterOfficeDetails(locationQuery, onlyBestMatch);
+  const finanzaemter = getFinanzaemterOfficeDetails(locationQuery, getAllOffices);
+  const gewerbeaemter = await getGewerbeaemterOfficeDetails(locationQuery, getAllOffices);
   return { finanzaemter, gewerbeaemter };
 }

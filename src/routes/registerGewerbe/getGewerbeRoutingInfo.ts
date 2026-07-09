@@ -2,7 +2,7 @@ import { getGewerbeamt, getLocationsDetails, type Gewerbeamt } from "../../clien
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
 import { splitStrasseHausnummer } from "../../helpers/formFieldTransformations";
 import { getAGS } from "../../helpers/getAGS";
-import { getBestMatch } from "../../helpers/getBestMatch";
+import { getFirstAssumingItsTheBestMatch } from "../../helpers/getFirstAssumingItsTheBestMatch";
 import { type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 
 const GEWERBEANMELDUNG_LEIKA_KEY = "99050012104000";
@@ -31,7 +31,7 @@ export async function getGewerbeRoutingInfo(
     strasse,
     hausnummer,
   });
-  const bestMatchingLocation = getBestMatch(locations);
+  const bestMatchingLocation = getFirstAssumingItsTheBestMatch(locations);
   if (bestMatchingLocation === undefined) {
     throw new Error(`No location found for zip code ${address.postleitzahl}`);
   }

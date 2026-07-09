@@ -53,8 +53,8 @@ async function requestRegionForPostleitzahl36037() {
   return { response, body };
 }
 
-async function requestRegionForAllMatches() {
-  const response = await app.request("/api/v1/region/36037?onlyBestMatch=false");
+async function requestRegion36037ForAllMatches() {
+  const response = await app.request("/api/v1/region/36037?getAllOffices=true");
   const body = (await response.json()) as RegionResponseBody;
   return { response, body };
 }
@@ -96,21 +96,21 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
     expect(body.gewerbeaemter).toEqual([]);
   });
 
-  it("returns all Gewerbeaemter when onlyBestMatch is false", async () => {
+  it("returns all Gewerbeaemter when getAllOffices is true", async () => {
     mockGetLocationsDetails.mockResolvedValue([
       { ars: "066310009009", name: "Fulda, Stadt", plz: "36037" },
       { ars: "066310010010", name: "Petersberg", plz: "36037" },
     ]);
 
-    const { body } = await requestRegionForAllMatches();
+    const { body } = await requestRegion36037ForAllMatches();
 
     expect(body.gewerbeaemter).toHaveLength(2);
   });
 
-  it("returns all Finanzaemter when onlyBestMatch is false", async () => {
+  it("returns all Finanzaemter when getAllOffices is true", async () => {
     mockGetFinanzamtId.mockReturnValue(["FA1", "FA2"]);
 
-    const { body } = await requestRegionForAllMatches();
+    const { body } = await requestRegion36037ForAllMatches();
 
     expect(body.finanzaemter).toHaveLength(2);
   });
@@ -118,7 +118,7 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
   it("returns 200 with empty gewerbeaemter but still all finanzaemter when the PVOG location lookup fails", async () => {
     mockGetLocationsDetails.mockRejectedValue(new Error("PVOG unavailable"));
 
-    const { response, body } = await requestRegionForAllMatches();
+    const { response, body } = await requestRegion36037ForAllMatches();
 
     expect(response.status).toEqual(HttpStatusCode.Ok);
     expect(body.gewerbeaemter).toEqual([]);
@@ -130,7 +130,7 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
       throw new Error("Finanzamt data error");
     });
 
-    const { response, body } = await requestRegionForAllMatches();
+    const { response, body } = await requestRegion36037ForAllMatches();
 
     expect(response.status).toEqual(HttpStatusCode.Ok);
     expect(body.finanzaemter).toEqual([]);
@@ -146,7 +146,7 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
       .mockRejectedValueOnce(new Error("first Gewerbeamt lookup failed"))
       .mockResolvedValueOnce({ ...GEWERBEAMT, name: "Gewerbeamt Nr. 2" });
 
-    const { body } = await requestRegionForAllMatches();
+    const { body } = await requestRegion36037ForAllMatches();
 
     expect(body.gewerbeaemter).toHaveLength(1);
     expect(body.gewerbeaemter[0]).toMatchObject({ name: "Gewerbeamt Nr. 2" });

@@ -39,14 +39,14 @@ export const RegionQuerySchema = z.object({
       example: "1",
       description: "Optional house number to narrow down the responsible offices",
     }),
-  onlyBestMatch: z
+  getAllOffices: z
     .stringbool()
-    .default(true)
+    .default(false)
     .openapi({
-      param: { name: "onlyBestMatch", in: "query" },
+      param: { name: "getAllOffices", in: "query" },
       example: "true",
       description:
-        "When true (default), each list for Gewerbeaemter & Finanzaemter contains only the best-matching office. The same office the submission would use. Set to false to return all Gewerbeaemter & Finanzaemter found for the given address.",
+        "When false (default), each list for Gewerbeaemter & Finanzaemter contains only the best-matching office. The same office the submission would use. Set to true to return all Gewerbeaemter & Finanzaemter found for the given address.",
     }),
 });
 

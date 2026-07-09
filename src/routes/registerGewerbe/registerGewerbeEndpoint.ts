@@ -23,7 +23,7 @@ import {
   createOfficeDetailsFromFinanzamt,
   createOfficeDetailsFromGewerbeamt,
 } from "../../helpers/createOfficeDetails";
-import { getBestMatch } from "../../helpers/getBestMatch";
+import { getFirstAssumingItsTheBestMatch } from "../../helpers/getFirstAssumingItsTheBestMatch";
 
 const GEWERBEANMELDUNG_LEIKA_KEY_URN = "urn:de:fim:leika:leistung:99050012104000";
 
@@ -109,7 +109,7 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
       hausnummerBis: hausnummerBis,
     });
 
-    const finanzamtId = getBestMatch(finanzamtIds);
+    const finanzamtId = getFirstAssumingItsTheBestMatch(finanzamtIds);
     if (finanzamtId === undefined) {
       return {
         success: false,
