@@ -8,14 +8,19 @@ export function formatDatumDE(isoDate: string): string {
 
 /** Helper to split street and number "Straße 123" in ["Straße", "123"] */
 export function splitStrasseHausnummer(strasseUndHausnummer: string) {
-  const match = /^(.+?)\s+(\d+(?:\s+\d+)?(?:\/\d+)?(?:\s*[a-zA-Z])?)\s*(?:-\s*(\d+))?$/.exec(
-    strasseUndHausnummer,
-  );
-  if (!match) throw new Error("The given address format is not supported");
+  const match =
+    /^(?<strasse>.+?)\s+(?<hausnummerGesamt>\d+(?:\s+\d+)?(?:\/\d+)?(?:\s*[a-zA-Z])?(?:\s*-\s*\d+)?)$/.exec(
+      strasseUndHausnummer,
+    );
+  if (!match?.groups) throw new Error("The given address format is not supported");
+
+  const { strasse, hausnummerGesamt } = match.groups;
+  const bisMatch = /^(?<hausnummer>.+?)\s*-\s*(?<hausnummerBis>\d+)$/.exec(hausnummerGesamt!);
+
   return {
-    strasse: match?.[1]?.trimEnd(),
-    hausnummer: match?.[2],
-    hausnummerBis: match?.[3],
+    strasse: strasse?.trimEnd(),
+    hausnummer: bisMatch?.groups?.hausnummer ?? hausnummerGesamt,
+    hausnummerBis: bisMatch?.groups?.hausnummerBis,
   };
 }
 
