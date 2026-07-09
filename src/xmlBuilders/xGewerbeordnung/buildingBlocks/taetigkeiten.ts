@@ -53,20 +53,22 @@ function createWeitereTaetigkeiten(weitereTaetigkeiten: WeitereTaetigkeiten | un
     </xga:weitereTaetigkeiten>`;
 }
 
+function createSchwerpunkt(schwerpunkt: Taetigkeit | undefined) {
+  if (!schwerpunkt) return "";
+  return `
+      <xga:schwerpunkt>
+        ${isDefinedInput(schwerpunkt.taetigkeitSchwerpunkt) ? `<xga:taetigkeitSchwerpunkt>${escapeXml(schwerpunkt.taetigkeitSchwerpunkt)}</xga:taetigkeitSchwerpunkt>` : ""}
+        ${createWirtschaftszweig(schwerpunkt.wirtschaftszweigschluessel)}
+        ${isDefinedInput(schwerpunkt.stichwort) ? `<xga:stichwort>${escapeXml(schwerpunkt.stichwort)}</xga:stichwort>` : ""}
+      </xga:schwerpunkt>`;
+}
+
 export function createTaetigkeiten(taetigkeitenGesamt: TaetigkeitenGesamt | undefined) {
   if (!taetigkeitenGesamt) return "";
   const { schwerpunkt, weitereTaetigkeiten } = taetigkeitenGesamt;
   return `
     <xga:taetigkeitenGesamt>
-      ${
-        schwerpunkt
-          ? `<xga:schwerpunkt>
-        ${isDefinedInput(schwerpunkt.taetigkeitSchwerpunkt) ? `<xga:taetigkeitSchwerpunkt>${escapeXml(schwerpunkt.taetigkeitSchwerpunkt)}</xga:taetigkeitSchwerpunkt>` : ""}
-        ${createWirtschaftszweig(schwerpunkt.wirtschaftszweigschluessel)}
-        ${isDefinedInput(schwerpunkt.stichwort) ? `<xga:stichwort>${escapeXml(schwerpunkt.stichwort)}</xga:stichwort>` : ""}
-      </xga:schwerpunkt>`
-          : ""
-      }
+      ${createSchwerpunkt(schwerpunkt)}
       ${createWeitereTaetigkeiten(weitereTaetigkeiten)}
     </xga:taetigkeitenGesamt>`;
 }
