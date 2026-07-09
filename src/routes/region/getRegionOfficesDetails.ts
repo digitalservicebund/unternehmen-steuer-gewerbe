@@ -3,7 +3,6 @@ import {
   getFinanzamtId,
 } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 import {
-  getAGSandARS,
   getGewerbeamt,
   getLocationsDetails,
   type LocationDetails,
@@ -52,24 +51,17 @@ async function getGewerbeaemterOfficeDetails(
   locationQuery: LocationQuery,
   onlyBestMatch: boolean,
 ): Promise<OfficeDetails[]> {
-  if (onlyBestMatch) {
-    // same first-match code path the XML submission uses (see getGewerbeRoutingInfo)
-    try {
-      const { ars } = await getAGSandARS(locationQuery);
-      const gewerbeamt = await getGewerbeamt(ars);
-      return [createOfficeDetailsFromGewerbeamt(gewerbeamt)];
-    } catch (error) {
-      console.error("Best matching Gewerbeamt lookup failed", error);
-      return [];
-    }
-  }
-
   let locations: LocationDetails[];
   try {
     locations = await getLocationsDetails(locationQuery);
   } catch (error) {
     console.error("Location lookup failed", error);
     return [];
+  }
+
+  if (onlyBestMatch) {
+    const bestMatchingLocation = getBestMatch(locations);
+    locations = bestMatchingLocation === undefined ? [] : [bestMatchingLocation];
   }
 
   const gewerbeaemter: OfficeDetails[] = [];

@@ -3,13 +3,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const {
   mockGetLocationsDetails,
   mockGetGewerbeamt,
-  mockGetAGSandARS,
   mockGetFinanzamtId,
   mockGetFinanzamtDetailsById,
 } = vi.hoisted(() => ({
   mockGetLocationsDetails: vi.fn(),
   mockGetGewerbeamt: vi.fn(),
-  mockGetAGSandARS: vi.fn(),
   mockGetFinanzamtId: vi.fn(),
   mockGetFinanzamtDetailsById: vi.fn(),
 }));
@@ -17,7 +15,6 @@ const {
 vi.mock("../../clients/pvogClient", () => ({
   getLocationsDetails: mockGetLocationsDetails,
   getGewerbeamt: mockGetGewerbeamt,
-  getAGSandARS: mockGetAGSandARS,
 }));
 
 vi.mock("@digitalservicebund/unternehmen-steuer-gewerbe-privat", () => ({
@@ -70,7 +67,6 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
       { ars: "066310010010", name: "Petersberg", plz: "36037" },
     ]);
     mockGetGewerbeamt.mockResolvedValue(GEWERBEAMT);
-    mockGetAGSandARS.mockResolvedValue({ ars: "066310009009", ags: "06631009" });
     mockGetFinanzamtId.mockReturnValue(["FA1"]);
     mockGetFinanzamtDetailsById.mockReturnValue(FINANZAMT_DETAILS);
   });
@@ -92,7 +88,7 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
   });
 
   it("returns 200 with empty gewerbeaemter when the best matching Gewerbeamt lookup fails", async () => {
-    mockGetAGSandARS.mockRejectedValue(new Error("No location found"));
+    mockGetGewerbeamt.mockRejectedValue(new Error("Gewerbeamt lookup failed"));
 
     const { response, body } = await requestRegionForPostleitzahl36037();
 
