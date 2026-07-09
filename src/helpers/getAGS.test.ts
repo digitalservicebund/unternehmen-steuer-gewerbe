@@ -6,7 +6,7 @@ describe("getAGS", () => {
     expect(getAGS("010545494080")).toBe("01054080");
   });
 
-  it("throws for an invalid ARS", () => {
+  it("throws if ARS is not 12 digits long", () => {
     expect(() => getAGS("0842100")).toThrow('Cannot derive an AGS from invalid ARS "0842100"');
   });
 });
