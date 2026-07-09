@@ -12,6 +12,19 @@ on:
   # allow for running this workflow manually (button in GitHub Actions UI)
   workflow_dispatch:
 
+# On each branch, the latest commit cancels the pipelines of any earlier commits.
+#
+# Goal: The latest state is processed as quickly as possible.
+#       Especially great for `main` (change lead time, no concurrency issues).
+#
+# Other consequences:
+#   * The pipeline may be cancelled during / between deployments to dev and prod.
+#   * We don't know the state (green/red) of the cancelled flows.
+#   * We don't spend pipeline minutes on (probably) outdated outcomes.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   PROJECT_NAME: unternehmen-steuer-gewerbe
   CONTAINER_REGISTRY: ghcr.io
