@@ -19,6 +19,7 @@ on:
 #
 # Other consequences:
 #   * The pipeline may be cancelled during / between deployments to dev and prod.
+#   * If the latest commit fails, the ones before don't make it to production.
 #   * We don't know the state (green/red) of the cancelled flows.
 #   * We don't spend pipeline minutes on (probably) outdated outcomes.
 concurrency:
