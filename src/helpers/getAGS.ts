@@ -8,7 +8,7 @@
 // map to AGS 1-5, ARS digits 10-12 (Gemeinde) to AGS 6-8.
 export function getAGS(ars: string): string {
   if (!/^\d{12}$/.test(ars)) {
-    throw new Error(`Cannot derive an AGS from invalid ARS "${ars}"`);
+    throw new Error(`Cannot derive an AGS from invalid ARS "${ars}" (ARS not 12 digits)`);
   }
 
   return ars.slice(0, 5) + ars.slice(9);
