@@ -20,50 +20,44 @@ interface RegionOfficesDetails {
   gewerbeaemter: OfficeDetails[];
 }
 
-function getFinanzaemterOfficeDetails(
-  locationQuery: LocationQuery,
-  getAllOffices: boolean,
-): OfficeDetails[] {
+function getAllFinanzamtIds(locationQuery: LocationQuery): string[] {
   try {
-    let finanzamtIds = getFinanzamtId({
+    return getFinanzamtId({
       postleitzahl: locationQuery.plz,
       ort: locationQuery.ort,
       strassenName: locationQuery.strasse,
       hausnummerVon: locationQuery.hausnummer,
     });
-
-    if (!getAllOffices) {
-      const bestMatchingFinanzamtId = getFirstAssumingItsTheBestMatch(finanzamtIds);
-      finanzamtIds = bestMatchingFinanzamtId === undefined ? [] : [bestMatchingFinanzamtId];
-    }
-
-    return finanzamtIds
-      .map((id) => getFinanzamtDetailsById(id))
-      .filter((details) => details !== undefined)
-      .map(createOfficeDetailsFromFinanzamt);
   } catch (error) {
     console.error("Finanzamt lookup failed", error);
     return [];
   }
 }
 
-async function getGewerbeaemterOfficeDetails(
-  locationQuery: LocationQuery,
-  getAllOffices: boolean,
-): Promise<OfficeDetails[]> {
-  let locations: LocationDetails[];
+async function getAllLocations(locationQuery: LocationQuery): Promise<LocationDetails[]> {
   try {
-    locations = await getLocationsDetails(locationQuery);
+    return await getLocationsDetails(locationQuery);
   } catch (error) {
     console.error("Location lookup failed", error);
     return [];
   }
+}
 
-  if (!getAllOffices) {
-    const bestMatchingLocation = getFirstAssumingItsTheBestMatch(locations);
-    locations = bestMatchingLocation === undefined ? [] : [bestMatchingLocation];
+function createFinanzaemterOfficeDetails(finanzamtIds: string[]): OfficeDetails[] {
+  try {
+    return finanzamtIds
+      .map((id) => getFinanzamtDetailsById(id))
+      .filter((details) => details !== undefined)
+      .map(createOfficeDetailsFromFinanzamt);
+  } catch (error) {
+    console.error("Finanzamt details lookup failed", error);
+    return [];
   }
+}
 
+async function createGewerbeaemterOfficeDetails(
+  locations: LocationDetails[],
+): Promise<OfficeDetails[]> {
   const gewerbeaemter: OfficeDetails[] = [];
 
   // getLocationsDetails returns one entry per municipality (ARS), so each Gewerbeamt is looked up only once
@@ -79,6 +73,11 @@ async function getGewerbeaemterOfficeDetails(
   return gewerbeaemter;
 }
 
+function limitToBestMatch<T>(matches: T[]): T[] {
+  const bestMatch = getFirstAssumingItsTheBestMatch(matches);
+  return bestMatch === undefined ? [] : [bestMatch];
+}
+
 /**
  * Get the responsible Finanzämter and Gewerbeämter for a given PLZ, ort, street and house number.
  * Unless getAllOffices is set, each list contains only the best match — the same office the XML
@@ -89,7 +88,13 @@ export async function getRegionOfficesDetails(
   locationQuery: LocationQuery,
   getAllOffices: boolean,
 ): Promise<RegionOfficesDetails> {
-  const finanzaemter = getFinanzaemterOfficeDetails(locationQuery, getAllOffices);
-  const gewerbeaemter = await getGewerbeaemterOfficeDetails(locationQuery, getAllOffices);
+  const allFinanzamtIds = getAllFinanzamtIds(locationQuery);
+  const allLocations = await getAllLocations(locationQuery);
+
+  const selectedFinanzamtIds = getAllOffices ? allFinanzamtIds : limitToBestMatch(allFinanzamtIds);
+  const selectedLocations = getAllOffices ? allLocations : limitToBestMatch(allLocations);
+
+  const finanzaemter = createFinanzaemterOfficeDetails(selectedFinanzamtIds);
+  const gewerbeaemter = await createGewerbeaemterOfficeDetails(selectedLocations);
   return { finanzaemter, gewerbeaemter };
 }
