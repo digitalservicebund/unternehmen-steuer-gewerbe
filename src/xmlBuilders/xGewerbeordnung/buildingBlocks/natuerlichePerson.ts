@@ -1,8 +1,7 @@
 import { createAnschrift, type Anschrift } from "./anschrift";
 import { createKommunikation, type Kommunikation } from "./kommunikation";
 import { createAufenthaltstitel, type Aufenthaltstitel } from "./aufenthaltstitel";
-import { escapeXml } from "../../../helpers/escapeXml";
-import { isDefinedInput } from "../../../helpers/isDefinedInput";
+import { optionalTag, optionalWrappedTag } from "../../../helpers/xmlTag";
 
 export interface Name {
   /** Familienname einer natürlichen Person bestehend aus Nachname, Zuname bzw. Familienname. */
@@ -45,9 +44,9 @@ function createName(name: Name | undefined) {
   if (!name) return "";
   return `
     <np:name>
-      ${isDefinedInput(name.familienname) ? `<np:familienname>${escapeXml(name.familienname)}</np:familienname>` : ""}
-      ${isDefinedInput(name.geburtsname) ? `<np:geburtsname>${escapeXml(name.geburtsname)}</np:geburtsname>` : ""}
-      ${isDefinedInput(name.vornamen) ? `<np:vornamen>${escapeXml(name.vornamen)}</np:vornamen>` : ""}
+      ${optionalTag("np:familienname", name.familienname)}
+      ${optionalTag("np:geburtsname", name.geburtsname)}
+      ${optionalTag("np:vornamen", name.vornamen)}
     </np:name>`;
 }
 
@@ -55,9 +54,9 @@ function createGeburt(geburt: Geburt | undefined) {
   if (!geburt) return "";
   return `
     <bk:geburt>
-      ${isDefinedInput(geburt.geburtsdatum) ? `<np:geburtsdatum><dat:datum>${escapeXml(geburt.geburtsdatum)}</dat:datum></np:geburtsdatum>` : ""}
-      ${isDefinedInput(geburt.ort) ? `<adr:ort>${escapeXml(geburt.ort)}</adr:ort>` : ""}
-      ${isDefinedInput(geburt.staat) ? `<bk:staat>${escapeXml(geburt.staat)}</bk:staat>` : ""}
+      ${optionalWrappedTag("np:geburtsdatum", "dat:datum", geburt.geburtsdatum)}
+      ${optionalTag("adr:ort", geburt.ort)}
+      ${optionalTag("bk:staat", geburt.staat)}
     </bk:geburt>`;
 }
 
@@ -65,11 +64,11 @@ export function createNatuerlichePerson(natuerlichePerson: NatuerlichePerson | u
   if (!natuerlichePerson) return "";
   return `
     <xga:natuerlichePerson>
-      ${isDefinedInput(natuerlichePerson.id) ? `<np:natuerlichePerson.id>${escapeXml(natuerlichePerson.id)}</np:natuerlichePerson.id>` : ""}
+      ${optionalTag("np:natuerlichePerson.id", natuerlichePerson.id)}
       ${createName(natuerlichePerson.name)}
       ${createGeburt(natuerlichePerson.geburt)}
-      ${isDefinedInput(natuerlichePerson.geschlecht) ? `<np:geschlecht listVersionID="1"><code>${escapeXml(natuerlichePerson.geschlecht)}</code></np:geschlecht>` : ""}
-      ${isDefinedInput(natuerlichePerson.staatsangehoerigkeit) ? `<np:staatsangehoerigkeit listVersionID="2020-05-11"><code>${escapeXml(natuerlichePerson.staatsangehoerigkeit)}</code></np:staatsangehoerigkeit>` : ""}
+      ${optionalWrappedTag("np:geschlecht", "code", natuerlichePerson.geschlecht, ' listVersionID="1"')}
+      ${optionalWrappedTag("np:staatsangehoerigkeit", "code", natuerlichePerson.staatsangehoerigkeit, ' listVersionID="2020-05-11"')}
       ${createAnschrift(natuerlichePerson.anschrift)}
       ${createKommunikation(natuerlichePerson.kommunikation)}
       ${createAufenthaltstitel(natuerlichePerson.aufenthaltstitel)}

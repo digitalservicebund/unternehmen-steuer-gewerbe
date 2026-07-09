@@ -1,5 +1,4 @@
-import { escapeXml } from "../../../helpers/escapeXml";
-import { isDefinedInput } from "../../../helpers/isDefinedInput";
+import { optionalTag } from "../../../helpers/xmlTag";
 
 export interface Anschrift {
   /** Falls die Anschrift unbekannt ist (z. B. bei Abmeldung von Amts wegen), so ist hier der Wert "unbekannt" zu übermitteln. */
@@ -21,12 +20,12 @@ export function createAnschrift(strassenanschriftInland: Anschrift | undefined) 
   return `
     <bk:anschrift>
       <bk:strassenanschriftInland>
-        ${isDefinedInput(strassenanschriftInland.strasse) ? `<adr:strasse>${escapeXml(strassenanschriftInland.strasse)}</adr:strasse>` : ""}
-        ${isDefinedInput(strassenanschriftInland.strassenschluessel) ? `<bk:strassenschluessel>${escapeXml(strassenanschriftInland.strassenschluessel)}</bk:strassenschluessel>` : ""}
-        ${isDefinedInput(strassenanschriftInland.hausnummerVon) ? `<bk:hausnummerVon>${escapeXml(strassenanschriftInland.hausnummerVon)}</bk:hausnummerVon>` : ""}
-        ${isDefinedInput(strassenanschriftInland.hausnummerBis) ? `<bk:hausnummerBis>${escapeXml(strassenanschriftInland.hausnummerBis)}</bk:hausnummerBis>` : ""}
-        ${isDefinedInput(strassenanschriftInland.postleitzahl) ? `<adr:postleitzahl>${escapeXml(strassenanschriftInland.postleitzahl)}</adr:postleitzahl>` : ""}
-        ${isDefinedInput(strassenanschriftInland.ort) ? `<adr:ort>${escapeXml(strassenanschriftInland.ort)}</adr:ort>` : ""}
+        ${optionalTag("adr:strasse", strassenanschriftInland.strasse)}
+        ${optionalTag("bk:strassenschluessel", strassenanschriftInland.strassenschluessel)}
+        ${optionalTag("bk:hausnummerVon", strassenanschriftInland.hausnummerVon)}
+        ${optionalTag("bk:hausnummerBis", strassenanschriftInland.hausnummerBis)}
+        ${optionalTag("adr:postleitzahl", strassenanschriftInland.postleitzahl)}
+        ${optionalTag("adr:ort", strassenanschriftInland.ort)}
       </bk:strassenanschriftInland>
     </bk:anschrift>`;
 }

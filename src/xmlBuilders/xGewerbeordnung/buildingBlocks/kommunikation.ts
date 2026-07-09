@@ -1,5 +1,4 @@
-import { escapeXml } from "../../../helpers/escapeXml";
-import { isDefinedInput } from "../../../helpers/isDefinedInput";
+import { optionalTag } from "../../../helpers/xmlTag";
 
 export interface Kommunikation {
   /** Telefonnummer, strukturiert gemäß ITU E.123. Beispiel: "+49 421 1234567", "+49 421 123 4567". */
@@ -16,9 +15,9 @@ export function createKommunikation(kommunikation: Kommunikation | undefined) {
   if (!kommunikation) return "";
   return `
     <bk:kommunikation>
-      ${isDefinedInput(kommunikation.telefon) ? `<komm:telefon>${escapeXml(kommunikation.telefon)}</komm:telefon>` : ""}
-      ${isDefinedInput(kommunikation.telefax) ? `<komm:telefax>${escapeXml(kommunikation.telefax)}</komm:telefax>` : ""}
-      ${isDefinedInput(kommunikation.email) ? `<komm:eMail>${escapeXml(kommunikation.email)}</komm:eMail>` : ""}
-      ${isDefinedInput(kommunikation.webAdresse) ? `<komm:webAdresse>${escapeXml(kommunikation.webAdresse)}</komm:webAdresse>` : ""}
+      ${optionalTag("komm:telefon", kommunikation.telefon)}
+      ${optionalTag("komm:telefax", kommunikation.telefax)}
+      ${optionalTag("komm:eMail", kommunikation.email)}
+      ${optionalTag("komm:webAdresse", kommunikation.webAdresse)}
     </bk:kommunikation>`;
 }
