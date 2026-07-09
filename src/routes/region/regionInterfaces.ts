@@ -44,9 +44,9 @@ export const RegionQuerySchema = z.object({
     .default(true)
     .openapi({
       param: { name: "onlyBestMatch", in: "query" },
-      example: "false",
+      example: "true",
       description:
-        "Set to false to return all matches. When true (default), each list contains only the best matching office — the same office the submission would use.",
+        "When true (default), each list for Gewerbeaemter & Finanzaemter contains only the best-matching office. The same office the submission would use. Set to false to return all Gewerbeaemter & Finanzaemter found for the given address.",
     }),
 });
 
