@@ -1,13 +1,19 @@
 import { createRoute, z } from "@hono/zod-openapi";
 
+const FitConnectUrlsSchema = z.object({
+  oauthTokenUrl: z.string(),
+  submissionApiUrl: z.string(),
+  destinationApiUrl: z.string(),
+  routingApiUrl: z.string(),
+});
+
 const HealthCheckResponseSchema = z.object({
   status: z.string().openapi({ example: "ok" }),
   gitCommitSHA: z.string().optional().openapi({
     example: "a1b2c3d",
     description: "Git commit SHA the app was built from",
   }),
-  fitConnectEnvironment: z.string().optional().openapi({
-    example: "testing",
+  fitConnectUrls: FitConnectUrlsSchema.optional().openapi({
     description: "Only returned if verbose is true",
   }),
 });
