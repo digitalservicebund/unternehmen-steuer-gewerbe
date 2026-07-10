@@ -1,12 +1,14 @@
 import { decodeProtectedHeader, type JWK, type JWTPayload } from "jose";
 import { encryptData, verifyEventToken } from "./crypto";
-import { type Environment, getEnvironmentUrls } from "./environments";
 import { createMetadata, type DataSchema } from "./metadata";
 import { fetchJson } from "../../helpers/fetchJson";
 import { getSecret } from "../../secrets";
 
 interface FitConnectClientConfig {
-  environment: Environment;
+  oauthTokenUrl: string;
+  submissionApiUrl: string;
+  destinationApiUrl: string;
+  routingApiUrl: string;
   clientId: string;
   clientSecret: string;
   privateKey: JWK;
@@ -185,7 +187,10 @@ interface RoutingApiResponse {
 
 export function getFitConnectClient() {
   const config: FitConnectClientConfig = {
-    environment: (getSecret("FIT_CONNECT_ENV") || "test") as Environment,
+    oauthTokenUrl: getSecret("FIT_CONNECT_OAUTH_TOKEN_URL"),
+    submissionApiUrl: getSecret("FIT_CONNECT_SUBMISSION_API_URL"),
+    destinationApiUrl: getSecret("FIT_CONNECT_DESTINATION_API_URL"),
+    routingApiUrl: getSecret("FIT_CONNECT_ROUTING_API_URL"),
     clientId: getSecret("FIT_CONNECT_CLIENT_ID"),
     clientSecret: getSecret("FIT_CONNECT_CLIENT_SECRET"),
     privateKey: getSecret("FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK")
@@ -193,10 +198,8 @@ export function getFitConnectClient() {
       : undefined,
   };
 
-  const urls = getEnvironmentUrls(config.environment);
-
   async function authenticate(): Promise<string> {
-    const data = await fetchJson<TokenResponse>(urls.oauthTokenUrl, {
+    const data = await fetchJson<TokenResponse>(config.oauthTokenUrl, {
       method: "POST",
       body: `grant_type=client_credentials&client_id=${config.clientId}&client_secret=${config.clientSecret}`,
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -213,7 +216,7 @@ export function getFitConnectClient() {
     const accessToken = await authenticate();
 
     const submission = await fetchJson<CreateSubmissionResponse>(
-      `${urls.submissionApiUrl}/v2/submissions`,
+      `${config.submissionApiUrl}/v2/submissions`,
       {
         method: "POST",
         body: { announcedAttachments: [], destinationId, publicService },
@@ -224,18 +227,18 @@ export function getFitConnectClient() {
     const metadata = createMetadata(dataSchema, data);
 
     const destination = await fetchJson<DestinationResponse>(
-      `${urls.submissionApiUrl}/v2/destinations/${destinationId}`,
+      `${config.submissionApiUrl}/v2/destinations/${destinationId}`,
     );
 
     const publicJwk = await fetchJson<JWK>(
-      `${urls.submissionApiUrl}/v2/destinations/${destinationId}/keys/${destination.encryptionKid}`,
+      `${config.submissionApiUrl}/v2/destinations/${destinationId}/keys/${destination.encryptionKid}`,
     );
 
     const encryptedData = await encryptData(data, publicJwk, dataSchema.mimeType);
     const encryptedMetadata = await encryptData(JSON.stringify(metadata), publicJwk);
 
     const result = await fetchJson<SubmitDataResponse>(
-      `${urls.submissionApiUrl}/v2/submissions/${submission.submissionId}`,
+      `${config.submissionApiUrl}/v2/submissions/${submission.submissionId}`,
       {
         method: "PUT",
         body: { encryptedData, encryptedMetadata },
@@ -253,16 +256,16 @@ export function getFitConnectClient() {
     const accessToken = await authenticate();
 
     const events = await fetchJson<CaseEventsResponse>(
-      `${urls.submissionApiUrl}/v2/submissions/${submissionId}/events`,
+      `${config.submissionApiUrl}/v2/submissions/${submissionId}/events`,
       { headers: { Authorization: `Bearer ${accessToken}` } },
     );
 
     const wellKnownJWKs = await fetchJson<{ keys: JWK[] }>(
-      `${urls.destinationApiUrl}//.well-known/jwks.json`,
+      `${config.destinationApiUrl}//.well-known/jwks.json`,
     );
 
     const destinationKeys = await fetchJson<DestinationKeysResponse>(
-      `${urls.destinationApiUrl}/v2/destinations/${destinationId}/keys`,
+      `${config.destinationApiUrl}/v2/destinations/${destinationId}/keys`,
     );
 
     const eventLog = await Promise.all(
@@ -279,7 +282,7 @@ export function getFitConnectClient() {
   }
 
   async function getRoutes(leikaKey: string, ags: string): Promise<RoutingApiResponse> {
-    const url = new URL(`${urls.routingApiUrl}/v1/routes`);
+    const url = new URL(`${config.routingApiUrl}/v1/routes`);
     url.searchParams.set("leikaKey", leikaKey);
     url.searchParams.set("ags", ags);
     const routingApiResponse = await fetchJson<RoutingApiResponse>(url.toString(), {

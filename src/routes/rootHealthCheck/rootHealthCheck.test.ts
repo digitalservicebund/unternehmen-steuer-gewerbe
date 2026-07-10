@@ -10,12 +10,17 @@ describe("Route / for Kubernetes Health Check", () => {
     expect(await response.json()).toEqual({ status: "ok" });
   });
 
-  it("Returns fitConnectEnvironment on GET to /?verbose=true", async () => {
+  it("Returns fitConnectUrls on GET to /?verbose=true", async () => {
     const response = await app.request("/?verbose=true");
     expect(response.status).toEqual(HttpStatusCode.Ok);
     expect(await response.json()).toEqual({
       status: "ok",
-      fitConnectEnvironment: expect.any(String),
+      fitConnectUrls: {
+        oauthTokenUrl: expect.any(String),
+        submissionApiUrl: expect.any(String),
+        destinationApiUrl: expect.any(String),
+        routingApiUrl: expect.any(String),
+      },
     });
   });
 
