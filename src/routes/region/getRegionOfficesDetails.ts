@@ -64,6 +64,7 @@ async function createGewerbeaemterOfficeDetails(
   for (const { ars } of locations) {
     try {
       const gewerbeamt = await getGewerbeamt(ars);
+      // TODO: return undefined if not found
       gewerbeaemter.push(createOfficeDetailsFromGewerbeamt(gewerbeamt));
     } catch (error) {
       console.error(`Gewerbeamt lookup failed for ARS ${ars}`, error);

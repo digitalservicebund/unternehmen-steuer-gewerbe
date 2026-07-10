@@ -39,6 +39,7 @@ export async function getGewerbeRoutingInfo(
   const ags = getAGS(ars);
 
   const gewerbeamt = await getGewerbeamt(ars);
+  // return undefiend if not found
 
   let fitConnectDestinationInformation = null;
 
@@ -47,8 +48,7 @@ export async function getGewerbeRoutingInfo(
     const res = await fitConnectClient.getRoutes(GEWERBEANMELDUNG_LEIKA_KEY, ags);
 
     if (res.routes.length === 0) {
-      // TODO: return undefined instead
-      throw new Error(`No FIT-Connect destination found for AGS ${ags}`);
+      return undefined;
     }
 
     // TODO: double-check response as soon as we have communes that support FIT-Connect

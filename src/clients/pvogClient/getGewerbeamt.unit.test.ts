@@ -148,7 +148,7 @@ describe("getGewerbeamt with mocked PVOG responses", () => {
 
     const gewerbeamt = await getGewerbeamt("064120000000");
 
-    expect(gewerbeamt.adresse?.ort).toBe("Ulm");
+    expect(gewerbeamt!.adresse?.ort).toBe("Ulm");
   });
 
   it("falls back to the first address when there is no Hausanschrift", async () => {
@@ -164,7 +164,7 @@ describe("getGewerbeamt with mocked PVOG responses", () => {
 
     const gewerbeamt = await getGewerbeamt("064120000000");
 
-    expect(gewerbeamt.adresse?.ort).toBe("Postfachstadt");
+    expect(gewerbeamt!.adresse?.ort).toBe("Postfachstadt");
   });
 
   it("returns no adresse when the organisation unit has no addresses", async () => {
@@ -172,7 +172,7 @@ describe("getGewerbeamt with mocked PVOG responses", () => {
 
     const gewerbeamt = await getGewerbeamt("064120000000");
 
-    expect(gewerbeamt.adresse).toBeUndefined();
+    expect(gewerbeamt!.adresse).toBeUndefined();
   });
 
   it("trims padding whitespace from the PVOG response values", async () => {
@@ -199,15 +199,15 @@ describe("getGewerbeamt with mocked PVOG responses", () => {
 
     const gewerbeamt = await getGewerbeamt("064120000000");
 
-    expect(gewerbeamt.name).toBe("Stadt Fulda");
-    expect(gewerbeamt.adresse).toEqual({
+    expect(gewerbeamt!.name).toBe("Stadt Fulda");
+    expect(gewerbeamt!.adresse).toEqual({
       strasse: "Schlossstraße",
       hausnummer: "1",
       postleitzahl: "36037",
       ort: "Fulda",
     });
-    expect(gewerbeamt.telefon).toBe("0661 102-0");
-    expect(gewerbeamt.onlineServices).toEqual([
+    expect(gewerbeamt!.telefon).toBe("0661 102-0");
+    expect(gewerbeamt!.onlineServices).toEqual([
       { title: "Online-Dienst", description: undefined, uri: "https://example.org" },
     ]);
   });

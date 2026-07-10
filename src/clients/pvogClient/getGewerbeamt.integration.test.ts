@@ -4,7 +4,7 @@ import { getGewerbeamt } from ".";
 describe("getGewerbeamt", () => {
   it("returns the Gewerbeamt Ulm with address, contact details and online service links for ARS 084210000000", async () => {
     const gewerbeamt = await getGewerbeamt("084210000000");
-    expect(gewerbeamt.name).toEqual(expect.any(String));
+    expect(gewerbeamt!.name).toEqual(expect.any(String));
     expect(gewerbeamt).toMatchObject({
       adresse: {
         strasse: "Olgastraße",
@@ -15,8 +15,8 @@ describe("getGewerbeamt", () => {
       telefon: "+49 731 161 3216",
       email: "gewerbe@ulm.de",
     });
-    expect(gewerbeamt.onlineServices.length).toBeGreaterThan(0);
-    for (const link of gewerbeamt.onlineServices) {
+    expect(gewerbeamt!.onlineServices.length).toBeGreaterThan(0);
+    for (const link of gewerbeamt!.onlineServices) {
       expect(link).toMatchObject({ uri: expect.any(String) });
     }
   });
@@ -25,8 +25,8 @@ describe("getGewerbeamt", () => {
   it.skip("returns an empty onlineServices list for Fraureuth (ARS 146120000000), which has no online services", async () => {
     const gewerbeamt = await getGewerbeamt("146120000000");
 
-    expect(gewerbeamt.name).toBe("Gewerbeamt");
-    expect(gewerbeamt.onlineServices).toEqual([]);
+    expect(gewerbeamt!.name).toBe("Gewerbeamt");
+    expect(gewerbeamt!.onlineServices).toEqual([]);
   });
 
   it("returns undefined if no service description was found for ARS 000000000000", async () => {
