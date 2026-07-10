@@ -151,13 +151,6 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
         info: result.info,
       };
     }
-    if (!result.success) {
-      return {
-        success: false,
-        errorType: ErrorTypeSchema.enum.upstream_error,
-        info: result.info,
-      };
-    }
     return {
       success: true,
       submissionId: "implementation missing",
