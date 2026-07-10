@@ -138,6 +138,17 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
 
     const result = sendFsE(fse, true);
     if (!result.success) {
+      const type =
+        result.returnCode === 610001002
+          ? ErrorTypeSchema.enum.validation_error
+          : ErrorTypeSchema.enum.upstream_error;
+      return {
+        success: false,
+        errorType: type,
+        info: result.info,
+      };
+    }
+    if (!result.success) {
       return {
         success: false,
         errorType: ErrorTypeSchema.enum.upstream_error,
