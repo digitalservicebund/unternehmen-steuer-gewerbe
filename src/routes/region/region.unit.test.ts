@@ -88,8 +88,8 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
       expect(mockGetFinanzamtDetailsById).toHaveBeenCalledWith("FA1");
     });
 
-    it("returns 200 with empty gewerbeaemter when the Gewerbeamt lookup fails", async () => {
-      mockGetGewerbeamt.mockRejectedValue(new Error("Gewerbeamt lookup failed"));
+    it("returns 200 with empty gewerbeaemter when the Gewerbeamt lookup returns undefined", async () => {
+      mockGetGewerbeamt.mockResolvedValue(undefined);
 
       const { response, body } = await requestRegionForPostleitzahl36037();
 
