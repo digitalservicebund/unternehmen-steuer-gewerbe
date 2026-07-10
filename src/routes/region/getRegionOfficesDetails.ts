@@ -62,14 +62,9 @@ async function createGewerbeaemterOfficeDetails(
 
   // getLocationsDetails returns one entry per municipality (ARS), so each Gewerbeamt is looked up only once
   for (const { ars } of locations) {
-    try {
-      const gewerbeamt = await getGewerbeamt(ars);
-      if (gewerbeamt) {
-        // TODO: return undefined if not found
-        gewerbeaemter.push(createOfficeDetailsFromGewerbeamt(gewerbeamt));
-      }
-    } catch (error) {
-      console.error(`Gewerbeamt lookup failed for ARS ${ars}`, error);
+    const gewerbeamt = await getGewerbeamt(ars);
+    if (gewerbeamt) {
+      gewerbeaemter.push(createOfficeDetailsFromGewerbeamt(gewerbeamt));
     }
   }
 
