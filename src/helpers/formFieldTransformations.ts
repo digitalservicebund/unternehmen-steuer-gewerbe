@@ -15,7 +15,7 @@ export function splitStrasseHausnummer(strasseUndHausnummer: string) {
   if (!match?.groups) throw new Error("The given address format is not supported");
 
   const { strasse, hausnummerGesamt } = match.groups;
-  const bisMatch = /^(?<hausnummer>.+?)\s*-\s*(?<hausnummerBis>\d+)$/.exec(hausnummerGesamt!);
+  const bisMatch = /^(?<hausnummer>[^-]+?)\s*-\s*(?<hausnummerBis>\d+)$/.exec(hausnummerGesamt!);
 
   return {
     strasse: strasse?.trimEnd(),
