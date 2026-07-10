@@ -43,7 +43,10 @@ vi.mock("./getGewerbeRoutingInfo", () => ({
 }));
 
 import app from "../../app";
-import { getFinanzamtId as mockGetFinanzamtId } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
+import {
+  getFinanzamtId as mockGetFinanzamtId,
+  sendFsE as mockSendFsE,
+} from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 
 import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
@@ -128,6 +131,24 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(json.gewerbeanmeldung.success).toBe(false);
       expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
       expect(mockGetFinanzamtId).not.toHaveBeenCalled();
+    });
+
+    it("Returns 400 BAD REQUEST when the requested FsE fails because sendFsE reports a fachliche Ablehnung (returnCode 610001002)", async () => {
+      vi.mocked(mockSendFsE).mockReturnValueOnce({
+        success: false,
+        returnCode: 610001002,
+        info: "Fachliche Ablehnung",
+      });
+
+      const response = await postRegisterGewerbe(
+        registerGewerbeSampleRequestAllFieldsFilled,
+        "?only=fseÜbermittlung",
+      );
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+      expect(json.fseÜbermittlung.success).toBe(false);
+      expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
     });
   });
 });
