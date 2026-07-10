@@ -134,12 +134,10 @@ describe("getGewerbeRoutingInfo", () => {
       expect(result!.ags).toBe("03046004");
     });
 
-    it("throws when FIT-Connect returns no routes for the AGS", async () => {
+    it("returns undefined when FIT-Connect returns no routes for the AGS", async () => {
       mockGetRoutes.mockResolvedValueOnce({ count: 0, offset: 0, totalCount: 0, routes: [] });
 
-      await expect(getGewerbeRoutingInfo(requestWithFitConnectSupport)).rejects.toThrow(
-        "No FIT-Connect destination found for AGS 03046004",
-      );
+      expect(await getGewerbeRoutingInfo(requestWithFitConnectSupport)).toBeUndefined();
     });
   });
 });
