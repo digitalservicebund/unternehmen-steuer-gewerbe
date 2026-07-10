@@ -70,12 +70,12 @@ describe("getGewerbeRoutingInfo", () => {
       });
     });
 
-    it("throws when no location is found for the address", async () => {
+    it("returns undefined when no location is found for the address", async () => {
       mockGetLocationsDetails.mockResolvedValueOnce([]);
 
-      await expect(
-        getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled),
-      ).rejects.toThrow("No location found for zip code");
+      expect(
+        await getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled),
+      ).toBeUndefined();
     });
   });
 
@@ -84,7 +84,7 @@ describe("getGewerbeRoutingInfo", () => {
       const result = await getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled);
 
       expect(mockGetGewerbeamt).toHaveBeenCalledWith("030460014004");
-      expect(result.gewerbeamt).toEqual({
+      expect(result!.gewerbeamt).toEqual({
         name: "Stadt Fulda",
         adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
         telefon: "0661 102-0",
@@ -98,6 +98,14 @@ describe("getGewerbeRoutingInfo", () => {
       await expect(
         getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled),
       ).rejects.toThrow("Gewerbeamt lookup failed");
+    });
+
+    it("returns undefined when no Gewerbeamt is found for the resolved ARS", async () => {
+      mockGetGewerbeamt.mockResolvedValueOnce(undefined);
+
+      expect(
+        await getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled),
+      ).toBeUndefined();
     });
   });
 
@@ -130,16 +138,14 @@ describe("getGewerbeRoutingInfo", () => {
 
       const result = await getGewerbeRoutingInfo(requestWithFitConnectSupport);
 
-      expect(result.fitConnectDestinationInformation!.destinationId).toBe("mock-destination-id");
-      expect(result.ags).toBe("03046004");
+      expect(result!.fitConnectDestinationInformation!.destinationId).toBe("mock-destination-id");
+      expect(result!.ags).toBe("03046004");
     });
 
-    it("throws when FIT-Connect returns no routes for the AGS", async () => {
+    it("returns undefined when FIT-Connect returns no routes for the AGS", async () => {
       mockGetRoutes.mockResolvedValueOnce({ count: 0, offset: 0, totalCount: 0, routes: [] });
 
-      await expect(getGewerbeRoutingInfo(requestWithFitConnectSupport)).rejects.toThrow(
-        "No FIT-Connect destination found for AGS 03046004",
-      );
+      expect(await getGewerbeRoutingInfo(requestWithFitConnectSupport)).toBeUndefined();
     });
   });
 });

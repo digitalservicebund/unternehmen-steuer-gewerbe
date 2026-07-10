@@ -21,7 +21,7 @@ export interface GewerbeRoutingInfo {
 
 export async function getGewerbeRoutingInfo(
   data: RegisterGewerbeRequest,
-): Promise<GewerbeRoutingInfo> {
+): Promise<GewerbeRoutingInfo | undefined> {
   const address = data.unternehmensDaten.adresseAbweichend ?? data.persönlicheDaten.adresse;
   const { strasse, hausnummer } = splitStrasseHausnummer(address.strasseUndHausnummer);
 
@@ -33,12 +33,15 @@ export async function getGewerbeRoutingInfo(
   });
   const bestMatchingLocation = getFirstAssumingItsTheBestMatch(locations);
   if (bestMatchingLocation === undefined) {
-    throw new Error(`No location found for zip code ${address.postleitzahl}`);
+    return undefined;
   }
   const { ars } = bestMatchingLocation;
   const ags = getAGS(ars);
 
   const gewerbeamt = await getGewerbeamt(ars);
+  if (!gewerbeamt) {
+    return undefined;
+  }
 
   let fitConnectDestinationInformation = null;
 
@@ -47,7 +50,7 @@ export async function getGewerbeRoutingInfo(
     const res = await fitConnectClient.getRoutes(GEWERBEANMELDUNG_LEIKA_KEY, ags);
 
     if (res.routes.length === 0) {
-      throw new Error(`No FIT-Connect destination found for AGS ${ags}`);
+      return undefined;
     }
 
     // TODO: double-check response as soon as we have communes that support FIT-Connect

@@ -150,7 +150,7 @@ function findCommunicationValue(
   return communications.find((communication) => communication.code === code)?.value;
 }
 
-export async function getGewerbeamt(ars: string): Promise<Gewerbeamt> {
+export async function getGewerbeamt(ars: string): Promise<Gewerbeamt | undefined> {
   const validDate = new Date().toISOString().split("T")[0]!;
 
   const serviceDescriptions = await fetchJson<ServiceDescriptionsResponse>(
@@ -162,9 +162,7 @@ export async function getGewerbeamt(ars: string): Promise<Gewerbeamt> {
     ars,
   );
   if (serviceDescription === undefined) {
-    throw new Error(
-      `No service description found for ARS ${ars} and LeiKa ID ${GEWERBEANMELDUNG_LEIKA_ID}`,
-    );
+    return undefined;
   }
   const lbId = serviceDescription.id;
 

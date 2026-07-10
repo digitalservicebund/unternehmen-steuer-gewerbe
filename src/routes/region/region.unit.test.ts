@@ -88,13 +88,15 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
       expect(mockGetFinanzamtDetailsById).toHaveBeenCalledWith("FA1");
     });
 
-    it("returns 200 with empty gewerbeaemter when the Gewerbeamt lookup fails", async () => {
-      mockGetGewerbeamt.mockRejectedValue(new Error("Gewerbeamt lookup failed"));
+    it("returns 200 with empty gewerbeaemter, without logging an error, when the Gewerbeamt lookup returns undefined", async () => {
+      mockGetGewerbeamt.mockResolvedValue(undefined);
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
       const { response, body } = await requestRegionForPostleitzahl36037();
 
       expect(response.status).toEqual(HttpStatusCode.Ok);
       expect(body.gewerbeaemter).toEqual([]);
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
     });
   });
 
@@ -117,8 +119,8 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
     expect(body.finanzaemter).toHaveLength(2);
   });
 
-  it("returns 200 with empty gewerbeaemter but still all finanzaemter when the PVOG location lookup fails", async () => {
-    mockGetLocationsDetails.mockRejectedValue(new Error("PVOG unavailable"));
+  it("returns 200 with empty gewerbeaemter but still all finanzaemter when the PVOG location lookup returns an empty array", async () => {
+    mockGetLocationsDetails.mockResolvedValue([]);
 
     const { response, body } = await requestRegion36037ForAllMatches();
 
@@ -127,10 +129,8 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
     expect(body.finanzaemter.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("returns 200 with empty finanzaemter but still all gewerbeaemter when the Finanzamt lookup throws", async () => {
-    mockGetFinanzamtId.mockImplementation(() => {
-      throw new Error("Finanzamt data error");
-    });
+  it("returns 200 with empty finanzaemter but still all gewerbeaemter when the Finanzamt lookup returns an empty array", async () => {
+    mockGetFinanzamtId.mockReturnValue([]);
 
     const { response, body } = await requestRegion36037ForAllMatches();
 
@@ -139,13 +139,13 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
     expect(body.gewerbeaemter.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("still returns the other Gewerbeamt when one of two Gewerbeamt lookups fails", async () => {
+  it("still returns the other Gewerbeamt when one of two Gewerbeamt lookups returns undefined", async () => {
     mockGetLocationsDetails.mockResolvedValue([
       { ars: "066310009009", name: "Gewerbeamt Nr. 1", plz: "36037" },
       { ars: "066310010010", name: "Gewerbeamt Nr. 2", plz: "36037" },
     ]);
     mockGetGewerbeamt
-      .mockRejectedValueOnce(new Error("first Gewerbeamt lookup failed"))
+      .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce({ ...GEWERBEAMT, name: "Gewerbeamt Nr. 2" });
 
     const { body } = await requestRegion36037ForAllMatches();
