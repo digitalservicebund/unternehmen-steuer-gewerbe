@@ -46,8 +46,10 @@ import app from "../../app";
 import {
   validateFsE as mockValidateFsE,
   sendFsE as mockSendFsE,
+  getFinanzamtId as mockGetFinanzamtId,
 } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
+import * as pdfGenerator from "./registerGewerbePdfGenerator";
 
 import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
 import { ErrorTypeSchema } from "./registerGewerbeInterfaces";
@@ -89,6 +91,17 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(json.gewerbeanmeldung.success).toBe(false);
       expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
       expect(json.fseÜbermittlung.success).toBe(true);
+    });
+
+    it("Returns 207 MULTI-STATUS with fseÜbermittlung invalid_data when no Finanzamt is found for the address, gewerbeanmeldung still succeeds", async () => {
+      vi.mocked(mockGetFinanzamtId).mockReturnValueOnce([]);
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+      expect(response.status).toEqual(HttpStatusCode.MultiStatus);
+      expect(json.fseÜbermittlung.success).toBe(false);
+      expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.invalid_data);
+      expect(json.gewerbeanmeldung.success).toBe(true);
     });
 
     it.each([
@@ -164,6 +177,20 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(response.status).toEqual(HttpStatusCode.InternalServerError);
       expect(json.gewerbeanmeldung.success).toBe(false);
       expect(json.fseÜbermittlung.success).toBe(false);
+    });
+
+    it("Returns 500 INTERNAL SERVER ERROR when an unexpected error is thrown outside of submission error handling", async () => {
+      vi.spyOn(pdfGenerator, "generatePdfReceipt").mockRejectedValueOnce(
+        new Error("PDF generation crashed"),
+      );
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+      expect(response.status).toEqual(HttpStatusCode.InternalServerError);
+      expect(json.gewerbeanmeldung.success).toBe(false);
+      expect(json.gewerbeanmeldung.info).toBe("Internal Server Error");
+      expect(json.fseÜbermittlung.success).toBe(false);
+      expect(json.fseÜbermittlung.info).toBe("Internal Server Error");
     });
 
     it("Returns 400 BAD REQUEST when sollIstVersteuerung is 'istVersteuerung' but istVersteuerungGrund is missing", async () => {
