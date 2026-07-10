@@ -84,7 +84,7 @@ describe("getGewerbeRoutingInfo", () => {
       const result = await getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled);
 
       expect(mockGetGewerbeamt).toHaveBeenCalledWith("030460014004");
-      expect(result.gewerbeamt).toEqual({
+      expect(result!.gewerbeamt).toEqual({
         name: "Stadt Fulda",
         adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
         telefon: "0661 102-0",
@@ -130,8 +130,8 @@ describe("getGewerbeRoutingInfo", () => {
 
       const result = await getGewerbeRoutingInfo(requestWithFitConnectSupport);
 
-      expect(result.fitConnectDestinationInformation!.destinationId).toBe("mock-destination-id");
-      expect(result.ags).toBe("03046004");
+      expect(result!.fitConnectDestinationInformation!.destinationId).toBe("mock-destination-id");
+      expect(result!.ags).toBe("03046004");
     });
 
     it("throws when FIT-Connect returns no routes for the AGS", async () => {

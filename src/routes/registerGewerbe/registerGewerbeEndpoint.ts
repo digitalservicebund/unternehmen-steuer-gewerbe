@@ -33,6 +33,7 @@ async function submitGewerbeanmeldung(
   let routingInfo: Awaited<ReturnType<typeof getGewerbeRoutingInfo>>;
   try {
     routingInfo = await getGewerbeRoutingInfo(data);
+    // TODO: return properly on not finding any routingInfo
   } catch (error) {
     console.error("Gewerbe routing info lookup failed", error);
     return {
@@ -45,7 +46,8 @@ async function submitGewerbeanmeldung(
   let gewerbeanmeldungXml: string;
   try {
     gewerbeanmeldungXml = await createGewerbeanmeldungXml(
-      transformToGewerbeanmeldung(data, routingInfo),
+      // TODO: remove ! once we handle it properly
+      transformToGewerbeanmeldung(data, routingInfo!),
     );
   } catch (error) {
     console.error("Gewerbeanmeldung XML validation failed", error);
@@ -58,7 +60,8 @@ async function submitGewerbeanmeldung(
 
   const gewerbeanmeldungPdfReceipt = await generatePdfReceipt(gewerbeanmeldungXml);
 
-  const gewerbeamtDetails = createOfficeDetailsFromGewerbeamt(routingInfo.gewerbeamt);
+  // TODO: remove the ! once we handle it properly
+  const gewerbeamtDetails = createOfficeDetailsFromGewerbeamt(routingInfo!.gewerbeamt);
   // Before using FIT-Connect -> Check in context if FIT-Connect or OSCI is supported by
   // the Communes as soon as we have Pilot-Communes
   try {
