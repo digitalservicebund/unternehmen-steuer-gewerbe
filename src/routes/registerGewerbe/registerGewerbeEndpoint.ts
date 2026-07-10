@@ -93,6 +93,9 @@ async function submitGewerbeanmeldung(
   }
 }
 
+// Sending fails because of semantic errors
+export const EricErrorFachlicheAblehnung = 610001002;
+
 async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeResponseItem> {
   try {
     const address = data.unternehmensDaten.adresseAbweichend ?? data.persönlicheDaten.adresse;
@@ -138,9 +141,13 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
 
     const result = sendFsE(fse, true);
     if (!result.success) {
+      const type =
+        result.returnCode === EricErrorFachlicheAblehnung
+          ? ErrorTypeSchema.enum.validation_error
+          : ErrorTypeSchema.enum.upstream_error;
       return {
         success: false,
-        errorType: ErrorTypeSchema.enum.upstream_error,
+        errorType: type,
         info: result.info,
       };
     }
