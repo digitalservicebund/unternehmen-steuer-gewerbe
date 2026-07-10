@@ -62,7 +62,7 @@
     "xslt3-he": "3.0.0-beta2"
   },
   "engines": {
-    "node": "26.4.0"
+    "node": "26.5.0"
   },
   "packageManager": "pnpm@11.5.1"
 }
