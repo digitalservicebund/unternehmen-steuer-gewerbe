@@ -30,22 +30,12 @@ const GEWERBEANMELDUNG_LEIKA_KEY_URN = "urn:de:fim:leika:leistung:99050012104000
 async function submitGewerbeanmeldung(
   data: RegisterGewerbeRequest,
 ): Promise<RegisterGewerbeResponseItem> {
-  let routingInfo: Awaited<ReturnType<typeof getGewerbeRoutingInfo>>;
-  try {
-    routingInfo = await getGewerbeRoutingInfo(data);
-    if (!routingInfo) {
-      return {
-        success: false,
-        errorType: ErrorTypeSchema.enum.invalid_data,
-        info: "No Gewerbeamt found for address",
-      };
-    }
-  } catch (error) {
-    console.error("Gewerbe routing info lookup failed", error);
+  const routingInfo = await getGewerbeRoutingInfo(data);
+  if (!routingInfo) {
     return {
       success: false,
-      errorType: ErrorTypeSchema.enum.upstream_error,
-      info: "Upstream service unavailable",
+      errorType: ErrorTypeSchema.enum.invalid_data,
+      info: "No Gewerbeamt found for address",
     };
   }
 
