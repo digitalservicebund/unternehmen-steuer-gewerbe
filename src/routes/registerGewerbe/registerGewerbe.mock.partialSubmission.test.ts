@@ -52,6 +52,7 @@ import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanme
 import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
 import { ErrorTypeSchema } from "./registerGewerbeInterfaces";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
+import { EricErrorFachlicheAblehnung } from "./registerGewerbeEndpoint";
 
 function postRegisterGewerbe(data = registerGewerbeSampleRequestAllFieldsFilled, queryString = "") {
   return app.request(`/api/v1/register-gewerbe${queryString}`, {
@@ -136,7 +137,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
     it("Returns 400 BAD REQUEST when the requested FsE fails because sendFsE reports a fachliche Ablehnung (returnCode 610001002)", async () => {
       vi.mocked(mockSendFsE).mockReturnValueOnce({
         success: false,
-        returnCode: 610001002,
+        returnCode: EricErrorFachlicheAblehnung,
         info: "Fachliche Ablehnung",
       });
 
