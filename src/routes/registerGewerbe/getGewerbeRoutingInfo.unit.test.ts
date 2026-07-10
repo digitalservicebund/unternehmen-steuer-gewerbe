@@ -70,12 +70,12 @@ describe("getGewerbeRoutingInfo", () => {
       });
     });
 
-    it("throws when no location is found for the address", async () => {
+    it("returns undefined when no location is found for the address", async () => {
       mockGetLocationsDetails.mockResolvedValueOnce([]);
 
-      await expect(
-        getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled),
-      ).rejects.toThrow("No location found for zip code");
+      expect(
+        await getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled),
+      ).toBeUndefined();
     });
   });
 
