@@ -39,6 +39,9 @@ export async function getGewerbeRoutingInfo(
   const ags = getAGS(ars);
 
   const gewerbeamt = await getGewerbeamt(ars);
+  if (!gewerbeamt) {
+    return undefined;
+  }
   // return undefiend if not found
 
   let fitConnectDestinationInformation = null;
