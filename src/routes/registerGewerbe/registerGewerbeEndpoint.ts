@@ -33,7 +33,13 @@ async function submitGewerbeanmeldung(
   let routingInfo: Awaited<ReturnType<typeof getGewerbeRoutingInfo>>;
   try {
     routingInfo = await getGewerbeRoutingInfo(data);
-    // TODO: return properly on not finding any routingInfo
+    if (!routingInfo) {
+      return {
+        success: false,
+        errorType: ErrorTypeSchema.enum.invalid_data,
+        info: "No Gewerbeamt found for address",
+      };
+    }
   } catch (error) {
     console.error("Gewerbe routing info lookup failed", error);
     return {
