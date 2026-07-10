@@ -80,6 +80,18 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(json.fseÜbermittlung.success).toBe(true);
     });
 
+    it("Returns 207 MULTI-STATUS with gewerbeanmeldung invalid_data when no routing info is found for the address, fseÜbermittlung still succeeds", async () => {
+      mockGetGewerbeRoutingInfo.mockResolvedValueOnce(undefined);
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+      expect(response.status).toEqual(HttpStatusCode.MultiStatus);
+      expect(json.gewerbeanmeldung.success).toBe(false);
+      expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.invalid_data);
+      expect(json.gewerbeanmeldung.info).toBe("No Gewerbeamt found for address");
+      expect(json.fseÜbermittlung.success).toBe(true);
+    });
+
     it("Returns 207 MULTI-STATUS with gewerbeanmeldung validation_error when XML creation throws, fseÜbermittlung still succeeds", async () => {
       vi.spyOn(gewerbeanmeldung, "createGewerbeanmeldungXml").mockRejectedValue(
         new Error("XML schema mismatch"),
