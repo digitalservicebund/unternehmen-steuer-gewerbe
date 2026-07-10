@@ -151,5 +151,23 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(json.fseÜbermittlung.success).toBe(false);
       expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.validation_error);
     });
+
+    it("Returns 500 INTERNAL SERVER ERROR when sending returns a 'Fehler im Transferheader'", async () => {
+      vi.mocked(mockSendFsE).mockReturnValueOnce({
+        success: false,
+        returnCode: 610101210,
+        info: "Fachliche Ablehnung",
+      });
+
+      const response = await postRegisterGewerbe(
+        registerGewerbeSampleRequestAllFieldsFilled,
+        "?only=fseÜbermittlung",
+      );
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.InternalServerError);
+      expect(json.fseÜbermittlung.success).toBe(false);
+      expect(json.fseÜbermittlung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
+    });
   });
 });
