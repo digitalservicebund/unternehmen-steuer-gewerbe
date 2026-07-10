@@ -71,7 +71,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
-  test:
+  test-unit:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -92,8 +92,55 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
-      - name: Run tests with coverage report
-        run: pnpm run test:coverage:ci
+      - name: Run unit tests with coverage report
+        run: pnpm run test:unit:ci
+        env:
+          # Not used for network calls in unit tests, but still required:
+          # - ERIC_HERSTELLERID is checked at import time (fail-fast guard in transformToFsE.ts),
+          #   and transitively imported by nearly every route-level unit test via app.ts.
+          # - the FIT_CONNECT JWKs are used by crypto.unit.test.ts for a real (local) encrypt/decrypt roundtrip.
+          ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
+          FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK: ${{ vars.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK }}
+          FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK: ${{ secrets.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK }}
+
+      - name: Upload coverage blob
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: vitest-blob-unit
+          path: .vitest-reports/unit.blob.json
+          retention-days: 1
+          if-no-files-found: error
+
+      - name: Send failure to Slack
+        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+        if: ${{ failure() && github.ref == 'refs/heads/main' }}
+        with:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
+
+  test-integration:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+        name: Install pnpm
+        with:
+          cache: true
+
+      - name: Install dependencies
+        run: pnpm install --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
+
+      - name: Run integration tests with coverage report
+        run: pnpm run test:integration:ci
         env:
           FIT_CONNECT_OAUTH_TOKEN_URL: ${{ vars.FIT_CONNECT_OAUTH_TOKEN_URL }}
           FIT_CONNECT_SUBMISSION_API_URL: ${{ vars.FIT_CONNECT_SUBMISSION_API_URL }}
@@ -111,11 +158,11 @@ jobs:
           AKDB_USERNAME: ${{ vars.AKDB_USERNAME }}
           AKDB_PASSWORD: ${{ secrets.AKDB_PASSWORD }}
 
-      - name: Upload coverage report
+      - name: Upload coverage blob
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: coverage-report
-          path: coverage/
+          name: vitest-blob-integration
+          path: .vitest-reports/integration.blob.json
           retention-days: 1
           if-no-files-found: error
 
@@ -131,7 +178,7 @@ jobs:
   # requires the SonarQubeCloud GitHub app in the repository
   ################################
   scan-with-sonarcloud:
-    needs: [test]
+    needs: [test-unit, test-integration]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -143,11 +190,31 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download coverage report
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+        name: Install pnpm
+        with:
+          cache: true
+
+      - name: Install dependencies
+        run: pnpm install --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
+
+      # fetch and combine coverage reports
+      - name: Download unit test coverage blob
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: coverage-report
-          path: coverage/
+          name: vitest-blob-unit
+          path: .vitest-reports/
+
+      - name: Download integration test coverage blob
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: vitest-blob-integration
+          path: .vitest-reports/
+
+      - name: Merge coverage reports
+        run: pnpm run test:coverage:merge
 
       - name: Cache SonarQube packages
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
@@ -313,7 +380,15 @@ jobs:
 
   publish-image:
     name: Publish image to registry (main only)
-    needs: [check-format-and-lint, test, scan-with-sonarcloud, build-image, secret-scanning]
+    needs:
+      [
+        check-format-and-lint,
+        test-unit,
+        test-integration,
+        scan-with-sonarcloud,
+        build-image,
+        secret-scanning,
+      ]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
@@ -527,7 +602,8 @@ jobs:
     # (we did run into this problem and saw auto-merges even as "frontend-checks" failed)
     needs:
       - check-format-and-lint
-      - test
+      - test-unit
+      - test-integration
       - scan-with-sonarcloud
       - build-image
       - secret-scanning
