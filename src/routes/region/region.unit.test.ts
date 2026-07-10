@@ -88,15 +88,6 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
       expect(mockGetFinanzamtDetailsById).toHaveBeenCalledWith("FA1");
     });
 
-    it("returns 200 with empty gewerbeaemter when the Gewerbeamt lookup returns undefined", async () => {
-      mockGetGewerbeamt.mockResolvedValue(undefined);
-
-      const { response, body } = await requestRegionForPostleitzahl36037();
-
-      expect(response.status).toEqual(HttpStatusCode.Ok);
-      expect(body.gewerbeaemter).toEqual([]);
-    });
-
     it("returns 200 with empty gewerbeaemter, without logging an error, when the Gewerbeamt lookup returns undefined", async () => {
       mockGetGewerbeamt.mockResolvedValue(undefined);
       const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
