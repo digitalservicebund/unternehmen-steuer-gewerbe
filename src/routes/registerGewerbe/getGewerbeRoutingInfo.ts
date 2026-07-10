@@ -42,7 +42,6 @@ export async function getGewerbeRoutingInfo(
   if (!gewerbeamt) {
     return undefined;
   }
-  // return undefiend if not found
 
   let fitConnectDestinationInformation = null;
 
