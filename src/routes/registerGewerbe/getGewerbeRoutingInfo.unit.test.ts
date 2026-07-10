@@ -99,6 +99,14 @@ describe("getGewerbeRoutingInfo", () => {
         getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled),
       ).rejects.toThrow("Gewerbeamt lookup failed");
     });
+
+    it("returns undefined when no Gewerbeamt is found for the resolved ARS", async () => {
+      mockGetGewerbeamt.mockResolvedValueOnce(undefined);
+
+      expect(
+        await getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled),
+      ).toBeUndefined();
+    });
   });
 
   describe("FIT-Connect routing", () => {
