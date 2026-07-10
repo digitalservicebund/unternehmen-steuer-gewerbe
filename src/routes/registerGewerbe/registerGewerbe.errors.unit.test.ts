@@ -67,17 +67,6 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
   afterEach(() => vi.restoreAllMocks());
 
   describe("in case of partial success", () => {
-    it("Returns 207 MULTI-STATUS with gewerbeanmeldung invalid data when no FIT-Connect routing found, fseÜbermittlung still succeeds", async () => {
-      mockGetGewerbeRoutingInfo.mockResolvedValueOnce(undefined);
-
-      const response = await postRegisterGewerbe();
-      const json = await response.json();
-      expect(response.status).toEqual(HttpStatusCode.MultiStatus);
-      expect(json.gewerbeanmeldung.success).toBe(false);
-      expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.invalid_data);
-      expect(json.fseÜbermittlung.success).toBe(true);
-    });
-
     it("Returns 207 MULTI-STATUS with gewerbeanmeldung invalid_data when no routing info is found for the address, fseÜbermittlung still succeeds", async () => {
       mockGetGewerbeRoutingInfo.mockResolvedValueOnce(undefined);
 
