@@ -21,38 +21,23 @@ interface RegionOfficesDetails {
 }
 
 function getAllFinanzamtIds(locationQuery: LocationQuery): string[] {
-  try {
-    return getFinanzamtId({
-      postleitzahl: locationQuery.plz,
-      ort: locationQuery.ort,
-      strassenName: locationQuery.strasse,
-      hausnummerVon: locationQuery.hausnummer,
-    });
-  } catch (error) {
-    console.error("Finanzamt lookup failed", error);
-    return [];
-  }
+  return getFinanzamtId({
+    postleitzahl: locationQuery.plz,
+    ort: locationQuery.ort,
+    strassenName: locationQuery.strasse,
+    hausnummerVon: locationQuery.hausnummer,
+  });
 }
 
 async function getAllLocations(locationQuery: LocationQuery): Promise<LocationDetails[]> {
-  try {
-    return await getLocationsDetails(locationQuery);
-  } catch (error) {
-    console.error("Location lookup failed", error);
-    return [];
-  }
+  return await getLocationsDetails(locationQuery);
 }
 
 function createFinanzaemterOfficeDetails(finanzamtIds: string[]): OfficeDetails[] {
-  try {
-    return finanzamtIds
-      .map((id) => getFinanzamtDetailsById(id))
-      .filter((details) => details !== undefined)
-      .map(createOfficeDetailsFromFinanzamt);
-  } catch (error) {
-    console.error("Finanzamt details lookup failed", error);
-    return [];
-  }
+  return finanzamtIds
+    .map((id) => getFinanzamtDetailsById(id))
+    .filter((details) => details !== undefined)
+    .map(createOfficeDetailsFromFinanzamt);
 }
 
 async function createGewerbeaemterOfficeDetails(
