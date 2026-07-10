@@ -1,6 +1,6 @@
 import { HonoAppType } from "../../honoApp";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
-import { getSecret } from "../../secrets";
+import { getEnvironmentVariable } from "../../secretsAndEnvironmentVariables";
 import { getEventsRoute } from "./getEventsRoute";
 
 export function addGetEventsEndpoint(app: HonoAppType): HonoAppType {
@@ -11,7 +11,7 @@ export function addGetEventsEndpoint(app: HonoAppType): HonoAppType {
       // The destination varies from commune to commune.
       // We can hard‑code it here for the first iterations, but in the future we need to
       // use the Fit‑Connect routing API to determine the destination ID.
-      const destinationId = getSecret("FIT_CONNECT_DESTINATION_ID");
+      const destinationId = getEnvironmentVariable("FIT_CONNECT_DESTINATION_ID");
 
       const fitConnectClient = getFitConnectClient();
 

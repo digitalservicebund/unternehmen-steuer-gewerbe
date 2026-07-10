@@ -1,9 +1,9 @@
 import "dotenv/config";
 import { describe, it, expect } from "vitest";
 import { getFitConnectClient } from "./fitConnectClient";
-import { getSecret } from "../../secrets";
+import { getEnvironmentVariable } from "../../secretsAndEnvironmentVariables";
 
-const DESTINATION_ID = getSecret("FIT_CONNECT_DESTINATION_ID");
+const DESTINATION_ID = getEnvironmentVariable("FIT_CONNECT_DESTINATION_ID");
 
 describe("FitConnectClient", () => {
   describe("submitData", () => {
