@@ -29,9 +29,7 @@ describe("getGewerbeamt", () => {
     expect(gewerbeamt.onlineServices).toEqual([]);
   });
 
-  it("throws if no service description was found for ARS 000000000000", async () => {
-    await expect(getGewerbeamt("000000000000")).rejects.toThrow(
-      "No service description found for ARS 000000000000",
-    );
+  it("returns undefined if no service description was found for ARS 000000000000", async () => {
+    expect(await getGewerbeamt("000000000000")).toBeUndefined();
   });
 });
