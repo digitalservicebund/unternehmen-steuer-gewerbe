@@ -13,6 +13,7 @@ const SUPPORTED_REGIONS = {
   fulda: [rangeOfPLZs("36037", "36043")],
   muenchen: [rangeOfPLZs("80331", "81929")],
   nordfriesland: [rangeOfPLZs("25811", "25999")],
+  // https://www.dasoertliche.de/?st=&ci=D%C3%BCsseldorf&form_name=search_pc
   duesseldorf: [
     rangeOfPLZs("40210", "40213"),
     rangeOfPLZs("40215", "40239", 2),
