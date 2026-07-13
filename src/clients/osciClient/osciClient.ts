@@ -1,6 +1,6 @@
 import { createMetadata } from "./metadata";
 import { fetchJson } from "../../helpers/fetchJson";
-import { getSecret } from "../../secrets";
+import { getEnvironmentVariable, getSecret } from "../../secretsAndEnvironmentVariables";
 
 interface OsciClientConfig {
   baseUrl: string;
@@ -57,7 +57,7 @@ const SEND_TIMEOUT_MS = 30_000;
 
 export function getOsciClient() {
   const config: OsciClientConfig = {
-    baseUrl: getSecret("AKDB_BASE_URL"),
+    baseUrl: getEnvironmentVariable("AKDB_BASE_URL"),
     username: getSecret("AKDB_USERNAME"),
     password: getSecret("AKDB_PASSWORD"),
   };

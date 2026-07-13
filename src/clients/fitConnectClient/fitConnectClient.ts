@@ -2,7 +2,7 @@ import { decodeProtectedHeader, type JWK, type JWTPayload } from "jose";
 import { encryptData, verifyEventToken } from "./crypto";
 import { createMetadata, type DataSchema } from "./metadata";
 import { fetchJson } from "../../helpers/fetchJson";
-import { getSecret } from "../../secrets";
+import { getEnvironmentVariable, getSecret } from "../../secretsAndEnvironmentVariables";
 
 interface FitConnectClientConfig {
   oauthTokenUrl: string;
@@ -187,11 +187,11 @@ interface RoutingApiResponse {
 
 export function getFitConnectClient() {
   const config: FitConnectClientConfig = {
-    oauthTokenUrl: getSecret("FIT_CONNECT_OAUTH_TOKEN_URL"),
-    submissionApiUrl: getSecret("FIT_CONNECT_SUBMISSION_API_URL"),
-    destinationApiUrl: getSecret("FIT_CONNECT_DESTINATION_API_URL"),
-    routingApiUrl: getSecret("FIT_CONNECT_ROUTING_API_URL"),
-    clientId: getSecret("FIT_CONNECT_CLIENT_ID"),
+    oauthTokenUrl: getEnvironmentVariable("FIT_CONNECT_OAUTH_TOKEN_URL"),
+    submissionApiUrl: getEnvironmentVariable("FIT_CONNECT_SUBMISSION_API_URL"),
+    destinationApiUrl: getEnvironmentVariable("FIT_CONNECT_DESTINATION_API_URL"),
+    routingApiUrl: getEnvironmentVariable("FIT_CONNECT_ROUTING_API_URL"),
+    clientId: getEnvironmentVariable("FIT_CONNECT_CLIENT_ID"),
     clientSecret: getSecret("FIT_CONNECT_CLIENT_SECRET"),
     privateKey: getSecret("FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK")
       ? JSON.parse(getSecret("FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK"))

@@ -7,7 +7,7 @@ import {
   sendFsE,
   validateFsE,
 } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
-import { getSecret } from "../../secrets";
+import { getEnvironmentVariable } from "../../secretsAndEnvironmentVariables";
 import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import {
   ErrorTypeSchema,
@@ -63,7 +63,7 @@ async function submitGewerbeanmeldung(
       // The destination varies from commune to commune.
       // We can hard‑code it here for the first iterations, but in the future we need to
       // use the Fit‑Connect routing API to determine the destination ID.
-      destinationId: getSecret("FIT_CONNECT_DESTINATION_ID"),
+      destinationId: getEnvironmentVariable("FIT_CONNECT_DESTINATION_ID"),
       publicService: {
         identifier: GEWERBEANMELDUNG_LEIKA_KEY_URN,
         name: "Gewerbe Anmeldung",

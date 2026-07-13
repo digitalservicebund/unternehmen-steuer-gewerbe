@@ -1,5 +1,5 @@
 import { HonoAppType } from "../../honoApp";
-import { getSecret } from "../../secrets";
+import { getEnvironmentVariable } from "../../secretsAndEnvironmentVariables";
 import { healthCheckRoute } from "./rootHealthCheckRoute";
 
 export function addHealthCheckEndpoint(app: HonoAppType): HonoAppType {
@@ -13,10 +13,10 @@ export function addHealthCheckEndpoint(app: HonoAppType): HonoAppType {
         ...(verbose
           ? {
               fitConnectUrls: {
-                oauthTokenUrl: getSecret("FIT_CONNECT_OAUTH_TOKEN_URL"),
-                submissionApiUrl: getSecret("FIT_CONNECT_SUBMISSION_API_URL"),
-                destinationApiUrl: getSecret("FIT_CONNECT_DESTINATION_API_URL"),
-                routingApiUrl: getSecret("FIT_CONNECT_ROUTING_API_URL"),
+                oauthTokenUrl: getEnvironmentVariable("FIT_CONNECT_OAUTH_TOKEN_URL"),
+                submissionApiUrl: getEnvironmentVariable("FIT_CONNECT_SUBMISSION_API_URL"),
+                destinationApiUrl: getEnvironmentVariable("FIT_CONNECT_DESTINATION_API_URL"),
+                routingApiUrl: getEnvironmentVariable("FIT_CONNECT_ROUTING_API_URL"),
               },
             }
           : {}),
