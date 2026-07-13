@@ -39,16 +39,21 @@ export function joinStrasseUndHausnummer(
 }
 
 export function splitTelefonnummer(telefonnummer: string) {
-  const match = /^(\+\d{1,5})\s(\d{1,5})\s(\d{1,13})(-(\d{1,5}))?$/.exec(telefonnummer);
+  const match =
+    /^(?<intVorw>\+\d{1,5})\s(?<natVorw>\d{1,5})\s(?<rufNr>\d{1,13})(?:-(?<durchwahl>\d{1,5}))?$/.exec(
+      telefonnummer,
+    );
 
-  if (!match) {
+  if (!match?.groups) {
     throw new Error("The given Phone number format is not supported");
   }
 
+  const { intVorw, natVorw, rufNr, durchwahl } = match.groups;
+
   return {
-    intVorw: match?.[1]?.trimEnd(),
-    natVorw: match?.[2]?.trimEnd(),
-    rufNr: match?.[3]?.trimEnd(),
-    durchwahl: match?.[5]?.trimEnd(),
+    intVorw: intVorw?.trimEnd(),
+    natVorw: natVorw?.trimEnd(),
+    rufNr: rufNr?.trimEnd(),
+    durchwahl: durchwahl?.trimEnd(),
   };
 }
