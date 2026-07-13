@@ -14,8 +14,7 @@ import {
   createReferenzierteSubjekte,
   type ReferenzierteSubjekte,
 } from "./buildingBlocks/referenzierteSubjekte";
-import { escapeXml } from "../../helpers/escapeXml";
-import { isDefinedInput } from "../../helpers/isDefinedInput";
+import { optionalTag, optionalWrappedTag } from "../../helpers/xmlTag";
 
 export interface CreateGewerbeanmeldungXmlData {
   nachrichtenkopf?: Nachrichtenkopf;
@@ -88,6 +87,11 @@ const ROOT_ATTRIBUTES = `
   version="1.6"
 ` as const;
 
+function createAutor(autor: Behoerde | undefined) {
+  if (!autor) return "";
+  return `<xga:autor>${createBehoerde(autor)}</xga:autor>`;
+}
+
 export async function createGewerbeanmeldungXml(
   gewerbeanmeldung: CreateGewerbeanmeldungXmlData,
 ): Promise<string> {
@@ -97,24 +101,24 @@ export async function createGewerbeanmeldungXml(
     <xga:ext.gewerbemeldung.0400 ${ROOT_ATTRIBUTES}>
       ${createG2gNachrichtenkopf(gewerbeanmeldung.nachrichtenkopf)}
       <xga:satz>
-        ${isDefinedInput(gewerbeanmeldung.anzeigerenderId) ? `<antr:anzeigender.id>${escapeXml(gewerbeanmeldung.anzeigerenderId)}</antr:anzeigender.id>` : ""}
-        ${isDefinedInput(gewerbeanmeldung.handelndePersonId) ? `<antr:handelndePerson.id>${escapeXml(gewerbeanmeldung.handelndePersonId)}</antr:handelndePerson.id>` : ""}
-        ${isDefinedInput(gewerbeanmeldung.handelndePersonVertrauensniveauCode) ? `<bk:handelndePerson.vertrauensniveauIdentifikation listVersionID="4"><code>${escapeXml(gewerbeanmeldung.handelndePersonVertrauensniveauCode)}</code></bk:handelndePerson.vertrauensniveauIdentifikation>` : ""}
-        ${isDefinedInput(gewerbeanmeldung.ansprechpartnerId) ? `<antr:ansprechpartner.id>${escapeXml(gewerbeanmeldung.ansprechpartnerId)}</antr:ansprechpartner.id>` : ""}
+        ${optionalTag("antr:anzeigender.id", gewerbeanmeldung.anzeigerenderId)}
+        ${optionalTag("antr:handelndePerson.id", gewerbeanmeldung.handelndePersonId)}
+        ${optionalWrappedTag("bk:handelndePerson.vertrauensniveauIdentifikation", "code", gewerbeanmeldung.handelndePersonVertrauensniveauCode, ' listVersionID="4"')}
+        ${optionalTag("antr:ansprechpartner.id", gewerbeanmeldung.ansprechpartnerId)}
         <xga:anmeldung>
-            ${gewerbeanmeldung.autor ? `<xga:autor>${createBehoerde(gewerbeanmeldung.autor)}</xga:autor>` : ""}
-            ${isDefinedInput(gewerbeanmeldung.satzErstellung) ? `<xga:satzErstellung>${escapeXml(gewerbeanmeldung.satzErstellung)}</xga:satzErstellung>` : ""}
-            ${isDefinedInput(gewerbeanmeldung.ereigniszeitpunkt) ? `<xga:ereigniszeitpunkt>${escapeXml(gewerbeanmeldung.ereigniszeitpunkt)}</xga:ereigniszeitpunkt>` : ""}
-            ${isDefinedInput(gewerbeanmeldung.istStorno) ? `<xga:istStorno>${escapeXml(gewerbeanmeldung.istStorno)}</xga:istStorno>` : ""}
-            ${isDefinedInput(gewerbeanmeldung.gemeindeSchluessel) ? `<xga:gemeindeSchluessel listVersionID="2020-03-31"><code>${escapeXml(gewerbeanmeldung.gemeindeSchluessel)}</code></xga:gemeindeSchluessel>` : ""}
-            ${isDefinedInput(gewerbeanmeldung.gemeindeschluesselErgaenzung) ? `<xga:gemeindeschluesselErgaenzung listVersionID="1"><code>${escapeXml(gewerbeanmeldung.gemeindeschluesselErgaenzung)}</code></xga:gemeindeschluesselErgaenzung>` : ""}
-            ${isDefinedInput(gewerbeanmeldung.uuid) ? `<xga:uuid>${escapeXml(gewerbeanmeldung.uuid)}</xga:uuid>` : ""}
-            ${isDefinedInput(gewerbeanmeldung.gueltigAb) ? `<xga:gueltigAb>${escapeXml(gewerbeanmeldung.gueltigAb)}</xga:gueltigAb>` : ""}
-            ${isDefinedInput(gewerbeanmeldung.datumMeldung) ? `<xga:datumMeldung>${escapeXml(gewerbeanmeldung.datumMeldung)}</xga:datumMeldung>` : ""}
+            ${createAutor(gewerbeanmeldung.autor)}
+            ${optionalTag("xga:satzErstellung", gewerbeanmeldung.satzErstellung)}
+            ${optionalTag("xga:ereigniszeitpunkt", gewerbeanmeldung.ereigniszeitpunkt)}
+            ${optionalTag("xga:istStorno", gewerbeanmeldung.istStorno)}
+            ${optionalWrappedTag("xga:gemeindeSchluessel", "code", gewerbeanmeldung.gemeindeSchluessel, ' listVersionID="2020-03-31"')}
+            ${optionalWrappedTag("xga:gemeindeschluesselErgaenzung", "code", gewerbeanmeldung.gemeindeschluesselErgaenzung, ' listVersionID="1"')}
+            ${optionalTag("xga:uuid", gewerbeanmeldung.uuid)}
+            ${optionalTag("xga:gueltigAb", gewerbeanmeldung.gueltigAb)}
+            ${optionalTag("xga:datumMeldung", gewerbeanmeldung.datumMeldung)}
             ${createBisherigeUnfallversicherung(gewerbeanmeldung.bisherigeUnfallversicherung)}
             ${createGewerbebetrieb(gewerbeanmeldung.gewerbebetrieb, natuerlichePerson0?.id ?? "")}
             ${createReferenzierteSubjekte(gewerbeanmeldung.referenzierteSubjekte)}
-            ${isDefinedInput(gewerbeanmeldung.grundAnmeldungSchluessel) ? `<xga:grundAnmeldungSchluessel><code>${escapeXml(gewerbeanmeldung.grundAnmeldungSchluessel)}</code></xga:grundAnmeldungSchluessel>` : ""}
+            ${optionalWrappedTag("xga:grundAnmeldungSchluessel", "code", gewerbeanmeldung.grundAnmeldungSchluessel)}
         </xga:anmeldung>
       </xga:satz>
     </xga:ext.gewerbemeldung.0400>`;

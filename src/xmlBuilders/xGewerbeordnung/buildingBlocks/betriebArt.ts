@@ -1,5 +1,4 @@
-import { escapeXml } from "../../../helpers/escapeXml";
-import { isDefinedInput } from "../../../helpers/isDefinedInput";
+import { optionalTag } from "../../../helpers/xmlTag";
 
 export interface BetriebArt {
   /** In diesem Element wird angegeben, ob es sich um einen Industriebetrieb handelt. */
@@ -16,9 +15,9 @@ export function createBetriebArt(betriebArt: BetriebArt | undefined) {
   if (!betriebArt) return "";
   return `
     <xga:betriebArt>
-      ${isDefinedInput(betriebArt.industrie) ? `<xga:industrie>${escapeXml(betriebArt.industrie)}</xga:industrie>` : ""}
-      ${isDefinedInput(betriebArt.handwerk) ? `<xga:handwerk>${escapeXml(betriebArt.handwerk)}</xga:handwerk>` : ""}
-      ${isDefinedInput(betriebArt.handel) ? `<xga:handel>${escapeXml(betriebArt.handel)}</xga:handel>` : ""}
-      ${isDefinedInput(betriebArt.sonstiges) ? `<xga:sonstiges>${escapeXml(betriebArt.sonstiges)}</xga:sonstiges>` : ""}
+      ${optionalTag("xga:industrie", betriebArt.industrie)}
+      ${optionalTag("xga:handwerk", betriebArt.handwerk)}
+      ${optionalTag("xga:handel", betriebArt.handel)}
+      ${optionalTag("xga:sonstiges", betriebArt.sonstiges)}
     </xga:betriebArt>`;
 }

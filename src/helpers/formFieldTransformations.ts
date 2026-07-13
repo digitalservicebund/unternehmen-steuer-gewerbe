@@ -7,15 +7,24 @@ export function formatDatumDE(isoDate: string): string {
 }
 
 /** Helper to split street and number "Straße 123" in ["Straße", "123"] */
+
 export function splitStrasseHausnummer(strasseUndHausnummer: string) {
-  const match = /^(.+?)\s+(\d+(?:\s+\d+)?(?:\/\d+)?(?:\s*[a-zA-Z])?)\s*(?:-\s*(\d+))?$/.exec(
-    strasseUndHausnummer,
+  const upToSixNumbers = String.raw`\d{1,6}`;
+  const hausnummerPattern = String.raw`${upToSixNumbers}(?:\s+${upToSixNumbers})?(?:/${upToSixNumbers})?(?:\s*[a-z])?`;
+  const addressPattern = new RegExp(
+    String.raw`^(?<strasse>.{1,100}?)\s+(?<hausnummer>${hausnummerPattern})(?:\s*-\s*(?<hausnummerBis>${upToSixNumbers}))?$`,
+    "i",
   );
-  if (!match) throw new Error("The given address format is not supported");
+
+  const match = addressPattern.exec(strasseUndHausnummer);
+  if (!match?.groups) throw new Error("The given address format is not supported");
+
+  const { strasse, hausnummer, hausnummerBis } = match.groups;
+
   return {
-    strasse: match?.[1]?.trimEnd(),
-    hausnummer: match?.[2],
-    hausnummerBis: match?.[3],
+    strasse,
+    hausnummer,
+    hausnummerBis,
   };
 }
 
@@ -31,16 +40,21 @@ export function joinStrasseUndHausnummer(
 }
 
 export function splitTelefonnummer(telefonnummer: string) {
-  const match = /^(\+\d{1,5})\s(\d{1,5})\s(\d{1,13})(-(\d{1,5}))?$/.exec(telefonnummer);
+  const match =
+    /^(?<intVorw>\+\d{1,5})\s(?<natVorw>\d{1,5})\s(?<rufNr>\d{1,13})(?:-(?<durchwahl>\d{1,5}))?$/.exec(
+      telefonnummer,
+    );
 
-  if (!match) {
+  if (!match?.groups) {
     throw new Error("The given Phone number format is not supported");
   }
 
+  const { intVorw, natVorw, rufNr, durchwahl } = match.groups;
+
   return {
-    intVorw: match?.[1]?.trimEnd(),
-    natVorw: match?.[2]?.trimEnd(),
-    rufNr: match?.[3]?.trimEnd(),
-    durchwahl: match?.[5]?.trimEnd(),
+    intVorw: intVorw?.trimEnd(),
+    natVorw: natVorw?.trimEnd(),
+    rufNr: rufNr?.trimEnd(),
+    durchwahl: durchwahl?.trimEnd(),
   };
 }
