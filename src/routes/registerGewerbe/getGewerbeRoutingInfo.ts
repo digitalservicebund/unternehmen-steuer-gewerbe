@@ -1,7 +1,7 @@
 import { getGewerbeamt, getLocationsDetails, type Gewerbeamt } from "../../clients/pvogClient";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
 import { splitStrasseHausnummer } from "../../helpers/formFieldTransformations";
-import { getAGS } from "../../helpers/getAGS";
+import { getAGS } from "../../helpers/getAgs";
 import { getFirstAssumingItsTheBestMatch } from "../../helpers/getFirstAssumingItsTheBestMatch";
 import { type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 
