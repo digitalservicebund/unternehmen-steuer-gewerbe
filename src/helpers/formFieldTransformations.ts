@@ -7,23 +7,24 @@ export function formatDatumDE(isoDate: string): string {
 }
 
 /** Helper to split street and number "Straße 123" in ["Straße", "123"] */
+
 export function splitStrasseHausnummer(strasseUndHausnummer: string) {
-  const match =
-    /^(?<strasse>.{1,100}?)\s+(?<hausnummerGesamt>\d{1,6}(?:\s+\d{1,6})?(?:\/\d{1,6})?(?:\s*[a-zA-Z])?(?:\s*-\s*\d{1,6})?)$/.exec(
-      strasseUndHausnummer,
-    );
+  const hausnummerBisPattern = String.raw`\d{1,6}`;
+  const hausnummerPattern = String.raw`${hausnummerBisPattern}(?:\s+${hausnummerBisPattern})?(?:/${hausnummerBisPattern})?(?:\s*[a-z])?`;
+  const addressPattern = new RegExp(
+    String.raw`^(?<strasse>.{1,100}?)\s+(?<hausnummer>${hausnummerPattern})(?:\s*-\s*(?<hausnummerBis>${hausnummerBisPattern}))?$`,
+    "i",
+  );
+
+  const match = addressPattern.exec(strasseUndHausnummer);
   if (!match?.groups) throw new Error("The given address format is not supported");
 
-  const { strasse, hausnummerGesamt } = match.groups;
-  const bisMatch =
-    /^(?<hausnummer>\d{1,6}(?:\s+\d{1,6})?(?:\/\d{1,6})?(?:\s*[a-zA-Z])?)\s*-\s*(?<hausnummerBis>\d{1,6})$/.exec(
-      hausnummerGesamt!,
-    );
+  const { strasse, hausnummer, hausnummerBis } = match.groups;
 
   return {
-    strasse: strasse?.trimEnd(),
-    hausnummer: bisMatch?.groups?.hausnummer ?? hausnummerGesamt,
-    hausnummerBis: bisMatch?.groups?.hausnummerBis,
+    strasse,
+    hausnummer,
+    hausnummerBis,
   };
 }
 
