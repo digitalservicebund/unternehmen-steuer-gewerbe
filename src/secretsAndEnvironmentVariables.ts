@@ -1,29 +1,24 @@
 import "dotenv/config";
 import { readFileSync } from "node:fs";
 
-// Credentials and key material, only ever read via getSecret().
-export const SECRET_NAMES = [
-  "AKDB_USERNAME",
-  "AKDB_PASSWORD",
-  "FIT_CONNECT_CLIENT_SECRET",
-  "FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK",
-] as const;
+// Credentials (keys, tokens etc.), only ever read via getSecret().
+export type SecretName =
+  | "AKDB_PASSWORD"
+  | "AKDB_USERNAME"
+  | "FIT_CONNECT_CLIENT_SECRET"
+  | "FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK";
 
-// Plain configuration (URLs, IDs, feature flags), only ever read via getEnvironmentVariable().
-export const ENVIRONMENT_VARIABLE_NAMES = [
-  "FIT_CONNECT_OAUTH_TOKEN_URL",
-  "FIT_CONNECT_SUBMISSION_API_URL",
-  "FIT_CONNECT_DESTINATION_API_URL",
-  "FIT_CONNECT_ROUTING_API_URL",
-  "FIT_CONNECT_CLIENT_ID",
-  "FIT_CONNECT_DESTINATION_ID",
-  "ERIC_HERSTELLERID",
-  "ERIC_ENABLE_CUSTOM_FINANZAMT_IDS",
-  "AKDB_BASE_URL",
-] as const;
-
-export type SecretName = (typeof SECRET_NAMES)[number];
-export type EnvironmentVariableName = (typeof ENVIRONMENT_VARIABLE_NAMES)[number];
+// Configuration (URLs, IDs, feature flags), only ever read via getEnvironmentVariable().
+export type EnvironmentVariableName =
+  | "AKDB_BASE_URL"
+  | "ERIC_ENABLE_CUSTOM_FINANZAMT_IDS"
+  | "ERIC_HERSTELLERID"
+  | "FIT_CONNECT_CLIENT_ID"
+  | "FIT_CONNECT_DESTINATION_API_URL"
+  | "FIT_CONNECT_DESTINATION_ID"
+  | "FIT_CONNECT_OAUTH_TOKEN_URL"
+  | "FIT_CONNECT_ROUTING_API_URL"
+  | "FIT_CONNECT_SUBMISSION_API_URL";
 
 export function getSecret(name: SecretName): string {
   if (process.env.SECRETS_FILE_PATH) {
