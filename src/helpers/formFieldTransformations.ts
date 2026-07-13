@@ -9,10 +9,10 @@ export function formatDatumDE(isoDate: string): string {
 /** Helper to split street and number "Straße 123" in ["Straße", "123"] */
 
 export function splitStrasseHausnummer(strasseUndHausnummer: string) {
-  const hausnummerBisPattern = String.raw`\d{1,6}`;
-  const hausnummerPattern = String.raw`${hausnummerBisPattern}(?:\s+${hausnummerBisPattern})?(?:/${hausnummerBisPattern})?(?:\s*[a-z])?`;
+  const upToSixNumbers = String.raw`\d{1,6}`;
+  const hausnummerPattern = String.raw`${upToSixNumbers}(?:\s+${upToSixNumbers})?(?:/${upToSixNumbers})?(?:\s*[a-z])?`;
   const addressPattern = new RegExp(
-    String.raw`^(?<strasse>.{1,100}?)\s+(?<hausnummer>${hausnummerPattern})(?:\s*-\s*(?<hausnummerBis>${hausnummerBisPattern}))?$`,
+    String.raw`^(?<strasse>.{1,100}?)\s+(?<hausnummer>${hausnummerPattern})(?:\s*-\s*(?<hausnummerBis>${upToSixNumbers}))?$`,
     "i",
   );
 
