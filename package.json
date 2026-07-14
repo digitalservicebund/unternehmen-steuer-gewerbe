@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc --noEmit && echo 'Type check passed. Use build:dev or build:prod to produce dist/'",
     "build:dev": "rm -rf dist && rolldown -c && mkdir -p dist/resources && cp -r src/resources/. dist/resources/ && cp -r node_modules/@digitalservicebund/unternehmen-steuer-gewerbe-privat/dist/ERiC-44.2.4.0 dist/ERiC-44.2.4.0 && cp -r node_modules/@digitalservicebund/unternehmen-steuer-gewerbe-privat/dist/resources/. dist/resources/",
-    "build:prod": "pnpm build:dev && pnpm install --prod",
+    "build:prod": "pnpm build:dev && rm -rf node_modules && pnpm install --prod",
     "build:image": "pnpm build:prod && docker build . --tag ${IMAGE_TAG:-unternehmen-steuer-gewerbe} --build-arg COMMIT_SHA=$(git rev-parse HEAD); status=$?; pnpm install; exit $status",
     "format": "oxfmt --check",
     "format:fix": "oxfmt",
@@ -36,7 +36,6 @@
     "@hono/node-server": "^2.0.8",
     "@hono/swagger-ui": "^0.6.1",
     "@hono/zod-openapi": "^1.4.0",
-    "@ls-lint/ls-lint": "^2.3.1",
     "dotenv": "^17.4.2",
     "fast-xml-parser": "^5.9.3",
     "hono": "^4.12.28",
@@ -48,6 +47,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@ls-lint/ls-lint": "^2.3.1",
     "@types/node": "^26.1.0",
     "@types/pdfkit": "^0.17.6",
     "@vitest/coverage-v8": "4.1.10",
