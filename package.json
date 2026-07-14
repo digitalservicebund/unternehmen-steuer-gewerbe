@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc --noEmit && echo 'Type check passed. Use build:dev or build:prod to produce dist/'",
     "build:dev": "rm -rf dist && rolldown -c && mkdir -p dist/resources && cp -r src/resources/. dist/resources/ && cp -r node_modules/@digitalservicebund/unternehmen-steuer-gewerbe-privat/dist/ERiC-44.2.4.0 dist/ERiC-44.2.4.0 && cp -r node_modules/@digitalservicebund/unternehmen-steuer-gewerbe-privat/dist/resources/. dist/resources/",
-    "build:prod": "pnpm build:dev && pnpm install --prod",
+    "build:prod": "pnpm build:dev && rm -rf node_modules && pnpm install --prod",
     "build:image": "pnpm build:prod && docker build . --tag ${IMAGE_TAG:-unternehmen-steuer-gewerbe} --build-arg COMMIT_SHA=$(git rev-parse HEAD); status=$?; pnpm install; exit $status",
     "format": "oxfmt --check",
     "format:fix": "oxfmt",
@@ -17,7 +17,7 @@
     "lint:fix": "oxlint --fix",
     "ls-lint": "ls-lint",
     "start": "op run --env-file .env -- tsx src/index.ts",
-    "start:image": "op run --env-file .env -- docker run -p 3000:3000 -e ERIC_HERSTELLERID -e FIT_CONNECT_OAUTH_TOKEN_URL -e FIT_CONNECT_SUBMISSION_API_URL -e FIT_CONNECT_DESTINATION_API_URL -e FIT_CONNECT_ROUTING_API_URL -e FIT_CONNECT_CLIENT_ID -e FIT_CONNECT_CLIENT_SECRET -e FIT_CONNECT_DESTINATION_ID -e FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK -e FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK unternehmen-steuer-gewerbe",
+    "start:image": "op run --env-file .env -- docker run -p 3000:3000 -e ERIC_HERSTELLERID -e ERIC_CERTIFICATE_BASE64 -e ERIC_CERTIFICATE_PIN -e FIT_CONNECT_OAUTH_TOKEN_URL -e FIT_CONNECT_SUBMISSION_API_URL -e FIT_CONNECT_DESTINATION_API_URL -e FIT_CONNECT_ROUTING_API_URL -e FIT_CONNECT_CLIENT_ID -e FIT_CONNECT_CLIENT_SECRET -e FIT_CONNECT_DESTINATION_ID -e FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK -e FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK unternehmen-steuer-gewerbe",
     "start:watch": "op run --env-file .env -- nodemon --watch . --ignore dist --ext ts,json,yml,md --exec pnpm run start",
     "test": "NODE_EXTRA_CA_CERTS=akdb-ca.public.test.pem op run --env-file .env -- vitest run",
     "test:unit": "vitest run --config vitest.unit.config.ts",
@@ -36,7 +36,6 @@
     "@hono/node-server": "^2.0.8",
     "@hono/swagger-ui": "^0.6.1",
     "@hono/zod-openapi": "^1.4.0",
-    "@ls-lint/ls-lint": "^2.3.1",
     "dotenv": "^17.4.2",
     "fast-xml-parser": "^5.9.3",
     "hono": "^4.12.28",
@@ -44,11 +43,11 @@
     "koffi": "^3.1.0",
     "pdfkit": "^0.19.1",
     "saxonjs-he": "3.0.0-beta2",
-    "vite": "8.1.3",
     "xmllint-wasm": "^5.2.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@ls-lint/ls-lint": "^2.3.1",
     "@types/node": "^26.1.0",
     "@types/pdfkit": "^0.17.6",
     "@vitest/coverage-v8": "4.1.10",
@@ -60,11 +59,12 @@
     "tsx": "^4.23.0",
     "typescript": "^7.0.2",
     "unpdf": "^1.6.2",
+    "vite": "8.1.3",
     "vitest": "^4.1.10",
     "xslt3-he": "3.0.0-beta2"
   },
   "engines": {
-    "node": "26.4.0"
+    "node": "26.5.0"
   },
   "packageManager": "pnpm@11.5.1"
 }
