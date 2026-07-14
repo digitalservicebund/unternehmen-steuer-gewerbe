@@ -10,9 +10,12 @@ const SUPPORTED_REGIONS = {
   aachen: [rangeOfPLZs("52062", "52080")],
   dresden: [rangeOfPLZs("01067", "01328"), "01465"],
   fulda: [rangeOfPLZs("36037", "36043")],
-  muenchen: [rangeOfPLZs("80331", "81929")],
+  münchen: [rangeOfPLZs("80331", "81929")],
   nordfriesland: [rangeOfPLZs("25811", "25999")],
-  duesseldorf: [rangeOfPLZs("40210", "40629")],
+  // This range is reserved for Düsseldorf, but not all of them are in use.
+  // Range source: https://de.wikipedia.org/wiki/D%C3%BCsseldorf)
+  // Reference with gaps: https://www.dasoertliche.de/?st=&ci=D%C3%BCsseldorf&form_name=search_pc
+  düsseldorf: [rangeOfPLZs("40210", "40629")],
   goslar: ["38640", "38642", "38644", "38690"],
   hamburg: [rangeOfPLZs("20095", "21149"), rangeOfPLZs("22041", "22769"), "27499"],
   mannheim: [rangeOfPLZs("68159", "68309")],
