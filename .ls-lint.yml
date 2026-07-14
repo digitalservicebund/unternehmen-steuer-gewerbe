@@ -1,0 +1,22 @@
+ls:
+  .dir: camelCase
+  .ts: camelCase
+  .d.ts: camelCase
+  .unit.test.ts: regex:^[a-z][a-zA-Z0-9]*(\.[a-z][a-zA-Z0-9]*)?$
+  .integration.test.ts: camelCase
+  .smoke.test.ts: camelCase
+  .load.test.ts: camelCase
+
+ignore:
+  - node_modules
+  - dist
+  - coverage
+  - ignored
+  - .git
+  - .github
+  - .vscode
+  - .idea
+  - .claude
+  - .eric-certificates
+  - .fallow
+  - src/resources

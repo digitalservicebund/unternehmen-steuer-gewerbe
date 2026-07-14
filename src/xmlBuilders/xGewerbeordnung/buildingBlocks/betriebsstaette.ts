@@ -1,5 +1,4 @@
-import { escapeXml } from "../../../helpers/escapeXml";
-import { isDefinedInput } from "../../../helpers/isDefinedInput";
+import { optionalWrappedTag } from "../../../helpers/xmlTag";
 import { createAnschrift, type Anschrift } from "./anschrift";
 import { createKommunikation, type Kommunikation } from "./kommunikation";
 
@@ -16,7 +15,7 @@ export function createBetriebsstaette(betriebsstaette: Betriebsstaette | undefin
   if (!betriebsstaette) return "";
   return `
     <xga:betriebsstaette>
-      ${isDefinedInput(betriebsstaette.artBetriebsstaette) ? `<wt:artBetriebsstaette listVersionID="1"><code>${escapeXml(betriebsstaette.artBetriebsstaette)}</code></wt:artBetriebsstaette>` : ""}
+      ${optionalWrappedTag("wt:artBetriebsstaette", "code", betriebsstaette.artBetriebsstaette, ' listVersionID="1"')}
       ${createAnschrift(betriebsstaette.anschrift)}
       ${createKommunikation(betriebsstaette.kommunikation)}
     </xga:betriebsstaette>`;

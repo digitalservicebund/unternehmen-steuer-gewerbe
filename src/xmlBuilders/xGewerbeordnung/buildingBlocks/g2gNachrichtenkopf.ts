@@ -1,5 +1,4 @@
-import { escapeXml } from "../../../helpers/escapeXml";
-import { isDefinedInput } from "../../../helpers/isDefinedInput";
+import { optionalTag } from "../../../helpers/xmlTag";
 import { createBehoerde, type Behoerde } from "./behoerde";
 
 export interface Nachrichtenkopf {
@@ -10,18 +9,28 @@ export interface Nachrichtenkopf {
   autor?: Behoerde;
 }
 
+function createLeser(leser: Behoerde | undefined) {
+  if (!leser) return "";
+  return `<bn-g2g:leser>${createBehoerde(leser)}</bn-g2g:leser>`;
+}
+
+function createAutor(autor: Behoerde | undefined) {
+  if (!autor) return "";
+  return `<bn-g2g:autor>${createBehoerde(autor)}</bn-g2g:autor>`;
+}
+
 export function createG2gNachrichtenkopf(nachrichtenkopf: Nachrichtenkopf | undefined) {
   if (!nachrichtenkopf) return "";
   return `
     <bn-g2g:nachrichtenkopf.g2g>
       <bn-g2g:identifikation.nachricht>
-        ${isDefinedInput(nachrichtenkopf.nachrichtenUUID) ? `<bn-g2g:nachrichtenUUID>${escapeXml(nachrichtenkopf.nachrichtenUUID)}</bn-g2g:nachrichtenUUID>` : ""}
+        ${optionalTag("bn-g2g:nachrichtenUUID", nachrichtenkopf.nachrichtenUUID)}
         <bn-g2g:nachrichtentyp listURI="urn:xoev-de:xgewerbeordnung:codeliste:nachrichtentypen" listVersionID="1.6">
           <code>0400</code>
         </bn-g2g:nachrichtentyp>
-        ${isDefinedInput(nachrichtenkopf.erstellungszeitpunkt) ? `<bn-g2g:erstellungszeitpunkt>${escapeXml(nachrichtenkopf.erstellungszeitpunkt)}</bn-g2g:erstellungszeitpunkt>` : ""}
+        ${optionalTag("bn-g2g:erstellungszeitpunkt", nachrichtenkopf.erstellungszeitpunkt)}
       </bn-g2g:identifikation.nachricht>
-      ${nachrichtenkopf.leser ? `<bn-g2g:leser>${createBehoerde(nachrichtenkopf.leser)}</bn-g2g:leser>` : ""}
-      ${nachrichtenkopf.autor ? `<bn-g2g:autor>${createBehoerde(nachrichtenkopf.autor)}</bn-g2g:autor>` : ""}
+      ${createLeser(nachrichtenkopf.leser)}
+      ${createAutor(nachrichtenkopf.autor)}
     </bn-g2g:nachrichtenkopf.g2g>`;
 }

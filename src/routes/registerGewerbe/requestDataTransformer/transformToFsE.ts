@@ -5,7 +5,7 @@ import {
 } from "../../../helpers/formFieldTransformations";
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { type ElsterFsEEUn } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
-import { getSecret } from "../../../secrets";
+import { getEnvironmentVariable } from "../../../secretsAndEnvironmentVariables";
 import {
   RELIGIONSSCHLUESSEL,
   GEWINN_ERMITTLUNG,
@@ -82,14 +82,16 @@ function getZahllastUeberschuss(data: RegisterGewerbeRequest) {
 }
 
 function ensureEricHerstellerId() {
-  if (getSecret("ERIC_HERSTELLERID") === "") throw new Error("ERIC_HERSTELLERID not set");
+  if (getEnvironmentVariable("ERIC_HERSTELLERID") === "")
+    throw new Error("ERIC_HERSTELLERID not set");
 }
 // run once so we fail on start if not set
 ensureEricHerstellerId();
 
 function determineFinanzamtIdOrDefault(id?: string): string {
   if (!id) return defaultFinanzamtId;
-  if (getSecret("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS") !== "true") return defaultFinanzamtId;
+  if (getEnvironmentVariable("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS") !== "true")
+    return defaultFinanzamtId;
 
   return id;
 }
@@ -115,7 +117,7 @@ export function transformToEUnFsE(
       datenArt: "EUn",
       vorgang: "send-Auth",
       testmerker: "700000004",
-      herstellerID: getSecret("ERIC_HERSTELLERID"),
+      herstellerID: getEnvironmentVariable("ERIC_HERSTELLERID"),
       datenLieferant: "ERiC Projekt",
       datei: { verschluesselung: "CMSEncryptedData", kompression: "GZIP" },
       versionClient: "ERiC Beispiele",
