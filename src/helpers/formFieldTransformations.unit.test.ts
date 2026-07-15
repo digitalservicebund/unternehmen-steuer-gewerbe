@@ -12,7 +12,7 @@ describe("splitStrasseHausnummer", () => {
     ["Betriebsweg 42a", "Betriebsweg", "42", undefined, "a"],
     ["Am Stadtpark 5", "Am Stadtpark", "5", undefined, undefined],
     ["Prinzessinnenstraße 8-14", "Prinzessinnenstraße", "8", "14", undefined],
-    ["straße des 17 juni 135", "straße des 17 juni", "135", undefined],
+    ["straße des 17 juni 135", "straße des 17 juni", "135", undefined, undefined],
     ["straße des 17 juni 1 2/5 b", "straße des 17 juni", "1", undefined, "2/5b"],
     ["Teststr. 4 - 44", "Teststr.", "4", "44", undefined],
   ])("splits '%s' correctly", (input, strasse, hausnummer, hausnummerBis, zusatz) => {
