@@ -68,7 +68,7 @@ function createClientCertificateDispatcherIfSecretsAreSet(): Agent | undefined {
   // the base64 encoded .p12 certificate file and the password it is encrypted with,
   // only set in environments where AKDB requires the certificate (production)
   const certificateBase64 = getSecret("AKDB_CERTIFICATE_BASE64");
-  const certificatePassphrase = getSecret("AKDB_CERTIFICATE_KEY");
+  const certificatePassphrase = getSecret("AKDB_CERTIFICATE_PASSPHRASE");
 
   if (certificateBase64 === "" || certificatePassphrase === "") {
     return undefined;
@@ -89,7 +89,7 @@ function createClientCertificateDispatcherIfSecretsAreSet(): Agent | undefined {
 export function getOsciClient() {
   const config: OsciClientConfig = {
     baseUrl: getEnvironmentVariable("AKDB_BASE_URL"),
-    username: getSecret("AKDB_USERNAME"),
+    username: getEnvironmentVariable("AKDB_USERNAME"),
     password: getSecret("AKDB_PASSWORD"),
   };
 

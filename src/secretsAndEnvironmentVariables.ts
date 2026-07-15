@@ -4,15 +4,15 @@ import { readFileSync } from "node:fs";
 // Credentials (keys, tokens etc.), only ever read via getSecret().
 export type SecretName =
   | "AKDB_CERTIFICATE_BASE64"
-  | "AKDB_CERTIFICATE_KEY"
+  | "AKDB_CERTIFICATE_PASSPHRASE"
   | "AKDB_PASSWORD"
-  | "AKDB_USERNAME"
   | "FIT_CONNECT_CLIENT_SECRET"
   | "FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK";
 
 // Configuration (URLs, IDs, feature flags), only ever read via getEnvironmentVariable().
 export type EnvironmentVariableName =
   | "AKDB_BASE_URL"
+  | "AKDB_USERNAME"
   | "ERIC_ENABLE_CUSTOM_FINANZAMT_IDS"
   | "ERIC_HERSTELLERID"
   | "FIT_CONNECT_CLIENT_ID"
