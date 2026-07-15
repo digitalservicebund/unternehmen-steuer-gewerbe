@@ -41,6 +41,9 @@ importers:
       saxonjs-he:
         specifier: 3.0.0-beta2
         version: 3.0.0-beta2
+      undici:
+        specifier: ^8.7.0
+        version: 8.7.0
       xmllint-wasm:
         specifier: ^5.2.0
         version: 5.2.0(@types/node@26.1.0)
@@ -1408,6 +1411,10 @@ packages:
   undici-types@8.3.0:
     resolution: {integrity: sha512-j375ScV60dom+YkPFIfTLcOiPxkN/buHz5GobjLhixFuANaNs3C9l4GmrWqejgXWJ7BbJcFYpTEUkS1Ge8bpZQ==}
 
+  undici@8.7.0:
+    resolution: {integrity: sha512-N7iQtfyLhIMOFgQubvmLV26svHpO0bqKnAiWotTQCVKCmWrcGbBotPuW1x+xwYZ2VHdSTVUfPQQnlEt1/LouTQ==}
+    engines: {node: '>=22.19.0'}
+
   unicode-properties@1.4.1:
     resolution: {integrity: sha512-CLjCCLQ6UuMxWnbIylkisbRj31qxHPAurvena/0iwSVbQ2G1VY5/HjV0IRabOEbDHlzZlRdCrD4NhB0JtU40Pg==}
 
@@ -2552,6 +2559,8 @@ snapshots:
   undefsafe@2.0.5: {}
 
   undici-types@8.3.0: {}
+
+  undici@8.7.0: {}
 
   unicode-properties@1.4.1:
     dependencies:

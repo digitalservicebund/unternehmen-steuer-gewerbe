@@ -3,6 +3,8 @@ import { readFileSync } from "node:fs";
 
 // Credentials (keys, tokens etc.), only ever read via getSecret().
 export type SecretName =
+  | "AKDB_CERTIFICATE_BASE64"
+  | "AKDB_CERTIFICATE_KEY"
   | "AKDB_PASSWORD"
   | "AKDB_USERNAME"
   | "FIT_CONNECT_CLIENT_SECRET"
