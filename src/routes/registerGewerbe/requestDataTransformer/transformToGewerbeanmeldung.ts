@@ -26,12 +26,12 @@ function getBetriebsAnschriftWithFallbackToPersönlicheDaten(
   privateAdresse: RegisterGewerbeRequest["persönlicheDaten"]["adresse"],
 ): Anschrift {
   const betriebsAdresse = adresseAbweichend ?? privateAdresse;
-  const { strasse, hausnummer, hausnummerBis, zusatz } = splitStrasseHausnummer(
+  const { strasse, hausnummer, hausnummerBis, hausnummerZusatz } = splitStrasseHausnummer(
     betriebsAdresse.strasseUndHausnummer,
   );
   return {
     strasse,
-    hausnummerVon: joinHausnummerUndZusatz(hausnummer, zusatz),
+    hausnummerVon: joinHausnummerUndZusatz(hausnummer, hausnummerZusatz),
     hausnummerBis,
     postleitzahl: betriebsAdresse.postleitzahl,
     ort: betriebsAdresse.ort,
@@ -152,7 +152,7 @@ export function transformToGewerbeanmeldung(
             strasse: personStrasseHausnummer.strasse,
             hausnummerVon: joinHausnummerUndZusatz(
               personStrasseHausnummer.hausnummer,
-              personStrasseHausnummer.zusatz,
+              personStrasseHausnummer.hausnummerZusatz,
             ),
             hausnummerBis: personStrasseHausnummer.hausnummerBis,
             postleitzahl: data.persönlicheDaten.adresse.postleitzahl,

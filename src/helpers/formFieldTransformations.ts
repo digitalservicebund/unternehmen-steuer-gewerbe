@@ -8,24 +8,31 @@ export function formatDatumDE(isoDate: string): string {
 
 /** Helper to split street and number "Straße 123" in ["Straße", "123"] */
 
-export function splitStrasseHausnummer(strasseUndHausnummer: string) {
+interface SplitStrasseHausnummer {
+  strasse?: string;
+  hausnummer?: string;
+  hausnummerBis?: string;
+  hausnummerZusatz?: string;
+}
+
+export function splitStrasseHausnummer(strasseUndHausnummer: string): SplitStrasseHausnummer {
   const upToSixNumbers = String.raw`\d{1,6}`;
   const zusatzPattern = String.raw`(?:\s+${upToSixNumbers})?(?:/${upToSixNumbers})?(?:\s*[a-z])?`;
   const addressPattern = new RegExp(
-    String.raw`^(?<strasse>.{1,100}?)\s+(?<hausnummer>${upToSixNumbers})(?<zusatz>${zusatzPattern})(?:\s*-\s*(?<hausnummerBis>${upToSixNumbers}))?$`,
+    String.raw`^(?<strasse>.{1,100}?)\s+(?<hausnummer>${upToSixNumbers})(?<hausnummerZusatz>${zusatzPattern})(?:\s*-\s*(?<hausnummerBis>${upToSixNumbers}))?$`,
     "i",
   );
 
   const match = addressPattern.exec(strasseUndHausnummer);
   if (!match?.groups) throw new Error("The given address format is not supported");
 
-  const { strasse, hausnummer, hausnummerBis, zusatz } = match.groups;
+  const { strasse, hausnummer, hausnummerBis, hausnummerZusatz } = match.groups;
 
   return {
     strasse,
     hausnummer,
     hausnummerBis,
-    zusatz: zusatz === "" ? undefined : zusatz,
+    hausnummerZusatz: hausnummerZusatz === "" ? undefined : hausnummerZusatz,
   };
 }
 
