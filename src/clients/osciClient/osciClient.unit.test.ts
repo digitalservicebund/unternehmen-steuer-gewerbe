@@ -62,7 +62,7 @@ describe("getOsciClient.sendMessage", () => {
     ).rejects.toThrow();
   });
 
-  it("sends without a dispatcher when the certificate secrets are not set", async () => {
+  it("sends without a custom dispatcher when the certificate secrets are not set", async () => {
     vi.stubEnv("AKDB_BASE_URL", "https://soaptest.akdb.de/okkommozg");
     vi.stubEnv("AKDB_CERTIFICATE_BASE64", "");
     vi.stubEnv("AKDB_CERTIFICATE_KEY", "");
