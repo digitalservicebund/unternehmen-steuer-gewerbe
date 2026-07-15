@@ -20,13 +20,12 @@ export function splitStrasseHausnummer(strasseUndHausnummer: string) {
   if (!match?.groups) throw new Error("The given address format is not supported");
 
   const { strasse, hausnummer, hausnummerBis, zusatz } = match.groups;
-  const zusatzOhneLeerzeichen = zusatz ? zusatz.replace(/\s+/g, "") : undefined;
 
   return {
     strasse,
     hausnummer,
     hausnummerBis,
-    zusatz: zusatzOhneLeerzeichen,
+    zusatz: zusatz === "" ? undefined : zusatz,
   };
 }
 
