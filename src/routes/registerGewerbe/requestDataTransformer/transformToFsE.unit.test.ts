@@ -17,7 +17,7 @@ describe("transformToEUnFsE", () => {
     expect(natPers?.adrkette?.strAdr).toMatchObject({
       str: "Musterstraße",
       hausNr: "1",
-      adressErg: "a",
+      adressErg: " a",
       plz: "03046",
       ort: "Cottbus",
     });

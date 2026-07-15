@@ -39,7 +39,7 @@ describe("transformToGewerbeanmeldung", () => {
     });
     expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
       strasse: "Musterstraße",
-      hausnummerVon: "1a",
+      hausnummerVon: "1 a",
       postleitzahl: "03046",
       ort: "Cottbus",
     });
