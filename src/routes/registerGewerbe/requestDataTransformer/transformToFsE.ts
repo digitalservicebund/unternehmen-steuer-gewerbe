@@ -30,7 +30,7 @@ function getUnternehmensAnschrift(data: RegisterGewerbeRequest) {
   if (adresseAbweichend === undefined) {
     return { entsprichtWohnanschrift: true };
   }
-  const { strasse, hausnummer, hausnummerBis } = splitStrasseHausnummer(
+  const { strasse, hausnummer, hausnummerBis, zusatz } = splitStrasseHausnummer(
     adresseAbweichend.strasseUndHausnummer,
   );
   return {
@@ -39,6 +39,7 @@ function getUnternehmensAnschrift(data: RegisterGewerbeRequest) {
         str: strasse,
         hausNr: hausnummer,
         hausNrZu: hausnummerBis,
+        adressErg: zusatz,
         plz: adresseAbweichend.postleitzahl,
         ort: adresseAbweichend.ort,
       },
@@ -152,7 +153,7 @@ export function transformToEUnFsE(
                 str: persönlicheStrasseHausnummer.strasse,
                 hausNr: persönlicheStrasseHausnummer.hausnummer,
                 hausNrZu: persönlicheStrasseHausnummer.hausnummerBis,
-                // adressErg: undefined,
+                adressErg: persönlicheStrasseHausnummer.zusatz,
                 plz: data.persönlicheDaten.adresse.postleitzahl,
                 ort: data.persönlicheDaten.adresse.ort,
               },

@@ -12,17 +12,23 @@ import {
 } from "./xGewerbeordnungCodes";
 import { Anschrift } from "../../../xmlBuilders/xGewerbeordnung/buildingBlocks/anschrift";
 
+// xGewerbeordnung has no separate field for the Hausnummer-Zusatz, so it is appended to
+// hausnummerVon directly (e.g. "21a")
+function joinHausnummerUndZusatz(hausnummer: string, zusatz: string | undefined): string {
+  return zusatz ? `${hausnummer}${zusatz}` : hausnummer;
+}
+
 function getBetriebsAnschriftWithFallbackToPersönlicheDaten(
   adresseAbweichend: RegisterGewerbeRequest["unternehmensDaten"]["adresseAbweichend"],
   privateAdresse: RegisterGewerbeRequest["persönlicheDaten"]["adresse"],
 ): Anschrift {
   const betriebsAdresse = adresseAbweichend ?? privateAdresse;
-  const { strasse, hausnummer, hausnummerBis } = splitStrasseHausnummer(
+  const { strasse, hausnummer, hausnummerBis, zusatz } = splitStrasseHausnummer(
     betriebsAdresse.strasseUndHausnummer,
   );
   return {
     strasse,
-    hausnummerVon: hausnummer,
+    hausnummerVon: joinHausnummerUndZusatz(hausnummer, zusatz),
     hausnummerBis,
     postleitzahl: betriebsAdresse.postleitzahl,
     ort: betriebsAdresse.ort,
@@ -141,7 +147,10 @@ export function transformToGewerbeanmeldung(
           staatsangehoerigkeit: STAATSANGEHOERIGKEIT[data.persönlicheDaten.staatsangehörigkeit],
           anschrift: {
             strasse: personStrasseHausnummer.strasse,
-            hausnummerVon: personStrasseHausnummer.hausnummer,
+            hausnummerVon: joinHausnummerUndZusatz(
+              personStrasseHausnummer.hausnummer,
+              personStrasseHausnummer.zusatz,
+            ),
             hausnummerBis: personStrasseHausnummer.hausnummerBis,
             postleitzahl: data.persönlicheDaten.adresse.postleitzahl,
             ort: data.persönlicheDaten.adresse.ort,

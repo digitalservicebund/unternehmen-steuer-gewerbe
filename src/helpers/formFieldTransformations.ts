@@ -10,9 +10,9 @@ export function formatDatumDE(isoDate: string): string {
 
 export function splitStrasseHausnummer(strasseUndHausnummer: string) {
   const upToSixNumbers = String.raw`\d{1,6}`;
-  const hausnummerPattern = String.raw`${upToSixNumbers}(?:\s+${upToSixNumbers})?(?:/${upToSixNumbers})?(?:\s*[a-z])?`;
+  const zusatzPattern = String.raw`(?:\s+${upToSixNumbers})?(?:/${upToSixNumbers})?(?:\s*[a-z])?`;
   const addressPattern = new RegExp(
-    String.raw`^(?<strasse>.{1,100}?)\s+(?<hausnummer>${hausnummerPattern})(?:\s*-\s*(?<hausnummerBis>${upToSixNumbers}))?$`,
+    String.raw`^(?<strasse>.{1,100}?)\s+(?<hausnummer>${upToSixNumbers})(?<zusatz>${zusatzPattern})(?:\s*-\s*(?<hausnummerBis>${upToSixNumbers}))?$`,
     "i",
   );
 
@@ -20,12 +20,13 @@ export function splitStrasseHausnummer(strasseUndHausnummer: string) {
   if (!match?.groups) throw new Error("The given address format is not supported");
 
   const { strasse, hausnummer, hausnummerBis, zusatz } = match.groups;
+  const zusatzOhneLeerzeichen = zusatz ? zusatz.replace(/\s+/g, "") : undefined;
 
   return {
     strasse,
     hausnummer,
     hausnummerBis,
-    zusatz,
+    zusatz: zusatzOhneLeerzeichen,
   };
 }
 
