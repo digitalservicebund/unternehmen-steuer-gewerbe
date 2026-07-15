@@ -206,7 +206,7 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
       str: "Musterstraße",
       hausNr: "2",
-      adressErg: "a",
+      adressErg: " a",
       plz: "96450",
       ort: "Coburg",
     });
