@@ -23,7 +23,7 @@ function mockFetch() {
   return fetchMock;
 }
 
-describe("getOsciClient", () => {
+describe("getOsciClient.sendMessage", () => {
   afterEach(() => {
     vi.clearAllMocks();
     vi.unstubAllEnvs();
@@ -47,6 +47,19 @@ describe("getOsciClient", () => {
       "https://apk.akdb.de/okkommozg/restapi/v3.0/messages/zko/json/multipart",
       expect.objectContaining({ dispatcher: expect.any(Agent) }),
     );
+  });
+
+  it("throws when the token request fails", async () => {
+    vi.stubEnv("AKDB_BASE_URL", "https://soaptest.akdb.de/okkommozg");
+    vi.stubEnv("AKDB_CERTIFICATE_BASE64", "");
+    vi.stubEnv("AKDB_CERTIFICATE_KEY", "");
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response("error", { status: 401, statusText: "Unauthorized" }),
+    );
+
+    await expect(
+      getOsciClient().sendMessage({ targetId: "MELDID:09000099", message: "<xml/>" }),
+    ).rejects.toThrow();
   });
 
   it("sends without a dispatcher when the certificate secrets are not set", async () => {
