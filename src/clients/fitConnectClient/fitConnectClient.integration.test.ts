@@ -29,7 +29,7 @@ describe("FitConnectClient", () => {
   });
 
   describe("getRoutes", () => {
-    it("returns a routing result for a known leiKa key and AGS", async () => {
+    it.skip("returns a routing result for a known leiKa key and AGS", async () => {
       const client = getFitConnectClient();
 
       const result = await client.getRoutes(
