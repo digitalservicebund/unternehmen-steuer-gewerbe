@@ -19,12 +19,13 @@ export function splitStrasseHausnummer(strasseUndHausnummer: string) {
   const match = addressPattern.exec(strasseUndHausnummer);
   if (!match?.groups) throw new Error("The given address format is not supported");
 
-  const { strasse, hausnummer, hausnummerBis } = match.groups;
+  const { strasse, hausnummer, hausnummerBis, zusatz } = match.groups;
 
   return {
     strasse,
     hausnummer,
     hausnummerBis,
+    zusatz,
   };
 }
 
