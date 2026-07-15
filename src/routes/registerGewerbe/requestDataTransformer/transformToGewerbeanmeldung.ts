@@ -14,8 +14,11 @@ import { Anschrift } from "../../../xmlBuilders/xGewerbeordnung/buildingBlocks/a
 
 // xGewerbeordnung has no separate field for the Hausnummer-Zusatz, so it is appended to
 // hausnummerVon directly (e.g. "21a")
-function joinHausnummerUndZusatz(hausnummer: string, zusatz: string | undefined): string {
-  return zusatz ? `${hausnummer}${zusatz}` : hausnummer;
+function joinHausnummerUndZusatz(
+  hausnummer: string | undefined,
+  zusatz: string | undefined,
+): string {
+  return `${hausnummer ?? ""}${zusatz ?? ""}`;
 }
 
 function getBetriebsAnschriftWithFallbackToPersönlicheDaten(
