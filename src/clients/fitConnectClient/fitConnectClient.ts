@@ -215,15 +215,6 @@ export function getFitConnectClient() {
   }: SubmitDataOptions): Promise<SubmitDataResponse> {
     const accessToken = await authenticate();
 
-    const submission = await fetchJson<CreateSubmissionResponse>(
-      `${config.submissionApiUrl}/v2/submissions`,
-      {
-        method: "POST",
-        body: { announcedAttachments: [], destinationId, publicService },
-        headers: { Authorization: `Bearer ${accessToken}` },
-      },
-    );
-
     const metadata = createMetadata(dataSchema, data);
 
     const destination = await fetchJson<DestinationResponse>(
@@ -232,6 +223,15 @@ export function getFitConnectClient() {
 
     const publicJwk = await fetchJson<JWK>(
       `${config.submissionApiUrl}/v2/destinations/${destinationId}/keys/${destination.encryptionKid}`,
+    );
+
+    const submission = await fetchJson<CreateSubmissionResponse>(
+      `${config.submissionApiUrl}/v2/submissions`,
+      {
+        method: "POST",
+        body: { announcedAttachments: [], destinationId, publicService },
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
     );
 
     const encryptedData = await encryptData(data, publicJwk, dataSchema.mimeType);
