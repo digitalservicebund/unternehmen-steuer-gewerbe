@@ -56,7 +56,7 @@ interface SendMessageResponse {
   };
 }
 
-const TOKEN_TIMEOUT_MS = 5_000;
+const DEFAULT_TIMEOUT_MS = 5_000;
 const SEND_TIMEOUT_MS = 30_000;
 
 // AKDB production requires us to authenticate with a client-certificate,
@@ -109,7 +109,7 @@ export function getOsciClient() {
       method: "POST",
       body,
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      signal: AbortSignal.timeout(TOKEN_TIMEOUT_MS),
+      signal: AbortSignal.timeout(DEFAULT_TIMEOUT_MS),
       dispatcher,
     });
 
