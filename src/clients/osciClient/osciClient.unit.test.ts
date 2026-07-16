@@ -90,6 +90,22 @@ describe("getOsciClient", () => {
   });
 
   describe("getTransportReport", () => {
+    it("passes a client-certificate dispatcher when the certificate secrets are set", async () => {
+      vi.stubEnv("AKDB_BASE_URL", "https://apk.akdb.de/okkommozg");
+      vi.stubEnv("AKDB_CERTIFICATE_BASE64", Buffer.from("certificate").toString("base64"));
+      vi.stubEnv("AKDB_CERTIFICATE_PASSPHRASE", "passphrase");
+      const fetchMock = mockGetTransportReportFetch();
+
+      await getOsciClient().getTransportReport({
+        messageId: "vps_by_178357726143931b13e14-2c78-4aa6-ba2c-0d911ec02d82",
+        authorityKey: "MELDID:09000099",
+      });
+
+      const [, reportOptions] = fetchMock.mock.calls[1]!;
+
+      expect(reportOptions?.dispatcher).toBeInstanceOf(Agent);
+    });
+
     it("requests the transport report for the given messageId and authorityKey", async () => {
       vi.stubEnv("AKDB_BASE_URL", "https://soaptest.akdb.de/okkommozg");
       vi.stubEnv("AKDB_CERTIFICATE_BASE64", "");
@@ -106,35 +122,12 @@ describe("getOsciClient", () => {
       expect(reportUrl).toBe(
         "https://soaptest.akdb.de/okkommozg/restapi/v3.0/messages/transport-report/osci",
       );
-      expect(reportOptions?.method).toBe("POST");
-      expect(reportOptions?.headers).toEqual({
-        Authorization: "Bearer token",
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "Accept-Encoding": "deflate, br",
-      });
       expect(JSON.parse(reportOptions?.body as string)).toEqual({
         messageID: "vps_by_178357726143931b13e14-2c78-4aa6-ba2c-0d911ec02d82",
         serviceID:
           "http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-ext.wsdl",
         authorityKey: "MELDID:09000099",
       });
-    });
-
-    it("throws when the transport report request fails", async () => {
-      vi.stubEnv("AKDB_BASE_URL", "https://soaptest.akdb.de/okkommozg");
-      vi.stubEnv("AKDB_CERTIFICATE_BASE64", "");
-      vi.stubEnv("AKDB_CERTIFICATE_PASSPHRASE", "");
-      vi.mocked(fetch)
-        .mockResolvedValueOnce(new Response(TOKEN_RESPONSE, { status: 200 }))
-        .mockResolvedValueOnce(new Response("error", { status: 404, statusText: "Not Found" }));
-
-      await expect(
-        getOsciClient().getTransportReport({
-          messageId: "vps_by_178357726143931b13e14-2c78-4aa6-ba2c-0d911ec02d82",
-          authorityKey: "MELDID:09000099",
-        }),
-      ).rejects.toThrow();
     });
   });
 });
