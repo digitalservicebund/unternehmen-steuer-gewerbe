@@ -77,7 +77,7 @@ jobs:
   test-unit:
     strategy:
       matrix:
-        shard: [1, 2]
+        shard: [1] # expand with [1, 2, 3] or similar
     runs-on: ubuntu-latest
     permissions:
       contents: read
