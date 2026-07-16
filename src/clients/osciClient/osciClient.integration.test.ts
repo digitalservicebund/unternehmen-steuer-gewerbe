@@ -47,7 +47,7 @@ describe("osciClient", () => {
     it("successfully sends a valid ext.gewerbemeldung.0400", async () => {
       const metadata = createMetadata({ targetId: "MELDID:09000099" });
 
-      // TODO: remove this override once our sender id "ds:schnellergruenden" is registered with the AKDB/DVDV
+      // TODO: remove this override once our sender id "ds:schnellergruenden" is registered
       metadata.metadata.source.sourceId = "xga:090010030000";
 
       vi.mocked(createMetadata).mockReturnValueOnce(metadata);
@@ -85,7 +85,7 @@ describe("osciClient", () => {
     it("fetches the transport report for a sent message", async () => {
       const metadata = createMetadata({ targetId: "MELDID:09000099" });
 
-      // TODO: remove this override once our sender id "ds:schnellergruenden" is registered with the AKDB/DVDV
+      // TODO: remove this override once our sender id "ds:schnellergruenden" is registered
       metadata.metadata.source.sourceId = "xga:090010030000";
 
       vi.mocked(createMetadata).mockReturnValueOnce(metadata);
