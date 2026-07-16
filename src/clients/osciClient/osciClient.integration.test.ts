@@ -18,64 +18,90 @@ function readSample(fileName: string) {
   return readFileSync(path.join(samplesDir, fileName), "utf8");
 }
 
-describe("osciClient.sendMessage", () => {
+describe("osciClient", () => {
   const osciClient = getOsciClient();
 
-  // alg.0300 is only used temporarily for testing; in production we will exclusively send ext.gewerbemeldung.0400
-  it("successfully sends a valid alg.gewerbemeldung.0300", async () => {
-    const metadata = createMetadata({ targetId: "MELDID:09000099" });
+  describe("sendMessage", () => {
+    // alg.0300 is only used temporarily for testing; in production we will exclusively send ext.gewerbemeldung.0400
+    it("successfully sends a valid alg.gewerbemeldung.0300", async () => {
+      const metadata = createMetadata({ targetId: "MELDID:09000099" });
 
-    // createMetadata defaults to ext.0400; override the message-type-specific fields for alg.0300.
-    metadata.metadata.source.sourceId = "xga:090010030000";
-    metadata.metadata.target.targetOperation =
-      "alg.gewerbemeldung.0300##http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-alg-Aufsichtsbehoerden.wsdl##xga";
-    metadata.payload.request.message.contentReference =
-      "form-data://message/payload.ok.alg.gewerbemeldung.0300.xml";
+      // createMetadata defaults to ext.0400; override the message-type-specific fields for alg.0300.
+      metadata.metadata.source.sourceId = "xga:090010030000";
+      metadata.metadata.target.targetOperation =
+        "alg.gewerbemeldung.0300##http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-alg-Aufsichtsbehoerden.wsdl##xga";
+      metadata.payload.request.message.contentReference =
+        "form-data://message/payload.ok.alg.gewerbemeldung.0300.xml";
 
-    vi.mocked(createMetadata).mockReturnValueOnce(metadata);
+      vi.mocked(createMetadata).mockReturnValueOnce(metadata);
 
-    const result = await osciClient.sendMessage({
-      targetId: "MELDID:09000099",
-      message: readSample("payload.ok.alg.gewerbemeldung.0300.xml"),
+      const result = await osciClient.sendMessage({
+        targetId: "MELDID:09000099",
+        message: readSample("payload.ok.alg.gewerbemeldung.0300.xml"),
+      });
+
+      expect(result).toBeDefined();
+      expect(result!.metadata.reply!.replyType).toBe("OK");
     });
 
-    expect(result).toBeDefined();
-    expect(result!.metadata.reply!.replyType).toBe("OK");
-  });
+    it("successfully sends a valid ext.gewerbemeldung.0400", async () => {
+      const metadata = createMetadata({ targetId: "MELDID:09000099" });
 
-  it("successfully sends a valid ext.gewerbemeldung.0400", async () => {
-    const metadata = createMetadata({ targetId: "MELDID:09000099" });
+      // TODO: remove this override once our sender id "ds:schnellergruenden" is registered with the AKDB/DVDV
+      metadata.metadata.source.sourceId = "xga:090010030000";
 
-    // TODO: remove this override once our sender id "ds:schnellergruenden" is registered with the AKDB/DVDV
-    metadata.metadata.source.sourceId = "xga:090010030000";
+      vi.mocked(createMetadata).mockReturnValueOnce(metadata);
 
-    vi.mocked(createMetadata).mockReturnValueOnce(metadata);
+      const result = await osciClient.sendMessage({
+        targetId: "MELDID:09000099",
+        message: readSample("custom-xgewo-1.6-valid-0400.xml"),
+      });
 
-    const result = await osciClient.sendMessage({
-      targetId: "MELDID:09000099",
-      message: readSample("custom-xgewo-1.6-valid-0400.xml"),
+      expect(result.metadata.reply.replyType).toBe("OK");
     });
 
-    expect(result.metadata.reply.replyType).toBe("OK");
+    it("throws for an invalid Gewerbemeldung", async () => {
+      const metadata = createMetadata({ targetId: "MELDID:12052000" });
+
+      // createMetadata defaults to ext.0400; override the message-type-specific fields for alg.0300.
+      metadata.metadata.source.sourceId = "xga:090010050000";
+      metadata.metadata.target.targetOperation =
+        "alg.gewerbemeldung.0300##http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-alg-Aufsichtsbehoerden.wsdl##xga";
+      metadata.payload.request.message.contentReference =
+        "form-data://message/payload.nok.alg.gewerbemeldung.0300.xml";
+
+      vi.mocked(createMetadata).mockReturnValueOnce(metadata);
+
+      await expect(
+        osciClient.sendMessage({
+          targetId: "MELDID:12052000",
+          message: readSample("payload.nok.alg.gewerbemeldung.0300.xml"),
+        }),
+      ).rejects.toThrow();
+    });
   });
 
-  it("throws for an invalid Gewerbemeldung", async () => {
-    const metadata = createMetadata({ targetId: "MELDID:12052000" });
+  describe("getTransportReport", () => {
+    it("fetches the transport report for a sent message", async () => {
+      const metadata = createMetadata({ targetId: "MELDID:09000099" });
 
-    // createMetadata defaults to ext.0400; override the message-type-specific fields for alg.0300.
-    metadata.metadata.source.sourceId = "xga:090010050000";
-    metadata.metadata.target.targetOperation =
-      "alg.gewerbemeldung.0300##http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-alg-Aufsichtsbehoerden.wsdl##xga";
-    metadata.payload.request.message.contentReference =
-      "form-data://message/payload.nok.alg.gewerbemeldung.0300.xml";
+      // TODO: remove this override once our sender id "ds:schnellergruenden" is registered with the AKDB/DVDV
+      metadata.metadata.source.sourceId = "xga:090010030000";
 
-    vi.mocked(createMetadata).mockReturnValueOnce(metadata);
+      vi.mocked(createMetadata).mockReturnValueOnce(metadata);
 
-    await expect(
-      osciClient.sendMessage({
-        targetId: "MELDID:12052000",
-        message: readSample("payload.nok.alg.gewerbemeldung.0300.xml"),
-      }),
-    ).rejects.toThrow();
+      const sendResult = await osciClient.sendMessage({
+        targetId: "MELDID:09000099",
+        message: readSample("custom-xgewo-1.6-valid-0400.xml"),
+      });
+
+      const report = await osciClient.getTransportReport({
+        messageId: sendResult.metadata.source.sourceMessageId,
+        authorityKey: "MELDID:09000099",
+      });
+
+      expect(report.identifiers.messageID).toBe(sendResult.metadata.source.sourceMessageId);
+      expect(report.tracks.length).toBeGreaterThan(0);
+    });
   });
 });
