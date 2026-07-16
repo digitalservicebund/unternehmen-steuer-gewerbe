@@ -82,7 +82,7 @@ describe("osciClient", () => {
   });
 
   describe("getTransportReport", () => {
-    it("fetches the transport report for a sent message", async () => {
+    it("successfully fetches the transport report for a sent message", async () => {
       const metadata = createMetadata({ targetId: "MELDID:09000099" });
 
       // TODO: remove this override once our sender id "ds:schnellergruenden" is registered
