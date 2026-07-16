@@ -1,3 +1,7 @@
+// see WSDL-Vorlagedateien on https://www.xrepository.de/details/urn:xoev-de:kosit:standard:xgewerbeordnung
+export const GEWERBEMELDUNG_EXT_SERVICE_ID =
+  "http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-ext.wsdl";
+
 export interface CreateMetadataOptions {
   targetId: string;
   sourceTimestamp?: string;
@@ -41,9 +45,7 @@ export function createMetadata({ targetId, sourceTimestamp }: CreateMetadataOpti
       target: {
         targetProcessType: "XGA",
         targetActionType: "http://www.xgewerbeordnung.de/spezifikation/xga/1.6",
-        // see WSLD-Vorlagsdatein on https://www.xrepository.de/details/urn:xoev-de:kosit:standard:xgewerbeordnung
-        targetOperation:
-          "ext.gewerbemeldung.0400##http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-ext.wsdl##xga",
+        targetOperation: `ext.gewerbemeldung.0400##${GEWERBEMELDUNG_EXT_SERVICE_ID}##xga`,
         targetId,
       },
       source: {
