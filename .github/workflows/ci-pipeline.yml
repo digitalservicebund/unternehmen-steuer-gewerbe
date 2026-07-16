@@ -54,7 +54,9 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: |
+          pnpm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
+          pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
@@ -91,7 +93,9 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: |
+          pnpm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
+          pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
@@ -138,7 +142,9 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: |
+          pnpm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
+          pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
@@ -199,7 +205,9 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: |
+          pnpm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
+          pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
@@ -266,7 +274,9 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: |
+          pnpm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
+          pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
@@ -534,7 +544,9 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: |
+          pnpm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
+          pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
