@@ -17,6 +17,7 @@ describe("transformToEUnFsE", () => {
     expect(natPers?.adrkette?.strAdr).toMatchObject({
       str: "Musterstraße",
       hausNr: "1",
+      adressErg: "a",
       plz: "03046",
       ort: "Cottbus",
     });
@@ -205,6 +206,7 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
       str: "Musterstraße",
       hausNr: "2",
+      adressErg: "a",
       plz: "96450",
       ort: "Coburg",
     });

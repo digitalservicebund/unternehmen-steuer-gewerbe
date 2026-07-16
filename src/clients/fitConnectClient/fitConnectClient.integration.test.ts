@@ -29,7 +29,8 @@ describe("FitConnectClient", () => {
   });
 
   describe("getRoutes", () => {
-    it("returns a routing result for a known leiKa key and AGS", async () => {
+    // Why: API has changed. Follow-up ticket has been created: SG-1096
+    it.skip("returns a routing result for a known leiKa key and AGS", async () => {
       const client = getFitConnectClient();
 
       const result = await client.getRoutes(
