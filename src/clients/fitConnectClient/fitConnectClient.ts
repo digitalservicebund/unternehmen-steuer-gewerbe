@@ -1,6 +1,6 @@
 import { decodeProtectedHeader, type JWK, type JWTPayload } from "jose";
 import { encryptData, verifyEventToken } from "./crypto";
-import { createMetadata, type DataSchema } from "./metadata";
+import { createMetadata150, type DataSchema } from "./metadata";
 import { fetchJson } from "../../helpers/fetchJson";
 import { getEnvironmentVariable, getSecret } from "../../secretsAndEnvironmentVariables";
 
@@ -215,7 +215,8 @@ export function getFitConnectClient() {
   }: SubmitDataOptions): Promise<SubmitDataResponse> {
     const accessToken = await authenticate();
 
-    const metadata = createMetadata(dataSchema, data);
+    // const metadata = createMetadata(dataSchema, data);
+    const metadata = createMetadata150(dataSchema, data);
 
     const destination = await fetchJson<DestinationResponse>(
       `${config.submissionApiUrl}/v2/destinations/${destinationId}`,
