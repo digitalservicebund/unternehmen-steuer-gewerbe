@@ -2,7 +2,7 @@
 // and an Agent from the npm package only works with the fetch and FormData from the undici package,
 // not with the versions bundled into node (see https://github.com/nodejs/undici/discussions/4200)
 import { Agent, fetch, FormData } from "undici";
-import { createMetadata } from "./metadata";
+import { createMetadata, GEWERBEMELDUNG_EXT_SERVICE_ID } from "./metadata";
 import { getEnvironmentVariable, getSecret } from "../../secretsAndEnvironmentVariables";
 
 interface OsciClientConfig {
@@ -54,6 +54,49 @@ interface SendMessageResponse {
     transport: SendMessageResponseTransport;
     reply: SendMessageResponseReply;
   };
+}
+
+interface GetTransportReportOptions {
+  messageId: string;
+  authorityKey: string;
+}
+
+interface TransportReportIdentifiers {
+  messageID: string;
+  serviceID: string;
+  authorityKey: string;
+}
+
+interface TransportReportEvent {
+  type: string;
+  timestamp: string;
+}
+
+interface TransportReportVerification {
+  timestamp: string;
+  x509SubjectName: string;
+  x509IssuerName: string;
+  x509SerialNumber: string;
+  certType: string;
+  mathResult: string;
+  offlineResult: string;
+  onlineChecked: boolean;
+  onlineResult: boolean;
+}
+
+interface TransportReportTrack {
+  id: string;
+  subject: string;
+  recentModification: string;
+  events: TransportReportEvent[];
+  verifications: TransportReportVerification[];
+  // the OSCI ProcessCardBundle XML the report fields are derived from
+  rawData: string;
+}
+
+interface TransportReportResponse {
+  identifiers: TransportReportIdentifiers;
+  tracks: TransportReportTrack[];
 }
 
 const DEFAULT_TIMEOUT_MS = 5_000;
@@ -159,5 +202,38 @@ export function getOsciClient() {
     return (await response.json()) as SendMessageResponse;
   }
 
-  return { sendMessage };
+  // fetches the "OSCI-Laufzettel" with status information about a previously sent message
+  async function getTransportReport(
+    options: GetTransportReportOptions,
+  ): Promise<TransportReportResponse> {
+    const accessToken = await getAccessToken();
+
+    const url = `${config.baseUrl}/restapi/v3.0/messages/transport-report/osci`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "Accept-Encoding": "deflate, br",
+      },
+      body: JSON.stringify({
+        messageID: options.messageId,
+        serviceID: GEWERBEMELDUNG_EXT_SERVICE_ID,
+        authorityKey: options.authorityKey,
+      }),
+      signal: AbortSignal.timeout(DEFAULT_TIMEOUT_MS),
+      dispatcher,
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `HTTP ${response.status} ${response.statusText} for ${url}: ${await response.text()}`,
+      );
+    }
+
+    return (await response.json()) as TransportReportResponse;
+  }
+
+  return { sendMessage, getTransportReport };
 }

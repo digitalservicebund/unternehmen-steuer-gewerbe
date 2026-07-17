@@ -231,15 +231,13 @@ jobs:
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@713881670b6b3676cda39549040e2d88c70d582e
-        continue-on-error: true
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      # Non-critical: don't break pipeline on Sonar quality gate
+      # Break pipeline on Sonar quality gate
       - name: SonarQube Quality Gate check
         id: sonarqube-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b
-        continue-on-error: true
         with:
           pollingTimeoutSec: 600
         env:
