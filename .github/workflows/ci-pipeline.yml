@@ -623,11 +623,16 @@ jobs:
       - name: Dependabot metadata
         id: metadata
         uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98
+
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
         with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          app-id: ${{ secrets.AUTO_MERGE_GRUENDEN_APP_APP_ID }}
+          private-key: ${{ secrets.AUTO_MERGE_GRUENDEN_APP_PRIVATE_KEY }}
       - name: Auto-merge Dependabot PRs except major version updates
         if: steps.metadata.outputs.update-type != 'version-update:semver-major'
-        run: gh pr merge --squash "$PR_URL"
+        run: gh pr merge --auto --squash "$PR_URL"
         env:
-          PR_URL: ${{github.event.pull_request.html_url}}
+          PR_URL: ${{steps.app-token.outputs.token}}
           GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
