@@ -49,7 +49,7 @@
   },
   "devDependencies": {
     "@ls-lint/ls-lint": "^2.3.1",
-    "@types/node": "^26.1.0",
+    "@types/node": "^26.1.1",
     "@types/pdfkit": "^0.17.6",
     "@vitest/coverage-v8": "4.1.10",
     "fast-xml-builder": "^1.2.1",
