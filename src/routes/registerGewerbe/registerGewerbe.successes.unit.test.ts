@@ -61,6 +61,31 @@ function postRegisterGewerbe(data = registerGewerbeSampleRequestAllFieldsFilled,
 describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
   afterEach(() => vi.restoreAllMocks());
 
+  it("returns 200 OK with success=true and submissionIds for gewerbe and steuer", async () => {
+    const response = await postRegisterGewerbe();
+    const json = await response.json();
+
+    expect(response.status).toEqual(HttpStatusCode.Ok);
+    expect(json.gewerbeanmeldung.success).toBe(true);
+    expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
+    expect(json.fseÜbermittlung.success).toBe(true);
+    expect(json.fseÜbermittlung.submissionId).toBeTruthy();
+  });
+
+  it("returns the responsible Finanzamt officeDetails, joining strasse and hausnummer", async () => {
+    const response = await postRegisterGewerbe();
+    const json = await response.json();
+
+    expect(response.status).toEqual(HttpStatusCode.Ok);
+    expect(json.fseÜbermittlung.officeDetails).toEqual({
+      name: "Finanzamt Mock",
+      strasseUndHausnummer: "Mockstraße 1",
+      postleitzahl: "00000",
+      ort: "Mockstadt",
+      telefon: "0000 000-0",
+    });
+  });
+
   describe("Gewerbeamt officeDetails", () => {
     it("returns the responsible Gewerbeamt address, joining strasse and hausnummer", async () => {
       const response = await postRegisterGewerbe();

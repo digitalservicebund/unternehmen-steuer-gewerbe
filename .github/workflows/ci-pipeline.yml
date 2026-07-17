@@ -150,24 +150,14 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
-      - name: Run integration tests (shard ${{ matrix.shard }}/${{ strategy.job-total }}) with coverage report
+      - name: Run integration tests (mocked, shard ${{ matrix.shard }}/${{ strategy.job-total }}) with coverage report
         run: pnpm run test:integration:ci --shard=${{ matrix.shard }}/${{ strategy.job-total }} --outputFile.blob=.vitest-reports/integration-tests-shard-${{ matrix.shard }}-of-${{ strategy.job-total }}.blob.json
         env:
-          FIT_CONNECT_OAUTH_TOKEN_URL: ${{ vars.FIT_CONNECT_OAUTH_TOKEN_URL }}
-          FIT_CONNECT_SUBMISSION_API_URL: ${{ vars.FIT_CONNECT_SUBMISSION_API_URL }}
-          FIT_CONNECT_DESTINATION_API_URL: ${{ vars.FIT_CONNECT_DESTINATION_API_URL }}
-          FIT_CONNECT_ROUTING_API_URL: ${{ vars.FIT_CONNECT_ROUTING_API_URL }}
+          # Mocked suite: no live API secrets needed. Still required because they're
+          # checked at import time or by crypto roundtrip tests, same as test-unit.
+          ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
           FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK: ${{ vars.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK }}
           FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK: ${{ secrets.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK }}
-          FIT_CONNECT_CLIENT_ID: ${{ vars.FIT_CONNECT_CLIENT_ID }}
-          FIT_CONNECT_CLIENT_SECRET: ${{ secrets.FIT_CONNECT_CLIENT_SECRET }}
-          FIT_CONNECT_DESTINATION_ID: ${{ vars.FIT_CONNECT_DESTINATION_ID }}
-          ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
-          ERIC_CERTIFICATE_BASE64: ${{ secrets.ERIC_CERTIFICATE_BASE64 }}
-          ERIC_CERTIFICATE_PIN: ${{ secrets.ERIC_CERTIFICATE_PIN }}
-          AKDB_BASE_URL: ${{ vars.AKDB_BASE_URL }}
-          AKDB_USERNAME: ${{ vars.AKDB_USERNAME }}
-          AKDB_PASSWORD: ${{ secrets.AKDB_PASSWORD }}
 
       - name: Upload coverage blob
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

@@ -1,0 +1,56 @@
+name: Contract Test
+
+on:
+  # every 30 minutes, 6:00-17:00 Berlin time.
+  # GitHub Actions cron is UTC-only and doesn't shift for DST, so this window
+  # is 05:00-17:00 CET (winter) / 06:00-18:00 CEST (summer) local time.
+  schedule:
+    - cron: "*/30 4-16 * * *"
+  workflow_dispatch:
+
+jobs:
+  test-contract:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          fetch-depth: 1
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+        name: Install pnpm
+        with:
+          cache: true
+
+      - name: Install dependencies
+        run: pnpm install --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
+
+      - name: Run contract tests
+        run: pnpm run test:contract:ci
+        env:
+          FIT_CONNECT_OAUTH_TOKEN_URL: ${{ vars.FIT_CONNECT_OAUTH_TOKEN_URL }}
+          FIT_CONNECT_SUBMISSION_API_URL: ${{ vars.FIT_CONNECT_SUBMISSION_API_URL }}
+          FIT_CONNECT_DESTINATION_API_URL: ${{ vars.FIT_CONNECT_DESTINATION_API_URL }}
+          FIT_CONNECT_ROUTING_API_URL: ${{ vars.FIT_CONNECT_ROUTING_API_URL }}
+          FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK: ${{ vars.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK }}
+          FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK: ${{ secrets.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK }}
+          FIT_CONNECT_CLIENT_ID: ${{ vars.FIT_CONNECT_CLIENT_ID }}
+          FIT_CONNECT_CLIENT_SECRET: ${{ secrets.FIT_CONNECT_CLIENT_SECRET }}
+          FIT_CONNECT_DESTINATION_ID: ${{ vars.FIT_CONNECT_DESTINATION_ID }}
+          ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
+          ERIC_CERTIFICATE_BASE64: ${{ secrets.ERIC_CERTIFICATE_BASE64 }}
+          ERIC_CERTIFICATE_PIN: ${{ secrets.ERIC_CERTIFICATE_PIN }}
+          AKDB_BASE_URL: ${{ vars.AKDB_BASE_URL }}
+          AKDB_USERNAME: ${{ vars.AKDB_USERNAME }}
+          AKDB_PASSWORD: ${{ secrets.AKDB_PASSWORD }}
+
+      - name: Send failure to Slack
+        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+        if: ${{ failure() }}
+        with:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
