@@ -54,7 +54,9 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: |
+          pnpm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
+          pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
@@ -95,7 +97,9 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: |
+          pnpm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
+          pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
@@ -146,7 +150,9 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: |
+          pnpm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
+          pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
@@ -197,7 +203,9 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: |
+          pnpm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
+          pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
@@ -220,7 +228,7 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
 
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@713881670b6b3676cda39549040e2d88c70d582e
+        uses: SonarSource/sonarqube-scan-action@22918119ff8e1ca75a623e15c8296b6ea4fbe28f
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
@@ -259,7 +267,9 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: |
+          pnpm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
+          pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
@@ -527,7 +537,9 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: |
+          pnpm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
+          pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
@@ -613,11 +625,14 @@ jobs:
       - name: Dependabot metadata
         id: metadata
         uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
         with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          client-id: ${{ secrets.AUTO_MERGE_GRUENDEN_APP_CLIENT_ID }}
+          private-key: ${{ secrets.AUTO_MERGE_GRUENDEN_APP_PRIVATE_KEY }}
       - name: Auto-merge Dependabot PRs except major version updates
         if: steps.metadata.outputs.update-type != 'version-update:semver-major'
-        run: gh pr merge --squash "$PR_URL"
+        run: gh pr merge --auto --squash "${{ github.event.pull_request.html_url }}"
         env:
-          PR_URL: ${{github.event.pull_request.html_url}}
-          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GH_TOKEN: ${{steps.app-token.outputs.token}}

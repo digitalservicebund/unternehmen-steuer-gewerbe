@@ -25,7 +25,9 @@ jobs:
         run: git config --global url."https://x-access-token:${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}@github.com/".insteadOf "git@github.com:"
 
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: |
+          pnpm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
+          pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
