@@ -24,5 +24,15 @@ describe("Route /api/v1/register-gewerbe/:submissionId/events", () => {
   it("Returns 200 OK on GET with /:submissionId/events", async () => {
     const response = await app.request(`/api/v1/register-gewerbe/${submissionId}/events`);
     expect(response.status).toEqual(HttpStatusCode.Ok);
+
+    // count/offset/totalCount/eventLog entries are specific to this just-created submission
+    // (timing, event count) - only the shape is pinned down here.
+    const body = await response.json();
+    expect(body).toEqual({
+      count: expect.any(Number),
+      offset: expect.any(Number),
+      totalCount: expect.any(Number),
+      eventLog: expect.any(Array),
+    });
   });
 });

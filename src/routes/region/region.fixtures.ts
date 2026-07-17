@@ -7,6 +7,10 @@
 // requires network/1Password access this environment doesn't have.
 import type { Gewerbeamt } from "../../clients/pvogClient/getGewerbeamt";
 import type { LocationDetails } from "../../clients/pvogClient/getLocationsDetails";
+import type { z } from "@hono/zod-openapi";
+import type { RegionResponseSchema } from "./regionInterfaces";
+
+type RegionResponseBody = z.infer<typeof RegionResponseSchema>;
 
 export const plz25813Locations: LocationDetails[] = [
   { ars: "010540056056", name: "Husum", plz: "25813" },
@@ -52,3 +56,258 @@ export const finanzamtDetailsFor = (name: string) => ({
   hausanschrift: { strasse: "Finanzstraße", hausnummer: "1", postleitzahl: "00000", ort: name },
   telefonnummer: "0000 000000",
 });
+
+// Full /api/v1/region/{plz} response bodies, recorded from a real run against the app
+// (real PVOG lookups + the local, offline ERiC Finanzamt lookup) on 2026-07-17. Used by
+// region.contract.test.ts for full-input/full-output comparisons; region.integration.test.ts
+// keeps its own client-level mocks (above) and granular assertions.
+export const plz25813GetAllOfficesResponse: RegionResponseBody = {
+  supported: true,
+  finanzaemter: [
+    {
+      name: "Finanzamt Nordfriesland",
+      strasseUndHausnummer: "Herzog-Adolf-Straße 18",
+      postleitzahl: "25813",
+      ort: "Husum",
+      telefon: "04841 8949-0",
+    },
+  ],
+  gewerbeaemter: [
+    {
+      name: "Amt Viöl - Ordnungsamt - Bürgerservice",
+      strasseUndHausnummer: "Westerende 41",
+      postleitzahl: "25884",
+      ort: "Viöl",
+      telefon: "04843 2090-98",
+      email: "Buergerservice@amt-vioel.de",
+      onlineServices: [
+        {
+          title: "Leistung über den Einheitlichen Ansprechpartner beantragen",
+          description:
+            "Für die Gewerbeanmeldung über den Einheitlichen Ansprechpartner Schleswig-Holstein steht Ihnen ein elektronischer Antrag (Antragsassistent) zur Verfügung",
+          uri: "https://am.schleswig-holstein.de/intelliform/forms/SH/standard/eGewerbe/eGewerbeAnmeldung/index",
+        },
+        {
+          title: "Gewerbe online anmelden",
+          uri: "https://am.schleswig-holstein.de/intelliform/forms/SH/standard/eGewerbe/eGewerbeAnmeldung/index",
+        },
+      ],
+    },
+    {
+      name: "Einheitlicher Ansprechpartner Schleswig-Holstein",
+      strasseUndHausnummer: "Deliusstraße 10",
+      postleitzahl: "24114",
+      ort: "Kiel",
+      telefon: "+49 431 530550-0",
+      email: "info@ea-sh.de",
+      onlineServices: [
+        {
+          title: "Leistung über den Einheitlichen Ansprechpartner beantragen",
+          description:
+            "Für die Gewerbeanmeldung über den Einheitlichen Ansprechpartner Schleswig-Holstein steht Ihnen ein elektronischer Antrag (Antragsassistent) zur Verfügung",
+          uri: "https://am.schleswig-holstein.de/intelliform/forms/SH/standard/eGewerbe/eGewerbeAnmeldung/index",
+        },
+        {
+          title: "Gewerbe online anmelden direkt über Stadt Husum",
+          uri: "https://am.schleswig-holstein.de/intelliform/forms/SH/standard/eGewerbe/eGewerbeAnmeldung/index",
+        },
+      ],
+    },
+    {
+      name: "Amt Nordsee-Treene",
+      strasseUndHausnummer: "Schulweg 19",
+      postleitzahl: "25866",
+      ort: "Mildstedt",
+      telefon: "04841 9920",
+      email: "info@amt-nordsee-treene.de",
+      onlineServices: [
+        {
+          title: "Leistung über den Einheitlichen Ansprechpartner beantragen",
+          description:
+            "Für die Gewerbeanmeldung über den Einheitlichen Ansprechpartner Schleswig-Holstein steht Ihnen ein elektronischer Antrag (Antragsassistent) zur Verfügung",
+          uri: "https://am.schleswig-holstein.de/intelliform/forms/SH/standard/eGewerbe/eGewerbeAnmeldung/index",
+        },
+        {
+          title: "Gewerbe anmelden",
+          uri: "https://am.schleswig-holstein.de/intelliform/forms/SH/standard/eGewerbe/eGewerbeAnmeldung/index",
+        },
+      ],
+    },
+    // Simonsberg and Südermarsch both fall under the same Amt as Ostenfeld/Mildstedt, hence the
+    // duplicate entry - one per municipality (ARS), same as getLocationsDetails returns 4 for this PLZ.
+    {
+      name: "Amt Nordsee-Treene",
+      strasseUndHausnummer: "Schulweg 19",
+      postleitzahl: "25866",
+      ort: "Mildstedt",
+      telefon: "04841 9920",
+      email: "info@amt-nordsee-treene.de",
+      onlineServices: [
+        {
+          title: "Leistung über den Einheitlichen Ansprechpartner beantragen",
+          description:
+            "Für die Gewerbeanmeldung über den Einheitlichen Ansprechpartner Schleswig-Holstein steht Ihnen ein elektronischer Antrag (Antragsassistent) zur Verfügung",
+          uri: "https://am.schleswig-holstein.de/intelliform/forms/SH/standard/eGewerbe/eGewerbeAnmeldung/index",
+        },
+        {
+          title: "Gewerbe anmelden",
+          uri: "https://am.schleswig-holstein.de/intelliform/forms/SH/standard/eGewerbe/eGewerbeAnmeldung/index",
+        },
+      ],
+    },
+  ],
+};
+
+export const plz89073DefaultResponse: RegionResponseBody = {
+  supported: false,
+  finanzaemter: [
+    {
+      name: "Finanzamt Ulm",
+      strasseUndHausnummer: "Wagnerstr. 2",
+      postleitzahl: "89077",
+      ort: "Ulm",
+      telefon: "0731/1030",
+    },
+  ],
+  gewerbeaemter: [
+    {
+      name: "Bürgerdienste - Gewerbean-, um-, abmeldungen, Reisegewerbekarten, Gaststättenrecht, Gesundheitswesen, Waffen- und Sprengstoffwesen",
+      strasseUndHausnummer: "Olgastraße 66",
+      postleitzahl: "89073",
+      ort: "Ulm",
+      telefon: "+49 731 161 3216",
+      email: "gewerbe@ulm.de",
+      onlineServices: [
+        {
+          title: "Gewerbe anmelden",
+          uri: "https://www.service-bw.de/onlineantraege/onlineantrag?prozessKey=m40169.gewerbe_anmelden_ludwigsburg&regionIds=2079&leistungId=496",
+        },
+        {
+          title: "Gewerberegisteranzeige",
+          description:
+            "<p>\n\tZur Anmeldung bedarf es lediglich einer kurzen Registrierung als Benutzer des E-Bürgerdienstes Gewerbeanzeige. Mittels des daraufhin an Ihre angegeben E-Mail-Adresse gesandten Aktivierungscodes legitimieren Sie sich bitte als tatsächlich eingetragener Nutzer. Bei juristischen Personen schicken Sie uns bitte noch Ihren Handelsregisterauszug zu.</p>",
+          uri: "https://aipkogema-ebd.dvvbw.de/ebd-gwr/index.jsp?ags=08421000",
+        },
+        {
+          title: "Terminvereinbarung bei den Bürgerdiensten in der Olgastraße 66, 89073 Ulm",
+          uri: "http://www.ulm.de/mb",
+        },
+        {
+          title: "Gewerbeanmeldung",
+          uri: "https://gewerbe.komm.one/intelliform/forms/pool/Behoerde/Gewerbeverfahren/Gewerbeanmeldung/index?caller=084210000000",
+        },
+      ],
+    },
+  ],
+};
+
+export const plz00000DefaultResponse: RegionResponseBody = {
+  supported: false,
+  finanzaemter: [],
+  gewerbeaemter: [],
+};
+
+export const plz25813DefaultResponse: RegionResponseBody = {
+  supported: true,
+  finanzaemter: [
+    {
+      name: "Finanzamt Nordfriesland",
+      strasseUndHausnummer: "Herzog-Adolf-Straße 18",
+      postleitzahl: "25813",
+      ort: "Husum",
+      telefon: "04841 8949-0",
+    },
+  ],
+  gewerbeaemter: [
+    {
+      name: "Amt Viöl - Ordnungsamt - Bürgerservice",
+      strasseUndHausnummer: "Westerende 41",
+      postleitzahl: "25884",
+      ort: "Viöl",
+      telefon: "04843 2090-98",
+      email: "Buergerservice@amt-vioel.de",
+      onlineServices: [
+        {
+          title: "Leistung über den Einheitlichen Ansprechpartner beantragen",
+          description:
+            "Für die Gewerbeanmeldung über den Einheitlichen Ansprechpartner Schleswig-Holstein steht Ihnen ein elektronischer Antrag (Antragsassistent) zur Verfügung",
+          uri: "https://am.schleswig-holstein.de/intelliform/forms/SH/standard/eGewerbe/eGewerbeAnmeldung/index",
+        },
+        {
+          title: "Gewerbe online anmelden",
+          uri: "https://am.schleswig-holstein.de/intelliform/forms/SH/standard/eGewerbe/eGewerbeAnmeldung/index",
+        },
+      ],
+    },
+  ],
+};
+
+export const plz25813Marktstrasse1Response: RegionResponseBody = {
+  supported: true,
+  finanzaemter: [
+    {
+      name: "Finanzamt Nordfriesland",
+      strasseUndHausnummer: "Herzog-Adolf-Straße 18",
+      postleitzahl: "25813",
+      ort: "Husum",
+      telefon: "04841 8949-0",
+    },
+  ],
+  gewerbeaemter: [
+    {
+      name: "Einheitlicher Ansprechpartner Schleswig-Holstein",
+      strasseUndHausnummer: "Deliusstraße 10",
+      postleitzahl: "24114",
+      ort: "Kiel",
+      telefon: "+49 431 530550-0",
+      email: "info@ea-sh.de",
+      onlineServices: [
+        {
+          title: "Leistung über den Einheitlichen Ansprechpartner beantragen",
+          description:
+            "Für die Gewerbeanmeldung über den Einheitlichen Ansprechpartner Schleswig-Holstein steht Ihnen ein elektronischer Antrag (Antragsassistent) zur Verfügung",
+          uri: "https://am.schleswig-holstein.de/intelliform/forms/SH/standard/eGewerbe/eGewerbeAnmeldung/index",
+        },
+        {
+          title: "Gewerbe online anmelden direkt über Stadt Husum",
+          uri: "https://am.schleswig-holstein.de/intelliform/forms/SH/standard/eGewerbe/eGewerbeAnmeldung/index",
+        },
+      ],
+    },
+  ],
+};
+
+export const plz25842DorfstrasseLutjenholmResponse: RegionResponseBody = {
+  supported: true,
+  finanzaemter: [
+    {
+      name: "Finanzamt Nordfriesland",
+      strasseUndHausnummer: "Herzog-Adolf-Straße 18",
+      postleitzahl: "25813",
+      ort: "Husum",
+      telefon: "04841 8949-0",
+    },
+  ],
+  gewerbeaemter: [
+    {
+      name: "Amt Mittleres Nordfriesland - Ordnungsabteilung",
+      strasseUndHausnummer: "Theodor-Storm-Straße 2",
+      postleitzahl: "25821",
+      ort: "Bredstedt",
+      telefon: "+49 4671 9192-0",
+      email: "info@amnf.de",
+      onlineServices: [
+        {
+          title: "Leistung über den Einheitlichen Ansprechpartner beantragen",
+          description:
+            "Für die Gewerbeanmeldung über den Einheitlichen Ansprechpartner Schleswig-Holstein steht Ihnen ein elektronischer Antrag (Antragsassistent) zur Verfügung",
+          uri: "https://am.schleswig-holstein.de/intelliform/forms/SH/standard/eGewerbe/eGewerbeAnmeldung/index",
+        },
+        {
+          title: "Gewerbe online anmelden Amt Mittleres Nordfriesland",
+          uri: "https://am.schleswig-holstein.de/intelliform/forms/SH/standard/eGewerbe/eGewerbeAnmeldung/index",
+        },
+      ],
+    },
+  ],
+};

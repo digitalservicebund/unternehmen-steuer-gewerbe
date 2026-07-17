@@ -3,6 +3,7 @@ import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { getOsciClient } from "./osciClient";
 import { createMetadata } from "./metadata";
+import { sendAlg0300ExpectedResult, sendExt0400ExpectedResult } from "./osciClient.fixtures";
 
 // spy-mock so the temporary alg.0300 tests can inject overridden metadata into sendMessage
 vi.mock("./metadata", { spy: true });
@@ -40,8 +41,7 @@ describe("osciClient", () => {
         message: readSample("payload.ok.alg.gewerbemeldung.0300.xml"),
       });
 
-      expect(result).toBeDefined();
-      expect(result!.metadata.reply!.replyType).toBe("OK");
+      expect(result).toEqual(sendAlg0300ExpectedResult);
     });
 
     it("successfully sends a valid ext.gewerbemeldung.0400", async () => {
@@ -57,7 +57,7 @@ describe("osciClient", () => {
         message: readSample("custom-xgewo-1.6-valid-0400.xml"),
       });
 
-      expect(result.metadata.reply.replyType).toBe("OK");
+      expect(result).toEqual(sendExt0400ExpectedResult);
     });
 
     it("throws for an invalid Gewerbemeldung", async () => {

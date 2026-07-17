@@ -24,15 +24,16 @@ describe("Route /api/v1/register-gewerbe (full Kombiantrag)", { timeout: 15_000 
   }, 15_000);
 
   describe("in case of success on POST", () => {
-    it("returns 200 OK with success=true for gewerbe and steuer", async () => {
+    it("returns 200 OK with success=true and a submissionId for gewerbe and steuer", async () => {
       expect(response.status).toEqual(HttpStatusCode.Ok);
-      expect(json.gewerbeanmeldung.success).toBe(true);
-      expect(json.fseÜbermittlung.success).toBe(true);
-    });
-
-    it("returns submissionIds for gewerbe and steuer", async () => {
-      expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
-      expect(json.fseÜbermittlung.submissionId).toBeTruthy();
+      expect(json.gewerbeanmeldung).toMatchObject({
+        success: true,
+        submissionId: expect.any(String),
+      });
+      expect(json.fseÜbermittlung).toMatchObject({
+        success: true,
+        submissionId: expect.any(String),
+      });
     });
 
     describe("on returning PDF receipts", () => {

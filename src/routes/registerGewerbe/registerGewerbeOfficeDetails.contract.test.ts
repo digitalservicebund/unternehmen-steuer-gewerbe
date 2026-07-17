@@ -28,13 +28,13 @@ describe(
 
       const json = await response.json();
 
-      expect(json.fseÜbermittlung.officeDetails!.name).toEqual(
-        "Finanzamt Friedrichshain-Kreuzberg",
-      );
-      expect(json.fseÜbermittlung.officeDetails!.strasseUndHausnummer).toEqual("Mehringdamm 22");
-      expect(json.fseÜbermittlung.officeDetails!.postleitzahl).toEqual("10961");
-      expect(json.fseÜbermittlung.officeDetails!.ort).toEqual("Berlin");
-      expect(json.fseÜbermittlung.officeDetails!.telefon).toEqual("030 9024-14 0");
+      expect(json.fseÜbermittlung.officeDetails).toEqual({
+        name: "Finanzamt Friedrichshain-Kreuzberg",
+        strasseUndHausnummer: "Mehringdamm 22",
+        postleitzahl: "10961",
+        ort: "Berlin",
+        telefon: "030 9024-14 0",
+      });
     });
 
     it("returns Finanzamt details for persönlicheDaten  (Musterstraße 1, 03046 Cottbus)", async () => {
@@ -47,13 +47,13 @@ describe(
       const response = await postRegisterGewerbe(dataWithoutAdresseAbweichend);
       const json = await response.json();
 
-      expect(json.fseÜbermittlung.officeDetails!.name).toEqual("Finanzamt Cottbus");
-      expect(json.fseÜbermittlung.officeDetails!.strasseUndHausnummer).toEqual(
-        "Vom-Stein-Straße 29",
-      );
-      expect(json.fseÜbermittlung.officeDetails!.postleitzahl).toEqual("03050");
-      expect(json.fseÜbermittlung.officeDetails!.ort).toEqual("Cottbus");
-      expect(json.fseÜbermittlung.officeDetails!.telefon).toEqual("0355 4991-4100");
+      expect(json.fseÜbermittlung.officeDetails).toEqual({
+        name: "Finanzamt Cottbus",
+        strasseUndHausnummer: "Vom-Stein-Straße 29",
+        postleitzahl: "03050",
+        ort: "Cottbus",
+        telefon: "0355 4991-4100",
+      });
     });
 
     it("returns the appropriate Gewerbeamt details for Fulda", async () => {
@@ -67,11 +67,22 @@ describe(
       const response = await postRegisterGewerbe(dataWithFulda);
       const json = await response.json();
 
-      expect(json.gewerbeanmeldung.officeDetails!.name).toEqual("Stadt Fulda");
-      expect(json.gewerbeanmeldung.officeDetails!.strasseUndHausnummer).toEqual("Schlossstraße 1");
-      expect(json.gewerbeanmeldung.officeDetails!.postleitzahl).toEqual("36037");
-      expect(json.gewerbeanmeldung.officeDetails!.ort).toEqual("Fulda");
-      expect(json.gewerbeanmeldung.officeDetails!.telefon).toEqual("0661 102-0");
+      expect(json.gewerbeanmeldung.officeDetails).toEqual({
+        name: "Stadt Fulda",
+        strasseUndHausnummer: "Schlossstraße 1",
+        postleitzahl: "36037",
+        ort: "Fulda",
+        telefon: "0661 102-0",
+        email: "buergerbuero@fulda.de",
+        onlineServices: [
+          {
+            title: "Gewerbeanzeige",
+            description:
+              "Sie können auf diesem Wege Gewerbeanzeigen zum Beginn, zur Änderung oder zur Schließung eines Gewerbes (Hauptniederlassung oder Zweigstelle) für die folgenden Rechtsformen erfassen.\nBeachten Sie bitte, dass für die Rechtsformen GbR, eGbR und OHG der Meldevorgang nur für natürliche Personen als Gesellschafter möglich ist. Die Erfassung juristischer Personen als Gesellschafter nehmen Sie bitte direkt im Gewerbeamt vor.\n\nEingetragenes Einzelunternehmen\nNicht eingetragenes Einzelunternehmen\nGesellschaft des bürgerlichen Rechts (GbR)\nEingetragene Gesellschaft bürgerlichen Rechts (eGbR)\nGesellschaft mit beschränkter Haftung (GmbH, auch gemeinnützige gGmbH)\nUnternehmergesellschaft (UG auch haftungsbeschränkt)\nOffene Handelsgesellschaft (OHG)\nKommanditgesellschaft (KG)\nGesellschaft mit beschränkter Haftung & Compagnie Kommanditgesellschaft (GmbH & Co. KG)\nGesellschaft mit beschränkter Haftung & Compagnie Offene Handelsgesellschaft (GmbH & Co. OHG)\nAktiengesellschaft (AG)\nEuropäische Aktiengesellschaft (SE) nur mit Eintragung in Handelsregister B\nGemäß § 14 Abs. 1 GewO muss der Beginn eines Gewerbes oder einer Zweigstelle sowie deren Umzug oder Schließung oder eine wesentliche Änderung der Tätigkeit der zuständigen Behörde angezeigt werden.\nSie können die Daten für diese Anzeige hier direkt erfassen und an Ihr Gewerbeamt übermitteln.\n\nSie benötigen ggf. folgende Unterlagen, welche am Ende der Erfassung hochgeladen werden müssen.\n\nRegisterauszug\nvorliegende Erlaubnisse\nvorliegende Handwerkskarten\nvorliegende Aufenthaltstitel\nvorliegende Vertretungsvollmacht\nKopie Personaldokument\n\nFür eine Gewerbeanzeige entstehen Gebühren gemäß Verwaltungskostenverzeichnis der Hessischen Verwaltungskostenordnung für den Geschäftsbereich des Ministeriums für Wirtschaft, Energie, Verkehr und Wohnen (VwKostO-MWEVW). Diese werden am Ende der Erfassung erhoben und betragen je nach Grund der Anzeige.",
+            uri: "https://gewerbeanzeige.ekom21.de/webclient/app/m/06631009/gewerbeanzeige",
+          },
+        ],
+      });
     });
 
     it("returns fseÜbermittlung success=false and 'invalid_data' if no Finanzamt found", async () => {
@@ -90,9 +101,11 @@ describe(
       const response = await postRegisterGewerbe(requestDataWithNonExistentAddress);
       const json = await response.json();
 
-      expect(json.fseÜbermittlung.success).toBe(false);
-      expect(json.fseÜbermittlung.errorType).toEqual(ErrorTypeSchema.enum.invalid_data);
-      expect(json.fseÜbermittlung.info).toEqual("No Finanzamt found for address");
+      expect(json.fseÜbermittlung).toEqual({
+        success: false,
+        errorType: ErrorTypeSchema.enum.invalid_data,
+        info: "No Finanzamt found for address",
+      });
     });
   },
 );
