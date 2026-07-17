@@ -8,6 +8,7 @@
 // verifies the event JWT's signature. So these are built with real, locally generated key pairs
 // (same technique as crypto.unit.test.ts), just like a live FIT-Connect environment would provide.
 import { exportJWK, generateKeyPair, SignJWT } from "jose";
+import { expect } from "vitest";
 
 const OAUTH_TOKEN_RESPONSE = {
   access_token: "token",
@@ -39,6 +40,7 @@ export async function buildSubmitDataFixtures(destinationId: string) {
       caseId: "case-1",
       destinationId,
       submissionId: "submission-1",
+      attachments: [],
       publicService: {
         description: null,
         identifier: "urn:de:fim:leika:leistung:99050012104000",
@@ -64,3 +66,32 @@ export async function buildSubmissionEventsFixtures() {
     destinationKeysResponse: { count: 0, offset: 0, totalCount: 0, keys: [] },
   };
 }
+
+// Expected getFitConnectClient() output for the contract test's full-input/full-output
+// comparisons. Static/echoed fields are literal (recorded 2026-07-17); genuinely dynamic fields
+// (submissionId/caseId, generated fresh by FIT-Connect every call) use expect.any(String). The
+// real response also carries an "attachments" field the SubmitDataResponse type doesn't declare -
+// fetchJson<T> only casts, it doesn't strip - so it's included here to match runtime behavior.
+export function submitDataExpectedResult(destinationId: string) {
+  return {
+    destinationId,
+    submissionId: expect.any(String),
+    caseId: expect.any(String),
+    attachments: [],
+    publicService: {
+      name: "Gewerbe Anmeldung",
+      description: null,
+      identifier: "urn:de:fim:leika:leistung:99050012104000",
+    },
+  };
+}
+
+// getSubmissionEvents's count/eventLog depend on how many lifecycle events this specific
+// submission has accumulated by the time it's called, and the eventLog entries themselves are
+// per-submission JWTs (sub/txn/jti/iat) - so only the shape is pinned down here.
+export const getSubmissionEventsExpectedShape = {
+  count: expect.any(Number),
+  offset: expect.any(Number),
+  totalCount: expect.any(Number),
+  eventLog: expect.any(Array),
+};
