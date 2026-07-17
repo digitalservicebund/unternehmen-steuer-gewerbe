@@ -78,6 +78,7 @@ jobs:
     strategy:
       matrix:
         shard: [1, 2]
+      fail-fast: false
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -128,6 +129,7 @@ jobs:
     strategy:
       matrix:
         shard: [1, 2, 3]
+      fail-fast: false
     runs-on: ubuntu-latest
     permissions:
       contents: read
