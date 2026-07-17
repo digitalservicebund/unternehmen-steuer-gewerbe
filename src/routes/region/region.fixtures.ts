@@ -10,6 +10,8 @@ import type { LocationDetails } from "../../clients/pvogClient/getLocationsDetai
 import type { z } from "@hono/zod-openapi";
 import type { RegionResponseSchema } from "./regionInterfaces";
 
+const ULM_TERMINVEREINBARUNG_URL = "http://www.ulm.de/mb";
+
 type RegionResponseBody = z.infer<typeof RegionResponseSchema>;
 
 export const plz25813Locations: LocationDetails[] = [
@@ -190,7 +192,7 @@ export const plz89073DefaultResponse: RegionResponseBody = {
         },
         {
           title: "Terminvereinbarung bei den Bürgerdiensten in der Olgastraße 66, 89073 Ulm",
-          uri: "http://www.ulm.de/mb",
+          uri: ULM_TERMINVEREINBARUNG_URL,
         },
         {
           title: "Gewerbeanmeldung",

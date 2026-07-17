@@ -10,6 +10,8 @@
 // in both getGewerbeamt.contract.test.ts and getGewerbeamt.integration.test.ts.
 import type { Gewerbeamt } from "./getGewerbeamt";
 
+const ULM_TERMINVEREINBARUNG_URL = "http://www.ulm.de/mb";
+
 export const ULM_ARS = "084210000000";
 export const FRAUREUTH_ARS = "146120000000";
 export const UNKNOWN_ARS = "000000000000";
@@ -32,7 +34,7 @@ export const ulmPvogResponses = {
       },
       {
         title: "Terminvereinbarung bei den Bürgerdiensten in der Olgastraße 66, 89073 Ulm",
-        uri: "http://www.ulm.de/mb",
+        uri: ULM_TERMINVEREINBARUNG_URL,
       },
       {
         title: "Gewerbeanmeldung",
@@ -102,7 +104,7 @@ export const ulmGewerbeamt: Gewerbeamt = {
     {
       title: "Terminvereinbarung bei den Bürgerdiensten in der Olgastraße 66, 89073 Ulm",
       description: undefined,
-      uri: "http://www.ulm.de/mb",
+      uri: ULM_TERMINVEREINBARUNG_URL,
     },
     {
       title: "Gewerbeanmeldung",

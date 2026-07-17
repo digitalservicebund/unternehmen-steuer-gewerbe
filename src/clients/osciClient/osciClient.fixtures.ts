@@ -4,6 +4,8 @@
 // contract test is run against the real API.
 import { expect } from "vitest";
 
+const XGA_SPEC_URL = "http://www.xgewerbeordnung.de/spezifikation/xga/1.6";
+
 export const tokenResponseBody = JSON.stringify({
   access_token: "token",
   token_type: "Bearer",
@@ -19,9 +21,8 @@ export const sendAlg0300OkResponseBody = JSON.stringify({
   metadata: {
     target: {
       targetProcessType: "XGA",
-      targetActionType: "http://www.xgewerbeordnung.de/spezifikation/xga/1.6",
-      targetOperation:
-        "alg.gewerbemeldung.0300##http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-alg-Aufsichtsbehoerden.wsdl##xga",
+      targetActionType: XGA_SPEC_URL,
+      targetOperation: `alg.gewerbemeldung.0300##${XGA_SPEC_URL}/xgewo16gewerbemeldung-alg-Aufsichtsbehoerden.wsdl##xga`,
       targetId: "MELDID:09000099",
     },
     source: {
@@ -44,9 +45,8 @@ export const sendExt0400OkResponseBody = JSON.stringify({
   metadata: {
     target: {
       targetProcessType: "XGA",
-      targetActionType: "http://www.xgewerbeordnung.de/spezifikation/xga/1.6",
-      targetOperation:
-        "ext.gewerbemeldung.0400##http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-ext.wsdl##xga",
+      targetActionType: XGA_SPEC_URL,
+      targetOperation: `ext.gewerbemeldung.0400##${XGA_SPEC_URL}/xgewo16gewerbemeldung-ext.wsdl##xga`,
       targetId: "MELDID:09000099",
     },
     source: {
@@ -72,9 +72,8 @@ export const sendAlg0300ExpectedResult = {
   metadata: {
     target: {
       targetProcessType: "XGA",
-      targetActionType: "http://www.xgewerbeordnung.de/spezifikation/xga/1.6",
-      targetOperation:
-        "alg.gewerbemeldung.0300##http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-alg-Aufsichtsbehoerden.wsdl##xga",
+      targetActionType: XGA_SPEC_URL,
+      targetOperation: `alg.gewerbemeldung.0300##${XGA_SPEC_URL}/xgewo16gewerbemeldung-alg-Aufsichtsbehoerden.wsdl##xga`,
       targetId: "MELDID:09000099",
     },
     source: {
@@ -97,9 +96,8 @@ export const sendExt0400ExpectedResult = {
   metadata: {
     target: {
       targetProcessType: "XGA",
-      targetActionType: "http://www.xgewerbeordnung.de/spezifikation/xga/1.6",
-      targetOperation:
-        "ext.gewerbemeldung.0400##http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-ext.wsdl##xga",
+      targetActionType: XGA_SPEC_URL,
+      targetOperation: `ext.gewerbemeldung.0400##${XGA_SPEC_URL}/xgewo16gewerbemeldung-ext.wsdl##xga`,
       targetId: "MELDID:09000099",
     },
     source: {
@@ -128,7 +126,7 @@ export const sendInvalidPayloadErrorResponse = {
 export const transportReportResponseBody = JSON.stringify({
   identifiers: {
     messageID: "vps_by_178357726143931b13e14-2c78-4aa6-ba2c-0d911ec02d83",
-    serviceID: "http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-ext.wsdl",
+    serviceID: `${XGA_SPEC_URL}/xgewo16gewerbemeldung-ext.wsdl`,
     authorityKey: "MELDID:09000099",
   },
   tracks: [
