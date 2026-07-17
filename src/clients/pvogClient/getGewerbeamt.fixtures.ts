@@ -8,6 +8,11 @@
 // "unstable API" backlog comment. The scenario this fixture was meant for (a Gewerbeamt found,
 // but with no online services) can no longer be produced from real data, so its test is skipped
 // in both getGewerbeamt.contract.test.ts and getGewerbeamt.integration.test.ts.
+import type { Gewerbeamt } from "./getGewerbeamt";
+
+export const ULM_ARS = "084210000000";
+export const FRAUREUTH_ARS = "146120000000";
+export const UNKNOWN_ARS = "000000000000";
 
 export const ulmPvogResponses = {
   serviceDescriptions: {
@@ -22,7 +27,7 @@ export const ulmPvogResponses = {
       {
         title: "Gewerberegisteranzeige",
         description:
-          "Zur Anmeldung bedarf es lediglich einer kurzen Registrierung als Benutzer des E-Bürgerdienstes Gewerbeanzeige.",
+          "<p>\n\tZur Anmeldung bedarf es lediglich einer kurzen Registrierung als Benutzer des E-Bürgerdienstes Gewerbeanzeige. Mittels des daraufhin an Ihre angegeben E-Mail-Adresse gesandten Aktivierungscodes legitimieren Sie sich bitte als tatsächlich eingetragener Nutzer. Bei juristischen Personen schicken Sie uns bitte noch Ihren Handelsregisterauszug zu.</p>",
         uri: "https://aipkogema-ebd.dvvbw.de/ebd-gwr/index.jsp?ags=08421000",
       },
       {
@@ -71,4 +76,48 @@ export const unknownArsPvogResponses = {
   serviceDescriptionDetail: { onlineServiceLinks: [] },
   organisationUnits: [],
   organisationUnitDetail: { title: "", location: { addresses: [], communications: [] } },
+};
+
+// Expected getGewerbeamt() output for each scenario, i.e. ulmPvogResponses mapped through
+// getGewerbeamt.ts's own logic (toAdresse, findCommunicationValue, the onlineServices map).
+// Used by getGewerbeamt.contract.test.ts for full-input-in/full-output-out comparisons against
+// the real API; getGewerbeamt.integration.test.ts keeps its own granular per-field assertions.
+export const ulmGewerbeamt: Gewerbeamt = {
+  name: "Bürgerdienste - Gewerbean-, um-, abmeldungen, Reisegewerbekarten, Gaststättenrecht, Gesundheitswesen, Waffen- und Sprengstoffwesen",
+  adresse: { strasse: "Olgastraße", hausnummer: "66", postleitzahl: "89073", ort: "Ulm" },
+  telefon: "+49 731 161 3216",
+  email: "gewerbe@ulm.de",
+  onlineServices: [
+    {
+      title: "Gewerbe anmelden",
+      description: undefined,
+      uri: "https://www.service-bw.de/onlineantraege/onlineantrag?prozessKey=m40169.gewerbe_anmelden_ludwigsburg&regionIds=2079&leistungId=496",
+    },
+    {
+      title: "Gewerberegisteranzeige",
+      description:
+        "<p>\n\tZur Anmeldung bedarf es lediglich einer kurzen Registrierung als Benutzer des E-Bürgerdienstes Gewerbeanzeige. Mittels des daraufhin an Ihre angegeben E-Mail-Adresse gesandten Aktivierungscodes legitimieren Sie sich bitte als tatsächlich eingetragener Nutzer. Bei juristischen Personen schicken Sie uns bitte noch Ihren Handelsregisterauszug zu.</p>",
+      uri: "https://aipkogema-ebd.dvvbw.de/ebd-gwr/index.jsp?ags=08421000",
+    },
+    {
+      title: "Terminvereinbarung bei den Bürgerdiensten in der Olgastraße 66, 89073 Ulm",
+      description: undefined,
+      uri: "http://www.ulm.de/mb",
+    },
+    {
+      title: "Gewerbeanmeldung",
+      description: undefined,
+      uri: "https://gewerbe.komm.one/intelliform/forms/pool/Behoerde/Gewerbeverfahren/Gewerbeanmeldung/index?caller=084210000000",
+    },
+  ],
+};
+
+// Pre-drift intent for the skipped Fraureuth case (see comment above) - not derived from any
+// real recording, since PVOG no longer returns this scenario at all.
+export const fraureuthGewerbeamt: Gewerbeamt = {
+  name: "Gewerbeamt",
+  adresse: undefined,
+  telefon: undefined,
+  email: undefined,
+  onlineServices: [],
 };
