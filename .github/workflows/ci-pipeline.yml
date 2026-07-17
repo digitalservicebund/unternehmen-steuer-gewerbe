@@ -619,6 +619,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+
     steps:
       - name: Dependabot metadata
         id: metadata
@@ -632,7 +633,6 @@ jobs:
           private-key: ${{ secrets.AUTO_MERGE_GRUENDEN_APP_PRIVATE_KEY }}
       - name: Auto-merge Dependabot PRs except major version updates
         if: steps.metadata.outputs.update-type != 'version-update:semver-major'
-        run: gh pr merge --auto --squash "$PR_URL"
+        run: gh pr merge --auto --squash "${{ github.event.pull_request.html_url }}"
         env:
-          PR_URL: ${{steps.app-token.outputs.token}}
-          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GH_TOKEN: ${{steps.app-token.outputs.token}}
