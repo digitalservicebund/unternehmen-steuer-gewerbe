@@ -99,7 +99,7 @@ interface TransportReportResponse {
   tracks: TransportReportTrack[];
 }
 
-const DEFAULT_TIMEOUT_MS = 5_000;
+const DEFAULT_TIMEOUT_MS = 15_000;
 const SEND_TIMEOUT_MS = 30_000;
 
 // AKDB production requires us to authenticate with a client-certificate,
