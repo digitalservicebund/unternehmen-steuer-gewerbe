@@ -11,7 +11,7 @@ describe("createMetadata", () => {
     const result = createMetadata(dataSchema, '{ "data": "passierschein a38" }');
 
     expect(result).toEqual({
-      $schema: "https://schema.fitko.de/fit-connect/metadata/2.0.0/metadata.schema.json",
+      $schema: "https://schema.fitko.de/fit-connect/metadata/1.5.0/metadata.schema.json",
       contentStructure: {
         data: {
           submissionSchema: {
@@ -24,6 +24,7 @@ describe("createMetadata", () => {
               "ff7ce088290ebfb46b7e01d73ce0732033a46b59f8f6ea71097cf9a0f4d11a23c1ef6bd8e62b5f518aaabf85b16b3d5e7f6d5c4fdecd36f7e64f171eb3289661",
           },
         },
+        attachments: [],
       },
     });
   });

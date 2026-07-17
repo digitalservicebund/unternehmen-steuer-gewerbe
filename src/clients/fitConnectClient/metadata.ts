@@ -8,7 +8,7 @@ export interface DataSchema {
 export function createMetadata(dataSchema: DataSchema, data: string) {
   const dataHash = createHash("sha512").update(data).digest("hex");
   return {
-    $schema: "https://schema.fitko.de/fit-connect/metadata/2.0.0/metadata.schema.json",
+    $schema: "https://schema.fitko.de/fit-connect/metadata/1.5.0/metadata.schema.json",
     contentStructure: {
       data: {
         submissionSchema: {
@@ -20,6 +20,7 @@ export function createMetadata(dataSchema: DataSchema, data: string) {
           content: dataHash,
         },
       },
+      attachments: [],
     },
   };
 }
