@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:ename="urn:xoev-de:xunternehmen:standard:basismodul:eingetragenername_1.1"
+           xmlns:bdt="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"
+           xmlns:xoev-code="http://xoev.de/schemata/code/1_0"
+           targetNamespace="urn:xoev-de:xunternehmen:standard:basismodul:eingetragenername_1.1"
+           version="1.1"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XUnternehmen.Basismodul</nameLang>
+            <nameKurz>XUnternehmen.Basismodul</nameKurz>
+            <nameTechnisch>basismodul</nameTechnisch>
+            <kennung>urn:xoev-de:xunternehmen:standard:basismodul</kennung>
+            <beschreibung>Basismodul des Standards XUnternehmen.</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>1.1</version>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVHandbuch>2.5</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP 2</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:import schemaLocation="xoev-code.xsd"
+              namespace="http://xoev.de/schemata/code/1_0"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-basisdatentypen_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"/>
+   <xs:element name="eingetragenerName" type="bdt:String.DIN91379.C">
+      <xs:annotation>
+         <xs:documentation>Die im Handels-, Genossenschafts oder Gesellschaftsregister eingetragene Firma eines wirtschaftlich Tätigen bzw. einer wirtschaftlichen Tätigkeit (z. B. eingetragenes Einzelunternehmen, eingetragene Zweigniederlassung) bzw. der im Vereinsregister, Partnerschaftsregister oder Stiftungsverzeichnis eingetragene Name. Der eingetragene Name kann auch in einem Register festgehalten sein, welches in einem anderen Staat geführt wird.Der eingetragene Name ist abzugrenzen von der Geschäftsbezeichnung.Das Kerndatenobjekt bildet auch die Namen juristischer Personen, rechtsfähiger Personengesellschaften oder sonstiger Personenvereinigungen ab, die nicht in einem Register, aber kraft Gesetz geführt werden.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+</xs:schema>

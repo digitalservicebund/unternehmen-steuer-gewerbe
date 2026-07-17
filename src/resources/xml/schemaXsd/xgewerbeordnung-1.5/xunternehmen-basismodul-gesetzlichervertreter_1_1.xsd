@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:gv="urn:xoev-de:xunternehmen:standard:basismodul:gesetzlichervertreter_1.1"
+           xmlns:bdt="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"
+           xmlns:xoev-code="http://xoev.de/schemata/code/1_0"
+           targetNamespace="urn:xoev-de:xunternehmen:standard:basismodul:gesetzlichervertreter_1.1"
+           version="1.1"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XUnternehmen.Basismodul</nameLang>
+            <nameKurz>XUnternehmen.Basismodul</nameKurz>
+            <nameTechnisch>basismodul</nameTechnisch>
+            <kennung>urn:xoev-de:xunternehmen:standard:basismodul</kennung>
+            <beschreibung>Basismodul des Standards XUnternehmen.</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>1.1</version>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVHandbuch>2.5</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP 2</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:import schemaLocation="xoev-code.xsd"
+              namespace="http://xoev.de/schemata/code/1_0"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-basisdatentypen_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"/>
+   <xs:complexType name="Code.ArtGesetzlicherVertreter">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Art des gesetzlichen Vertreters</nameLang>
+               <nameKurz>artgesetzlichervertreter</nameKurz>
+               <nameTechnisch>artgesetzlichervertreter</nameTechnisch>
+               <kennung>urn:xoev-de:xunternehmen:codeliste:artgesetzlichervertreter</kennung>
+               <beschreibung>Arten der gesetzlichen Vertreter</beschreibung>
+               <herausgebernameLang>Betreiber XUnternehmen (KoSIT und d-NRW AÖR) im Auftrag des Bundesministeriums für Wirtschaft und Energie</herausgebernameLang>
+               <herausgebernameKurz>XUnternehmen</herausgebernameKurz>
+            </codeliste>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token" form="unqualified"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xunternehmen:codeliste:artgesetzlichervertreter"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="artGesetzlicherVertreter" type="gv:Code.ArtGesetzlicherVertreter">
+      <xs:annotation>
+         <xs:documentation>Art des Gesetzlichen Vertreters. Die möglichen Ausprägungen dieses Attributes sind durch die Codeliste Art des gesetzlichen Vertreters (urn:xoev-de:xunternehmen:codeliste:artgesetzlichervertreter) im XRepository bestimmt.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="gesetzlicherVertreter">
+      <xs:annotation>
+         <xs:documentation>Mit dieser Rolle wird der gesetzliche Vertreter einer juristischen Person, einer rechtsfähigen Personengesellschaft, einer sonstigen Personenvereinigung oder natürlichen Person gefasst. Es handelt sich hierbei um Vertreter, deren Vertretungsmacht sich allein aus gesetzlichen Bestimmungen ergibt und nicht durch ein Rechtsgeschäft erteilt wurde.Hierunter fallen bei natürlichen Personen die Eltern oder der Vormund für minderjährige Kinder und der Betreuer für volljährige Personen. Hierunter fallen bei einer juristischen Person, einer rechtsfähigen Personengesellschaft oder einer sonstigen Personenvereinigung die Mitglieder des Vertretungsorgans (Organwalter, Organmitglieder, Organträger) wie beispielweise: ein Geschäftsführer einer GmbH gemäß § 35 GmbhG ein Mitglied des Vorstands einer Aktiengesellschaft gemäß § 78 AktG ein Mitglied des Vorstands einer Genossenschaft gemäß § 24 GenG oder ein Mitglied des Vorstands eines eingetragenen Vereins gemäß § 26 BGB ein Liquidator bzw. Abwickler einer Gesellschaft gemäß § 66 GmbHG, § 265 AktG, § 269 AktG, § 146 BGB Bei Personengesellschaften müssen ihre gesetzliche Vertreter aus dem Kreis ihrer Gesellschafter stammen (Prinzip der Selbstorganschaft), wobei aber nicht alle Gesellschafter gesetzliche Vertreter sein müssen. Letzteres ist beispielsweise immer der Fall für den Kommanditisten einer KG, aber auch möglich für eine offene Handelsgesellschaft.Sofern bei einer Personengesellschaft sowohl ihre gesetzlichen Vertreter als auch ihre Gesellschafter angegeben werden, treten einige davon entsprechend in doppelter Rolle auf.Bei Kapitalgesellschaften und Genossenschaften nach deutschem Recht müssen die gesetzlichen Vertreter natürliche Personen sein. Dies gilt aber nicht allgemein für juristische Personen, beispielsweise nicht für den eingetragenen Verein oder bestimmte Kapitalgesellschaften nach ausländischem Recht, und auch nicht für Personengesellschaften, deren gesetzliche Vertreter im Allgemeinen auch juristische Personen (z. B. die Verwaltungs-GmbH in einer GmbH amp Co KG) oder andere rechtsfähige Personengesellschaften sein können.Bei gesetzlichen Vertretern, die keine natürliche Personen sind, werden in Verwaltungsverfahren häufig auch Angaben zu deren gesetzlichen Vertretern (natürliche Personen) benötigt. Explizit nicht unter diese Rolle fallen die rechtsgeschäftlichen Vertreter, die Bevollmächtigte sind (Prokuristen, Handlungsbevollmächtigte). Die rechtsgeschäftlichen Vertreter eines wirtschaftlich Tätigen werden aktuell im Kerndatenmodell nicht berücksichtigt.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="gv:gesetzlicherVertreter.id">
+               <xs:annotation>
+                  <xs:documentation>Angabe eines gesetzlichen Vertreters als ID-Querverweis innerhalb des jeweiligen Kontextes (Nachricht, Datensatz) auf ein Element np:natuerlichePerson, jp:juristischePerson, pg:rechtsfaehigePersonengesellschaft, pv:sonstigePersonenvereinigung (oder auf ein entsprechendes abgeleitetes Element).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="gv:artGesetzlicherVertreter" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Art des Gesetzlichen Vertreters. Die möglichen Ausprägungen dieses Attributes sind durch die Codeliste Art des gesetzlichen Vertreters (urn:xoev-de:xunternehmen:codeliste:artgesetzlichervertreter) im XRepository bestimmt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="gesetzlicherVertreter.id" type="bdt:IDType">
+      <xs:annotation>
+         <xs:documentation>Angabe eines gesetzlichen Vertreters als ID-Querverweis innerhalb des jeweiligen Kontextes (Nachricht, Datensatz) auf ein Element np:natuerlichePerson, jp:juristischePerson, pg:rechtsfaehigePersonengesellschaft, pv:sonstigePersonenvereinigung (oder auf ein entsprechendes abgeleitetes Element).</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+</xs:schema>

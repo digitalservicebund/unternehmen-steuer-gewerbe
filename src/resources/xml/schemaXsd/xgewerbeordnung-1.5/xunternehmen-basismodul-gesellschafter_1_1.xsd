@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:ges="urn:xoev-de:xunternehmen:standard:basismodul:gesellschafter_1.1"
+           xmlns:bdt="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"
+           xmlns:xoev-code="http://xoev.de/schemata/code/1_0"
+           targetNamespace="urn:xoev-de:xunternehmen:standard:basismodul:gesellschafter_1.1"
+           version="1.1"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XUnternehmen.Basismodul</nameLang>
+            <nameKurz>XUnternehmen.Basismodul</nameKurz>
+            <nameTechnisch>basismodul</nameTechnisch>
+            <kennung>urn:xoev-de:xunternehmen:standard:basismodul</kennung>
+            <beschreibung>Basismodul des Standards XUnternehmen.</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>1.1</version>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVHandbuch>2.5</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP 2</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:import schemaLocation="xoev-code.xsd"
+              namespace="http://xoev.de/schemata/code/1_0"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-basisdatentypen_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"/>
+   <xs:complexType name="Code.ArtGesellschafterPersonengesellschaft">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Art eines Gesellschafters einer Personengesellschaft</nameLang>
+               <nameKurz>Art eines Gesellschafters einer Personengesellschaft</nameKurz>
+               <nameTechnisch>artgesellschafterpersonengesellschaft</nameTechnisch>
+               <kennung>urn:xoev-de:xunternehmen:codeliste:artgesellschafterpersonengesellschaft</kennung>
+               <beschreibung>Die Dokumentation der Codeliste ist noch zu ergänzen.</beschreibung>
+               <herausgebernameLang>XUnternehmen</herausgebernameLang>
+               <herausgebernameKurz>XUnternehmen</herausgebernameKurz>
+            </codeliste>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token" form="unqualified"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xunternehmen:codeliste:artgesellschafterpersonengesellschaft"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="art" type="ges:Code.ArtGesellschafterPersonengesellschaft">
+      <xs:annotation>
+         <xs:documentation>Weitere Charakterisierung der Art des Gesellschafterverhältnisses</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="gesellschafter">
+      <xs:annotation>
+         <xs:documentation>Mit dieser Rolle wird ein Gesellschafter einer rechtsfähigen Personengesellschaft gefasst.In Abhängigkeit vom Verfahren kann eine weitere Qualifizierung der Gesellschafterrolle erforderlich sein: Persönlich haftender Gesellschafter: Ein persönlich haftender Gesellschafter (Vollhafter) ist ein Gesellschafter, der mit seinem Privatvermögen für Verbindlichkeiten der Gesellschaft haftet. Das betrifft den Komplementär einer Kommanditgesellschaft (KG) sowie alle Gesellschafter einer Gesellschaft bürgerlichen Rechts (GbR) und einer offenen Handelsgesellschaft (oHG). Geschäftsführender Gesellschafter: Ein geschäftsführender Gesellschafter ist Gesellschafter, für den zusätzlich zu seiner Beteiligung an der Gesellschaft im Gesellschaftervertrag die Geschäftsführungsbefugnis erteilt ist. Sofern im jeweiligen Anwendungskontext des Kerndatenmodells bei einer Personengesellschaft sowohl ihre Gesellschafter (durch die diese Rolle) als auch ihre gesetzlichen Vertreter angegeben werden, treten aufgrund des Prinzips der Selbstorganschaft einige davon in doppelter Rolle auf.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="ges:gesellschafter.id">
+               <xs:annotation>
+                  <xs:documentation>Angabe eines Gesellschafters als ID-Querverweis innerhalb des jeweiligen Kontextes (Nachricht, Datensatz) auf ein Element np:natuerlichePerson, jp:juristischePerson, pg:rechtsfaehigePersonengesellschaft, pv:sonstigePersonenvereinigung (oder auf ein entsprechendes abgeleitetes Element).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="ges:art" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Weitere Charakterisierung der Art des Gesellschafterverhältnisses</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="gesellschafter.id" type="bdt:IDType">
+      <xs:annotation>
+         <xs:documentation>Angabe eines Gesellschafters als ID-Querverweis innerhalb des jeweiligen Kontextes (Nachricht, Datensatz) auf ein Element np:natuerlichePerson, jp:juristischePerson, pg:rechtsfaehigePersonengesellschaft, pv:sonstigePersonenvereinigung (oder auf ein entsprechendes abgeleitetes Element).</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+</xs:schema>

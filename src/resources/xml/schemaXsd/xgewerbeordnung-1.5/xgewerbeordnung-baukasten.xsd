@@ -1,0 +1,1310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:bk="http://www.xgewerbeordnung.de/spezifikation/baukasten/1.5"
+           xmlns:adr="urn:xoev-de:xunternehmen:standard:basismodul:adressen_1.1"
+           xmlns:bdt="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"
+           xmlns:bn-beh="http://xoev.de/schemata/basisnachricht/behoerde/1_0"
+           xmlns:bn-g2g="http://xoev.de/schemata/basisnachricht/g2g/1_0"
+           xmlns:eintr="urn:xoev-de:xunternehmen:standard:basismodul:eintragung_1.1"
+           xmlns:ename="urn:xoev-de:xunternehmen:standard:basismodul:eingetragenername_1.1"
+           xmlns:kom="urn:xoev-de:xunternehmen:standard:basismodul:kommunikation_1.1"
+           xmlns:nachr="urn:xoev-de:xunternehmen:standard:basismodul:nachrichtenstruktur_1.1"
+           xmlns:np="urn:xoev-de:xunternehmen:standard:basismodul:natuerlicheperson_1.1"
+           xmlns:rf="urn:xoev-de:xunternehmen:standard:basismodul:rechtsform_1.1"
+           xmlns:wt="urn:xoev-de:xunternehmen:standard:basismodul:wirtschaftlichetaetigkeit_1.1"
+           xmlns:xoev-code="http://xoev.de/schemata/code/1_0"
+           targetNamespace="http://www.xgewerbeordnung.de/spezifikation/baukasten/1.5"
+           version="1.5"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XGewerbeordnung</nameLang>
+            <nameKurz>XGewerbeordnung</nameKurz>
+            <nameTechnisch>xgewerbeordnung</nameTechnisch>
+            <kennung>urn:xoev-de:kosit:standard:xgewerbeordnung</kennung>
+            <beschreibung>XGewerbeordnung</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>1.5</version>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVHandbuch>2.5</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP 2</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:import schemaLocation="xoev-basisnachricht-behoerde.xsd"
+              namespace="http://xoev.de/schemata/basisnachricht/behoerde/1_0"/>
+   <xs:import schemaLocation="xoev-basisnachricht-g2g.xsd"
+              namespace="http://xoev.de/schemata/basisnachricht/g2g/1_0"/>
+   <xs:import schemaLocation="xoev-code.xsd"
+              namespace="http://xoev.de/schemata/code/1_0"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-adressen_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:adressen_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-basisdatentypen_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-eingetragenername_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:eingetragenername_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-eintragung_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:eintragung_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-kommunikation_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:kommunikation_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-nachrichten_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:nachrichtenstruktur_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-natuerlicheperson_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:natuerlicheperson_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-rechtsform_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:rechtsform_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-wirtschaftlichetaetigkeit_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:wirtschaftlichetaetigkeit_1.1"/>
+   <xs:complexType name="Code.AnlassFreitext">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Anlass Freitextnachricht</nameLang>
+               <nameKurz>Anlass Freitextnachricht</nameKurz>
+               <nameTechnisch>anlassfreitext</nameTechnisch>
+               <kennung>urn:xoev-de:xgewerbeordnung:codeliste:anlassfreitext</kennung>
+               <beschreibung>Anlass der Übermittlung einer Freitextnachricht</beschreibung>
+               <herausgebernameLang>XGewerbeordnung</herausgebernameLang>
+               <herausgebernameKurz>XGewerbeordnung</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>2</version>
+               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
+            </versionCodeliste>
+            <codelistenspalten>
+               <Code>
+                  <spaltennameLang>Code</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </Code>
+               <Text>
+                  <spaltennameLang>Text</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </Text>
+               <Hinweis>
+                  <spaltennameLang>Hinweis</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>optional</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </Hinweis>
+            </codelistenspalten>
+            <genutzteCodeSpalte>Code</genutzteCodeSpalte>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" form="unqualified" type="bk:anlassfreitext"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xgewerbeordnung:codeliste:anlassfreitext"/>
+            <xs:attribute name="listVersionID"
+                          type="xs:normalizedString"
+                          use="optional"
+                          fixed="2"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.Behoerdenkennung">
+      <xs:annotation>
+         <xs:documentation>Die zu verwendende Codeliste ergibt sich aus dem Nachrichtenkontext. Siehe Beschreibung des Datentyps Behoerdenkennung.</xs:documentation>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token" form="unqualified"/>
+            </xs:sequence>
+            <xs:attribute name="listURI" type="xs:anyURI" use="required"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.Handwerkskammer">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Handwerkskammern</nameLang>
+               <nameKurz>Handwerkskammern</nameKurz>
+               <nameTechnisch>handwerkskammern</nameTechnisch>
+               <kennung>urn:xoev-de:xunternehmen:codeliste:handwerkskammern</kennung>
+               <beschreibung>Enthält die Schlüssel aller Handwerkskammern</beschreibung>
+               <herausgebernameLang>Betreiber XUnternehmen (KoSIT und d-NRW) im Auftrag des Bundesministeriums für Wirtschaft und Energie (XUnternehmen)</herausgebernameLang>
+               <herausgebernameKurz>XUnternehmen</herausgebernameKurz>
+            </codeliste>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token" form="unqualified"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xunternehmen:codeliste:handwerkskammern"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.Rueckweisungsgrund">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Rückweisungsgründe</nameLang>
+               <nameKurz>Rückweisungsgründe</nameKurz>
+               <nameTechnisch>rueckweisungsgruende</nameTechnisch>
+               <kennung>urn:xoev-de:xgewerbeordnung:codeliste:rueckweisungsgruende</kennung>
+               <beschreibung>Diese Tabelle führt mögliche Gründe für eine Rücksendung einer Nachricht an den Absender auf. Mit dem Präfix des jeweiligen Schlüssels wird folgende Systematik festgelegt: T (Transportproblem), X (formales Problem mit XML), V (Versionsproblem), S (nicht spezifikationskonform).</beschreibung>
+               <herausgebernameLang>Betreiber XGewerbeordnung (KoSIT und d-NRW im Auftrag des Bundesministeriums für Wirtschaft und Energie)</herausgebernameLang>
+               <herausgebernameKurz>XGewerbeordnung</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>1</version>
+               <versionCodelistenHandbuch>1.0</versionCodelistenHandbuch>
+            </versionCodeliste>
+            <codelistenspalten>
+               <key>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </key>
+               <name>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </name>
+            </codelistenspalten>
+            <genutzteCodeSpalte>key</genutzteCodeSpalte>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" form="unqualified">
+                  <xs:simpleType>
+                     <xs:restriction base="xs:token">
+                        <xs:enumeration value="S001">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Nicht spezifikationskonform: Die Nachricht ist nicht UTF-8 codiert.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="S010">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Nicht spezifikationskonform: Ungültige Codeliste.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="S011">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Nicht spezifikationskonform: Ungültiger Code in einer Codeliste.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="S020">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Nicht spezifikationskonform: Fehlerhafte Einzelfälle</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="S100">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Nicht spezifikationskonform: Rückweisung aufgrund erneuter Lieferung eines bereits erfolgreich verarbeiteten Datensatzes</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="S999">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Nicht spezifikationskonform aus anderen Gründen.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T000">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Das Zertifikat des Absenders ist abgelaufen.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T001">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Das Zertifikat des Absenders ist widerrufen.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T002">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Das Zertifikat des Absenders ist nicht gültig.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T003">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Das Zertifikat des Absenders fehlt.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T010">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Die Signatur der Inhaltsdaten fehlt oder hat nicht das geforderte Signaturniveau.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T011">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Die Signatur der Inhaltsdaten ist nicht gültig (Integrität verletzt).</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T020">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Die Inhaltsdaten können von dem Empfänger nicht dechiffriert werden.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T070">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Der Absender ist zur Inanspruchnahme dieses Dienstes nicht berechtigt.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T080">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Die Nachricht ist dem falschen Empfänger / Leser zugestellt worden, d. h. im Nachrichtenkopf ist eine abweichende Empfängerbehörde eingetragen (Irrläufer).</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T099">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Sonstiger Verstoß gegen Anforderungen des OSCI-Transport-Profils</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="V000">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Nicht spezifikationskonform: Die Nachricht kann in der Version, die in der Nachricht angegeben wird, vom Empfänger nicht bearbeitet werden (Der Dienst ist in dieser Version nicht oder nicht mehr bereit).</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="X000">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Die Nachricht ist kein wohlgeformtes XML-Dokument.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="X001">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Die Nachricht ist nicht valide zu dem Schema der in der Nachricht angegebenen Version</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="X002">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Die Nachricht ist nicht valide zu den Schematron-Regeln, die für diese Nachricht gelten. Schematron-Fehlercode(s) werden als Unter-Codes mitgeteilt.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                     </xs:restriction>
+                  </xs:simpleType>
+               </xs:element>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xgewerbeordnung:codeliste:rueckweisungsgruende"/>
+            <xs:attribute name="listVersionID"
+                          type="xs:normalizedString"
+                          use="optional"
+                          fixed="1"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.RueckweisungsgrundSpezifisch">
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token" form="unqualified"/>
+            </xs:sequence>
+            <xs:attribute name="listURI" type="xs:anyURI" use="required"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.Staatsgebiet">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Codeliste Staatsgebiete aus der Staats- und Gebietssystematik des Statistischen Bundesamtes</nameLang>
+               <nameKurz>Destatis Staatsgebiete</nameKurz>
+               <nameTechnisch>staatsgebiete</nameTechnisch>
+               <kennung>urn:de:bund:destatis:bevoelkerungsstatistik:schluessel:staatsgebiete</kennung>
+               <beschreibung>Codeliste Staatsgebiete. Tabelle von derzeitigen Staatsgebieten und deren unselbständiger Teile, d.h. von Staaten und deren Gebiete bzw. Gebietsteile sowie von exterritorialen Teilen von Staaten. Liste von Gebieten, die über einen eigenen ISO-3166-1 Code verfügen. Mehrere Einträge können den gleichen Destatis-Gebietscode besitzen. Bei Staaten ohne unselbständige Gebiete (mit eigenen ISO-Code) trägt das Staatsgebiet sowohl den gleichen Destatis-Code wie auch den gleichen ISO-Code wie der Staat. Bei Staaten mit unselbständigen Gebieten (mit eigenen ISO-Code) wird der Teil des Staatsgebietes mit den gleichen Destatis- und ISO-Codes wird der Staat als "Mutterland" bezeichnet, alle anderen Teile des Staatsgebietes als unselbständige(s) Gebiete(e). Enthält z.B. Einträge für: Frankreich (Mutterland, also das Hexagon), Französisch-Guayana (exterritoriales Gebiet, d.h. Übersee-Departement Frankreichs), Italien (Gebiet des Stiefels + Inseln im Mittelmeer), Vereinigtes Königreich (= Großbritannien - d.h. Gebiet von England, Schottland, Wales - plus Nordirland), britische Jungferninseln (exterritoriales Gebiet des Vereinigten Königreichs), Jersey (Krongebiet, rechtlich kein Teil des Vereinigten Königreichs). Neben der amtlichen Bezeichnung des Gebiets (Kurzform und Vollform) ist der Suchbegriff aus dem Länderverzeichnis des Auswärtigen Amtes aufgeführt (der Suchbegriff ist hier eine griffige Bezeichnung des Gebietes). Die Angaben umfassen zudem die amtlichen Bezeichnungen (Kurzform und Vollform) des Staates, zu dem das Gebiet gehört, die Staatsangehörigkeit, die in diesem Gebiet gilt, sowie die numerischen Destatis-Code für Gebiet, Staatsangehörigkeit und Staat, den 2- und 3-stelligen alphabetischen ISO 3166-1 Code sowie für den Staat, zu dem das Gebiet gehört, ggf. das Datum der Selbständigkeit bzw. Gründungsdatum nach den Angaben des Auswärtigen Amtes und das Auflösungs- bzw. Enddatum als berechnete Angabe aus dem Gründungsdatum des/der Nachfolgestaaten.</beschreibung>
+               <herausgebernameLang>Statistisches Bundesamt, Wiesbaden (DESTATIS)</herausgebernameLang>
+               <herausgebernameKurz>Destatis</herausgebernameKurz>
+            </codeliste>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token" form="unqualified"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:de:bund:destatis:bevoelkerungsstatistik:schluessel:staatsgebiete"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.Status">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Status</nameLang>
+               <nameKurz>Status</nameKurz>
+               <nameTechnisch>Status</nameTechnisch>
+               <kennung>urn:xoev-de:xgewerbeordnung:codeliste:status</kennung>
+               <beschreibung>Gibt den Status für eine Handwerkskarte, eine Erlaubnis oder eine Aufenthaltsgenemigung an.</beschreibung>
+               <herausgebernameLang>Betreiber XGewerbeordnung (KoSIT und IT.NRW im Auftrag des Bundesministeriums für Wirtschaft und Energie)</herausgebernameLang>
+               <herausgebernameKurz>XGewerbeordnung</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>2</version>
+               <datumGueltigkeitAb>2023-11-01</datumGueltigkeitAb>
+               <versionCodelistenHandbuch>1.0</versionCodelistenHandbuch>
+            </versionCodeliste>
+            <codelistenspalten>
+               <Code>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </Code>
+               <Text>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </Text>
+            </codelistenspalten>
+            <genutzteCodeSpalte>Code</genutzteCodeSpalte>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" form="unqualified">
+                  <xs:simpleType>
+                     <xs:restriction base="xs:token">
+                        <xs:enumeration value="0">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Liegt nicht vor</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="1">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Liegt vor</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="2">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Erloschen</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="3">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Beantragt</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="4">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Liegt vor oder beantragt</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                     </xs:restriction>
+                  </xs:simpleType>
+               </xs:element>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xgewerbeordnung:codeliste:status"/>
+            <xs:attribute name="listVersionID"
+                          type="xs:normalizedString"
+                          use="optional"
+                          fixed="2"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.Unfallversicherungstraeger">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Träger der gesetzlichen Unfallversicherung</nameLang>
+               <nameKurz>Unfallversicherungsträger</nameKurz>
+               <nameTechnisch>unfallversicherungstraeger</nameTechnisch>
+               <kennung>urn:xoev-de:xgewerbeordnung:codeliste:unfallversicherungstraeger</kennung>
+               <beschreibung>Träger der gesetzlichen Unfallversicherung</beschreibung>
+               <herausgebernameLang>Betreiber XGewerbeordnung (KoSIT und d-nrw im Auftrag des Bundesministeriums für Wirtschaft und Energie)</herausgebernameLang>
+               <herausgebernameKurz>XGewerbeordnung</herausgebernameKurz>
+            </codeliste>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token" form="unqualified"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xgewerbeordnung:codeliste:unfallversicherungstraeger"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.Vertrauensniveau">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Codes für Vertrauensniveau</nameLang>
+               <nameKurz>vertrauensniveau</nameKurz>
+               <nameTechnisch>vertrauensniveau</nameTechnisch>
+               <kennung>urn:xoev-de:fim:codeliste:vertrauensniveau</kennung>
+               <beschreibung>Codeliste für das Vertrauensniveau. Die eIDAS-Verordnung regelt die für die gegenseitige Anerkennung erforderlichen rechtlichen Rahmenbedingungen. Sie sieht insbesondere vor, dass sich die Wahl der Identifizierungsmittel nach dem jeweils benötigten Vertrauensniveau der Verwaltungsdienstleistung richtet. Besonders sichere Identifizierungsmittel sind in Verwaltungsdienstleistungen mit hohem Vertrauensniveau einzusetzen, bei Verwaltungsdienstleistungen mit niedrigerem Vertrauensniveau werden geringere Anforderungen an das Identifizierungsmittel gestellt.</beschreibung>
+               <herausgebernameLang>Geschäfts- und Koordinierungsstelle Föderales Informationsmanagement</herausgebernameLang>
+               <herausgebernameKurz>GK_FIM</herausgebernameKurz>
+            </codeliste>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token" form="unqualified"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:fim:codeliste:vertrauensniveau"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.WeitereKommunikationspartner">
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token" form="unqualified"/>
+            </xs:sequence>
+            <xs:attribute name="listURI" type="xs:anyURI" use="required"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Freitext.Beteiligter">
+      <xs:annotation>
+         <xs:documentation>Angaben zur Identifikation eines Gewerbetreibenden (natürliche oder juristische Person) oder eines wirtschaftlich Tätigen (auch Personengesellschaften) des Gewerbebetriebs, auf den sich eine Freitextnachricht bezieht. Um die Zuordnung beim Leser zu ermöglichen, sollen alle Angaben der Datenstruktur, welche dem Autor der Freitextnachricht vorliegen, angegeben werden. Es muss mindestens eines der Elemente np:name, ename:eingetragenerName, bk:gbrGesellschafter oder wt:geschaeftsbezeichnung angegeben werden. Sofern dem Autor der Freitextnachricht im Fall einer Personengesellschaft Angaben sowohl zur Personengesellschaft als auch zu den Gesellschaftern vorliegen, so sollen für beide Elemente identifikationBeteiligter angegeben werden.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element ref="rf:rechtsform" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Angabe der Rechtsform des Beteiligten. Es dürfen ausschließlich die in beschriebenen Rechtsformen-Codes verwendet werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="bk:eintragung" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Angabe der Eintragung des Beteiligten in ein Handels-, Genossenschafts- oder Vereinsregister</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="ename:eingetragenerName" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Angabe des eingetragenen Namen des Beteiligten</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="gbRGesellschafter" minOccurs="0" type="bdt:String.DIN91379.C">
+            <xs:annotation>
+               <xs:documentation>Die Gesellschafter (mit Vor- und Nachname bzw. Firma) der GbR als ein Textfeld Umsetzungshinweis: Sofern dem Autor die Angaben zu den Gesellschaftern einzeln und strukturiert vorliegen, so sollen diese auch als einzelne Elemente bk:identifikationBeteiligter übermittelt werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="wt:geschaeftsbezeichnung" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Angabe einer Geschäftsbezeichnung</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="np:name" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Angabe des Namens der natürlichen Person</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="bk:geburt" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Angabe der Geburtsdaten der natürlichen Person</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="bk:anschrift" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>Angabe einer Anschrift des Beteiligten (Wohnanschrift oder Hauptniederlassung), welche vom Leser zur Identifikation des Beteiligten herangezogen werden kann.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="NachweisdokumentType">
+      <xs:annotation>
+         <xs:documentation>Metainformationen zu einem zugehörigen Nachweisdokument in Dateiform.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="dokumentid" type="bdt:String.DIN91379.C">
+            <xs:annotation>
+               <xs:documentation>Innerhalb des Transport-Kontextes eindeutige Kennung des Dokuments (z. B. als Verweis auf einen separaten Content in einem OSCI-Container).</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="dateiname" type="bdt:String.DIN91379.C">
+            <xs:annotation>
+               <xs:documentation>Der Dateiname des Dokuments.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="mimetype" type="bdt:String.DIN91379.C">
+            <xs:annotation>
+               <xs:documentation>Der Mime-Type des Dokuments.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="kategorie" type="bdt:String.DIN91379.C">
+            <xs:annotation>
+               <xs:documentation>Die Kategorie des Dokuments. Beispiel: "Antrag im Original".</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="StrassenanschriftInlandType">
+      <xs:annotation>
+         <xs:documentation>Angaben für die Adressierung im Inland, soweit es sich um die Anschrift eines Gebäudes handelt. Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Hausnummer differenziert (von, bis). Straßenschlüssel ergänzt. Ortsteil ergänzt.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element ref="adr:strasse">
+            <xs:annotation>
+               <xs:documentation>Falls die Anschrift unbekannt ist (z. B. bei Abmeldung von Amts wegen), so ist hier der Wert "unbekannt" zu übermitteln.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="strassenschluessel"
+                     minOccurs="0"
+                     type="bdt:String.DIN91379.C">
+            <xs:annotation>
+               <xs:documentation>Angabe des Straßenschlüssels in der Gemeinde.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="hausnummerVon" minOccurs="0" type="bdt:String.DIN91379.C">
+            <xs:annotation>
+               <xs:documentation>Hausnummer (von), z.B. "136 A"</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="hausnummerBis" minOccurs="0" type="bdt:String.DIN91379.C">
+            <xs:annotation>
+               <xs:documentation>Hausnummer (bis), z.B. "136 C"</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="adr:postleitzahl">
+            <xs:annotation>
+               <xs:documentation>Es ist die Postleitzahl anzugeben.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="adr:ort">
+            <xs:annotation>
+               <xs:documentation>Der Name des Ortes (Gemeinde, Ortschaft oder Stadt).</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="ortsteil" minOccurs="0" type="bdt:String.DIN91379.C"/>
+         <xs:element ref="adr:zusatzangaben" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Es sind Zusatzangaben zur Anschrift anzugeben.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:simpleType name="anlassfreitext">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Anlass Freitextnachricht</nameLang>
+               <nameKurz>Anlass Freitextnachricht</nameKurz>
+               <nameTechnisch>anlassfreitext</nameTechnisch>
+               <kennung>urn:xoev-de:xgewerbeordnung:codeliste:anlassfreitext</kennung>
+               <beschreibung>Anlass der Übermittlung einer Freitextnachricht</beschreibung>
+               <herausgebernameLang>XGewerbeordnung</herausgebernameLang>
+               <herausgebernameKurz>XGewerbeordnung</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>2</version>
+               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
+            </versionCodeliste>
+            <codelistenspalten>
+               <Code>
+                  <spaltennameLang>Code</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </Code>
+               <Text>
+                  <spaltennameLang>Text</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </Text>
+               <Hinweis>
+                  <spaltennameLang>Hinweis</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>optional</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </Hinweis>
+            </codelistenspalten>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:restriction base="xs:token">
+         <xs:enumeration value="00">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Sonstige Anlässe</Text>
+                  <Hinweis>Mit diesem Anlass kann bspw. über eine behördliche Entscheidung informiert werden, welche nicht mit spezifischeren Codes abgebildet werden können.</Hinweis>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="01">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Benachrichtigung über eine steuerliche Abmeldung</Text>
+                  <Hinweis/>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="02">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Benachrichtigung über die Eintragung in die Handwerksrolle / Ausstellung einer Handwerkskarte</Text>
+                  <Hinweis/>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="03">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Benachrichtigung über die Ausstellung einer Erlaubnis</Text>
+                  <Hinweis/>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="04">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Benachrichtigung über die Ausstellung eines Aufenthaltstitels</Text>
+                  <Hinweis/>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="05">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Benachrichtigung über einen Todesfall</Text>
+                  <Hinweis>Übermittlung von Empfangsstelle zu Gewerbemeldestelle</Hinweis>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="06">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Benachrichtigung über die Verlegung einer Niederlassung / Betriebsstätte</Text>
+                  <Hinweis>Übermittlung von Empfangsstelle zu Gewerbemeldestelle</Hinweis>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="07">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Benachrichtigung darüber, dass Gewerbetreibender / Gewerbebetrieb unbekannt verzogen sind</Text>
+                  <Hinweis/>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="08">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Benachrichtigung über die Untersagung einer Tätigkeit</Text>
+                  <Hinweis/>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="09">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Rückfrage / Hinweis zu einer Gewerbemeldung</Text>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="10">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Kommunikation im Rahmen von Online-Verfahren</Text>
+                  <Hinweis>Dieser Anlass darf nur in der Kommunikation zwischen Stellen, die Online-Anträge entgegennehmen (bspw. einheitlicher Ansprechpartner) und verarbeitenden Gewerbebehörden verwendet werden</Hinweis>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="11">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Rückfrage oder Mitteilung im Rahmen des Rückmeldeverfahrens</Text>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="21">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Auskunftsersuchen</Text>
+                  <Hinweis/>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+      </xs:restriction>
+   </xs:simpleType>
+   <xs:element name="anschrift">
+      <xs:annotation>
+         <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Detailliertere Struktur für die Strassenanschrift. Detailliertere Struktur für die Auslandsanschriften. Keine Postfachanschrift.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:choice>
+            <xs:element ref="bk:strassenanschriftInland">
+               <xs:annotation>
+                  <xs:documentation>Angaben für die Adressierung im Inland, soweit es sich um die Anschrift eines Gebäudes handelt. Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Hausnummer differenziert (von, bis). Straßenschlüssel ergänzt. Ortsteil ergänzt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:anschriftAusland">
+               <xs:annotation>
+                  <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Codierung des Staates über die Codeliste Destatis Staatsgebiete, nicht Destatis Staaten. Hausnummer differenziert (von, bis). Straßenschlüssel ergänzt. Ortsteil ergänzt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:choice>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="anschriftAusland">
+      <xs:annotation>
+         <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Codierung des Staates über die Codeliste Destatis Staatsgebiete, nicht Destatis Staaten. Hausnummer differenziert (von, bis). Straßenschlüssel ergänzt. Ortsteil ergänzt.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="staatsgebiet" type="bk:Code.Staatsgebiet">
+               <xs:annotation>
+                  <xs:documentation>Angabe des Staatsgebiets</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="adr:strasse" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Es ist die Bezeichnung der Straße anzugeben.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="hausnummerVon" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Hausnummer (von)</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="hausnummerBis" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Hausnummer (bis)</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="adr:postleitzahl" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Es ist die Postleitzahl anzugeben.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="adr:ort">
+               <xs:annotation>
+                  <xs:documentation>Der Name des Ortes (Gemeinde, Ortschaft oder Stadt).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="ortsteil" minOccurs="0" type="bdt:String.DIN91379.C"/>
+            <xs:element ref="adr:zusatzangaben" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Es sind Zusatzangaben zur Anschrift anzugeben.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="eintragung">
+      <xs:annotation>
+         <xs:documentation>Dieses Kerndatenobjekt fasst die Daten, mit welchen die Eintragung eines wirtschaftlich Tätigen bzw. eines Gewerbebetriebs in ein Register (Handels-, Gesellschafts-, Genossenschafts- oder Vereinsregister) oder in ein Verzeichnis (Stiftungsverzeichnis) identifiziert werden kann.Die Eintragung kann auch in ein Register oder Verzeichnis erfolgen, welches in einem anderen Staat geführt wird.Zwischen Rechtsform und Eintragung besteht ein Zusammenhang. Welche Eintragungsarten (Handelsregister A, Handelsregister B, Gesellschaftsregister, Genossenschaftsregister, Vereinsregister, Register im Ausland, Kraft Gesetz) für welche Rechtsformen zulässig sein können, wird als Information in der Codeliste der Rechtsformen mitgeführt. Das Objekt ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Semantisch konkretisiert auf Gewerbebetriebe als Art der wirtschaftlichen Tätigkeit Keine Eintragung im Partnerschaftsregister zulässig Das Element staat wurde nicht aus dem Basismodul übernommen, da dort Code und nicht Freitext vorgesehen ist. Das Element registergericht.bezeichnung wurde nicht aus dem Basismodul übernommen, stattdessen ist das Element registergericht.code zu nutzen.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="eintr:artEintragung">
+               <xs:annotation>
+                  <xs:documentation>Angabe der Art des Registers, in welchem der wirtschaftlich Tätige bzw. die wirtschaftliche Tätigkeit (z. B. Zweigniederlassung) geführt wird.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="eintr:registergericht.code" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Schlüssel des Registergerichts, in dessen Handels-, Genossenschafts-, Gesellschafts-, Partnerschafts- oder Vereinsregister, in welchem der wirtschaftlich Tätige bzw. die wirtschaftliche Tätigkeit (z. B. Zweigniederlassung) geführt wird.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="eintr:stiftungsverzeichnis" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Bei Einträgen im Stiftungsverzeichnis: Angabe des Bundeslandes bzw. der Behörde, in dessen oder deren Stiftungsverzeichnis der Eintrag geführt wird.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="adr:ort" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Bei Einträgen im Ausland: Angabe des Ortes der registerführenden Stelle.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="staat" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Bei Einträgen im Ausland: Angabe des Staates der registerführenden Stelle.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="eintr:eintragungsnummer">
+               <xs:annotation>
+                  <xs:documentation>Nummer der Eintragung im jeweiligen Register</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="geburt">
+      <xs:annotation>
+         <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Angabe zum Staat als Freitext statt Code.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="np:geburtsdatum" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Datum der Vollendung der Geburt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="adr:ort" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Der Ort der Geburt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="staat" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Der Staat der Geburt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="handelndePerson.vertrauensniveauIdentifikation"
+               type="bk:Code.Vertrauensniveau">
+      <xs:annotation>
+         <xs:documentation>Das Vertrauensniveau gemäß welchem die Identität der handelnden natürlichen Person vom Online-Dienst festgestellt wurde.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="kommunikation">
+      <xs:annotation>
+         <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt eingeschränkt: De-Mail ist unzulässig. Alle Angaben mehrfach möglich. Die Klammerangabe bei Vorwahlen in der Telefonnummer wird nicht unterstützt.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="kom:telefon" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Telefonnummer, strukturiert gemäß ITU E.123. Beispiel: "+49  421 1234567", "+49  421 123 4567". Die Angabe muss gemäß DIN 5008 aufgebaut sein.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="kom:telefax" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Telefaxnummer, strukturiert gemäß ITU E.123. Beispiel: "+49  421 1234567", "+49  421 123 4567". Die Angabe muss gemäß DIN 5008 aufgebaut sein.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="kom:eMail" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>E-Mail-Adresse</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="kom:webAdresse" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Web-Adresse</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="nachweisdokument.onlinedienst" type="bk:NachweisdokumentType">
+      <xs:annotation>
+         <xs:documentation>Vom Online-Dienst selbst erstellte Nachweisdokumente zur Ablage in der Akte der fachlich zuständigen Stelle. Beispiel: Die Willenserklärung eines oder der Antragstellenden "im Original".</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="nachweisdokument.upload" type="bk:NachweisdokumentType">
+      <xs:annotation>
+         <xs:documentation>Vom Anwender hochgeladene Nachweisdokumente (hochgeladene Fotos, Scans, etc.).</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="rueckweisendeStelle">
+      <xs:annotation>
+         <xs:documentation>Dieses Kindelement ist nur dann zu übermitteln, wenn die Nachricht nicht von dem ursprünglich adressierten Leser zurückgesandt wird, sondern von einer anderen Stelle (zum Beispiel einer Clearingstelle, die im Auftrag der ursprünglich adressierten Behörde eine Prüfung eingehender Nachrichten nach formalen Kriterien durchführt).</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="pruefinstanz" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Mit diesem Element wird die Stelle bezeichnet, die die Nachricht beanstandet hat.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:anschrift">
+               <xs:annotation>
+                  <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Detailliertere Struktur für die Strassenanschrift. Detailliertere Struktur für die Auslandsanschriften. Keine Postfachanschrift.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:kommunikation">
+               <xs:annotation>
+                  <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt eingeschränkt: De-Mail ist unzulässig. Alle Angaben mehrfach möglich. Die Klammerangabe bei Vorwahlen in der Telefonnummer wird nicht unterstützt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="rueckweisungEinzelfall">
+      <xs:annotation>
+         <xs:documentation>Mit diesem Element werden die nicht verarbeitbaren Einzelfälle aus der zurückgewiesenen (Sammel-)Nachricht kenntlich gemacht. Für jeden nicht verarbeitbaren Einzelfall sind neben den Identifikationsdaten die Gründe mitzuteilen, aufgrund derer der Einzelfall nicht verarbeitet werden konnte. Diese Gründe sind so präzise und vollständig wie möglich zu bezeichnen, um eine schnelle Klärung des Sachverhalts zu ermöglichen. Dieses Element darf nur verwendet werden, wenn auf Nachrichtenebene (alleinig) der Rückweisungsgrund S020 angegeben wurde. Werden mit diesem Element nicht verarbeitbare Einzelfälle mitgeteilt, so gelten alle anderen Einzelfälle der Ursprungsnachricht als nicht zurückgewiesen.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="identifikation.einzelfall" type="bdt:UUID">
+               <xs:annotation>
+                  <xs:documentation>Die UUID des nicht verarbeitbaren Einzelfalls</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:rueckweisungsgrund" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Für jeden Einzelfall sind hier die Gründe zu übermitteln, aufgrund derer der Einzelfall zurückgewiesen wird.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="rueckweisungsgrund">
+      <xs:annotation>
+         <xs:documentation>In diesem Element werden die Gründe mitgeteilt, aufgrund derer die Nachricht zurückgewiesen wird. Generell ist so vorzugehen, dass die Gründe für die Rückweisung so präzise und vollständig wie möglich bezeichnet werden, um eine schnelle Klärung des Sachverhalts zu ermöglichen.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="grund" type="bk:Code.Rueckweisungsgrund">
+               <xs:annotation>
+                  <xs:documentation>Mit diesem Element wird ein Grund übermittelt, aus dem die Nachricht zurückgewiesen wird.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:rueckweisungsgrundSpezifisch"
+                        minOccurs="0"
+                        maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>In diesem Element können weitere - im Allgemeinen kontextspezifische Angaben - zu dem Grund übermittelt werden, aus dem die Nachricht zurückgewiesen wird.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="rueckweisungsgrundSpezifisch">
+      <xs:annotation>
+         <xs:documentation>In diesem Datentyp wird ein Grund für die Rückweisung der Nachricht in Form eines beliebigen kontextspezifischen Fehlercodes und/oder einer Fehlerbeschreibung genauer spezifiziert. Die Schematron-Fehlercodes der Spezifikation XGewerbeordnung können über die Codeliste Codelist.SchematronFehlercodes angegeben werden.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="code"
+                        minOccurs="0"
+                        type="bk:Code.RueckweisungsgrundSpezifisch"/>
+            <xs:element name="beschreibung" minOccurs="0" type="bdt:String.DIN91379.C"/>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="spezifischeInformation">
+      <xs:annotation>
+         <xs:documentation>Sollen zu einer Freitextnachricht zusätzliche Informationen angegeben werden, dann können diese über diesen Datentyp angegeben werden. Dies ist bei konkreten Bedarfen bilateral zu vereinbaren.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="begriff" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Die Bezeichnung der Information</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="inhalt" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Die Information selbst</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="staatsangehoerigkeitFreitext" type="bdt:String.DIN91379.C">
+      <xs:annotation>
+         <xs:documentation>Hier ist die Staatsangehörigkeit zu übermitteln, sofern kein passender Code in np:staatsangehoerigkeit angegeben werden kann.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="strassenanschriftInland" type="bk:StrassenanschriftInlandType">
+      <xs:annotation>
+         <xs:documentation>Angaben für die Adressierung im Inland, soweit es sich um die Anschrift eines Gebäudes handelt. Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Hausnummer differenziert (von, bis). Straßenschlüssel ergänzt. Ortsteil ergänzt.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="transportinformationen">
+      <xs:annotation>
+         <xs:documentation>In diesem Element sind Informationen zu übermitteln, die bei dem Empfang einer als fehlerhaft betrachteten Nachricht möglicherweise der Transportebene entnommen werden konnten. Diese Angaben können gemacht werden, um dem Leser oder Empfänger einer Rücksendenachricht die Identifikation der als fehlerhaft betrachteten und nunmehr zurückgesandten Nachricht zu erleichtern. Alle Kindelemente dieses Elementes sind optional, da keine verbindlichen Anforderungen an das Transportprotokoll gestellt werden können.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="nachrichtenId" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Hier kann eine Identifikation der aus den genannten Gründen zurückgewiesenen Nachricht übermittelt werden, sofern sich diese aus dem Transportprotokoll entnehmen lässt. Im Falle von OSCI-Transport wäre hier die messageID des Transportumschlages zu nutzen.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="betreff" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Hier kann der Inhalt der Betreff- oder Subject-Zeile der aus den genannten Gründen zurückgewiesenen Nachricht übermittelt werden, sofern sich diese aus dem Transportprotokoll entnehmen lässt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="sendezeitpunkt" minOccurs="0" type="xs:dateTime">
+               <xs:annotation>
+                  <xs:documentation>Hier kann der Zeitpunkt des Versands der aus den genannten Gründen zurückgewiesenen Nachricht übermittelt werden, sofern sich dieser aus dem Transportprotokoll entnehmen lässt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="ergaenzendeHinweise"
+                        minOccurs="0"
+                        type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Hier können weitere Angaben gemacht werden, die dem Empfänger der aus den genannten Gründen zurückgewiesenen Nachricht helfen, diese in seinem Verfahren zu identifizieren.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="zustellanschrift">
+      <xs:annotation>
+         <xs:documentation>Dies ist eine Rolle, welche das Kerndatenobjekt Anschrift einnehmen kann. Mit der Rolle wird eine Anschrift für die Zustellung von Schriftstücken angegeben. Eine Zustellanschrift ist insbesondere die im Handels- oder Genossenschaftsregister eingetragene inländische Geschäftsanschrift (vgl. §§ 29, 106 HGB). Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Spezifischere Darstellung für die Strassenanschrift. Abweichende, strukturierte Darstellung für die Auslandsanschriften.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:choice>
+            <xs:element ref="bk:strassenanschriftInland">
+               <xs:annotation>
+                  <xs:documentation>Angaben für die Adressierung im Inland, soweit es sich um die Anschrift eines Gebäudes handelt. Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Hausnummer differenziert (von, bis). Straßenschlüssel ergänzt. Ortsteil ergänzt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:anschriftAusland">
+               <xs:annotation>
+                  <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Codierung des Staates über die Codeliste Destatis Staatsgebiete, nicht Destatis Staaten. Hausnummer differenziert (von, bis). Straßenschlüssel ergänzt. Ortsteil ergänzt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:choice>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="rueckweisung.0900">
+      <xs:annotation>
+         <xs:documentation>Mit dieser Nachricht wird eine an den Leser gerichtete Ursprungsnachricht als fehlerhaft an den Autor zurückgewiesen (bei asynchroner Kommunikation).</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element ref="bk:rueckweisendeStelle" minOccurs="0">
+                     <xs:annotation>
+                        <xs:documentation>Dieses Kindelement ist nur dann zu übermitteln, wenn die Nachricht nicht von dem ursprünglich adressierten Leser zurückgesandt wird, sondern von einer anderen Stelle (zum Beispiel einer Clearingstelle, die im Auftrag der ursprünglich adressierten Behörde eine Prüfung eingehender Nachrichten nach formalen Kriterien durchführt).</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element ref="bk:rueckweisungsgrund" maxOccurs="unbounded">
+                     <xs:annotation>
+                        <xs:documentation>In diesem Element werden die Gründe mitgeteilt, aufgrund derer die Nachricht zurückgewiesen wird. Generell ist so vorzugehen, dass die Gründe für die Rückweisung so präzise und vollständig wie möglich bezeichnet werden, um eine schnelle Klärung des Sachverhalts zu ermöglichen.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element ref="bk:transportinformationen" minOccurs="0">
+                     <xs:annotation>
+                        <xs:documentation>In diesem Element sind Informationen zu übermitteln, die bei dem Empfang einer als fehlerhaft betrachteten Nachricht möglicherweise der Transportebene entnommen werden konnten. Diese Angaben können gemacht werden, um dem Leser oder Empfänger einer Rücksendenachricht die Identifikation der als fehlerhaft betrachteten und nunmehr zurückgesandten Nachricht zu erleichtern. Alle Kindelemente dieses Elementes sind optional, da keine verbindlichen Anforderungen an das Transportprotokoll gestellt werden können.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element ref="bk:rueckweisungEinzelfall" minOccurs="0" maxOccurs="unbounded">
+                     <xs:annotation>
+                        <xs:documentation>Mit diesem Element werden die nicht verarbeitbaren Einzelfälle aus der zurückgewiesenen (Sammel-)Nachricht kenntlich gemacht. Für jeden nicht verarbeitbaren Einzelfall sind neben den Identifikationsdaten die Gründe mitzuteilen, aufgrund derer der Einzelfall nicht verarbeitet werden konnte. Diese Gründe sind so präzise und vollständig wie möglich zu bezeichnen, um eine schnelle Klärung des Sachverhalts zu ermöglichen. Dieses Element darf nur verwendet werden, wenn auf Nachrichtenebene (alleinig) der Rückweisungsgrund S020 angegeben wurde. Werden mit diesem Element nicht verarbeitbare Einzelfälle mitgeteilt, so gelten alle anderen Einzelfälle der Ursprungsnachricht als nicht zurückgewiesen.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="identifikation.nachricht"
+                              minOccurs="0"
+                              type="bn-g2g:Identifikation.NachrichtType">
+                     <xs:annotation>
+                        <xs:documentation>In diesem Kindelement wird die die Rückweisung auslösende fachliche Nachricht identifiziert. Sofern kein Transportfehler vorliegt und die Ursprungsnachricht schemakonform ist, muss das Element übermittelt werden. Ist die Ursprungsnachricht nicht schemakonform, kann die Übermittlung des Elements entfallen.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="nachricht" minOccurs="0" type="xs:base64Binary">
+                     <xs:annotation>
+                        <xs:documentation>Dieses Element enthält die aus den genannten Gründen zurückgewiesene ursprüngliche Nachricht. Um technische Probleme mit verschachtelten XML-Dokumenten zu vermeiden, ist der zurückgewiesene Inhalt immer base64-codiert zurückzusenden. Dieses Element ist nur anzugeben, wenn die zurückgewiesene Nachricht nicht schema-konform ist.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="rueckweisung.0910">
+      <xs:annotation>
+         <xs:documentation>Mit dieser Nachricht wird eine an den Leser gerichtete Ursprungsnachricht als fehlerhaft an den Autor zurückgewiesen (bei synchroner Kommunikation).</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element ref="bk:rueckweisendeStelle" minOccurs="0">
+                     <xs:annotation>
+                        <xs:documentation>Dieses Kindelement ist nur dann zu übermitteln, wenn die Nachricht nicht von dem ursprünglich adressierten Leser zurückgesandt wird, sondern von einer anderen Stelle (zum Beispiel einer Clearingstelle, die im Auftrag der ursprünglich adressierten Behörde eine Prüfung eingehender Nachrichten nach formalen Kriterien durchführt).</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element ref="bk:rueckweisungsgrund" maxOccurs="unbounded">
+                     <xs:annotation>
+                        <xs:documentation>In diesem Element werden die Gründe mitgeteilt, aufgrund derer die Nachricht zurückgewiesen wird. Generell ist so vorzugehen, dass die Gründe für die Rückweisung so präzise und vollständig wie möglich bezeichnet werden, um eine schnelle Klärung des Sachverhalts zu ermöglichen.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element ref="bk:transportinformationen" minOccurs="0">
+                     <xs:annotation>
+                        <xs:documentation>In diesem Element sind Informationen zu übermitteln, die bei dem Empfang einer als fehlerhaft betrachteten Nachricht möglicherweise der Transportebene entnommen werden konnten. Diese Angaben können gemacht werden, um dem Leser oder Empfänger einer Rücksendenachricht die Identifikation der als fehlerhaft betrachteten und nunmehr zurückgesandten Nachricht zu erleichtern. Alle Kindelemente dieses Elementes sind optional, da keine verbindlichen Anforderungen an das Transportprotokoll gestellt werden können.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element ref="bk:rueckweisungEinzelfall" minOccurs="0" maxOccurs="unbounded">
+                     <xs:annotation>
+                        <xs:documentation>Mit diesem Element werden die nicht verarbeitbaren Einzelfälle aus der zurückgewiesenen (Sammel-)Nachricht kenntlich gemacht. Für jeden nicht verarbeitbaren Einzelfall sind neben den Identifikationsdaten die Gründe mitzuteilen, aufgrund derer der Einzelfall nicht verarbeitet werden konnte. Diese Gründe sind so präzise und vollständig wie möglich zu bezeichnen, um eine schnelle Klärung des Sachverhalts zu ermöglichen. Dieses Element darf nur verwendet werden, wenn auf Nachrichtenebene (alleinig) der Rückweisungsgrund S020 angegeben wurde. Werden mit diesem Element nicht verarbeitbare Einzelfälle mitgeteilt, so gelten alle anderen Einzelfälle der Ursprungsnachricht als nicht zurückgewiesen.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="identifikation.nachricht"
+                              minOccurs="0"
+                              type="bn-g2g:Identifikation.NachrichtType">
+                     <xs:annotation>
+                        <xs:documentation>In diesem Kindelement wird die die Rückweisung auslösende fachliche Nachricht identifiziert. Sofern kein Transportfehler vorliegt und die Ursprungsnachricht schemakonform ist, muss das Element übermittelt werden. Ist die Ursprungsnachricht nicht schemakonform, kann die Übermittlung des Elements entfallen.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="freitext.1000">
+      <xs:annotation>
+         <xs:documentation>Mit dieser Nachricht kann eine auf einen spezifischen Gewerbebetrieb bezogene Freitextmitteilung an eine andere Behörde übermittelt werden. Um dem Leser die Zuordnung des Gewerbebetriebs im eigenen Bestand zu ermöglichen, sind zwingend Identifikationsdaten zu mindestens einem Gewerbetreibenden und/oder zu dem wirtschaftlichen Tätigen des Gewerbebetriebs sowie zur Betriebsstätte zu übermitteln. Es sollen alle Elemente der Datenstruktur befüllt werden, deren Daten dem Autor der Nachricht vorliegen. Sofern sich diese Nachricht auf eine zuvor empfangene oder übermittelte Nachricht bezieht, kann zur näheren Bestimmung zusätzlich deren UUID angegeben werden.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="anlass" type="bk:Code.AnlassFreitext">
+                     <xs:annotation>
+                        <xs:documentation>Anlass der Übermittlung dieser Freitextnachricht. Sofern kein zutreffender spezifischer Anlass in der Codeliste vorgesehen ist, ist der Code 00 anzugeben.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="kennungGewerbebetriebAutor" minOccurs="0" type="bdt:UUID">
+                     <xs:annotation>
+                        <xs:documentation>Die eindeutige Kennung bzw. das Zeichen des Gewerbebetriebs im Bestand des Autors ("unser Zeichen"). Sofern der Autor eine Gewerbemeldestelle ist, die den Gewerbebetrieb im Datenbestand führt, ist dieses Element ein Pflichtfeld und es muss die GewerbebetriebID angegeben werden. Dies gilt auch bei Altfällen, für die dem Leser zuvor noch keine Gewerbemeldung mit GewerbebetriebID übermittelt wurde.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="kennungGewerbebetriebLeser" minOccurs="0" type="bdt:UUID">
+                     <xs:annotation>
+                        <xs:documentation>Die eindeutige Kennung bzw. das Zeichen des Gewerbebetriebs im Bestand des Lesers (sofern diese dem Autor aus einer früheren Datenübermittlung bekannt ist - "ihr Zeichen"). Sofern der Leser eine Gewerbemeldestelle ist, so darf hier nur die GewerbebetriebID angegeben werden, welche der Autor der Freitextnachricht in einer früheren Datenübermittlung von dieser erhalten hat.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="uuidVorhergehendeGewerbemeldung"
+                              minOccurs="0"
+                              type="bdt:UUID">
+                     <xs:annotation>
+                        <xs:documentation>Dieses Element kann angegeben werden, um den Bezug zu einer zuvor empfangenen Gewerbemeldung zum Gewerbebetrieb herzustellen. Hier ist der Inhalt des Elements xga:satz/xga:*/xga:uuid der Gewerbemeldung anzugeben.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="uuidVorhergehendeFreitextnachricht"
+                              minOccurs="0"
+                              type="bdt:UUID">
+                     <xs:annotation>
+                        <xs:documentation>Dieses Element kann angegeben werden, um den Bezug zu einer zuvor empfangenen Freitextnachricht zum Gewerbebetrieb herzustellen. Hier ist der Inhalt des Elements bn-g2g:nachrichtenkopf.g2g/bn-g2g:identifikation.nachricht/bn-g2g:nachrichtenUUID anzugeben.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="identifikationBeteiligter"
+                              maxOccurs="unbounded"
+                              type="bk:Freitext.Beteiligter">
+                     <xs:annotation>
+                        <xs:documentation>Angaben zur Identifikation eines Gewerbetreibenden (natürliche oder juristische Person) oder eines wirtschaftlich Tätigen (auch Personengesellschaften) des Gewerbebetriebs, auf den sich eine Freitextnachricht bezieht. Um die Zuordnung beim Leser zu ermöglichen, sollen alle Angaben der Datenstruktur, welche dem Autor der Freitextnachricht vorliegen, angegeben werden. Es muss mindestens eines der Elemente np:name, ename:eingetragenerName oder wt:geschaeftsbezeichnung angegeben werden. Sofern dem Autor der Freitextnachricht im Fall einer Personengesellschaft Angaben sowohl zur Personengesellschaft als auch zu den Gesellschaftern vorliegen, so sollen Elemente identifikationBeteiligter für alle Beteiligten angegeben werden.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="identifikationBetriebsstaette"
+                              type="bk:StrassenanschriftInlandType">
+                     <xs:annotation>
+                        <xs:documentation>Angaben zu der Betriebsstätte des Gewerbebetriebs, auf welche sich diese Freitextnachricht bezieht. Falls keine Betriebsstätte vorhanden ist (Reisegewerbe, "Schubladenerlaubnis"), ist hier die Wohnanschrift anzugeben.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="betreff" type="bdt:String.DIN91379.C">
+                     <xs:annotation>
+                        <xs:documentation>Angabe eines Betreffs</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="antwortErwuenscht" type="xs:boolean">
+                     <xs:annotation>
+                        <xs:documentation>Angabe, ob eine Antwort des Lesers erwünscht ist oder nicht.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="freitext" type="bdt:String.DIN91379.C">
+                     <xs:annotation>
+                        <xs:documentation>Der übermittelte Freitext.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="anlage"
+                              minOccurs="0"
+                              maxOccurs="unbounded"
+                              type="bk:NachweisdokumentType">
+                     <xs:annotation>
+                        <xs:documentation>Angaben zu einer Anlage zu dieser Freitextnachricht (siehe Transportprofil zur Übermittlung der Anlage). Es sind ausschließlich Dokumente mit folgenden Dateitypen zulässig: PDF, JPEG, PNG. Die Gesamtgröße aller Anlagen darf 10 MB nicht überschreiten.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element ref="bk:spezifischeInformation" minOccurs="0" maxOccurs="unbounded">
+                     <xs:annotation>
+                        <xs:documentation>Sollen zu einer Freitextnachricht zusätzliche Informationen angegeben werden, dann können diese über diesen Datentyp angegeben werden. Dies ist bei konkreten Bedarfen bilateral zu vereinbaren.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+</xs:schema>

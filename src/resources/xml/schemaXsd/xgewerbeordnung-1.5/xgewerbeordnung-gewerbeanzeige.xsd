@@ -1,0 +1,2789 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xga="http://www.xgewerbeordnung.de/spezifikation/xga/1.5"
+           xmlns:adr="urn:xoev-de:xunternehmen:standard:basismodul:adressen_1.1"
+           xmlns:antr="urn:xoev-de:xunternehmen:standard:basismodul:antraege-anzeigen_1.1"
+           xmlns:bdt="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"
+           xmlns:bk="http://www.xgewerbeordnung.de/spezifikation/baukasten/1.5"
+           xmlns:bn-beh="http://xoev.de/schemata/basisnachricht/behoerde/1_0"
+           xmlns:bn-g2g="http://xoev.de/schemata/basisnachricht/g2g/1_0"
+           xmlns:dat="urn:xoev-de:xunternehmen:standard:basismodul:datumsangaben_1.1"
+           xmlns:eintr="urn:xoev-de:xunternehmen:standard:basismodul:eintragung_1.1"
+           xmlns:ename="urn:xoev-de:xunternehmen:standard:basismodul:eingetragenername_1.1"
+           xmlns:ges="urn:xoev-de:xunternehmen:standard:basismodul:gesellschafter_1.1"
+           xmlns:gv="urn:xoev-de:xunternehmen:standard:basismodul:gesetzlichervertreter_1.1"
+           xmlns:jp="urn:xoev-de:xunternehmen:standard:basismodul:juristischeperson_1.1"
+           xmlns:kom="urn:xoev-de:xunternehmen:standard:basismodul:kommunikation_1.1"
+           xmlns:nachr="urn:xoev-de:xunternehmen:standard:basismodul:nachrichtenstruktur_1.1"
+           xmlns:np="urn:xoev-de:xunternehmen:standard:basismodul:natuerlicheperson_1.1"
+           xmlns:rf="urn:xoev-de:xunternehmen:standard:basismodul:rechtsform_1.1"
+           xmlns:rpg="urn:xoev-de:xunternehmen:standard:basismodul:rechtsfaehigepersonengesellschaft_1.1"
+           xmlns:sitze="urn:xoev-de:xunternehmen:standard:basismodul:sitze_1.1"
+           xmlns:spv="urn:xoev-de:xunternehmen:standard:basismodul:sonstigepersonenvereinigung_1.1"
+           xmlns:wt="urn:xoev-de:xunternehmen:standard:basismodul:wirtschaftlichetaetigkeit_1.1"
+           xmlns:xoev-code="http://xoev.de/schemata/code/1_0"
+           targetNamespace="http://www.xgewerbeordnung.de/spezifikation/xga/1.5"
+           version="1.5"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XGewerbeordnung</nameLang>
+            <nameKurz>XGewerbeordnung</nameKurz>
+            <nameTechnisch>xgewerbeordnung</nameTechnisch>
+            <kennung>urn:xoev-de:kosit:standard:xgewerbeordnung</kennung>
+            <beschreibung>XGewerbeordnung</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>1.5</version>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVHandbuch>2.5</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP 2</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:import schemaLocation="xgewerbeordnung-baukasten.xsd"
+              namespace="http://www.xgewerbeordnung.de/spezifikation/baukasten/1.5"/>
+   <xs:import schemaLocation="xoev-basisnachricht-behoerde.xsd"
+              namespace="http://xoev.de/schemata/basisnachricht/behoerde/1_0"/>
+   <xs:import schemaLocation="xoev-basisnachricht-g2g.xsd"
+              namespace="http://xoev.de/schemata/basisnachricht/g2g/1_0"/>
+   <xs:import schemaLocation="xoev-code.xsd"
+              namespace="http://xoev.de/schemata/code/1_0"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-adressen_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:adressen_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-antraege-anzeigen_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:antraege-anzeigen_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-basisdatentypen_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-datumsangaben_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:datumsangaben_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-eingetragenername_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:eingetragenername_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-eintragung_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:eintragung_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-gesellschafter_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:gesellschafter_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-gesetzlichervertreter_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:gesetzlichervertreter_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-juristischeperson_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:juristischeperson_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-kommunikation_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:kommunikation_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-nachrichten_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:nachrichtenstruktur_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-natuerlicheperson_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:natuerlicheperson_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-rechtsfaehigepersonengesellschaft_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:rechtsfaehigepersonengesellschaft_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-rechtsform_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:rechtsform_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-sitze_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:sitze_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-sonstigepersonenvereinigung_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:sonstigepersonenvereinigung_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-wirtschaftlichetaetigkeit_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:wirtschaftlichetaetigkeit_1.1"/>
+   <xs:complexType name="BetriebsstaetteType">
+      <xs:annotation>
+         <xs:documentation>Angaben zu einer Betriebsstätte.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element ref="wt:artBetriebsstaette" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Nähere Bestimmung der Art der Betriebsstätte. Die möglichen Ausprägungen dieses Attributes sind durch die Codeliste Art einer Niederlassung (urn: xoev-de:xunternehmen:codeliste:artniederlassung) im XRepository bestimmt.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="bk:anschrift" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Detailliertere Struktur für die Strassenanschrift. Detailliertere Struktur für die Auslandsanschriften. Keine Postfachanschrift.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="bk:kommunikation" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt eingeschränkt: De-Mail ist unzulässig. Alle Angaben mehrfach möglich. Die Klammerangabe bei Vorwahlen in der Telefonnummer wird nicht unterstützt.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Code.Antwortstatus">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Antwortstatus</nameLang>
+               <nameKurz>Antwortstatus</nameKurz>
+               <nameTechnisch>antwortstatus</nameTechnisch>
+               <kennung>urn:xoev-de:xgewerbeordnung:codeliste:antwortstatus</kennung>
+               <beschreibung>Enthält den Antwortstatus für eine Übergabenachricht</beschreibung>
+               <herausgebernameLang>Betreiber XGewerbeordnung (KoSIT und d-NRW im Auftrag des Bundesministeriums für Wirtschaft und Energie)</herausgebernameLang>
+               <herausgebernameKurz>XGewerbeordnung</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>1</version>
+               <datumGueltigkeitAb>2022-05-01</datumGueltigkeitAb>
+               <versionCodelistenHandbuch>1.0</versionCodelistenHandbuch>
+            </versionCodeliste>
+            <codelistenspalten>
+               <Code>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </Code>
+               <Text>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </Text>
+            </codelistenspalten>
+            <genutzteCodeSpalte>Code</genutzteCodeSpalte>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" form="unqualified">
+                  <xs:simpleType>
+                     <xs:restriction base="xs:token">
+                        <xs:enumeration value="01">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Gewerbetreibender gefunden</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="02">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Gewerbetreibender nicht gefunden</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                     </xs:restriction>
+                  </xs:simpleType>
+               </xs:element>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xgewerbeordnung:codeliste:antwortstatus"/>
+            <xs:attribute name="listVersionID"
+                          type="xs:normalizedString"
+                          use="optional"
+                          fixed="1"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.BeteiligungOeffentlicheHand">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Beteiligung der öffentlichen Hand</nameLang>
+               <nameKurz>Beteiligung der öffentlichen Hand</nameKurz>
+               <nameTechnisch>beteiligungoeffentlichehand</nameTechnisch>
+               <kennung>urn:xoev-de:xgewerbeordnung:codeliste:beteiligungoeffentlichehand</kennung>
+               <beschreibung>Beteiligung der öffentlichen Hand</beschreibung>
+               <herausgebernameLang>Betreiber XGewerbeordnung (KoSIT und d-NRW im Auftrag des Bundesministeriums für Wirtschaft und Energie)</herausgebernameLang>
+               <herausgebernameKurz>XGewerbeordnung</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>1</version>
+               <datumGueltigkeitAb>2020-05-01</datumGueltigkeitAb>
+               <versionCodelistenHandbuch>1.0</versionCodelistenHandbuch>
+            </versionCodeliste>
+            <codelistenspalten>
+               <Code>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </Code>
+               <Text>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </Text>
+            </codelistenspalten>
+            <genutzteCodeSpalte>Code</genutzteCodeSpalte>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" form="unqualified">
+                  <xs:simpleType>
+                     <xs:restriction base="xs:token">
+                        <xs:enumeration value="0">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Nein</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="1">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Ja</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="2">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Nicht bekannt</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                     </xs:restriction>
+                  </xs:simpleType>
+               </xs:element>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xgewerbeordnung:codeliste:beteiligungoeffentlichehand"/>
+            <xs:attribute name="listVersionID"
+                          type="xs:normalizedString"
+                          use="optional"
+                          fixed="1"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.FachlicherAenderungsanlass">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Fachlicher Änderungsanlass</nameLang>
+               <nameKurz>Fachlicher Änderungsanlass</nameKurz>
+               <nameTechnisch>fachlicheraenderungsanlass</nameTechnisch>
+               <kennung>urn:xoev-de:xgewerbeordnung:codeliste:fachlicheraenderungsanlass</kennung>
+               <beschreibung>Gibt den fachlichen Änderungsanlass bei einer Gewerbeummeldung oder einer Datenaktualisierung an.</beschreibung>
+               <herausgebernameLang>Betreiber XGewerbeordnung (KoSIT und d-NRW im Auftrag des Bundesministeriums für Wirtschaft und Energie)</herausgebernameLang>
+               <herausgebernameKurz>XGewerbeordnung</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>6</version>
+               <datumGueltigkeitAb>2024-05-01</datumGueltigkeitAb>
+               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
+               <aenderungZurVorversion>Der Begriff "Berichtigung" in der Beschreibung wurde gem. neuer Spezifikation durch den Begriff "Datenaktualisierung" ersetzt. Daneben wurde der Hinweis zu Code 16 ergänzt: "Hierunter fallen nur identitätswahrende Rechtsformwechsel des Gewerbetreibenden bzw. Rechtsformwechsel, die nicht über Ab- und Anmeldung vorgenommen werden"</aenderungZurVorversion>
+            </versionCodeliste>
+            <codelistenspalten>
+               <Code>
+                  <spaltennameLang>Code</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </Code>
+               <Text>
+                  <spaltennameLang>Text</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </Text>
+               <Hinweise>
+                  <spaltennameLang>Hinweise</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>optional</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </Hinweise>
+            </codelistenspalten>
+            <genutzteCodeSpalte>Code</genutzteCodeSpalte>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code"
+                           form="unqualified"
+                           type="xga:fachlicheraenderungsanlass"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xgewerbeordnung:codeliste:fachlicheraenderungsanlass"/>
+            <xs:attribute name="listVersionID"
+                          type="xs:normalizedString"
+                          use="optional"
+                          fixed="6"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.GemeindeschluesselErgaenzung">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Gemeindeschlüssel-Ergänzung</nameLang>
+               <nameKurz>Gemeindeschlüssel-Ergänzung</nameKurz>
+               <nameTechnisch>gemeindeschluesselergaenzung</nameTechnisch>
+               <kennung>urn:xoev-de:xgewerbeordnung:codeliste:gemeindeschluesselergaenzung</kennung>
+               <beschreibung>Codes für eine verwaltungstechnische Zuordnung von Betriebsstätten unterhalb der Gemeindeebene.</beschreibung>
+               <herausgebernameLang>Betreiber XGewerbeordnung (KoSIT und d-NRW im Auftrag des Bundesministeriums für Wirtschaft und Energie)</herausgebernameLang>
+               <herausgebernameKurz>XGewerbeordnung</herausgebernameKurz>
+            </codeliste>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token" form="unqualified"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xgewerbeordnung:codeliste:gemeindeschluesselergaenzung"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.GrundFuerAbmeldung">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Grund für Abmeldung</nameLang>
+               <nameKurz>Grund für Abmeldung</nameKurz>
+               <nameTechnisch>grundfuerabmeldung</nameTechnisch>
+               <kennung>urn:xoev-de:xgewerbeordnung:codeliste:grundfuerabmeldung</kennung>
+               <beschreibung>Gibt die Gründe für die Abmeldung eines Gewerbes an</beschreibung>
+               <herausgebernameLang>Betreiber XGewerbeordnung (KoSIT und d-NRW im Auftrag des Bundesministeriums für Wirtschaft und Energie)</herausgebernameLang>
+               <herausgebernameKurz>XGewerbeordnung</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>3</version>
+               <datumGueltigkeitAb>2022-05-01</datumGueltigkeitAb>
+               <versionCodelistenHandbuch>1.0</versionCodelistenHandbuch>
+               <aenderungZurVorversion>Bezeichnungen redaktionell an die geänderten Formulare angepasst. Die Codes bleiben unverändert.</aenderungZurVorversion>
+            </versionCodeliste>
+            <codelistenspalten>
+               <Code>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </Code>
+               <Text>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </Text>
+            </codelistenspalten>
+            <genutzteCodeSpalte>Code</genutzteCodeSpalte>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" form="unqualified">
+                  <xs:simpleType>
+                     <xs:restriction base="xs:token">
+                        <xs:enumeration value="01">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Vollständige Aufgabe</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="02">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Verlegung in einen anderen Meldebezirk</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="03">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Übergang nach d. Umwandlungsgesetz (z. B. Verschmelzung, Spaltung)</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="04">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Wechsel der Rechtsform</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="05">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Gesellschafteraustritt</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="06">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Übergabe (Erbfolge, Kauf oder Pacht)</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                     </xs:restriction>
+                  </xs:simpleType>
+               </xs:element>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xgewerbeordnung:codeliste:grundfuerabmeldung"/>
+            <xs:attribute name="listVersionID"
+                          type="xs:normalizedString"
+                          use="optional"
+                          fixed="3"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.GrundFuerAnmeldung">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Grund für Anmeldung</nameLang>
+               <nameKurz>Grund für Anmeldung</nameKurz>
+               <nameTechnisch>grundfueranmeldung</nameTechnisch>
+               <kennung>urn:xoev-de:xgewerbeordnung:codeliste:grundfueranmeldung</kennung>
+               <beschreibung>Gibt die Gründe für die Anmeldung eines Gewerbes an</beschreibung>
+               <herausgebernameLang>Betreiber XGewerbeordnung (KoSIT und d-NRW im Auftrag des Bundesministeriums für Wirtschaft und Energie)</herausgebernameLang>
+               <herausgebernameKurz>XGewerbeordnung</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>3</version>
+               <datumGueltigkeitAb>2025-11-01</datumGueltigkeitAb>
+               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
+               <aenderungZurVorversion>Anpassung des Codes 02 infolge der Änderung der GewAnzV durch das Rückmeldeverfahren</aenderungZurVorversion>
+            </versionCodeliste>
+            <codelistenspalten>
+               <Code>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </Code>
+               <Text>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </Text>
+            </codelistenspalten>
+            <genutzteCodeSpalte>Code</genutzteCodeSpalte>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" form="unqualified">
+                  <xs:simpleType>
+                     <xs:restriction base="xs:token">
+                        <xs:enumeration value="01">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Neugründung</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="02">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Verlegung des Betriebs aus einem anderen Meldebezirk</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="03">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Übergang nach dem Umwandlungsgesetz (z.B. Verschmelzung, Spaltung)</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="04">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Wechsel der Rechtsform</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="05">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Gesellschaftereintritt</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="06">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Übernahme (Erbfolge, Kauf oder Pacht)</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                     </xs:restriction>
+                  </xs:simpleType>
+               </xs:element>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xgewerbeordnung:codeliste:grundfueranmeldung"/>
+            <xs:attribute name="listVersionID"
+                          type="xs:normalizedString"
+                          use="optional"
+                          fixed="3"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.GrundStornierung">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Grund Stornierung</nameLang>
+               <nameKurz>Grund Stornierung</nameKurz>
+               <nameTechnisch>grundstornierung</nameTechnisch>
+               <kennung>urn:xoev-de:xgewerbeordnung:codeliste:grundstornierung</kennung>
+               <beschreibung>Gibt den Grund einer Stornierung an</beschreibung>
+               <herausgebernameLang>XGewerbeordnung</herausgebernameLang>
+               <herausgebernameKurz>XGewerbeordnung</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>1</version>
+               <versionCodelistenHandbuch>1.0</versionCodelistenHandbuch>
+            </versionCodeliste>
+            <codelistenspalten>
+               <Code>
+                  <spaltennameLang>Code</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </Code>
+               <Beschreibung>
+                  <spaltennameLang>Beschreibung</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </Beschreibung>
+            </codelistenspalten>
+            <genutzteCodeSpalte>Code</genutzteCodeSpalte>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" form="unqualified" type="xga:grundstornierung"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xgewerbeordnung:codeliste:grundstornierung"/>
+            <xs:attribute name="listVersionID"
+                          type="xs:normalizedString"
+                          use="optional"
+                          fixed="1"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.StatusGewerbebetrieb0600">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Status Gewerbebetrieb (0600)</nameLang>
+               <nameKurz>Status Gewerbebetrieb (0600)</nameKurz>
+               <nameTechnisch>statusgewerbebetrieb0600</nameTechnisch>
+               <kennung>urn:xoev-de:xgewerbeordnung:codeliste:statusgewerbebetrieb0600</kennung>
+               <beschreibung>Status des Gewerbebetriebs bezogen auf die Anfrage in der Nachricht 0600.</beschreibung>
+               <herausgebernameLang>Betreiber XGewerbeordnung (KoSIT und IT.NRW im Auftrag des Bundesministeriums für Wirtschaft und Energie)</herausgebernameLang>
+               <herausgebernameKurz>XGewerbeordnung</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>1</version>
+               <datumGueltigkeitAb>2022-05-01</datumGueltigkeitAb>
+               <versionCodelistenHandbuch>1.0</versionCodelistenHandbuch>
+            </versionCodeliste>
+            <codelistenspalten>
+               <Code>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </Code>
+               <Text>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </Text>
+            </codelistenspalten>
+            <genutzteCodeSpalte>Code</genutzteCodeSpalte>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" form="unqualified">
+                  <xs:simpleType>
+                     <xs:restriction base="xs:token">
+                        <xs:enumeration value="01">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Aktiver Gewerbebetrieb</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="02">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Abgemeldeter Gewerbebetrieb</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="03">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Ehemaliger, noch aktiver Gewerbebetrieb des angefragten Gewerbetreibenden (Gesellschafteraustritt)</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                     </xs:restriction>
+                  </xs:simpleType>
+               </xs:element>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xgewerbeordnung:codeliste:statusgewerbebetrieb0600"/>
+            <xs:attribute name="listVersionID"
+                          type="xs:normalizedString"
+                          use="optional"
+                          fixed="1"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.UrsacheFuerAbmeldung">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Ursache für Abmeldung</nameLang>
+               <nameKurz>Ursache für Abmeldung</nameKurz>
+               <nameTechnisch>ursachefuerabmeldung</nameTechnisch>
+               <kennung>urn:xoev-de:xgewerbeordnung:codeliste:ursachefuerabmeldung</kennung>
+               <beschreibung>Gibt Ursachen für die Abmeldung eines Gewerbes an (teilweise redundant zu den Gründen für eine Abmeldung)</beschreibung>
+               <herausgebernameLang>Betreiber XGewerbeordnung (KoSIT und d-NRW im Auftrag des Bundesministeriums für Wirtschaft und Energie)</herausgebernameLang>
+               <herausgebernameKurz>XGewerbeordnung</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>5</version>
+               <datumGueltigkeitAb>2025-11-01</datumGueltigkeitAb>
+               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
+               <aenderungZurVorversion>Der Code 24 ("Rückmeldeverfahren") wurde aufgenommen. Hinweis für Code 16 aufgenommen (Einschränkung auf die Verwendung vor der Einführung des Rückmeldeverfahrens). </aenderungZurVorversion>
+            </versionCodeliste>
+            <codelistenspalten>
+               <Code>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </Code>
+               <Text>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </Text>
+               <Anmerkung>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>optional</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </Anmerkung>
+            </codelistenspalten>
+            <genutzteCodeSpalte>Code</genutzteCodeSpalte>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" form="unqualified">
+                  <xs:simpleType>
+                     <xs:restriction base="xs:token">
+                        <xs:enumeration value="10">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Keine Angabe</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="11">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>unzureichende Rentabilität</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="12">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Insolvenz</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="13">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Von Amts wegen</Text>
+                                 <Anmerkung>Künftig nicht mehr zu verwenden (siehe Regel SCH-0179 der Spezifikation: Die Abmeldungsursache 13 ist nur für Ereigniszeitpunkte vor dem 01.05.2020 zulässig, danach sind die differenzierteren Abmeldegründe 19 bis 22 zu verwenden.)</Anmerkung>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="14">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Persönliche/ familiäre Gründe</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="15">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Betrieb nie ausgeübt</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="16">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Verlegung</Text>
+                                 <Anmerkung>Künftig nicht mehr zu verwenden (siehe Regel SCH-0267 der Spezifikation: Die Abmeldungsursache 16 ist nur für Ereigniszeitpunkte vor dem 01.11.2025 zulässig, danach ist die Abmeldeursache 24 (Rückmeldeverfahren) zu verwenden.)</Anmerkung>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="17">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Übergabe</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="18">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Sonstige Gründe</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="19">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Von Amts wegen (Löschung der juristischen Person im Register)</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="20">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Von Amts wegen (Sterbefall)</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="21">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Von Amts wegen (Gewerbebetrieb nicht ermittelbar)</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="22">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Von Amts wegen (sonstige Gründe)</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="24">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Rückmeldeverfahren</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                     </xs:restriction>
+                  </xs:simpleType>
+               </xs:element>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xgewerbeordnung:codeliste:ursachefuerabmeldung"/>
+            <xs:attribute name="listVersionID"
+                          type="xs:normalizedString"
+                          use="optional"
+                          fixed="5"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.Verdachtsmoment">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Verdachtsmomente (Zollverwaltung)</nameLang>
+               <nameKurz>Verdachtsmomente Zollverwaltung</nameKurz>
+               <nameTechnisch>verdachtsmomente</nameTechnisch>
+               <kennung>urn:xoev-de:xgewerbeordnung:codeliste:verdachtsmomente</kennung>
+               <beschreibung>Enthält Anhaltspunkte für Verdachtsmomente</beschreibung>
+               <herausgebernameLang>Betreiber XGewerbeordnung (KoSIT und IT.NRW im Auftrag des Bundesministeriums für Wirtschaft und Energie)</herausgebernameLang>
+               <herausgebernameKurz>XGewerbeordnung</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>2</version>
+               <datumGueltigkeitAb>2019-11-01</datumGueltigkeitAb>
+               <versionCodelistenHandbuch>1.0</versionCodelistenHandbuch>
+               <aenderungZurVorversion>Rechtschreibfehler korrigiert.</aenderungZurVorversion>
+            </versionCodeliste>
+            <codelistenspalten>
+               <Code>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </Code>
+               <Text>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </Text>
+            </codelistenspalten>
+            <genutzteCodeSpalte>Code</genutzteCodeSpalte>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" form="unqualified">
+                  <xs:simpleType>
+                     <xs:restriction base="xs:token">
+                        <xs:enumeration value="01">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Anschrift ist Hoteladresse/Gemeinschaftsquartier</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="02">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Gleiche Angaben für mehrere Personen</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="03">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Gewerbeausübung in den angegebenen Räumlichkeiten nicht möglich</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="04">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Anmeldung durch Vermittler</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="05">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Keine postalische/telefonische Erreichbarkeit</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="06">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>Unzureichende Kenntnisse der deutschen Sprache</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="07">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <Text>sonstige Anhaltspunkte. Übermittlung möglich</Text>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                     </xs:restriction>
+                  </xs:simpleType>
+               </xs:element>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xgewerbeordnung:codeliste:verdachtsmomente"/>
+            <xs:attribute name="listVersionID"
+                          type="xs:normalizedString"
+                          use="optional"
+                          fixed="2"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="GewerbebetriebType">
+      <xs:annotation>
+         <xs:documentation>Ein Gewerbebetrieb beschreibt die wirtschaftliche Einheit, unter der ein oder mehrere Gewerbetreibende/r im Außenverhältnis am Wirtschaftsleben teilnehmen. Er ist definiert durch: den/die Gewerbetreibenden (wer?): Gewerbetreibender ist, wer zur Anzeige des Gewerbes verpflichtet ist (z. B. jeder Beteiligte einer GbR); vgl. § 14 Abs. 1 Satz 1 GewO). die angemeldete(n) Tätigkeit(en) (was?), die Betriebstätte als Ort, an dem die Tätigkeiten ausgeführt werden (wo?).</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="gewerbebetriebID" minOccurs="0" type="bdt:UUID">
+            <xs:annotation>
+               <xs:documentation>Eine UUID als eindeutige technische Identifikation des Gewerbebetriebes, gleiche fachliche, aber vom AGS unabhängige Systematik wie gemeindeMeldungNr.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="gemeindeMeldungNr" minOccurs="0" type="bdt:String.DIN91379.C">
+            <xs:annotation>
+               <xs:documentation>Nummer der Meldung des Gewerbebetriebes in der Gemeinde. Die Gemeindemeldungsnummer wird von den Gewerbeämtern i.d.R. so vergeben, dass Gewerbebetriebe damit innerhalb des Zuständigkeitsbereichs einer Gewerbebehörde eindeutig identifiziert werden können.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="rf:rechtsform">
+            <xs:annotation>
+               <xs:documentation>Angabe der Rechtsform. Es dürfen ausschließlich die in beschriebenen Rechtsformen-Codes verwendet werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="wt:wirtschaftlichTaetiger.id">
+            <xs:annotation>
+               <xs:documentation>ID-Verweis innerhalb des jeweiligen Kontextes auf ein Element xga:natuerlichePerson, xga:juristischePerson, xga:rechtsfaehigePersonengesellschaft, xga:sonstigePersonenvereinigung (oder auf ein entsprechendes abgeleitetes Element) in der Rolle Wirtschaftlich Tätiger.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="ename:eingetragenerName" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Die im Handels-, Genossenschafts oder Gesellschaftsregister eingetragene Firma eines wirtschaftlich Tätigen bzw. einer wirtschaftlichen Tätigkeit (z. B. eingetragenes Einzelunternehmen, eingetragene Zweigniederlassung) bzw. der im Vereinsregister, Partnerschaftsregister oder Stiftungsverzeichnis eingetragene Name. Der eingetragene Name kann auch in einem Register festgehalten sein, welches in einem anderen Staat geführt wird.Der eingetragene Name ist abzugrenzen von der Geschäftsbezeichnung.Das Kerndatenobjekt bildet auch die Namen juristischer Personen, rechtsfähiger Personengesellschaften oder sonstiger Personenvereinigungen ab, die nicht in einem Register, aber kraft Gesetz geführt werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="bk:eintragung" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Dieses Kerndatenobjekt fasst die Daten, mit welchen die Eintragung eines wirtschaftlich Tätigen bzw. eines Gewerbebetriebs in ein Register (Handels-, Gesellschafts-, Genossenschafts- oder Vereinsregister) oder in ein Verzeichnis (Stiftungsverzeichnis) identifiziert werden kann.Die Eintragung kann auch in ein Register oder Verzeichnis erfolgen, welches in einem anderen Staat geführt wird.Zwischen Rechtsform und Eintragung besteht ein Zusammenhang. Welche Eintragungsarten (Handelsregister A, Handelsregister B, Gesellschaftsregister, Genossenschaftsregister, Vereinsregister, Register im Ausland, Kraft Gesetz) für welche Rechtsformen zulässig sein können, wird als Information in der Codeliste der Rechtsformen mitgeführt. Das Objekt ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Semantisch konkretisiert auf Gewerbebetriebe als Art der wirtschaftlichen Tätigkeit Keine Eintragung im Partnerschaftsregister zulässig Das Element staat wurde nicht aus dem Basismodul übernommen, da dort Code und nicht Freitext vorgesehen ist. Das Element registergericht.bezeichnung wurde nicht aus dem Basismodul übernommen, stattdessen ist das Element registergericht.code zu nutzen.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="wt:geschaeftsbezeichnung" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Zur Außendarstellung einer wirtschaftlichen Tätigkeit oder einer Betriebsstätte verwendeter Name, der nicht im Handel-, Genossenschafts-, Partnerschafts- oder Vereinsregister eingetragen ist oder davon abweicht (z.B. Gasthof "Zum lustigen Wirt"; "Ruck-Zuck-GbR").</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="xga:betriebsstaette" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Angaben zu der Betriebsstätte.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="xga:abweichendeHauptniederlassung" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Angaben zur abweichenden Hauptniederlassung.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="vertretungsberechtigtePerson.id"
+                     minOccurs="0"
+                     type="bdt:IDType">
+            <xs:annotation>
+               <xs:documentation>Vertretungsberechtigte Person (z.B. Betriebsleiter).</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="xga:taetigkeitenGesamt" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Dieses Element wird durch das Attribut Tätigkeit des Datenobjekts Wirtschaftliche Tätigkeit im Kerndatenmodell des Standards XUnternehmen definiert und an dieser Stelle wie folgt konkretisiert: Mittels dieses Datentyps werden die an der Betriebsstätte tatsächlich ausgeübten Tätigkeiten angegeben. Jede Angabe zu einer Tätigkeit darf nur in genau einem der drei Kindelemente (schwerpunkt, weitereTaetigkeiten, weitereNeuAusgeuebteTaetigkeiten) mitgeteilt werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="xga:gewerbetreibender" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>Dieses Element wird durch das Kerndatenobjekt wirtschaftlich Tätiger definiert und an dieser Stelle wie folgt konkretisiert: Gewerbetreibender ist, wer zur Anzeige des Gewerbes verpflichtet ist. Sofern es sich bei dem wirtschaftlich Tätigen um eine Personengesellschaft handelt, muss es sich bei dem Gewerbetreibenden um einen ihrer Gesellschafter handeln (bei mehrstöckigen Personengesellschaften entsprechend).</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="anzahlVollzeitBeschaeftigte"
+                     minOccurs="0"
+                     type="xs:nonNegativeInteger">
+            <xs:annotation>
+               <xs:documentation>In diesem Element wird die Anzahl der Vollzeitbeschäftigten (inklusive Ehe- oder Lebenspartner, Aushilfen, jedoch stets ohne den Inhaber selbst) angegeben, welche zum Zeitpunkt der Gewerbemeldung in der Betriebsstätte tätig sind.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="anzahlTeilzeitBeschaeftigte"
+                     minOccurs="0"
+                     type="xs:nonNegativeInteger">
+            <xs:annotation>
+               <xs:documentation>In diesem Element wird die Anzahl der Teilzeitbeschäftigten (inklusive Ehe- oder Lebenspartner, Aushilfen, jedoch stets ohne den Inhaber selbst) angegeben, welche zum Zeitpunkt der Gewerbemeldung in der Betriebsstätte tätig sind.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="istReisegewerbe" minOccurs="0" type="xs:boolean">
+            <xs:annotation>
+               <xs:documentation>Mit diesem Element kann übermittelt werden, ob es sich bei dem Gewerbe um eine Reisegewerbe handelt.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="beteiligungOeffentlicheHand"
+                     minOccurs="0"
+                     type="xga:Code.BeteiligungOeffentlicheHand">
+            <xs:annotation>
+               <xs:documentation>In diesem Element wird angegeben, ob eine Beteiligung der öffentlichen Hand vorliegt an dem Betrieb vorliegt.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="xga:betriebArt" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Gibt die Art eine Betriebes (Handels-, Handwerks-, Industrie oder sonstiger Betrieb) an.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="xga:erlaubnis" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>In diesem Typ werden die Angaben zu einem laufenden oder abgeschlossenen gewerberechtlichen Zulassungsverfahren zusammengefasst (z.B. für die Ausübung eines Gewerbes oder im Rahmen einer Erlaubnis nach § 34c, § 34d GewO).</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="xga:handwerkskarte" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>Der Typ enthält Informationen zu einer für die Ausübung des Gewerbes erforderlichen Handwerkskarte. Eine Handwerkskarte ist die amtliche Bescheinigung über die vollzogene Eintragung in die Handwerksrolle und der Nachweis über die Berechtigung das betreffende Handwerk selbständig auszuüben.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Gewerbemeldung" abstract="true">
+      <xs:annotation>
+         <xs:documentation>Dies ist der abstrakte Basistyp, aus welchem die Elemente für Weiterleitungen von Anmeldungen, Ummeldungen, Abmeldungen und Datenaktualisierungen abgeleitet werden.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="autor" type="bn-beh:BehoerdeType">
+            <xs:annotation>
+               <xs:documentation>Die die Gewerbeanzeige entgegennehmende Behörde. Sofern im gleichnamigen Element im Nachrichtenkopf eine Behördenkennung mit dem Präfix 'MELDID' verwendet wird, stimmen die Angaben im Nachrichtenkopf und die Angaben an dieser Stelle überein.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="satzErstellung" type="xs:dateTime">
+            <xs:annotation>
+               <xs:documentation>Angabe des Zeitpunkts der Erstellung des XML-Datensatzes für die Übermittlung. Sofern der XML-Datensatz nicht unmittelbar zum Zeitpunkt des auslösenden Ereignisses erstellt wird (beispielsweise bei Batch-Erstellung zum Tagesende, bei Nachlieferungen oder bei Korrekturen), liegt dieser Zeitpunkt nach xga:ereigniszeitpunkt. Der Erstellungszeitpunkt muss neben einer Angabe zum Datum eine zeitliche Information beinhalten. Diese ist mit einer Genauigkeit auf Ebene von Millisekunden und der Angabe zur Zeitzone zu übermitteln.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="ereigniszeitpunkt" type="xs:dateTime">
+            <xs:annotation>
+               <xs:documentation>Der Zeitpunkt, zu welchem der die Übermittlung auslösende Verwaltungsvorgang (Aufnahme / Änderung / Korrektur eines Datensatzes) im gemeindlichen Gewerbeverzeichnis gespeichert wurde. Der Ereigniszeitpunkt muss neben einer Angabe zum Datum eine zeitliche Information beinhalten. Diese ist mit einer Genauigkeit auf Ebene von Millisekunden und der Angabe zur Zeitzone zu übermitteln.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="istStorno" type="xs:boolean">
+            <xs:annotation>
+               <xs:documentation>Angabe über das Vorliegen einer Stornierung dieser Gewerbemeldung (bereits übermittelte An-, Um- oder Abmeldung) entsprechend .</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="grundStornierungSchluessel"
+                     minOccurs="0"
+                     type="xga:Code.GrundStornierung">
+            <xs:annotation>
+               <xs:documentation>Falls mit der Meldung eine Stornierung übermittelt wird, wird mit diesem Datentyp der Grund der Stornierung angegeben.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="uuidStornierteMeldung" minOccurs="0" type="bdt:UUID">
+            <xs:annotation>
+               <xs:documentation>Wenn es sich bei dieser Meldung um eine ersetzende Meldung infolge einer Korrektur handelt, ist mit diesem Datentypen die UUID der zu stornierenden Gewerbemeldung anzugeben.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="gemeindeSchluessel" type="adr:Code.Gemeindeschluessel">
+            <xs:annotation>
+               <xs:documentation>Amtlicher Gemeindeschlüssel der Sitzgemeinde der Betriebsstätte. Bitte den Hinweis zum Code-Datentyp beachten - an dieser Stelle sind keine Codes für Stadtteile / Stadtbezirke zulässig.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="gemeindeschluesselErgaenzung"
+                     minOccurs="0"
+                     type="xga:Code.GemeindeschluesselErgaenzung">
+            <xs:annotation>
+               <xs:documentation>In diesem Element kann eine verwaltungstechnische Zuordnung der Betriebsstätte unterhalb der Gemeindeebene vorgenommen werden (z. B. Stadtbezirke für die Stadtstaaten).</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="uuid" type="bdt:UUID">
+            <xs:annotation>
+               <xs:documentation>Eindeutige Kennzeichnung der Gewerbeanzeige als UUID.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="gueltigAb" type="xs:date">
+            <xs:annotation>
+               <xs:documentation>Datum des Beginns, der meldepflichtigen Änderung, der Aufgabe des Gewerbes oder der Datenaktualisierung. Im papiergebundenen Verfahren entspricht dies den Formularfeldern "Datum des Beginns der angemeldeten Tätigkeit" (Anmeldung), "Datum der Änderung" (Ummeldung) und "Datum der Betriebsaufgabe" (Abmeldung). Im Falle der Datenaktualisierung entspricht dies dem Datum des Wirksamwerdens der Aktualisierung.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="datumMeldung" minOccurs="0" type="xs:date">
+            <xs:annotation>
+               <xs:documentation>Datum, an welchem die An-, Um-, Abmeldung bzw. Datenaktualisierung an die Gewerbemeldestelle übergeben wurde. Im papiergebundenen Verfahren entspricht dies dem Formularfeld "Datum".</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="xga:bisherigeUnfallversicherung" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Angaben zur bisherigen Unfallversicherung bei Übernahme, Verschmelzung oder Spaltung.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="xga:spezifischeInformation"
+                     minOccurs="0"
+                     maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>Sollen zu der Gewerbeanzeige zusätzliche Informationen angegeben werden, dann können diese über diesen Datentyp angegeben werden. Dies ist bei konkreten Bedarfen bilateral zu vereinbaren.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="xga:gewerbebetrieb">
+            <xs:annotation>
+               <xs:documentation>Ein Gewerbebetrieb beschreibt die wirtschaftliche Einheit, unter der ein oder mehrere Gewerbetreibende/r im Außenverhältnis am Wirtschaftsleben teilnehmen. Er ist definiert durch: den/die Gewerbetreibenden (wer?): Gewerbetreibender ist, wer zur Anzeige des Gewerbes verpflichtet ist (z. B. jeder Beteiligte einer GbR); vgl. § 14 Abs. 1 Satz 1 GewO). die angemeldete(n) Tätigkeit(en) (was?), die Betriebstätte als Ort, an dem die Tätigkeiten ausgeführt werden (wo?).</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="referenzierteSubjekte"
+                     minOccurs="0"
+                     type="xga:ReferenzierteSubjekte">
+            <xs:annotation>
+               <xs:documentation>Innerhalb des Elements gewerbebetrieb über ID referenzierte Subjekte.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="ReferenzierteSubjekte">
+      <xs:sequence>
+         <xs:element ref="xga:natuerlichePerson" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Geburt und Anschrift mit spezifischeren Datentypen. Fachspezifische Angaben ergänzt. Hinweis: Die Angabe nichtVorhanden ist nur dann zulässig, wenn der jeweilige Namensbestandteil zu Recht nicht vorhanden ist.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="xga:juristischePerson" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>Unter juristischen Personen werden sowohl die Körperschaften des Privatrechts (Gesellschaft mit beschränkter Haftung, Aktiengesellschaft, Kommanditgesellschaft auf Aktien, eingetragener Verein, Genossenschaft) als auch öffentlich-rechtliche Körperschaften (Gebietskörperschaften, Selbstverwaltungskörperschaften, sonstige Körperschaften des öffentlichen Rechts) erfasst.Die konkrete Rechtsform der juristischen Person kann mittels einer Codeliste angegeben werden. Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Zustellanschrift mit spezifischerem Datentyp. Fachspezifische Angaben ergänzt.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="xga:rechtsfaehigePersonengesellschaft"
+                     minOccurs="0"
+                     maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>Die rechtsfähige Personengesellschaft im Kontext von XGewerbeordnung umfasst sowohl die rechtsfähige Gesellschaft des Bürgerlichen Rechts (GbR), als auch Personenhandelsgesellschaften wie die Offene Handelsgesellschaft (oHG), die Kommanditgesellschaft (KG) und die Kapitalgesellschaft amp Co. KG. Entsprechend sind rechtsfähige Personengesellschaften nach ausländischem und supranationalem Recht zu berücksichtigen.Die konkrete Rechtsform der rechtsfähigen Personengesellschaft kann mittels einer Codeliste angegeben werden. Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Einschränkung: Keine Partnerschaftsgesellschaften. Zustellanschrift mit spezifischerem Datentyp. Fachspezifische Angaben ergänzt.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="xga:sonstigePersonenvereinigung"
+                     minOccurs="0"
+                     maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>Hierunter werden alle Personenvereinigungen gefasst, die weder unter juristische Personen noch unter rechtsfähige Personengesellschaften fallen. Die sonstigen Personenvereinigungen (z. B. die Erbengemeinschaft) werden in der Regel nicht wirtschaftlich tätig.Die konkrete Rechtsform der sonstigen Personenvereinigung kann mittels einer Codeliste angegeben werden. Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Zustellanschrift mit spezifischerem Datentyp. Fachspezifische Angaben ergänzt.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="abh.satz">
+      <xs:choice>
+         <xs:element ref="xga:anmeldung"/>
+         <xs:element ref="xga:ummeldung"/>
+         <xs:element ref="xga:abmeldung"/>
+         <xs:element ref="xga:datenaktualisierung"/>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="abruf.anfrage.satz">
+      <xs:sequence>
+         <xs:element name="abgemeldeteBetriebeLiefern" type="xs:boolean">
+            <xs:annotation>
+               <xs:documentation>Angabe, ob abgemeldete Betriebe (historische Daten) mitgeliefert werden sollen.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="identdatenGewerbetreibender">
+            <xs:complexType>
+               <xs:choice>
+                  <xs:element ref="xga:identdatenNatuerlichePerson">
+                     <xs:annotation>
+                        <xs:documentation>Identifikationsdaten zum Gewerbetreibenden (natürliche Person), dessen Gewerbebetriebe abgerufen werden sollen.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element ref="xga:identdatenJuristischePerson">
+                     <xs:annotation>
+                        <xs:documentation>Identifikationsdaten zum Gewerbetreibenden (juristische Person), dessen Gewerbebetriebe abgerufen werden sollen.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:choice>
+            </xs:complexType>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="abruf.antwort.satz">
+      <xs:sequence>
+         <xs:element name="autor" type="bn-beh:BehoerdeType"/>
+         <xs:element name="satzErstellung" type="xs:dateTime">
+            <xs:annotation>
+               <xs:documentation>Der Erstellungszeitpunkt muss neben einer Angabe zum Datum eine zeitliche Information beinhalten. Diese ist mit einer Genauigkeit auf Ebene von Millisekunden und der Angabe zur Zeitzone zu übermitteln.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="antwortstatus" type="xga:Code.Antwortstatus"/>
+         <xs:element ref="xga:gewerbebetriebMitMetadaten" maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>Angaben zum Gewerbebetrieb mit den Daten zum letzten Gültigkeitszeitpunkt, letztem Datum der Meldung und dem letzten Ereigniszeitpunkt.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="alg.satz">
+      <xs:choice>
+         <xs:element ref="xga:anmeldung"/>
+         <xs:element ref="xga:ummeldung"/>
+         <xs:element ref="xga:abmeldung"/>
+         <xs:element ref="xga:datenaktualisierung"/>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="as.satz">
+      <xs:choice>
+         <xs:element ref="xga:anmeldung"/>
+         <xs:element ref="xga:ummeldung"/>
+         <xs:element ref="xga:abmeldung"/>
+         <xs:element ref="xga:datenaktualisierung"/>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="dgu.satz">
+      <xs:choice>
+         <xs:element ref="xga:anmeldung"/>
+         <xs:element ref="xga:ummeldung"/>
+         <xs:element ref="xga:abmeldung"/>
+         <xs:element ref="xga:datenaktualisierung"/>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="ea.satz">
+      <xs:choice>
+         <xs:element ref="xga:anmeldung"/>
+         <xs:element ref="xga:ummeldung"/>
+         <xs:element ref="xga:abmeldung"/>
+         <xs:element ref="xga:datenaktualisierung"/>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="erl.satz">
+      <xs:choice>
+         <xs:element ref="xga:anmeldung"/>
+         <xs:element ref="xga:ummeldung"/>
+         <xs:element ref="xga:abmeldung"/>
+         <xs:element ref="xga:datenaktualisierung"/>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="ext.satz">
+      <xs:sequence>
+         <xs:element ref="antr:anzeigender.id" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Angabe des Anzeigenden als ID-Querverweis innerhalb des jeweiligen Kontextes (Nachricht, Datensatz) auf ein Element xga:natuerlichePerson oder xga:juristischePerson.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="antr:handelndePerson.id" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Angabe der handelnden Person als ID-Querverweis innerhalb des jeweiligen Kontextes (Nachricht, Datensatz) auf ein Element np:natuerlichePerson (oder auf ein entsprechendes abgeleitetes Element).</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="bk:handelndePerson.vertrauensniveauIdentifikation">
+            <xs:annotation>
+               <xs:documentation>Das Vertrauensniveau gemäß welchem die Identität der handelnden natürlichen Person vom Online-Dienst festgestellt wurde.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="antr:ansprechpartner.id" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>Angabe des Ansprechpartners als ID-Querverweis innerhalb des jeweiligen Kontextes (Nachricht, Datensatz) auf ein Element np:natuerlichePerson (oder auf ein entsprechendes abgeleitetes Element).</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="bk:nachweisdokument.upload"
+                     minOccurs="0"
+                     maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>Von den Antragstellenden im Online-Dienst bereitgestellte Nachweisdokumente (hochgeladene Fotos, Scans, etc.).</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="bk:nachweisdokument.onlinedienst"
+                     minOccurs="0"
+                     maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>Vom Online-Dienst selbst erstellte Nachweisdokumente zur Ablage in der Akte der fachlich zuständigen Stelle. Beispiel: Die Willenserklärung eines oder der Antragstellenden "im Original".</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:choice>
+            <xs:annotation>
+               <xs:documentation>[nd]</xs:documentation>
+            </xs:annotation>
+            <xs:element ref="xga:anmeldung"/>
+            <xs:element ref="xga:ummeldung"/>
+            <xs:element ref="xga:abmeldung"/>
+            <xs:element ref="xga:datenaktualisierung"/>
+         </xs:choice>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="fa.satz">
+      <xs:choice>
+         <xs:element ref="xga:anmeldung"/>
+         <xs:element ref="xga:ummeldung"/>
+         <xs:element ref="xga:abmeldung"/>
+         <xs:element ref="xga:datenaktualisierung"/>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="hwk.satz">
+      <xs:choice>
+         <xs:element ref="xga:anmeldung"/>
+         <xs:element ref="xga:ummeldung"/>
+         <xs:element ref="xga:abmeldung"/>
+         <xs:element ref="xga:datenaktualisierung"/>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="ihk.satz">
+      <xs:choice>
+         <xs:element ref="xga:anmeldung"/>
+         <xs:element ref="xga:ummeldung"/>
+         <xs:element ref="xga:abmeldung"/>
+         <xs:element ref="xga:datenaktualisierung"/>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="is.satz">
+      <xs:choice>
+         <xs:element ref="xga:anmeldung"/>
+         <xs:element ref="xga:ummeldung"/>
+         <xs:element ref="xga:abmeldung"/>
+         <xs:element ref="xga:datenaktualisierung"/>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="lue.satz">
+      <xs:choice>
+         <xs:element ref="xga:anmeldung"/>
+         <xs:element ref="xga:ummeldung"/>
+         <xs:element ref="xga:abmeldung"/>
+         <xs:element ref="xga:datenaktualisierung"/>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="rg.satz">
+      <xs:choice>
+         <xs:element ref="xga:abmeldung"/>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="rueckmeldung.satz">
+      <xs:sequence>
+         <xs:element ref="xga:anmeldung"/>
+         <xs:element name="hinweise" minOccurs="0" type="bdt:String.DIN91379.C">
+            <xs:annotation>
+               <xs:documentation>Hinweise der für die Gewerbeanmeldung zuständigen Gewerbebehörde an die vormals zuständige Gewerbebehörde.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="sta.satz">
+      <xs:choice>
+         <xs:element ref="xga:anmeldung"/>
+         <xs:element ref="xga:ummeldung"/>
+         <xs:element ref="xga:abmeldung"/>
+         <xs:element ref="xga:datenaktualisierung"/>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="zv.satz">
+      <xs:choice>
+         <xs:element ref="xga:anmeldung"/>
+      </xs:choice>
+   </xs:complexType>
+   <xs:simpleType name="fachlicheraenderungsanlass">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Fachlicher Änderungsanlass</nameLang>
+               <nameKurz>Fachlicher Änderungsanlass</nameKurz>
+               <nameTechnisch>fachlicheraenderungsanlass</nameTechnisch>
+               <kennung>urn:xoev-de:xgewerbeordnung:codeliste:fachlicheraenderungsanlass</kennung>
+               <beschreibung>Gibt den fachlichen Änderungsanlass bei einer Gewerbeummeldung oder einer Datenaktualisierung an.</beschreibung>
+               <herausgebernameLang>Betreiber XGewerbeordnung (KoSIT und d-NRW im Auftrag des Bundesministeriums für Wirtschaft und Energie)</herausgebernameLang>
+               <herausgebernameKurz>XGewerbeordnung</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>6</version>
+               <datumGueltigkeitAb>2024-05-01</datumGueltigkeitAb>
+               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
+               <aenderungZurVorversion>Der Begriff "Berichtigung" in der Beschreibung wurde gem. neuer Spezifikation durch den Begriff "Datenaktualisierung" ersetzt. Daneben wurde der Hinweis zu Code 16 ergänzt: "Hierunter fallen nur identitätswahrende Rechtsformwechsel des Gewerbetreibenden bzw. Rechtsformwechsel, die nicht über Ab- und Anmeldung vorgenommen werden"</aenderungZurVorversion>
+            </versionCodeliste>
+            <codelistenspalten>
+               <Code>
+                  <spaltennameLang>Code</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </Code>
+               <Text>
+                  <spaltennameLang>Text</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </Text>
+               <Hinweise>
+                  <spaltennameLang>Hinweise</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>optional</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </Hinweise>
+            </codelistenspalten>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:restriction base="xs:token">
+         <xs:enumeration value="01">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Verlegung innerhalb Gemeinde</Text>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="02">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Aufgabe von Tätigkeiten</Text>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="03">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Änderung des Firmennamens</Text>
+                  <Hinweise>Ab 01.11.2023 nicht mehr zu verwenden, stattdessen sind die Codes 17 und 18 zu verwenden</Hinweise>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="04">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Namensänderung</Text>
+                  <Hinweise>Ab 01.11.2023 nicht mehr zu verwenden, stattdessen sind die Codes 17 und 18 zu verwenden</Hinweise>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="05">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Nebenerwerb wird Haupterwerb</Text>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="06">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Haupterwerb wird Nebenerwerb</Text>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="07">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Änderung in der Wohnanschrift</Text>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="08">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Änderung in der Anschrift der Hauptniederlassung</Text>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="09">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Zweigstelle wird Hauptniederlassung</Text>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="10">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Hauptniederlassung wird Zweigstelle</Text>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="11">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Benennung eines neuen gesetzlichen Vertreters</Text>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="12">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Ausscheiden eines gesetzlichen Vertreters</Text>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="13">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Änderung von Personengesellschaft in Einzelunternehmen</Text>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="14">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Erweiterung der Tätigkeit</Text>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="15">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Änderung der Tätigkeit</Text>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="16">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Wechsel der Rechtsform des Gewerbebetriebes</Text>
+                  <Hinweise>Hierunter fallen nur identitätswahrende Rechtsformwechsel des Gewerbetreibenden bzw. Rechtsformwechsel, die nicht über Ab- und Anmeldung vorgenommen werden</Hinweise>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="17">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Meldepflichtige Namensänderung</Text>
+                  <Hinweise>Bei Namensänderung des Gewerbetreibenden (vgl. § 14 Abs. 1 Satz 2 Nr. 2a GewO)</Hinweise>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="18">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Sonstige, nicht meldepflichtige Namensänderung</Text>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="99">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Text>Sonstige nicht aufgeführte Änderungen</Text>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+      </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="grundstornierung">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Grund Stornierung</nameLang>
+               <nameKurz>Grund Stornierung</nameKurz>
+               <nameTechnisch>grundstornierung</nameTechnisch>
+               <kennung>urn:xoev-de:xgewerbeordnung:codeliste:grundstornierung</kennung>
+               <beschreibung>Gibt den Grund einer Stornierung an</beschreibung>
+               <herausgebernameLang>XGewerbeordnung</herausgebernameLang>
+               <herausgebernameKurz>XGewerbeordnung</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>1</version>
+               <versionCodelistenHandbuch>1.0</versionCodelistenHandbuch>
+            </versionCodeliste>
+            <codelistenspalten>
+               <Code>
+                  <spaltennameLang>Code</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </Code>
+               <Beschreibung>
+                  <spaltennameLang>Beschreibung</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </Beschreibung>
+            </codelistenspalten>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:restriction base="xs:token">
+         <xs:enumeration value="0">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Beschreibung>Zu stornierende Meldung irrtümlich verschickt</Beschreibung>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="1">
+            <xs:annotation>
+               <xs:appinfo>
+                  <Beschreibung>Zu stornierende Meldung fehlerhaft</Beschreibung>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+      </xs:restriction>
+   </xs:simpleType>
+   <xs:element name="abmeldung">
+      <xs:annotation>
+         <xs:documentation>Dieses Element umfasst alle Angaben, die in einer Gewerbeabmeldung übermittelt werden können.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xga:Gewerbemeldung">
+               <xs:sequence>
+                  <xs:element ref="xga:kuenftigesGewerbe" minOccurs="0">
+                     <xs:annotation>
+                        <xs:documentation>Angaben zum künftigen Gewerbe.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="grundAbmeldungSchluessel"
+                              minOccurs="0"
+                              type="xga:Code.GrundFuerAbmeldung"/>
+                  <xs:element name="ursacheAbmeldung" minOccurs="0" type="bdt:String.DIN91379.C"/>
+                  <xs:element name="ursacheAbmeldungSchluessel"
+                              minOccurs="0"
+                              type="xga:Code.UrsacheFuerAbmeldung"/>
+                  <xs:element name="istTechnischeAbmeldung" minOccurs="0" type="xs:boolean">
+                     <xs:annotation>
+                        <xs:documentation>Falls es sich bei der Abmeldung um eine (Wieder)Abmeldung zur Rücknahme oder Korrektur einer irrtümlichen Anmeldung nach Ablauf der Stornierungsfrist von 42 Tagen handelt, so ist dies mit dem Wert "true" in diesem Datentypen anzugeben (vgl. ).</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="abweichendeHauptniederlassung" type="xga:BetriebsstaetteType">
+      <xs:annotation>
+         <xs:documentation>Angaben zur abweichenden Hauptniederlassung.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="anmeldung">
+      <xs:annotation>
+         <xs:documentation>Dieses Element umfasst alle Angaben, die in einer Gewerbeanmeldung übermittelt werden können.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xga:Gewerbemeldung">
+               <xs:sequence>
+                  <xs:element ref="xga:frueheresGewerbe" minOccurs="0">
+                     <xs:annotation>
+                        <xs:documentation>Angaben zum früheren Gewerbe.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="grundAnmeldungSchluessel"
+                              minOccurs="0"
+                              type="xga:Code.GrundFuerAnmeldung"/>
+                  <xs:element name="verdachtsmomenteText"
+                              minOccurs="0"
+                              type="bdt:String.DIN91379.C">
+                     <xs:annotation>
+                        <xs:documentation>Dieses Feld dient der inhaltlichen Konkretisierung der im Element verdachtsmoment übermittelten Verdachtsmomente.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="verdachtsmoment"
+                              minOccurs="0"
+                              maxOccurs="7"
+                              type="xga:Code.Verdachtsmoment"/>
+                  <xs:element name="fruehereGewerbebetriebID" minOccurs="0" type="bdt:UUID">
+                     <xs:annotation>
+                        <xs:documentation>Sofern eine GewerbebetriebID des früheren Gewerbes bekannt ist, ist diese in diesem Element zu übermitteln. Wenn es sich bei der Gewerbemeldung um eine ersetzende Anmeldung infolge einer Korrektur handelt, ist hier die GewerbebetriebID des Gewerbebetriebs aus der Originalmeldung zu übermitteln, sofern mit der Korrektur der Anmeldung eine neue GewerbebetriebID vergeben wurde. Wenn es sich bei der Gewerbemeldung um eine technische Anmeldung zur Korrektur einer fehlerhaften Abmeldung (nach Ablauf der Korrekturfrist von 42 Tagen) handelt, ist hier die GewerbebetriebID des Gewerbebetriebs aus der Abmeldung zu übermitteln, sofern mit der technischen Anmeldung eine neue GewerbebetriebID vergeben wurde.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="istTechnischeAnmeldung" minOccurs="0" type="xs:boolean">
+                     <xs:annotation>
+                        <xs:documentation>Falls es sich bei der Anmeldung um eine (Wieder)Anmeldung zur Rücknahme oder Korrektur einer irrtümlichen Abmeldung nach Ablauf der Stornierungsfrist von 42 Tagen handelt, so ist dies mit dem Wert "true" in diesem Datentypen anzugeben (vgl. ).</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="aufenthaltstitel">
+      <xs:annotation>
+         <xs:documentation>Mittels dieses Typs werden Angaben zum Aufenthaltstitel ausländischer Betriebsinhaber gemacht.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="status" type="bk:Code.Status">
+               <xs:annotation>
+                  <xs:documentation>Angabe des Status des Aufenthaltstitels</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="ausgestelltAm" minOccurs="0" type="xs:date">
+               <xs:annotation>
+                  <xs:documentation>Ausstellungsdatum des Aufenthaltstitels</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="ausgestelltVonName"
+                        minOccurs="0"
+                        type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Name der den Aufenthaltstitel ausstellenden Behörde</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="ausgestelltVonPLZ" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Postleitzahl der den Aufenthaltstitel ausstellenden Behörde</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="ausgestelltVonOrt" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Ort der den Aufenthaltstitel ausstellenden Behörde</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="auflagen" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Beschreibt eine oder mehrere die Erwerbstätigkeit betreffende Auflagen und/oder Beschränkungen zum Aufenthaltstitel in Textform (z.B. "Gültig bis zum 01.02.2033").</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="betriebArt">
+      <xs:annotation>
+         <xs:documentation>Gibt die Art eine Betriebes (Handels-, Handwerks-, Industrie oder sonstiger Betrieb) an.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="industrie" type="xs:boolean">
+               <xs:annotation>
+                  <xs:documentation>In diesem Element wird angegeben, ob es sich um einen Industriebetrieb handelt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="handwerk" type="xs:boolean">
+               <xs:annotation>
+                  <xs:documentation>In diesem Element wird angegeben, ob es sich um einen Handwerksbetrieb handelt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="handel" type="xs:boolean">
+               <xs:annotation>
+                  <xs:documentation>In diesem Element wird angegeben, ob es sich um einen Handelsbetrieb handelt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="sonstiges" type="xs:boolean">
+               <xs:annotation>
+                  <xs:documentation>In diesem Element wird angegeben, ob es sich um Betrieb sonstiger Art handelt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="betriebsstaette" type="xga:BetriebsstaetteType">
+      <xs:annotation>
+         <xs:documentation>Angaben zu der Betriebsstätte.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="bisherigeUnfallversicherung">
+      <xs:annotation>
+         <xs:documentation>Angaben zur bisherigen Unfallversicherung bei Übernahme, Verschmelzung oder Spaltung.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="traeger" type="bk:Code.Unfallversicherungstraeger">
+               <xs:annotation>
+                  <xs:documentation>Der Träger der bisherigen gesetzlichen Unfallversicherung.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="unternehmensnummer"
+                        minOccurs="0"
+                        type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Die Unternehmensnummer bei der bisherigen gesetzlichen Unfallversicherung (früher Mitgliedsnummer).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="datenaktualisierung">
+      <xs:annotation>
+         <xs:documentation>Dieses Element umfasst alle Angaben, die bei einer Datenaktualisierung auf Wunsch des Betroffenen oder auf Grundlage eigener Erkenntnisse der Gewerbebehörde übermittelt werden können. Als Ummeldung anzeigepflichtige Vorgänge nach § 14 Abs. 1 Satz 2 Nr. 1, 2 und 2a GewO dürfen nicht mit einer Datenaktualisierung übermittelt werden.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xga:Gewerbemeldung">
+               <xs:sequence>
+                  <xs:element name="grundDatenaktualisierungSchluessel"
+                              minOccurs="0"
+                              maxOccurs="unbounded"
+                              type="xga:Code.FachlicherAenderungsanlass"/>
+                  <xs:element name="anlaesseDatenaktualisierung"
+                              minOccurs="0"
+                              type="bdt:String.DIN91379.C">
+                     <xs:annotation>
+                        <xs:documentation>Es können sonstige Gründe für die Aktualisierung der Daten, welche zu der Datenaktualisierungsmeldung geführt haben und im Schlüsselverzeichnis „Fachlicher Änderungsanlass“ nicht aufgeführt sind, angegeben werden (z.B. die Korrektur der angemeldeten Telefonnummer bei der Betriebsstätte).</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element ref="xga:gewerbebetriebVorAenderung" minOccurs="0">
+                     <xs:annotation>
+                        <xs:documentation>In diesem Element sind bei einer Datenaktualisierung alle bekannten bzw. vorhandenen Angaben zum Gewerbe vor der Datenaktualisierung anzugeben.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="referenzierteSubjekteVorAenderung"
+                              minOccurs="0"
+                              type="xga:ReferenzierteSubjekte">
+                     <xs:annotation>
+                        <xs:documentation>Innerhalb des Elements gewerbebetriebVorAenderung über ID referenzierte Subjekte.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="erlaubnis">
+      <xs:annotation>
+         <xs:documentation>In diesem Typ werden die Angaben zu einem laufenden oder abgeschlossenen gewerberechtlichen Zulassungsverfahren zusammengefasst (z.B. für die Ausübung eines Gewerbes oder im Rahmen einer Erlaubnis nach § 34c, § 34d GewO).</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="status" type="bk:Code.Status">
+               <xs:annotation>
+                  <xs:documentation>Angabe des Status der Erlaubnis.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="ausgestelltAm" minOccurs="0" type="xs:date">
+               <xs:annotation>
+                  <xs:documentation>Ausstellungsdatum der Erlaubnis.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="ausgestelltVonName"
+                        minOccurs="0"
+                        type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Name der die Erlaubnis ausstellenden Behörde.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="ausgestelltVonPLZ" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Postleitzahl der die Erlaubnis ausstellenden Behörde.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="ausgestelltVonOrt" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Ort der die Erlaubnis ausstellenden Behörde.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="frueheresGewerbe">
+      <xs:annotation>
+         <xs:documentation>Angaben zum früheren Gewerbe.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="nameFirmaGewerbetreibender"
+                        minOccurs="0"
+                        type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Name des früheren Gewerbetreibenden oder Firmenname</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:anschrift" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Detailliertere Struktur für die Strassenanschrift. Detailliertere Struktur für die Auslandsanschriften. Keine Postfachanschrift.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:kommunikation" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt eingeschränkt: De-Mail ist unzulässig. Alle Angaben mehrfach möglich. Die Klammerangabe bei Vorwahlen in der Telefonnummer wird nicht unterstützt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="gesellschafter">
+      <xs:annotation>
+         <xs:documentation>Im Kontext der Gewerbeanzeige werden ausschließlich persönlich haftende und geschäftsführende Gesellschafter betrachtet (ohne Differenzierung auf Datenebene).</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="ges:gesellschafter.id">
+               <xs:annotation>
+                  <xs:documentation>ID-Verweis innerhalb des jeweiligen Kontextes auf ein Element xga:natuerlichePerson, xga:juristischePerson, xga:rechtsfaehigePersonengesellschaft, xga:sonstigePersonenvereinigung (oder auf ein entsprechendes abgeleitetes Element) in der Rolle Gesellschafter.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="eintrittsdatum" minOccurs="0" type="xs:date">
+               <xs:annotation>
+                  <xs:documentation>Eintrittsdatum des Gesellschafters.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="austrittsdatum" minOccurs="0" type="xs:date">
+               <xs:annotation>
+                  <xs:documentation>Austrittsdatum des Gesellschafters.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="gesetzlicherVertreter">
+      <xs:annotation>
+         <xs:documentation>Dieses Element entspricht dem Datenobjekt Gesetzlicher Vertreter aus dem Kerndatenmodell XUnternehmen, ergänzt um weitere fachliche Attribute.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="gv:gesetzlicherVertreter.id">
+               <xs:annotation>
+                  <xs:documentation>ID-Verweis innerhalb des jeweiligen Kontextes auf ein Element xga:natuerlichePerson, xga:juristischePerson, xga:rechtsfaehigePersonengesellschaft, xga:sonstigePersonenvereinigung (oder auf ein entsprechendes abgeleitetes Element) in der Rolle Gesetzlicher Vertreter.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="eintrittsdatum" minOccurs="0" type="xs:date">
+               <xs:annotation>
+                  <xs:documentation>Eintrittsdatum des gesetzlichen Vertreters.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="austrittsdatum" minOccurs="0" type="xs:date">
+               <xs:annotation>
+                  <xs:documentation>Austrittsdatum des gesetzlichen Vertreters.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="gewerbebetrieb" type="xga:GewerbebetriebType">
+      <xs:annotation>
+         <xs:documentation>Ein Gewerbebetrieb beschreibt die wirtschaftliche Einheit, unter der ein oder mehrere Gewerbetreibende/r im Außenverhältnis am Wirtschaftsleben teilnehmen. Er ist definiert durch: den/die Gewerbetreibenden (wer?): Gewerbetreibender ist, wer zur Anzeige des Gewerbes verpflichtet ist (z. B. jeder Beteiligte einer GbR); vgl. § 14 Abs. 1 Satz 1 GewO). die angemeldete(n) Tätigkeit(en) (was?), die Betriebstätte als Ort, an dem die Tätigkeiten ausgeführt werden (wo?).</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="gewerbebetriebMitMetadaten">
+      <xs:annotation>
+         <xs:documentation>Angaben zum Gewerbebetrieb mit den Daten zum letzten Gültigkeitszeitpunkt, letztem Datum der Meldung und dem letzten Ereigniszeitpunkt.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="letztesGueltigAb" type="xs:date">
+               <xs:annotation>
+                  <xs:documentation>Datum des Beginns, der Änderung oder der Aufgabe des Gewerbes. Im papiergebundenen Verfahren entspricht dies den Formularfeldern "Datum des Beginns der angemeldeten Tätigkeit" (Anmeldung), "Datum der Änderung" (Ummeldung) und "Datum der Betriebsaufgabe" (Abmeldung).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="letztesDatumMeldung" type="xs:date">
+               <xs:annotation>
+                  <xs:documentation>Datum, an welchem die An-, Um- bzw. Abmeldung an die Gewerbemeldestelle übergeben wurde. Im papiergebundenen Verfahren entspricht dies dem Formularfeld "Datum".</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="letzterEreigniszeitpunkt" type="xs:dateTime">
+               <xs:annotation>
+                  <xs:documentation>Der Zeitpunkt, zu welchem der die Übermittlung auslösende Verwaltungsvorgang (Aufnahme / Änderung / Korrektur eines Datensatzes) im gemeindlichen Gewerbeverzeichnis gespeichert wurde. Der Ereigniszeitpunkt muss neben einer Angabe zum Datum eine zeitliche Information beinhalten. Diese ist mit einer Genauigkeit auf Ebene von Millisekunden und der Angabe zur Zeitzone zu übermitteln.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="status" type="xga:Code.StatusGewerbebetrieb0600">
+               <xs:annotation>
+                  <xs:documentation>Status dieses Gewebebetriebs.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="xga:gewerbebetrieb">
+               <xs:annotation>
+                  <xs:documentation>Ein Gewerbebetrieb beschreibt die wirtschaftliche Einheit, unter der ein oder mehrere Gewerbetreibende/r im Außenverhältnis am Wirtschaftsleben teilnehmen. Er ist definiert durch: den/die Gewerbetreibenden (wer?): Gewerbetreibender ist, wer zur Anzeige des Gewerbes verpflichtet ist (z. B. jeder Beteiligte einer GbR); vgl. § 14 Abs. 1 Satz 1 GewO). die angemeldete(n) Tätigkeit(en) (was?), die Betriebstätte als Ort, an dem die Tätigkeiten ausgeführt werden (wo?).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="referenzierteSubjekte" type="xga:ReferenzierteSubjekte">
+               <xs:annotation>
+                  <xs:documentation>Innerhalb des Elements gewerbebetrieb über ID referenzierte Subjekte.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="gewerbebetriebVorAenderung" type="xga:GewerbebetriebType">
+      <xs:annotation>
+         <xs:documentation>Dieser Typ dient bei einer Ummeldung oder einer Datenaktualisierung der fachlichen Zusammenführung der Daten zu Gewerbetreibenden (beteiligten Personen bzw. Firmen) und Betriebsstätten (Hauptniederlassung und gemeldeter Betriebsstätte) sowie weiteren Informationen zum Gewerbe vor der gemeldeten Änderung. Hinweis: Im Gegensatz zum Typ Gewerbe gelten einige semantische Bedingungen (Schematron-Regeln) rein fachlicher Natur für diesen Datentyp nicht, um das Übermitteln älterer Datenbestände zu ermöglichen.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="gewerbetreibender">
+      <xs:annotation>
+         <xs:documentation>Dieses Element wird durch das Kerndatenobjekt wirtschaftlich Tätiger definiert und an dieser Stelle wie folgt konkretisiert: Gewerbetreibender ist, wer zur Anzeige des Gewerbes verpflichtet ist. Sofern es sich bei dem wirtschaftlich Tätigen um eine Personengesellschaft handelt, muss es sich bei dem Gewerbetreibenden um einen ihrer Gesellschafter handeln (bei mehrstöckigen Personengesellschaften entsprechend).</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="gewerbetreibender.id" type="bdt:IDType">
+               <xs:annotation>
+                  <xs:documentation>ID-Verweis auf ein Element xga:natuerlichePerson oder xga:juristischePerson.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="istNebenerwerb" minOccurs="0" type="xs:boolean">
+               <xs:annotation>
+                  <xs:documentation>Mit diesem Element kann übermittelt werden, ob es sich bei dem Gewerbe um einen Nebenerwerb des angegebenen Gewerbetreibenden handelt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="handwerkskarte">
+      <xs:annotation>
+         <xs:documentation>Der Typ enthält Informationen zu einer für die Ausübung des Gewerbes erforderlichen Handwerkskarte. Eine Handwerkskarte ist die amtliche Bescheinigung über die vollzogene Eintragung in die Handwerksrolle und der Nachweis über die Berechtigung das betreffende Handwerk selbständig auszuüben.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="status" type="bk:Code.Status">
+               <xs:annotation>
+                  <xs:documentation>Status der Handwerkskarte</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="ausgestelltAm" minOccurs="0" type="xs:date">
+               <xs:annotation>
+                  <xs:documentation>Ausstellungsdatum der Handwerkskarte</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="ausgestelltVonName"
+                        minOccurs="0"
+                        type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Name der die Handwerkskarte ausstellenden Handwerkskammer (z.B. "Mittelfranken, Nürnberg"). Das Element darf nur angegeben werden, wenn kein Schlüssel zu der Handwerkskammer im betroffenen Element angegeben wurde. Der Schlüssel der Handwerkskammer sollte bevorzugt verwendet werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="ausgestelltVonPLZ" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Postleitzahl des Sitzes der die Handwerkskarte ausstellenden Handwerkskammer (z.B. "90489"). Das Element sollte nur angegeben werden, wenn kein Schlüssel zu der Handwerkskammer im betreffenden Element angegeben wurde.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="ausgestelltVonOrt" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Ort des Sitzes der die Handwerkskarte ausstellenden Handwerkskammer (z.B. "Nürnberg"). Das Element sollte nur angegeben werden, wenn kein Schlüssel zu der Handwerkskammer im betreffenden Element angegeben wurde.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="ausgestelltVonSchluessel"
+                        minOccurs="0"
+                        type="bk:Code.Handwerkskammer"/>
+            <xs:element name="artHandwerkskarte" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Wurde eine Handwerkskarte in der Gewerbeanzeige angegeben, dann kann mittels dieses Elements mitgeteilt werden, welche zulassungspflichtigen Handwerke auf der Handwerkskarte angegeben sind (z.B. "Zimmererhandwerk").</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="identdatenJuristischePerson">
+      <xs:annotation>
+         <xs:documentation>Identifikationsdaten zum Gewerbetreibenden (juristische Person), dessen Gewerbebetriebe abgerufen werden sollen.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="rf:rechtsform">
+               <xs:annotation>
+                  <xs:documentation>Angabe der Rechtsform. Es dürfen ausschließlich die in beschriebenen Rechtsformen-Codes verwendet werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:eintragung">
+               <xs:annotation>
+                  <xs:documentation>ID-Verweis innerhalb des jeweiligen Kontextes auf ein Element xga:natuerlichePerson, xga:juristischePerson, xga:rechtsfaehigePersonengesellschaft, xga:sonstigePersonenvereinigung (oder auf ein entsprechendes abgeleitetes Element) in der Rolle Gesellschafter.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="identdatenNatuerlichePerson">
+      <xs:annotation>
+         <xs:documentation>Identifikationsdaten zum Gewerbetreibenden (natürliche Person), dessen Gewerbebetriebe abgerufen werden sollen.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="np:name">
+               <xs:annotation>
+                  <xs:documentation>ID-Verweis innerhalb des jeweiligen Kontextes auf ein Element xga:natuerlichePerson, xga:juristischePerson, xga:rechtsfaehigePersonengesellschaft, xga:sonstigePersonenvereinigung (oder auf ein entsprechendes abgeleitetes Element) in der Rolle Gesellschafter.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:geburt">
+               <xs:annotation>
+                  <xs:documentation>ID-Verweis innerhalb des jeweiligen Kontextes auf ein Element xga:natuerlichePerson, xga:juristischePerson, xga:rechtsfaehigePersonengesellschaft, xga:sonstigePersonenvereinigung (oder auf ein entsprechendes abgeleitetes Element) in der Rolle Gesellschafter.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:anschrift">
+               <xs:annotation>
+                  <xs:documentation>ID-Verweis innerhalb des jeweiligen Kontextes auf ein Element xga:natuerlichePerson, xga:juristischePerson, xga:rechtsfaehigePersonengesellschaft, xga:sonstigePersonenvereinigung (oder auf ein entsprechendes abgeleitetes Element) in der Rolle Gesellschafter.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="juristischePerson">
+      <xs:annotation>
+         <xs:documentation>Unter juristischen Personen werden sowohl die Körperschaften des Privatrechts (Gesellschaft mit beschränkter Haftung, Aktiengesellschaft, Kommanditgesellschaft auf Aktien, eingetragener Verein, Genossenschaft) als auch öffentlich-rechtliche Körperschaften (Gebietskörperschaften, Selbstverwaltungskörperschaften, sonstige Körperschaften des öffentlichen Rechts) erfasst.Die konkrete Rechtsform der juristischen Person kann mittels einer Codeliste angegeben werden. Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Zustellanschrift mit spezifischerem Datentyp. Fachspezifische Angaben ergänzt.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="jp:juristischePerson.id">
+               <xs:annotation>
+                  <xs:documentation>Innerhalb des jeweiligen Kontextes eindeutige ID dieser Instanz des Datentyps Juristische Person.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="rf:rechtsform">
+               <xs:annotation>
+                  <xs:documentation>Angabe der Rechtsform. Es dürfen ausschließlich die in beschriebenen Rechtsformen-Codes verwendet werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="ename:eingetragenerName">
+               <xs:annotation>
+                  <xs:documentation>Die im Handels-, Genossenschafts oder Gesellschaftsregister eingetragene Firma eines wirtschaftlich Tätigen bzw. einer wirtschaftlichen Tätigkeit (z. B. eingetragenes Einzelunternehmen, eingetragene Zweigniederlassung) bzw. der im Vereinsregister, Partnerschaftsregister oder Stiftungsverzeichnis eingetragene Name. Der eingetragene Name kann auch in einem Register festgehalten sein, welches in einem anderen Staat geführt wird.Der eingetragene Name ist abzugrenzen von der Geschäftsbezeichnung.Das Kerndatenobjekt bildet auch die Namen juristischer Personen, rechtsfähiger Personengesellschaften oder sonstiger Personenvereinigungen ab, die nicht in einem Register, aber kraft Gesetz geführt werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:eintragung" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Dieses Kerndatenobjekt fasst die Daten, mit welchen die Eintragung eines wirtschaftlich Tätigen bzw. eines Gewerbebetriebs in ein Register (Handels-, Gesellschafts-, Genossenschafts- oder Vereinsregister) oder in ein Verzeichnis (Stiftungsverzeichnis) identifiziert werden kann.Die Eintragung kann auch in ein Register oder Verzeichnis erfolgen, welches in einem anderen Staat geführt wird.Zwischen Rechtsform und Eintragung besteht ein Zusammenhang. Welche Eintragungsarten (Handelsregister A, Handelsregister B, Gesellschaftsregister, Genossenschaftsregister, Vereinsregister, Register im Ausland, Kraft Gesetz) für welche Rechtsformen zulässig sein können, wird als Information in der Codeliste der Rechtsformen mitgeführt. Das Objekt ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Semantisch konkretisiert auf Gewerbebetriebe als Art der wirtschaftlichen Tätigkeit Keine Eintragung im Partnerschaftsregister zulässig Das Element staat wurde nicht aus dem Basismodul übernommen, da dort Code und nicht Freitext vorgesehen ist. Das Element registergericht.bezeichnung wurde nicht aus dem Basismodul übernommen, stattdessen ist das Element registergericht.code zu nutzen.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:zustellanschrift" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Dies ist eine Rolle, welche das Kerndatenobjekt Anschrift einnehmen kann. Mit der Rolle wird eine Anschrift für die Zustellung von Schriftstücken angegeben. Eine Zustellanschrift ist insbesondere die im Handels- oder Genossenschaftsregister eingetragene inländische Geschäftsanschrift (vgl. §§ 29, 106 HGB). Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Spezifischere Darstellung für die Strassenanschrift. Abweichende, strukturierte Darstellung für die Auslandsanschriften.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:kommunikation" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt eingeschränkt: De-Mail ist unzulässig. Alle Angaben mehrfach möglich. Die Klammerangabe bei Vorwahlen in der Telefonnummer wird nicht unterstützt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="xga:gesetzlicherVertreter" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Dieses Element entspricht dem Datenobjekt Gesetzlicher Vertreter aus dem Kerndatenmodell XUnternehmen, ergänzt um weitere fachliche Attribute.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="xga:erlaubnis" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>In diesem Typ werden die Angaben zu einem laufenden oder abgeschlossenen gewerberechtlichen Zulassungsverfahren zusammengefasst (z.B. für die Ausübung eines Gewerbes oder im Rahmen einer Erlaubnis nach § 34c, § 34d GewO).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="anzahlGesetzlicheVertreter"
+                        minOccurs="0"
+                        type="xs:nonNegativeInteger">
+               <xs:annotation>
+                  <xs:documentation>Anzahl der gesetzlichen Vertreter.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="kuenftigesGewerbe">
+      <xs:annotation>
+         <xs:documentation>Angaben zum künftigen Gewerbe.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="nameFirmaGewerbetreibender"
+                        minOccurs="0"
+                        type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Name des künftigen Gewerbetreibenden oder Firmenname</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:anschrift" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Detailliertere Struktur für die Strassenanschrift. Detailliertere Struktur für die Auslandsanschriften. Keine Postfachanschrift.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:kommunikation" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt eingeschränkt: De-Mail ist unzulässig. Alle Angaben mehrfach möglich. Die Klammerangabe bei Vorwahlen in der Telefonnummer wird nicht unterstützt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="natuerlichePerson">
+      <xs:annotation>
+         <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Geburt und Anschrift mit spezifischeren Datentypen. Fachspezifische Angaben ergänzt. Hinweis: Die Angabe nichtVorhanden ist nur dann zulässig, wenn der jeweilige Namensbestandteil zu Recht nicht vorhanden ist.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="np:natuerlichePerson.id">
+               <xs:annotation>
+                  <xs:documentation>Innerhalb des jeweiligen Kontextes eindeutige ID dieser Instanz des Datentyps Natürliche Person.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="np:doktorgrad" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Es sind nur diejenigen Doktorgrade anzugeben, die in Pässe eingetragen werden dürfen. Sind mehrere Doktorgrade anzugeben, so sind sie durch ein Leerzeichen zu trennen.Zulässig sind derzeit: „DR.“, „Dr.“, „DR.HC.“, „Dr.hc.“, „Dr.EH.“ und „Dr.eh.“.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="np:name">
+               <xs:annotation>
+                  <xs:documentation>Datenobjekt zur Darstellung des Namens einer natürlichen Person in lateinischer Schrift, entsprechend der Vorgaben aus dem Baukasten des Förderalen Informationsmanagements (FIM).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:geburt" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Angabe zum Staat als Freitext statt Code.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="np:geschlecht" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Als Geschlechtsangabe zulässig sind: "männlich", "weiblich", "divers", "keine Angabe".</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="np:staatsangehoerigkeit" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Die Staatsangehörigkeit der natürlichen Person gemäß Codierung des statistischen Bundesamts.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:staatsangehoerigkeitFreitext"
+                        minOccurs="0"
+                        maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Hier ist die Staatsangehörigkeit zu übermitteln, sofern kein passender Code in np:staatsangehoerigkeit angegeben werden kann.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:anschrift" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Detailliertere Struktur für die Strassenanschrift. Detailliertere Struktur für die Auslandsanschriften. Keine Postfachanschrift.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:kommunikation" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt eingeschränkt: De-Mail ist unzulässig. Alle Angaben mehrfach möglich. Die Klammerangabe bei Vorwahlen in der Telefonnummer wird nicht unterstützt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="xga:erlaubnis" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>In diesem Typ werden die Angaben zu einem laufenden oder abgeschlossenen gewerberechtlichen Zulassungsverfahren zusammengefasst (z.B. für die Ausübung eines Gewerbes oder im Rahmen einer Erlaubnis nach § 34c, § 34d GewO).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="xga:aufenthaltstitel" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Mittels dieses Typs werden Angaben zum Aufenthaltstitel ausländischer Betriebsinhaber gemacht.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="fachverfahrenskennziffer"
+                        minOccurs="0"
+                        type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>In diesem Element kann eine vom Fachverfahren erzeugte Kennziffer zur Verarbeitung der Information zu einer beteiligten Person an eine Verteilplattform übermittelt werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="rechtsfaehigePersonengesellschaft">
+      <xs:annotation>
+         <xs:documentation>Die rechtsfähige Personengesellschaft im Kontext von XGewerbeordnung umfasst sowohl die rechtsfähige Gesellschaft des Bürgerlichen Rechts (GbR), als auch Personenhandelsgesellschaften wie die Offene Handelsgesellschaft (oHG), die Kommanditgesellschaft (KG) und die Kapitalgesellschaft amp Co. KG. Entsprechend sind rechtsfähige Personengesellschaften nach ausländischem und supranationalem Recht zu berücksichtigen.Die konkrete Rechtsform der rechtsfähigen Personengesellschaft kann mittels einer Codeliste angegeben werden. Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Einschränkung: Keine Partnerschaftsgesellschaften. Zustellanschrift mit spezifischerem Datentyp. Fachspezifische Angaben ergänzt.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="rpg:rechtsfaehigePersonengesellschaft.id">
+               <xs:annotation>
+                  <xs:documentation>Innerhalb des jeweiligen Kontextes eindeutige ID dieser Instanz des Datentyps Rechtsfähige Personengesellschaft.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="rf:rechtsform">
+               <xs:annotation>
+                  <xs:documentation>Angabe der Rechtsform. Es dürfen ausschließlich die in beschriebenen Rechtsformen-Codes verwendet werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="ename:eingetragenerName" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Die im Handels-, Genossenschafts oder Gesellschaftsregister eingetragene Firma eines wirtschaftlich Tätigen bzw. einer wirtschaftlichen Tätigkeit (z. B. eingetragenes Einzelunternehmen, eingetragene Zweigniederlassung) bzw. der im Vereinsregister, Partnerschaftsregister oder Stiftungsverzeichnis eingetragene Name. Der eingetragene Name kann auch in einem Register festgehalten sein, welches in einem anderen Staat geführt wird.Der eingetragene Name ist abzugrenzen von der Geschäftsbezeichnung.Das Kerndatenobjekt bildet auch die Namen juristischer Personen, rechtsfähiger Personengesellschaften oder sonstiger Personenvereinigungen ab, die nicht in einem Register, aber kraft Gesetz geführt werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:eintragung" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Dieses Kerndatenobjekt fasst die Daten, mit welchen die Eintragung eines wirtschaftlich Tätigen bzw. eines Gewerbebetriebs in ein Register (Handels-, Gesellschafts-, Genossenschafts- oder Vereinsregister) oder in ein Verzeichnis (Stiftungsverzeichnis) identifiziert werden kann.Die Eintragung kann auch in ein Register oder Verzeichnis erfolgen, welches in einem anderen Staat geführt wird.Zwischen Rechtsform und Eintragung besteht ein Zusammenhang. Welche Eintragungsarten (Handelsregister A, Handelsregister B, Gesellschaftsregister, Genossenschaftsregister, Vereinsregister, Register im Ausland, Kraft Gesetz) für welche Rechtsformen zulässig sein können, wird als Information in der Codeliste der Rechtsformen mitgeführt. Das Objekt ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Semantisch konkretisiert auf Gewerbebetriebe als Art der wirtschaftlichen Tätigkeit Keine Eintragung im Partnerschaftsregister zulässig Das Element staat wurde nicht aus dem Basismodul übernommen, da dort Code und nicht Freitext vorgesehen ist. Das Element registergericht.bezeichnung wurde nicht aus dem Basismodul übernommen, stattdessen ist das Element registergericht.code zu nutzen.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:zustellanschrift" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Dies ist eine Rolle, welche das Kerndatenobjekt Anschrift einnehmen kann. Mit der Rolle wird eine Anschrift für die Zustellung von Schriftstücken angegeben. Eine Zustellanschrift ist insbesondere die im Handels- oder Genossenschaftsregister eingetragene inländische Geschäftsanschrift (vgl. §§ 29, 106 HGB). Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Spezifischere Darstellung für die Strassenanschrift. Abweichende, strukturierte Darstellung für die Auslandsanschriften.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:kommunikation" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt eingeschränkt: De-Mail ist unzulässig. Alle Angaben mehrfach möglich. Die Klammerangabe bei Vorwahlen in der Telefonnummer wird nicht unterstützt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="xga:gesellschafter" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Im Kontext der Gewerbeanzeige werden ausschließlich persönlich haftende und geschäftsführende Gesellschafter betrachtet (ohne Differenzierung auf Datenebene).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="xga:erlaubnis" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>In diesem Typ werden die Angaben zu einem laufenden oder abgeschlossenen gewerberechtlichen Zulassungsverfahren zusammengefasst (z.B. für die Ausübung eines Gewerbes oder im Rahmen einer Erlaubnis nach § 34c, § 34d GewO).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="anzahlGeschaeftsfuehrendeGesellschafter"
+                        minOccurs="0"
+                        type="xs:nonNegativeInteger">
+               <xs:annotation>
+                  <xs:documentation>Anzahl der geschäftsführenden Gesellschafter.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="gbRGesellschafter" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Die in Formularfeld 1 zu nennenden weiteren Gesellschafter (mit Vor- und Nachname bzw. Firma) der GbR. Hinweis: Die Information kann/sollte generiert werden aus den Meldungen der weiteren Gesellschafter über die gemeinsame GewerbebetriebID bzw. Gemeindemeldungsnummer. Sofern in einem Satz mehrere Gewerbemeldungen für eine Personengesellschaft zusammengefasst übermittelt werden, so sollen an dieser Stelle alle Gesellschafter genannt werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="schwerpunkt">
+      <xs:annotation>
+         <xs:documentation>In diesem Datentyp ist der Schwerpunkt der tatsächlich an der gemeldeten Betriebsstätte ausgeübten Tätigkeiten anzugeben. Es gibt genau einen Schwerpunkt. Wenn an dieser Betriebstätte nur eine Tätigkeit ausgeübt wird, stellt diese den Schwerpunkt dar.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="taetigkeitSchwerpunkt" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Hier wird der vom Gewerbetreibenden angegebene Tätigkeitsschwerpunkt übermittelt. Es handelt sich hierbei nicht um den in Text des im Element taetigkeitSchluessel angegebenen Wirtschaftszweigschlüssels, sondern um die ursprüngliche Angabe des Gewerbetreibenden. Falls durch den Gewerbetreibenden kein Schwerpunkt angeben wurde bzw. durch den Bearbeiter zu ermitteln ist, soll die erste in der Meldung angegebene Tätigkeit als Schwerpunkt verwendet werden. Wird genau eine Tätigkeit angegeben, ist diese immer hier (und nur hier) anzugeben, um eine redundante Übermittlung auszuschließen.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="taetigkeitSchluessel"
+                        minOccurs="0"
+                        type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Der zum Tätigkeitsschwerpunkt gehörige Wirtschaftszweigschlüssel</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="stichwort" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Übermittelt werden soll, wenn im Fachverfahren vorhanden, die Sachbearbeiter-Auswahl des Stichwortes aus dem entsprechenden Schlüsselverzeichnis, das zur Zuordnung des Wirtschaftszweischlüssels des Tätigkeitsschwerpunktes geführt hat. Ein Stichwort sollte nur übermittelt werden, wenn auch ein Tätigkeitsschlüssel (Element xga:taetigkeitSchluessel) angegeben ist.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="beginnTaetigkeit" minOccurs="0" type="xs:date">
+               <xs:annotation>
+                  <xs:documentation>Beginn der dem Schwerpunkt zugeordneten Tätigkeit</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="endeTaetigkeit" minOccurs="0" type="xs:date">
+               <xs:annotation>
+                  <xs:documentation>Ende der dem Schwerpunkt zugeordneten Tätigkeit</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="neuAusgeuebt" minOccurs="0" type="xs:boolean">
+               <xs:annotation>
+                  <xs:documentation>Im Falle einer Ummeldung ist anzugeben, ob der Tätigkeitsschwerpunkt neu ausgeübt wird.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="sonstigePersonenvereinigung">
+      <xs:annotation>
+         <xs:documentation>Hierunter werden alle Personenvereinigungen gefasst, die weder unter juristische Personen noch unter rechtsfähige Personengesellschaften fallen. Die sonstigen Personenvereinigungen (z. B. die Erbengemeinschaft) werden in der Regel nicht wirtschaftlich tätig.Die konkrete Rechtsform der sonstigen Personenvereinigung kann mittels einer Codeliste angegeben werden. Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Zustellanschrift mit spezifischerem Datentyp. Fachspezifische Angaben ergänzt.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="spv:sonstigePersonenvereinigung.id">
+               <xs:annotation>
+                  <xs:documentation>Innerhalb des jeweiligen Kontextes eindeutige ID dieser Instanz des Datentyps Sonstige Personenvereinigung.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="rf:rechtsform">
+               <xs:annotation>
+                  <xs:documentation>Angabe der Rechtsform. Es dürfen ausschließlich die in beschriebenen Rechtsformen-Codes verwendet werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="ename:eingetragenerName" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Die im Handels-, Genossenschafts oder Gesellschaftsregister eingetragene Firma eines wirtschaftlich Tätigen bzw. einer wirtschaftlichen Tätigkeit (z. B. eingetragenes Einzelunternehmen, eingetragene Zweigniederlassung) bzw. der im Vereinsregister, Partnerschaftsregister oder Stiftungsverzeichnis eingetragene Name. Der eingetragene Name kann auch in einem Register festgehalten sein, welches in einem anderen Staat geführt wird.Der eingetragene Name ist abzugrenzen von der Geschäftsbezeichnung.Das Kerndatenobjekt bildet auch die Namen juristischer Personen, rechtsfähiger Personengesellschaften oder sonstiger Personenvereinigungen ab, die nicht in einem Register, aber kraft Gesetz geführt werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:eintragung" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Dieses Kerndatenobjekt fasst die Daten, mit welchen die Eintragung eines wirtschaftlich Tätigen bzw. eines Gewerbebetriebs in ein Register (Handels-, Gesellschafts-, Genossenschafts- oder Vereinsregister) oder in ein Verzeichnis (Stiftungsverzeichnis) identifiziert werden kann.Die Eintragung kann auch in ein Register oder Verzeichnis erfolgen, welches in einem anderen Staat geführt wird.Zwischen Rechtsform und Eintragung besteht ein Zusammenhang. Welche Eintragungsarten (Handelsregister A, Handelsregister B, Gesellschaftsregister, Genossenschaftsregister, Vereinsregister, Register im Ausland, Kraft Gesetz) für welche Rechtsformen zulässig sein können, wird als Information in der Codeliste der Rechtsformen mitgeführt. Das Objekt ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Semantisch konkretisiert auf Gewerbebetriebe als Art der wirtschaftlichen Tätigkeit Keine Eintragung im Partnerschaftsregister zulässig Das Element staat wurde nicht aus dem Basismodul übernommen, da dort Code und nicht Freitext vorgesehen ist. Das Element registergericht.bezeichnung wurde nicht aus dem Basismodul übernommen, stattdessen ist das Element registergericht.code zu nutzen.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:zustellanschrift" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Dies ist eine Rolle, welche das Kerndatenobjekt Anschrift einnehmen kann. Mit der Rolle wird eine Anschrift für die Zustellung von Schriftstücken angegeben. Eine Zustellanschrift ist insbesondere die im Handels- oder Genossenschaftsregister eingetragene inländische Geschäftsanschrift (vgl. §§ 29, 106 HGB). Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt konkretisiert: Spezifischere Darstellung für die Strassenanschrift. Abweichende, strukturierte Darstellung für die Auslandsanschriften.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="bk:kommunikation" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Dieses Element ist gegenüber der Definition aus dem Kerndatenmodell wie folgt eingeschränkt: De-Mail ist unzulässig. Alle Angaben mehrfach möglich. Die Klammerangabe bei Vorwahlen in der Telefonnummer wird nicht unterstützt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="xga:gesetzlicherVertreter" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Dieses Element wird durch das Kerndatenmodell des Standards XUnternehmen definiert und an dieser Stelle ohne weitere Konkretisierung genutzt: Mit dieser Rolle wird der gesetzliche Vertreter einer sonstigen Personenvereinigung gefasst. Es handelt sich hierbei um Vertreter, deren Vertretungsmacht sich allein aus gesetzlichen Bestimmungen ergibt und nicht durch ein Rechtsgeschäft erteilt wurde. Bei gesetzlichen Vertretern, die keine natürlichen Personen sind, werden auch Angaben zu deren gesetzlichen Vertretern (natürliche Personen) benötigt. Explizit nicht unter diese Rolle fallen die rechtsgeschäftlichen Vertreter, die Bevollmächtigte sind (Prokuristen, Handlungsbevollmächtigte). Die rechtsgeschäftlichen Vertreter eines wirtschaftlich Tätigen werden aktuell im Kerndatenmodell nicht berücksichtigt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="xga:erlaubnis" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>In diesem Typ werden die Angaben zu einem laufenden oder abgeschlossenen gewerberechtlichen Zulassungsverfahren zusammengefasst (z.B. für die Ausübung eines Gewerbes oder im Rahmen einer Erlaubnis nach § 34c, § 34d GewO).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="anzahlBeteiligte" minOccurs="0" type="xs:nonNegativeInteger">
+               <xs:annotation>
+                  <xs:documentation>Anzahl der an der sonstigen Personenvereinigung Beteiligten im Sinne des Formularfelds 12.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="spezifischeInformation">
+      <xs:annotation>
+         <xs:documentation>Sollen zu der Gewerbeanzeige zusätzliche Informationen angegeben werden, dann können diese über diesen Datentyp angegeben werden. Dies ist bei konkreten Bedarfen bilateral zu vereinbaren.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="begriff" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Die Bezeichnung der Information</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="inhalt" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Die Information selbst</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="taetigkeit">
+      <xs:annotation>
+         <xs:documentation>Hier kann eine einzelne ausgeübte Tätigkeit angegeben werden und/oder ein Wirtschaftszweigschlüssel. Wird ausschließlich ein Wirtschaftszweigschlüssel angegeben, bezieht dieser sich auf eine der im Element taetigkeitenZusammengefasst angegebenen Tätigkeiten. Es sind damit folgende Möglichkeiten der Nutzung gegeben: es wird nur die textuelle Beschreibung der Tätigkeit angegeben (TaetigkeitEinzeln); es wird ein Paar aus textueller Beschreibung und entsprechendem Schlüssel (TaetigkeitSchluessel) angegeben; es wird nur ein Schlüssel ohne textuelle Entsprechung angegeben. Im letzten Fall wird keine Aussage zur Beziehung des Schlüssels zu ggf. mit anderen Instanzen dieses Datentyps mitgeteilten Tätigkeitstexten getroffen.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="taetigkeitEinzeln" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Hier wird eine vom Gewerbetreibenden angegebene Tätigkeit einzeln übermittelt. Es handelt sich hierbei nicht um den im Text des im Element taetigkeitSchluessel angegebenen Wirtschaftszweigschlüssels, sondern um die ursprüngliche Angabe des Gewerbetreibenden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="taetigkeitSchluessel"
+                        minOccurs="0"
+                        type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Hier ist der Wirtschaftszweigschlüssel anzugeben. Sofern taetigkeitEinzeln übermittelt wird, bezieht sich das vorliegende Element auf diese Angabe. Ist ausschließlich ein Schlüssel angegeben, bezieht sich dieser auf das Element taetigkeitenZusammengefasst.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="stichwort" minOccurs="0" type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Übermittelt werden soll, wenn im Fachverfahren vorhanden, die Sachbearbeiter-Auswahl des Stichwortes aus dem entsprechenden Schlüsselverzeichnis, das zur Zuordnung des Wirtschaftszweig-Schlüssels der Tätigkeit geführt hat. Ein Stichwort sollte nur übermittelt werden, wenn auch ein Tätigkeitsschlüssel (Element xga:taetigkeitSchluessel) angegeben ist.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="beginnTaetigkeit" minOccurs="0" type="xs:date">
+               <xs:annotation>
+                  <xs:documentation>Beginn der Tätigkeit</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element name="endeTaetigkeit" minOccurs="0" type="xs:date">
+               <xs:annotation>
+                  <xs:documentation>Ende der Tätigkeit</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="taetigkeitenGesamt">
+      <xs:annotation>
+         <xs:documentation>Dieses Element wird durch das Attribut Tätigkeit des Datenobjekts Wirtschaftliche Tätigkeit im Kerndatenmodell des Standards XUnternehmen definiert und an dieser Stelle wie folgt konkretisiert: Mittels dieses Datentyps werden die an der Betriebsstätte tatsächlich ausgeübten Tätigkeiten angegeben. Jede Angabe zu einer Tätigkeit darf nur in genau einem der drei Kindelemente (schwerpunkt, weitereTaetigkeiten, weitereNeuAusgeuebteTaetigkeiten) mitgeteilt werden.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="xga:schwerpunkt">
+               <xs:annotation>
+                  <xs:documentation>Es ist der Schwerpunkt der tatsächlich an der gemeldeten Betriebsstätte ausgeübten Tätigkeiten anzugeben. Es gibt genau einen Schwerpunkt. Wenn an dieser Betriebstätte nur eine Tätigkeit ausgeübt wird, stellt diese den Schwerpunkt dar. Die Angabe soll sich nicht wiederholen (keine Redundanz), d.h. Angaben, die im Datentyp Schwerpunkt (also im vorliegenden Element) getätigt werden, sollen weder in den Elementen weitereTaetigkeiten noch weitereNeuAusgeuebteTaetigkeiten vorkommen.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="xga:weitereTaetigkeiten" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Im Falle einer Anmeldung sind Angaben zu den angemeldeten Tätigkeiten, im Falle einer Ummeldung Angaben zu den weiterhin an der Betriebsstätte ausgeübten Tätigkeiten und im Fall einer Abmeldung Angaben zu den bisher angemeldeten Tätigkeiten mitzuteilen, soweit diese nicht im Element schwerpunkt enthalten sind. Im Kindelement taetigkeitenZusammengefasst sind die Texte der betroffenen Tätigkeiten vollständig anzugeben.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="xga:weitereNeuAusgeuebteTaetigkeiten" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Im Falle einer Ummeldung sind Angaben zu den neu an der Betriebsstätte ausgeübten Tätigkeiten mitzuteilen, soweit diese nicht bereits im Element schwerpunkt enthalten sind. Im Kindelement taetigkeitenZusammengefasst sind die Texte der betroffenen Tätigkeiten vollständig anzugeben. Falls im Datenbestand in den Fachverfahren Angaben zu weiteren neu ausgeübten Tätigkeiten separat gespeichert sind, sollen diese Bestandsdaten für die Übermittlung in xga:gewerbebetriebVorAenderung in das Element xga:weitereTaetigkeiten aufgenommen werden werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="ummeldung">
+      <xs:annotation>
+         <xs:documentation>Dieses Element umfasst alle Angaben, die in einer Gewerbeummeldung übermittelt werden können.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xga:Gewerbemeldung">
+               <xs:sequence>
+                  <xs:element ref="xga:frueheresGewerbe" minOccurs="0">
+                     <xs:annotation>
+                        <xs:documentation>Angaben zum früheren Gewerbe.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="grundUmmeldungSchluessel"
+                              minOccurs="0"
+                              maxOccurs="unbounded"
+                              type="xga:Code.FachlicherAenderungsanlass"/>
+                  <xs:element name="anlaesseUmmeldung" minOccurs="0" type="bdt:String.DIN91379.C">
+                     <xs:annotation>
+                        <xs:documentation>Es können sonstige Ummeldegründe, welche zu der Gewerbeummeldung geführt haben und im Schlüsselverzeichnis „Fachlicher Änderungsanlass“ nicht aufgeführt sind, angegeben werden (z.B. die Änderung der Telefonnummer bei der Betriebsstätte).</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element ref="xga:gewerbebetriebVorAenderung" minOccurs="0">
+                     <xs:annotation>
+                        <xs:documentation>In diesem Element sind bei einer Ummeldung alle bekannten bzw. vorhandenen Angaben zum Gewerbe vor der Ummeldung anzugeben. Dies sind die Informationen, welche im gemeindlichen Gewerbeverzeichnis vor der Durchführung der Ummeldung vorlagen. Hinweis: Der Standard fordert nicht, dass die Angaben im gemeindlichen Gewerbeverzeichnis zuvor auf den tatsächlichen Stand vor der Ummeldung aktualisiert werden. Sollte eine Gewerbebehörde dies tun, wäre hierzu zuvor eine separate Datenaktualisierung zu übermitteln.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="referenzierteSubjekteVorAenderung"
+                              minOccurs="0"
+                              type="xga:ReferenzierteSubjekte">
+                     <xs:annotation>
+                        <xs:documentation>Innerhalb des Elements gewerbebetriebVorAenderung über ID referenzierte Subjekte.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="weitereNeuAusgeuebteTaetigkeiten">
+      <xs:annotation>
+         <xs:documentation>Mittels dieses Datentyps sind im Falle einer Ummeldung Angaben zu den neu an der Betriebsstätte ausgeübten Tätigkeiten mitzuteilen, soweit diese nicht als Schwerpunkt angegeben sind. Falls im Datenbestand in den Fachverfahren Angaben zu weiteren neu ausgeübten Tätigkeiten separat gespeichert sind, sollen diese Bestandsdaten für die Übermittlung in xga:gewerbebetriebVorAenderung in das Element xga:weitereTaetigkeiten aufgenommen werden werden.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="taetigkeitenZusammengefasst"
+                        minOccurs="0"
+                        type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Zusammenfassung aller vom Gewerbetreibenden angegebenen neu ausgeübten Tätigkeiten, jedoch ohne den (gegebenenfalls neu ausgeübten) Tätigkeitsschwerpunkt, welcher in Schwerpunkt angegeben werden muss. Dieses Element ist unabhängig davon zu bilden, ob auch das Element taetigkeitEinzeln übermittelt wird, oder nicht. Sofern dieses Element automatisch aus einzeln erfassten Tätigkeiten gebildet wird, ist als Trennzeichen "|" (Unicode 007C) zu verwenden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="xga:taetigkeit" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Hier werden alle vom Gewerbetreibenden angegebenen neu ausgeübten Tätigkeiten in Form separater Angaben einzelner Tätigkeiten übermittelt. Der Tätigkeitsschwerpunkt wird hierbei jedoch nicht erneut angegeben. Sofern historische (bereits zu einem früheren Zeitpunkt nicht mehr ausgeübte) Tätigkeiten im Register geführt werden, dürfen diese nicht an externe Empfangsstellen übermittelt werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="weitereTaetigkeiten">
+      <xs:annotation>
+         <xs:documentation>Mittels dieses Datentyps sind im Fall einer Anmeldung Angaben zu den angemeldeten, im Fall einer Ummeldung Angaben zu den weiterhin an der Betriebsstätte ausgeübten und im Fall einer Abmeldung die bisher angemeldeten Tätigkeiten mitzuteilen, soweit diese nicht in einer Instanz des Datentyps Schwerpunkt enthalten sind.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="taetigkeitenZusammengefasst"
+                        minOccurs="0"
+                        type="bdt:String.DIN91379.C">
+               <xs:annotation>
+                  <xs:documentation>Zusammenfassung aller vom Gewerbetreibenden angegebenen weiteren Tätigkeiten, jedoch ohne den Tätigkeitsschwerpunkt, welcher in Schwerpunkt angegeben werden muss. Dieses Element ist unabhängig davon zu bilden, ob auch das Element taetigkeitEinzeln übermittelt wird, oder nicht. Sofern dieses Element automatisch aus einzeln erfassten Tätigkeiten gebildet wird, ist als Trennzeichen "|" (Unicode 007C) zu verwenden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="xga:taetigkeit" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Hier werden alle vom Gewerbetreibenden angegebenen weiteren ausgeübten Tätigkeiten in Form separater Angaben einzelner Tätigkeiten übermittelt. Der Tätigkeitsschwerpunkt wird hierbei jedoch nicht erneut angegeben. Sofern historische (bereits zu einem früheren Zeitpunkt nicht mehr ausgeübte) Tätigkeiten im Register geführt werden, dürfen diese nicht an externe Empfangsstellen übermittelt werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="sta.gewerbemeldung.0100">
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="satz" maxOccurs="unbounded" type="xga:sta.satz"/>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="ihk.gewerbemeldung.0200">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>§ 3 Abs. 1 Nr. 1 GewAnzV</rechtsgrundlage>
+            <title>Mitteilung von Gewerbeanzeigen an die Industrie- und Handelskammern</title>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="satz" maxOccurs="unbounded" type="xga:ihk.satz"/>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="hwk.gewerbemeldung.0210">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>Mitteilung einer Gewerbeanzeige an die Handwerkskammern</title>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="satz" maxOccurs="unbounded" type="xga:hwk.satz"/>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="ea.gewerbemeldung.0220">
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="satz" maxOccurs="unbounded" type="xga:ea.satz"/>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="dgu.gewerbemeldung.0230">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>Mitteilung von Gewerbeanzeigen an die Deutsche Gesetzliche Unfallversicherung</title>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="satz" maxOccurs="unbounded" type="xga:dgu.satz"/>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="rg.gewerbemeldung.0240">
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="satz" maxOccurs="unbounded" type="xga:rg.satz"/>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="fa.gewerbemeldung.0250">
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="satz" maxOccurs="unbounded" type="xga:fa.satz"/>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="zv.gewerbemeldung.0260">
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="satz" maxOccurs="unbounded" type="xga:zv.satz"/>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="is.gewerbemeldung.0270">
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="satz" maxOccurs="unbounded" type="xga:is.satz"/>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="as.gewerbemeldung.0280">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>Mitteilung von Gewerbeanzeigen an die Behörden des Arbeitsschutzes</title>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="satz" maxOccurs="unbounded" type="xga:as.satz"/>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="lue.gewerbemeldung.0290">
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="satz" maxOccurs="unbounded" type="xga:lue.satz"/>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="alg.gewerbemeldung.0300">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>Vollständige Mitteilung einer Gewerbeanzeige</title>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="satz" maxOccurs="unbounded" type="xga:alg.satz"/>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="erl.gewerbemeldung.0310">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>Mitteilung von Gewerbeanzeigen an die Erlaubnisbehörden</title>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="satz" maxOccurs="unbounded" type="xga:erl.satz"/>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="ext.gewerbemeldung.0400">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>Mitteilung einer Gewerbeanzeige durch eine externe Stelle an die Gewerbebehörde</title>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="satz" type="xga:ext.satz"/>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="abh.gewerbemeldung.0500">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>Mitteilung von Gewerbeanzeigen an die Ausländerbehörde</title>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="satz" maxOccurs="unbounded" type="xga:abh.satz"/>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="abruf.anfrage.0600">
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="satz" maxOccurs="unbounded" type="xga:abruf.anfrage.satz"/>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="abruf.antwort.0601">
+      <xs:annotation>
+         <xs:documentation>Mit dieser Nachricht können die Daten zu einem oder mehreren Gewerbebetrieben übermittelt werden.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="satz" maxOccurs="unbounded" type="xga:abruf.antwort.satz"/>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="rueckmeldung.0700">
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="satz" maxOccurs="unbounded" type="xga:rueckmeldung.satz"/>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+</xs:schema>

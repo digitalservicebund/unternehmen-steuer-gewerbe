@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:eintr="urn:xoev-de:xunternehmen:standard:basismodul:eintragung_1.1"
+           xmlns:adr="urn:xoev-de:xunternehmen:standard:basismodul:adressen_1.1"
+           xmlns:bdt="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"
+           xmlns:xoev-code="http://xoev.de/schemata/code/1_0"
+           targetNamespace="urn:xoev-de:xunternehmen:standard:basismodul:eintragung_1.1"
+           version="1.1"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XUnternehmen.Basismodul</nameLang>
+            <nameKurz>XUnternehmen.Basismodul</nameKurz>
+            <nameTechnisch>basismodul</nameTechnisch>
+            <kennung>urn:xoev-de:xunternehmen:standard:basismodul</kennung>
+            <beschreibung>Basismodul des Standards XUnternehmen.</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>1.1</version>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVHandbuch>2.5</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP 2</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:import schemaLocation="xoev-code.xsd"
+              namespace="http://xoev.de/schemata/code/1_0"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-adressen_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:adressen_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-basisdatentypen_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"/>
+   <xs:complexType name="Code.ArtDerEintragung">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Art der Eintragung</nameLang>
+               <nameKurz>Art der Eintragung</nameKurz>
+               <nameTechnisch>artdereintragung</nameTechnisch>
+               <kennung>urn:xoev-de:xunternehmen:codeliste:artdereintragung</kennung>
+               <beschreibung>Angabe der Art des Registers, in welchem ein wirtschaftlich Tätiger bzw. eine wirtschaftliche Tätigkeit geführt wird.</beschreibung>
+               <herausgebernameLang>XUnternehmen</herausgebernameLang>
+               <herausgebernameKurz>XUnternehmen</herausgebernameKurz>
+            </codeliste>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token" form="unqualified"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xunternehmen:codeliste:artdereintragung"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.Registergericht">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Registergerichte</nameLang>
+               <nameKurz>Registergerichte</nameKurz>
+               <nameTechnisch>registergerichte</nameTechnisch>
+               <kennung>urn:xoev-de:xunternehmen:codeliste:registergerichte</kennung>
+               <beschreibung>Enthält alle Registergerichte. Als Schlüssel für die Datenübermittlung ist die Spalte XJustiz_Id zu verwenden.</beschreibung>
+               <herausgebernameLang>Betreiber XUnternehmen (KoSIT und d-NRW AÖR) im Auftrag des Bundesministeriums für Wirtschaft und Energie</herausgebernameLang>
+               <herausgebernameKurz>XUnternehmen</herausgebernameKurz>
+            </codeliste>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token" form="unqualified"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xunternehmen:codeliste:registergerichte"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="artEintragung" type="eintr:Code.ArtDerEintragung">
+      <xs:annotation>
+         <xs:documentation>Angabe der Art des Registers, in welchem der wirtschaftlich Tätige bzw. die wirtschaftliche Tätigkeit (z. B. Zweigniederlassung) geführt wird.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="eintragung">
+      <xs:annotation>
+         <xs:documentation>Dieses Kerndatenobjekt fasst die Daten, mit welchen die Eintragung eines wirtschaftlich Tätigen bzw. einer wirtschaftlichen Tätigkeit in ein Register (Handels-, Genossenschafts-, Partnerschafts- oder Vereinsregister) oder in ein Verzeichnis (Stiftungsverzeichnis) identifiziert werden kann. Die Eintragung kann auch in ein Register oder Verzeichnis erfolgen, welches in einem anderen Staat geführt wird. Zwischen Rechtsform und Eintragung besteht ein Zusammenhang. Welche Eintragungsarten (Handelsregister A, Handelsregister B, Genossenschaftsregister, Gesellschaftsregister, Vereinsregister, Partnerschaftsregister, Register im Ausland, Kraft Gesetz) für welche Rechtsformen zulässig sein können, wird als Information in der Codeliste der Rechtsformen mitgeführt.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="eintr:artEintragung" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Angabe der Art des Registers, in welchem der wirtschaftlich Tätige bzw. die wirtschaftliche Tätigkeit (z. B. Zweigniederlassung) geführt wird.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="eintr:registergericht.code" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Schlüssel des Registergerichts, in dessen Handels-, Genossenschafts-, Partnerschafts- oder Vereinsregister, in welchem der wirtschaftlich Tätige bzw. die wirtschaftliche Tätigkeit (z. B. Zweigniederlassung) geführt wird.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="eintr:registergericht.bezeichnung" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Bezeichnung des Registergerichts, in dessen Register der wirtschaftlich Tätige bzw. die wirtschaftliche Tätigkeit (z. B. Zweigniederlassung) geführt wird. Umsetzungshinweis: Wann immer möglich, sollte das Attribut Registergericht.Code verwendet werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="eintr:stiftungsverzeichnis" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Bei Einträgen im Stiftungsverzeichnis: Angabe des Bundeslandes bzw. der Behörde, in dessen oder deren Stiftungsverzeichnis der Eintrag geführt wird.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="adr:ort" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Bei Einträgen im Ausland: Angabe des Ortes der registerführenden Stelle.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="adr:staat" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Bei Einträgen im Ausland: Angabe des Staates der registerführenden Stelle.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="eintr:eintragungsnummer" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Nummer der Eintragung im jeweiligen Register</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="eintragungsnummer" type="bdt:String.DIN91379.C">
+      <xs:annotation>
+         <xs:documentation>Nummer der Eintragung im jeweiligen Register</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="registergericht.bezeichnung" type="bdt:String.DIN91379.C">
+      <xs:annotation>
+         <xs:documentation>Bezeichnung des Registergerichts, in dessen Register der wirtschaftlich Tätige bzw. die wirtschaftliche Tätigkeit (z. B. Zweigniederlassung) geführt wird. Umsetzungshinweis: Wann immer möglich, sollte das Attribut Registergericht.Code verwendet werden.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="registergericht.code" type="eintr:Code.Registergericht">
+      <xs:annotation>
+         <xs:documentation>Schlüssel des Registergerichts, in dessen Handels-, Genossenschafts-, Partnerschafts- oder Vereinsregister, in welchem der wirtschaftlich Tätige bzw. die wirtschaftliche Tätigkeit (z. B. Zweigniederlassung) geführt wird.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="stiftungsverzeichnis" type="bdt:String.DIN91379.C">
+      <xs:annotation>
+         <xs:documentation>Bei Einträgen im Stiftungsverzeichnis: Angabe des Bundeslandes bzw. der Behörde, in dessen oder deren Stiftungsverzeichnis der Eintrag geführt wird.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+</xs:schema>

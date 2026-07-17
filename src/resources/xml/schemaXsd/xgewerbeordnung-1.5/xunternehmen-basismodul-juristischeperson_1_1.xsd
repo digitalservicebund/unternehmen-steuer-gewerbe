@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:jp="urn:xoev-de:xunternehmen:standard:basismodul:juristischeperson_1.1"
+           xmlns:adr="urn:xoev-de:xunternehmen:standard:basismodul:adressen_1.1"
+           xmlns:bdt="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"
+           xmlns:eintr="urn:xoev-de:xunternehmen:standard:basismodul:eintragung_1.1"
+           xmlns:ename="urn:xoev-de:xunternehmen:standard:basismodul:eingetragenername_1.1"
+           xmlns:gv="urn:xoev-de:xunternehmen:standard:basismodul:gesetzlichervertreter_1.1"
+           xmlns:kom="urn:xoev-de:xunternehmen:standard:basismodul:kommunikation_1.1"
+           xmlns:rf="urn:xoev-de:xunternehmen:standard:basismodul:rechtsform_1.1"
+           xmlns:sitze="urn:xoev-de:xunternehmen:standard:basismodul:sitze_1.1"
+           xmlns:wt="urn:xoev-de:xunternehmen:standard:basismodul:wirtschaftlichetaetigkeit_1.1"
+           xmlns:xoev-code="http://xoev.de/schemata/code/1_0"
+           targetNamespace="urn:xoev-de:xunternehmen:standard:basismodul:juristischeperson_1.1"
+           version="1.1"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XUnternehmen.Basismodul</nameLang>
+            <nameKurz>XUnternehmen.Basismodul</nameKurz>
+            <nameTechnisch>basismodul</nameTechnisch>
+            <kennung>urn:xoev-de:xunternehmen:standard:basismodul</kennung>
+            <beschreibung>Basismodul des Standards XUnternehmen.</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>1.1</version>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVHandbuch>2.5</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP 2</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:import schemaLocation="xoev-code.xsd"
+              namespace="http://xoev.de/schemata/code/1_0"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-adressen_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:adressen_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-basisdatentypen_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-eingetragenername_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:eingetragenername_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-eintragung_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:eintragung_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-gesetzlichervertreter_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:gesetzlichervertreter_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-kommunikation_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:kommunikation_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-rechtsform_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:rechtsform_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-sitze_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:sitze_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-wirtschaftlichetaetigkeit_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:wirtschaftlichetaetigkeit_1.1"/>
+   <xs:element name="juristischePerson">
+      <xs:annotation>
+         <xs:documentation>Dieses Kerndatenobjekt umfasst die allgemeinen Angaben zu einer juristischen Person des privaten oder öffentlichen Rechts.Unter juristischen Personen werden sowohl die Körperschaften des Privatrechts (Gesellschaft mit beschränkter Haftung, Aktiengesellschaft, Kommanditgesellschaft auf Aktien, eingetragener Verein, Genossenschaft) als auch öffentlich-rechtliche Körperschaften (Gebietskörperschaften, Selbstverwaltungskörperschaften, sonstige Körperschaften des öffentlichen Rechts) erfasst.Die konkrete Rechtsform der juristischen Person kann mittels einer Codeliste angegeben werden.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="jp:juristischePerson.id">
+               <xs:annotation>
+                  <xs:documentation>Innerhalb des jeweiligen Kontextes eindeutige ID dieser Instanz des Kerndatenobjekts Juristische Person.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="wt:bundeseinheitlicheWirtschaftsnummer" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Die bundeseinheitliche Wirtschaftsnummer für Unternehmen gemäß § 2 UBRegG.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="rf:rechtsform" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Die Rechtsform einer wirtschaftlichen Tätigkeit, einer juristischen Person, einer rechtsfähigen Personengesellschaft oder einer sonstigen Personenvereinigung im Sinne der Rechtsform-Codierung.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="ename:eingetragenerName" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Die im Handels-, Genossenschafts oder Gesellschaftsregister eingetragene Firma eines wirtschaftlich Tätigen bzw. einer wirtschaftlichen Tätigkeit (z. B. eingetragenes Einzelunternehmen, eingetragene Zweigniederlassung) bzw. der im Vereinsregister, Partnerschaftsregister oder Stiftungsverzeichnis eingetragene Name. Der eingetragene Name kann auch in einem Register festgehalten sein, welches in einem anderen Staat geführt wird.Der eingetragene Name ist abzugrenzen von der Geschäftsbezeichnung.Das Kerndatenobjekt bildet auch die Namen juristischer Personen, rechtsfähiger Personengesellschaften oder sonstiger Personenvereinigungen ab, die nicht in einem Register, aber kraft Gesetz geführt werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="eintr:eintragung" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Dieses Kerndatenobjekt fasst die Daten, mit welchen die Eintragung eines wirtschaftlich Tätigen bzw. einer wirtschaftlichen Tätigkeit in ein Register (Handels-, Genossenschafts-, Partnerschafts- oder Vereinsregister) oder in ein Verzeichnis (Stiftungsverzeichnis) identifiziert werden kann. Die Eintragung kann auch in ein Register oder Verzeichnis erfolgen, welches in einem anderen Staat geführt wird. Zwischen Rechtsform und Eintragung besteht ein Zusammenhang. Welche Eintragungsarten (Handelsregister A, Handelsregister B, Genossenschaftsregister, Gesellschaftsregister, Vereinsregister, Partnerschaftsregister, Register im Ausland, Kraft Gesetz) für welche Rechtsformen zulässig sein können, wird als Information in der Codeliste der Rechtsformen mitgeführt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="adr:anschrift" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Angaben für die Adressierung. Eine Anschrift ist entweder eine Inlands- oder ein Auslandsanschrift.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="sitze:sitz" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Der Sitz einer Körperschaft, Personenvereinigung oder Vermögensmasse ist der Ort, der durch Gesetz, Gesellschaftsvertrag, Satzung, Stiftungsgeschäft oder dergleichen bestimmt ist.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="sitze:effektiverVerwaltungssitz" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Der effektiver Verwaltungssitz ist - im Unterschied zum Sitz - der Ort, an dem sich die Hauptverwaltung befindet und die Geschäfte tatsächlich geführt werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="kom:kommunikation" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Angaben zu Telefon, Telefax, Email-Adresse und/oder Webseite.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="gv:gesetzlicherVertreter" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Mit dieser Rolle wird der gesetzliche Vertreter einer juristischen Person, einer rechtsfähigen Personengesellschaft, einer sonstigen Personenvereinigung oder natürlichen Person gefasst. Es handelt sich hierbei um Vertreter, deren Vertretungsmacht sich allein aus gesetzlichen Bestimmungen ergibt und nicht durch ein Rechtsgeschäft erteilt wurde.Hierunter fallen bei natürlichen Personen die Eltern oder der Vormund für minderjährige Kinder und der Betreuer für volljährige Personen. Hierunter fallen bei einer juristischen Person, einer rechtsfähigen Personengesellschaft oder einer sonstigen Personenvereinigung die Mitglieder des Vertretungsorgans (Organwalter, Organmitglieder, Organträger) wie beispielweise: ein Geschäftsführer einer GmbH gemäß § 35 GmbhG ein Mitglied des Vorstands einer Aktiengesellschaft gemäß § 78 AktG ein Mitglied des Vorstands einer Genossenschaft gemäß § 24 GenG oder ein Mitglied des Vorstands eines eingetragenen Vereins gemäß § 26 BGB ein Liquidator bzw. Abwickler einer Gesellschaft gemäß § 66 GmbHG, § 265 AktG, § 269 AktG, § 146 BGB Bei Personengesellschaften müssen ihre gesetzliche Vertreter aus dem Kreis ihrer Gesellschafter stammen (Prinzip der Selbstorganschaft), wobei aber nicht alle Gesellschafter gesetzliche Vertreter sein müssen. Letzteres ist beispielsweise immer der Fall für den Kommanditisten einer KG, aber auch möglich für eine offene Handelsgesellschaft.Sofern bei einer Personengesellschaft sowohl ihre gesetzlichen Vertreter als auch ihre Gesellschafter angegeben werden, treten einige davon entsprechend in doppelter Rolle auf.Bei Kapitalgesellschaften und Genossenschaften nach deutschem Recht müssen die gesetzlichen Vertreter natürliche Personen sein. Dies gilt aber nicht allgemein für juristische Personen, beispielsweise nicht für den eingetragenen Verein oder bestimmte Kapitalgesellschaften nach ausländischem Recht, und auch nicht für Personengesellschaften, deren gesetzliche Vertreter im Allgemeinen auch juristische Personen (z. B. die Verwaltungs-GmbH in einer GmbH amp Co KG) oder andere rechtsfähige Personengesellschaften sein können.Bei gesetzlichen Vertretern, die keine natürliche Personen sind, werden in Verwaltungsverfahren häufig auch Angaben zu deren gesetzlichen Vertretern (natürliche Personen) benötigt. Explizit nicht unter diese Rolle fallen die rechtsgeschäftlichen Vertreter, die Bevollmächtigte sind (Prokuristen, Handlungsbevollmächtigte). Die rechtsgeschäftlichen Vertreter eines wirtschaftlich Tätigen werden aktuell im Kerndatenmodell nicht berücksichtigt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="juristischePerson.id" type="bdt:IDType">
+      <xs:annotation>
+         <xs:documentation>Innerhalb des jeweiligen Kontextes eindeutige ID dieser Instanz des Kerndatenobjekts Juristische Person.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+</xs:schema>

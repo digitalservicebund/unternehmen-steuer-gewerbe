@@ -36,7 +36,8 @@ let cachedStylesheetInternal: object | undefined;
 
 async function getXsdFiles() {
   if (cachedXsdFiles) return cachedXsdFiles;
-  const schemaDir = path.join(getResourcesDir(), "xml/schemaXsd/xgewerbeordnung-1.6");
+  // const schemaDir = path.join(getResourcesDir(), "xml/schemaXsd/xgewerbeordnung-1.6");
+  const schemaDir = path.join(getResourcesDir(), "xml/schemaXsd/xgewerbeordnung-1.5");
   const mainXsd = await fs.readFile(
     path.join(schemaDir, "xgewerbeordnung-gewerbeanzeige.xsd"),
     "utf8",

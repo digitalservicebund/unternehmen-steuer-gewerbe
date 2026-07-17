@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:np="urn:xoev-de:xunternehmen:standard:basismodul:natuerlicheperson_1.1"
+           xmlns:adr="urn:xoev-de:xunternehmen:standard:basismodul:adressen_1.1"
+           xmlns:bdt="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"
+           xmlns:dat="urn:xoev-de:xunternehmen:standard:basismodul:datumsangaben_1.1"
+           xmlns:gv="urn:xoev-de:xunternehmen:standard:basismodul:gesetzlichervertreter_1.1"
+           xmlns:kom="urn:xoev-de:xunternehmen:standard:basismodul:kommunikation_1.1"
+           xmlns:xoev-code="http://xoev.de/schemata/code/1_0"
+           targetNamespace="urn:xoev-de:xunternehmen:standard:basismodul:natuerlicheperson_1.1"
+           version="1.1"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XUnternehmen.Basismodul</nameLang>
+            <nameKurz>XUnternehmen.Basismodul</nameKurz>
+            <nameTechnisch>basismodul</nameTechnisch>
+            <kennung>urn:xoev-de:xunternehmen:standard:basismodul</kennung>
+            <beschreibung>Basismodul des Standards XUnternehmen.</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>1.1</version>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVHandbuch>2.5</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP 2</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:import schemaLocation="xoev-code.xsd"
+              namespace="http://xoev.de/schemata/code/1_0"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-adressen_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:adressen_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-basisdatentypen_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-datumsangaben_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:datumsangaben_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-gesetzlichervertreter_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:gesetzlichervertreter_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-kommunikation_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:kommunikation_1.1"/>
+   <xs:complexType name="Code.Geschlecht">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Geschlechtsangaben in XInneres</nameLang>
+               <nameKurz>XInneres Geschlecht</nameKurz>
+               <nameTechnisch>geschlecht</nameTechnisch>
+               <kennung>urn:xoev-de:xinneres:codeliste:geschlecht</kennung>
+               <beschreibung>Diese Codeliste umfasst die im Standard XInneres zur Datenübermittlung genutzten Codes für Geschlechtsangaben gemäß §§ 22 und 45 b PStG.</beschreibung>
+               <herausgebernameLang>Koordinierungsstelle für IT-Standards</herausgebernameLang>
+               <herausgebernameKurz>KoSIT</herausgebernameKurz>
+            </codeliste>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token" form="unqualified"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xinneres:codeliste:geschlecht"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.Staatsangehoerigkeit">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Codeliste Staatsangehörigkeit aus der Staats- und Gebietssystematik des Statistischen Bundesamtes</nameLang>
+               <nameKurz>DESTATIS Staatsangehörigkeit</nameKurz>
+               <nameTechnisch>Staatsangehoerigkeit</nameTechnisch>
+               <kennung>urn:de:bund:destatis:bevoelkerungsstatistik:schluessel:staatsangehoerigkeit</kennung>
+               <beschreibung>Staatsangehörigkeit. Tabelle von Staaten und Staatsangehörigkeiten. Enthält alle Einträge der Codeliste Staat (eigenständige, von Deutschland diplomatisch anerkannte derzeitige Staaten) und zusätzlich Einträge für ehemalige Staaten sowie Ersatzwerte. Die Liste ist mit dem Auswärtigen Amt abgestimmt und enthält auch einen Eintrag für die Palästinensischen Gebiete. Enthalten sind alle Staaten im vollen politischen Sinne, z.B. Frankreich, Italien, Vereinigtes Königreich, nicht aber: britische Jungferninseln, Jersey sowie alle früheren Staaten seit 1970, z.B. Sowjetunion. Neben den amtlichen Bezeichnungen (Kurzform und Vollform) und der Staatsangehörigkeit als Adjektiv/Adverb ist auch der jeweilige ist auch der jeweilige Suchbegriff aus dem Länderverzeichnis des Auswärtigen Amtes aufgeführt (der Suchbegriff ist eine griffige Bezeichnung des Staates). Die Angaben umfassen zudem den numerische Destatis-Code für Staatsangehörigkeit und Staat den 2- und 3-stelligen alphabetischen ISO 3166-1 Code sowie ggf. das Datum der Selbständigkeit bzw. Gründungsdatum nach den Angaben des Auswärtigen Amtes und das Auflösungs- bzw. Enddatum als berechnete Angabe aus dem Gründungsdatum des/der Nachfolgestaaten.</beschreibung>
+               <herausgebernameLang>Statistisches Bundesamt F 204, Wiesbaden</herausgebernameLang>
+               <herausgebernameKurz>DESTATIS-F204</herausgebernameKurz>
+            </codeliste>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token" form="unqualified"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:de:bund:destatis:bevoelkerungsstatistik:schluessel:staatsangehoerigkeit"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="doktorgrad" type="bdt:String.DIN91379.C">
+      <xs:annotation>
+         <xs:documentation>Es sind nur diejenigen Doktorgrade anzugeben, die in Pässe eingetragen werden dürfen. Sind mehrere Doktorgrade anzugeben, so sind sie durch ein Leerzeichen zu trennen.Zulässig sind derzeit: „DR.“, „Dr.“, „DR.HC.“, „Dr.hc.“, „Dr.EH.“ und „Dr.eh.“.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="familienname" type="bdt:String.DIN91379.C">
+      <xs:annotation>
+         <xs:documentation>Familienname einer natürlichen Person bestehend aus Nachname, Zuname bzw. Familienname.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="familienname.nichtVorhanden" type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation>Angabe, dass die betreffende Person keinen Familiennamen führt. Dieses Element ist nur anzugeben, wenn es den Wert true hat.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="geburt">
+      <xs:annotation>
+         <xs:documentation>Angaben zur Geburt einer natürlichen Person.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="np:geburtsdatum" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Datum der Vollendung der Geburt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="adr:ort" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Der Ort der Geburt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="adr:staat" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>(siehe Dokumentation von Staat)</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="geburtsdatum" type="dat:Datum.MitTeilbekanntUndUnbekanntType">
+      <xs:annotation>
+         <xs:documentation>Datum der Vollendung der Geburt.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="geburtsname" type="bdt:String.DIN91379.C">
+      <xs:annotation>
+         <xs:documentation>Der Geburtsname entspricht dem Familiennamen einer natürlichen Person vor der Schließung der ersten Ehe bzw. vor dem Eingehen der ersten Lebenspartnerschaft.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="geburtsname.nichtVorhanden" type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation>Angabe, dass vor der Eheschließung oder vor der Begründung der Lebenspartnerschaft nach dem für die Namensführung maßgebenden Recht kein Familienname vorhanden gewesen ist. Dieses Element ist nur anzugeben, wenn es den Wert true hat.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="geschlecht" type="np:Code.Geschlecht">
+      <xs:annotation>
+         <xs:documentation>Als Geschlechtsangabe zulässig sind: "männlich", "weiblich", "divers", "keine Angabe".</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="identifikationsnummer" type="bdt:String.DIN91379.C">
+      <xs:annotation>
+         <xs:appinfo>
+            <implementationHint>Umsetzungshinweis: Die Identifikationsnummer besteht aus genau 11 Ziffern.</implementationHint>
+         </xs:appinfo>
+         <xs:documentation>Identifikationsnummer einer natürlichen Person gemäß § 4 Abs. 2 IDNrG.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="name">
+      <xs:annotation>
+         <xs:documentation>Datenobjekt zur Darstellung des Namens einer natürlichen Person in lateinischer Schrift, entsprechend der Vorgaben aus dem Baukasten des Förderalen Informationsmanagements (FIM).</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="np:familienname" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Familienname einer natürlichen Person bestehend aus Nachname, Zuname bzw. Familienname.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="np:familienname.nichtVorhanden" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Angabe, dass die betreffende Person keinen Familiennamen führt. Dieses Element ist nur anzugeben, wenn es den Wert true hat.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="np:geburtsname" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Der Geburtsname entspricht dem Familiennamen einer natürlichen Person vor der Schließung der ersten Ehe bzw. vor dem Eingehen der ersten Lebenspartnerschaft.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="np:geburtsname.nichtVorhanden" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Angabe, dass vor der Eheschließung oder vor der Begründung der Lebenspartnerschaft nach dem für die Namensführung maßgebenden Recht kein Familienname vorhanden gewesen ist. Dieses Element ist nur anzugeben, wenn es den Wert true hat.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="np:vornamen" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Vornamen einer natürlichen Person.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="np:vornamen.nichtVorhanden" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Angabe, dass die betreffende Person keinen Vornamen führt. Dieses Element ist nur anzugeben, wenn es den Wert true hat.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="natuerlichePerson">
+      <xs:annotation>
+         <xs:documentation>Dieses Datenobjekt umfasst die allgemeinen Angaben zu einer natürlichen Person (Mensch), welche im fachlichen Kontext (Antrag eines wirtschaftlich Tätigen, Anzeige eines wirtschaftlich Tätigen, ...) in mindestens einer und gegebenenfalls mehreren Rollen auftritt.Der (Stamm-) Datenkranz zur natürlichen Person entspricht der Strukturierung des § 3 Abs. 1 BMG Konkret: Gemäß § 3 Abs. 1 Nrn. 1, 3, 4, 6, 7, 10 und 12 BMG für die Einwohnermelderegister, des § 139b Abs. 3 AO Konkret: § 139b AO Abs. 3 Nrn. 3, 5, 6, 8, 9 und 10 für die Steueridentifikationsnummer, des § 8 Abs. 1 Nr. 1 OZG Konkret: § 8 OZG Abs. 1 Nr. 1 Buchstaben a, b, c, d, e, f, g, h und i .</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="np:natuerlichePerson.id">
+               <xs:annotation>
+                  <xs:documentation>Innerhalb des jeweiligen Kontextes eindeutige ID dieser Instanz des Kerndatenobjekts Natürliche Person.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="np:identifikationsnummer" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Identifikationsnummer einer natürlichen Person gemäß § 4 Abs. 2 IDNrG.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="np:doktorgrad" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Es sind nur diejenigen Doktorgrade anzugeben, die in Pässe eingetragen werden dürfen. Sind mehrere Doktorgrade anzugeben, so sind sie durch ein Leerzeichen zu trennen.Zulässig sind derzeit: „DR.“, „Dr.“, „DR.HC.“, „Dr.hc.“, „Dr.EH.“ und „Dr.eh.“.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="np:name">
+               <xs:annotation>
+                  <xs:documentation>Datenobjekt zur Darstellung des Namens einer natürlichen Person in lateinischer Schrift, entsprechend der Vorgaben aus dem Baukasten des Förderalen Informationsmanagements (FIM).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="np:geburt" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Angaben zur Geburt einer natürlichen Person.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="np:geschlecht" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Als Geschlechtsangabe zulässig sind: "männlich", "weiblich", "divers", "keine Angabe".</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="np:staatsangehoerigkeit" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Die Staatsangehörigkeit der natürlichen Person gemäß Codierung des statistischen Bundesamts.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="adr:anschrift" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Angaben für die Adressierung. Eine Anschrift ist entweder eine Inlands- oder ein Auslandsanschrift.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="kom:kommunikation" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Angaben zu Telefon, Telefax, Email-Adresse und/oder Webseite.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="gv:gesetzlicherVertreter" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Mit dieser Rolle wird der gesetzliche Vertreter einer juristischen Person, einer rechtsfähigen Personengesellschaft, einer sonstigen Personenvereinigung oder natürlichen Person gefasst. Es handelt sich hierbei um Vertreter, deren Vertretungsmacht sich allein aus gesetzlichen Bestimmungen ergibt und nicht durch ein Rechtsgeschäft erteilt wurde.Hierunter fallen bei natürlichen Personen die Eltern oder der Vormund für minderjährige Kinder und der Betreuer für volljährige Personen. Hierunter fallen bei einer juristischen Person, einer rechtsfähigen Personengesellschaft oder einer sonstigen Personenvereinigung die Mitglieder des Vertretungsorgans (Organwalter, Organmitglieder, Organträger) wie beispielweise: ein Geschäftsführer einer GmbH gemäß § 35 GmbhG ein Mitglied des Vorstands einer Aktiengesellschaft gemäß § 78 AktG ein Mitglied des Vorstands einer Genossenschaft gemäß § 24 GenG oder ein Mitglied des Vorstands eines eingetragenen Vereins gemäß § 26 BGB ein Liquidator bzw. Abwickler einer Gesellschaft gemäß § 66 GmbHG, § 265 AktG, § 269 AktG, § 146 BGB Bei Personengesellschaften müssen ihre gesetzliche Vertreter aus dem Kreis ihrer Gesellschafter stammen (Prinzip der Selbstorganschaft), wobei aber nicht alle Gesellschafter gesetzliche Vertreter sein müssen. Letzteres ist beispielsweise immer der Fall für den Kommanditisten einer KG, aber auch möglich für eine offene Handelsgesellschaft.Sofern bei einer Personengesellschaft sowohl ihre gesetzlichen Vertreter als auch ihre Gesellschafter angegeben werden, treten einige davon entsprechend in doppelter Rolle auf.Bei Kapitalgesellschaften und Genossenschaften nach deutschem Recht müssen die gesetzlichen Vertreter natürliche Personen sein. Dies gilt aber nicht allgemein für juristische Personen, beispielsweise nicht für den eingetragenen Verein oder bestimmte Kapitalgesellschaften nach ausländischem Recht, und auch nicht für Personengesellschaften, deren gesetzliche Vertreter im Allgemeinen auch juristische Personen (z. B. die Verwaltungs-GmbH in einer GmbH amp Co KG) oder andere rechtsfähige Personengesellschaften sein können.Bei gesetzlichen Vertretern, die keine natürliche Personen sind, werden in Verwaltungsverfahren häufig auch Angaben zu deren gesetzlichen Vertretern (natürliche Personen) benötigt. Explizit nicht unter diese Rolle fallen die rechtsgeschäftlichen Vertreter, die Bevollmächtigte sind (Prokuristen, Handlungsbevollmächtigte). Die rechtsgeschäftlichen Vertreter eines wirtschaftlich Tätigen werden aktuell im Kerndatenmodell nicht berücksichtigt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="natuerlichePerson.id" type="bdt:IDType">
+      <xs:annotation>
+         <xs:documentation>Innerhalb des jeweiligen Kontextes eindeutige ID dieser Instanz des Kerndatenobjekts Natürliche Person.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="staatsangehoerigkeit" type="np:Code.Staatsangehoerigkeit">
+      <xs:annotation>
+         <xs:documentation>Die Staatsangehörigkeit der natürlichen Person gemäß Codierung des statistischen Bundesamts.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="vornamen" type="bdt:String.DIN91379.C">
+      <xs:annotation>
+         <xs:documentation>Vornamen einer natürlichen Person.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="vornamen.nichtVorhanden" type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation>Angabe, dass die betreffende Person keinen Vornamen führt. Dieses Element ist nur anzugeben, wenn es den Wert true hat.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+</xs:schema>

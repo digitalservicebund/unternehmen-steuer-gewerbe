@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:antr="urn:xoev-de:xunternehmen:standard:basismodul:antraege-anzeigen_1.1"
+           xmlns:bdt="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"
+           xmlns:nachr="urn:xoev-de:xunternehmen:standard:basismodul:nachrichtenstruktur_1.1"
+           xmlns:wt="urn:xoev-de:xunternehmen:standard:basismodul:wirtschaftlichetaetigkeit_1.1"
+           xmlns:xoev-code="http://xoev.de/schemata/code/1_0"
+           targetNamespace="urn:xoev-de:xunternehmen:standard:basismodul:antraege-anzeigen_1.1"
+           version="1.1"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XUnternehmen.Basismodul</nameLang>
+            <nameKurz>XUnternehmen.Basismodul</nameKurz>
+            <nameTechnisch>basismodul</nameTechnisch>
+            <kennung>urn:xoev-de:xunternehmen:standard:basismodul</kennung>
+            <beschreibung>Basismodul des Standards XUnternehmen.</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>1.1</version>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVHandbuch>2.5</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP 2</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:import schemaLocation="xoev-code.xsd"
+              namespace="http://xoev.de/schemata/code/1_0"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-basisdatentypen_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-nachrichten_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:nachrichtenstruktur_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-wirtschaftlichetaetigkeit_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:wirtschaftlichetaetigkeit_1.1"/>
+   <xs:element name="ansprechpartner">
+      <xs:annotation>
+         <xs:documentation>Angaben zu einem Ansprechpartner, welcher von der handelnden Person in einem konkreten Antrag eines wirtschaftlich Tätigen bzw. in einer konkreten Anzeige eines wirtschaftlich Tätigen benannt wird für Rückfragen seitens der zuständigen Stelle.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="antr:ansprechpartner.id">
+               <xs:annotation>
+                  <xs:documentation>Angabe des Ansprechpartners als ID-Querverweis innerhalb des jeweiligen Kontextes (Nachricht, Datensatz) auf ein Element np:natuerlichePerson (oder auf ein entsprechendes abgeleitetes Element).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="ansprechpartner.id" type="bdt:IDType">
+      <xs:annotation>
+         <xs:documentation>Angabe des Ansprechpartners als ID-Querverweis innerhalb des jeweiligen Kontextes (Nachricht, Datensatz) auf ein Element np:natuerlichePerson (oder auf ein entsprechendes abgeleitetes Element).</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="antragWirtschaftlichTaetiger">
+      <xs:annotation>
+         <xs:documentation>Mit diesem Kerndatenobjekt wird ein an eine zuständige öffentliche Stelle gerichteter Antrag eines wirtschaftlich Tätigen auf Durchführung eines Verwaltungsverfahrens in eigener Sache gemäß § 9 VwVfG gefasst.In Abhängigkeit von den Erfordernissen des Verwaltungsverfahrens können zusätzlich Angaben zur wirtschaftlichen Tätigkeit des Antragstellers notwendig sein.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="wt:wirtschaftlicheTaetigkeit" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Das Kerndatenobjekt Wirtschaftliche Tätigkeit umfasst in generischer Weise eine planmäßige, für eine gewisse Dauer bestimmte, selbstständige wirtschaftliche Tätigkeit eines wirtschaftlich Tätigen. Im Sinne des Kerndatenmodells ist dieses Kerndatenobjekt nicht auf eine gewerbliche Tätigkeit beschränkt. Auch eine freiberufliche Tätigkeit einer natürlichen Person oder Partnergesellschaft sowie Betriebe der Urproduktion fallen darunter. Das Kerndatenobjekt generalisiert in sehr weitgehender und nicht abschließender Weise die Begriffe Unternehmen, Betrieb, Betriebstätte und Gewerbe in ihren vielfältigen fachlichen Bedeutungen und Ausprägungen und ist insofern im Allgemeinen nicht ohne weiteres interoperabel zwischen verschiedenen fachlichen Kontexten, da jeweils unterschiedlich abgrenzt wird, was als (eine) wirtschaftliche Tätigkeit zu fassen ist. Trotz der aus semantischer Sicht offenen Definition definiert dieses Kerndatenobjekt einen Nukleus einheitlicher Eigenschaften, die übergreifend anwendbar sind. Diese umfassen insbesondere den wirtschaftlich Tätigen, die ausgeübte Tätigkeit (Benennung, WZ-Schlüssel), die Geschäftsbezeichnung bzw. den vom Rechtsträger abweichenden Namen (z. B. bei Einzelunternehmen und Zweigniederlassungen), und ggf. die Betriebsstätte(n), an welchen die wirtschaftliche Tätigkeit ausgeübt wird.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="antr:antragsteller" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Mit dieser Rolle wird die natürliche Person oder juristische Person oder die rechtsfähige Personengesellschaft oder sonstige Personenvereinigung identifiziert, die bei der zuständigen Stelle in eigener Sache den Erlass eines Verwaltungsakts beantragt oder durch einen Vertreter beantragen lässt und so die Durchführung eines Verwaltungsverfahrens im Sinne des § 9 VwVfG veranlasst. Der Antragsteller ist Beteiligter im Verwaltungsverfahren gemäß § 13 VwVfG.In gewerberechtlichen Verfahren nach der Gewerbeordnung sind nur natürliche Personen und juristische Personen Antragsteller. Mangels zuerkannter Rechtspersönlichkeit werden Personengesellschaften nicht als Antragsteller angesehen. Besonderheiten/Ausnahmen gelten u.a. im Handwerksrecht und Gaststättenrecht. Gem. § 1 (1) HwO können auch Personengesellschaften die Zulassung beantragen. Gem. § 2 I 2 GastG können auch nichtrechtsfähige Vereine eine Zulassung erhalten.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="antr:handelndePerson" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Mit dieser Rolle wird die natürliche Person identifiziert, die im konkreten Vorgang die Verfahrenshandlungen (beispielsweise einen Antrag stellt oder eine Anzeige einreicht) vornimmt. Sofern der Antragsteller eine natürliche Person ist, kann sie für sich selbst handeln, aber auch im Rahmen einer Vollmacht durch eine andere handelnde Person vertreten werden. Sofern der Antragsteller eine juristische Person oder eine rechtsfähige Personengesellschaft oder sonstige Personenvereinigung ist, kann die handelnde Person einer der gesetzlichen Vertreter (juristische Person) oder einer der Gesellschafter (Personengesellschaft) oder eine andere nach außen vertretungsberechtigte Person sein. In Abhängigkeit von der Stellung der handelnden Person zum Antragsteller muss die Handlungsbefugnis in der Regel nachgewiesen werden (Handelsregisterauszug, Gesellschaftervertrag, Vollmacht).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="antr:ansprechpartner" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Angaben zu einem Ansprechpartner, welcher von der handelnden Person in einem konkreten Antrag eines wirtschaftlich Tätigen bzw. in einer konkreten Anzeige eines wirtschaftlich Tätigen benannt wird für Rückfragen seitens der zuständigen Stelle.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="nachr:referenzen" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Container für innerhalb eines fachlichen Kontextes über ihre ID referenzierte Instanzen der Kerndatenobjekte Natürliche Person, Juristische Person, Rechtsfähige Personengesellschaft und/oder Sonstige Personenvereinigung.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="antragsteller">
+      <xs:annotation>
+         <xs:documentation>Mit dieser Rolle wird die natürliche Person oder juristische Person oder die rechtsfähige Personengesellschaft oder sonstige Personenvereinigung identifiziert, die bei der zuständigen Stelle in eigener Sache den Erlass eines Verwaltungsakts beantragt oder durch einen Vertreter beantragen lässt und so die Durchführung eines Verwaltungsverfahrens im Sinne des § 9 VwVfG veranlasst. Der Antragsteller ist Beteiligter im Verwaltungsverfahren gemäß § 13 VwVfG.In gewerberechtlichen Verfahren nach der Gewerbeordnung sind nur natürliche Personen und juristische Personen Antragsteller. Mangels zuerkannter Rechtspersönlichkeit werden Personengesellschaften nicht als Antragsteller angesehen. Besonderheiten/Ausnahmen gelten u.a. im Handwerksrecht und Gaststättenrecht. Gem. § 1 (1) HwO können auch Personengesellschaften die Zulassung beantragen. Gem. § 2 I 2 GastG können auch nichtrechtsfähige Vereine eine Zulassung erhalten.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="antr:antragsteller.id">
+               <xs:annotation>
+                  <xs:documentation>Angabe des Antragstellers als ID-Querverweis innerhalb des jeweiligen Kontextes (Nachricht, Datensatz) auf ein Element np:natuerlichePerson, jp:juristischePerson, pg:rechtsfaehigePersonengesellschaft, pv:sonstigePersonenvereinigung (oder auf ein entsprechendes abgeleitetes Element).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="antragsteller.id" type="bdt:IDType">
+      <xs:annotation>
+         <xs:documentation>Angabe des Antragstellers als ID-Querverweis innerhalb des jeweiligen Kontextes (Nachricht, Datensatz) auf ein Element np:natuerlichePerson, jp:juristischePerson, pg:rechtsfaehigePersonengesellschaft, pv:sonstigePersonenvereinigung (oder auf ein entsprechendes abgeleitetes Element).</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="anzeigeWirtschaftlichTaetiger">
+      <xs:annotation>
+         <xs:documentation>Mit diesem Kerndatenobjekt wird eine an die zuständige öffentliche Stelle gerichtete einseitige empfangsbedürftige Willenserklärung eines wirtschaftlich Tätigen in eigener Sache gefasst.Zusätzlich können Angaben zur wirtschaftlichen Tätigkeit des Anzeigenden notwendig sein.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="wt:wirtschaftlicheTaetigkeit" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Das Kerndatenobjekt Wirtschaftliche Tätigkeit umfasst in generischer Weise eine planmäßige, für eine gewisse Dauer bestimmte, selbstständige wirtschaftliche Tätigkeit eines wirtschaftlich Tätigen. Im Sinne des Kerndatenmodells ist dieses Kerndatenobjekt nicht auf eine gewerbliche Tätigkeit beschränkt. Auch eine freiberufliche Tätigkeit einer natürlichen Person oder Partnergesellschaft sowie Betriebe der Urproduktion fallen darunter. Das Kerndatenobjekt generalisiert in sehr weitgehender und nicht abschließender Weise die Begriffe Unternehmen, Betrieb, Betriebstätte und Gewerbe in ihren vielfältigen fachlichen Bedeutungen und Ausprägungen und ist insofern im Allgemeinen nicht ohne weiteres interoperabel zwischen verschiedenen fachlichen Kontexten, da jeweils unterschiedlich abgrenzt wird, was als (eine) wirtschaftliche Tätigkeit zu fassen ist. Trotz der aus semantischer Sicht offenen Definition definiert dieses Kerndatenobjekt einen Nukleus einheitlicher Eigenschaften, die übergreifend anwendbar sind. Diese umfassen insbesondere den wirtschaftlich Tätigen, die ausgeübte Tätigkeit (Benennung, WZ-Schlüssel), die Geschäftsbezeichnung bzw. den vom Rechtsträger abweichenden Namen (z. B. bei Einzelunternehmen und Zweigniederlassungen), und ggf. die Betriebsstätte(n), an welchen die wirtschaftliche Tätigkeit ausgeübt wird.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="antr:anzeigender" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Mit dieser Rolle wird die natürliche Person oder juristische Person oder die rechtsfähige Personengesellschaft oder sonstige Personenvereinigung identifiziert, die bei der zuständigen Stelle in eigener Sache eine Anzeige erstattet oder durch einen Vertreter erstatten lässt. In gewerberechtlichen Verfahren nach der Gewerbeordnung sind nur sind nur natürliche Personen und juristische Personen Anzeigende. Mangels zuerkannter Rechtspersönlichkeit werden Personengesellschaften nicht als Anzeigende angesehen. Besonderheiten/Ausnahmen gelten u.a. im Handwerksrecht und Gaststättenrecht.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="antr:handelndePerson" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Mit dieser Rolle wird die natürliche Person identifiziert, die im konkreten Vorgang die Verfahrenshandlungen (beispielsweise einen Antrag stellt oder eine Anzeige einreicht) vornimmt. Sofern der Antragsteller eine natürliche Person ist, kann sie für sich selbst handeln, aber auch im Rahmen einer Vollmacht durch eine andere handelnde Person vertreten werden. Sofern der Antragsteller eine juristische Person oder eine rechtsfähige Personengesellschaft oder sonstige Personenvereinigung ist, kann die handelnde Person einer der gesetzlichen Vertreter (juristische Person) oder einer der Gesellschafter (Personengesellschaft) oder eine andere nach außen vertretungsberechtigte Person sein. In Abhängigkeit von der Stellung der handelnden Person zum Antragsteller muss die Handlungsbefugnis in der Regel nachgewiesen werden (Handelsregisterauszug, Gesellschaftervertrag, Vollmacht).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="antr:ansprechpartner" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Angaben zu einem Ansprechpartner, welcher von der handelnden Person in einem konkreten Antrag eines wirtschaftlich Tätigen bzw. in einer konkreten Anzeige eines wirtschaftlich Tätigen benannt wird für Rückfragen seitens der zuständigen Stelle.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="nachr:referenzen">
+               <xs:annotation>
+                  <xs:documentation>Container für innerhalb eines fachlichen Kontextes über ihre ID referenzierte Instanzen der Kerndatenobjekte Natürliche Person, Juristische Person, Rechtsfähige Personengesellschaft und/oder Sonstige Personenvereinigung.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="anzeigender">
+      <xs:annotation>
+         <xs:documentation>Mit dieser Rolle wird die natürliche Person oder juristische Person oder die rechtsfähige Personengesellschaft oder sonstige Personenvereinigung identifiziert, die bei der zuständigen Stelle in eigener Sache eine Anzeige erstattet oder durch einen Vertreter erstatten lässt. In gewerberechtlichen Verfahren nach der Gewerbeordnung sind nur sind nur natürliche Personen und juristische Personen Anzeigende. Mangels zuerkannter Rechtspersönlichkeit werden Personengesellschaften nicht als Anzeigende angesehen. Besonderheiten/Ausnahmen gelten u.a. im Handwerksrecht und Gaststättenrecht.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="antr:anzeigender.id">
+               <xs:annotation>
+                  <xs:documentation>Angabe des Anzeigenden als ID-Querverweis innerhalb des jeweiligen Kontextes (Nachricht, Datensatz) auf ein Element np:natuerlichePerson, jp:juristischePerson, pg:rechtsfaehigePersonengesellschaft, pv:sonstigePersonenvereinigung (oder auf ein entsprechendes abgeleitetes Element).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="anzeigender.id" type="bdt:IDType">
+      <xs:annotation>
+         <xs:documentation>Angabe des Anzeigenden als ID-Querverweis innerhalb des jeweiligen Kontextes (Nachricht, Datensatz) auf ein Element np:natuerlichePerson, jp:juristischePerson, pg:rechtsfaehigePersonengesellschaft, pv:sonstigePersonenvereinigung (oder auf ein entsprechendes abgeleitetes Element).</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="handelndePerson">
+      <xs:annotation>
+         <xs:documentation>Mit dieser Rolle wird die natürliche Person identifiziert, die im konkreten Vorgang die Verfahrenshandlungen (beispielsweise einen Antrag stellt oder eine Anzeige einreicht) vornimmt. Sofern der Antragsteller eine natürliche Person ist, kann sie für sich selbst handeln, aber auch im Rahmen einer Vollmacht durch eine andere handelnde Person vertreten werden. Sofern der Antragsteller eine juristische Person oder eine rechtsfähige Personengesellschaft oder sonstige Personenvereinigung ist, kann die handelnde Person einer der gesetzlichen Vertreter (juristische Person) oder einer der Gesellschafter (Personengesellschaft) oder eine andere nach außen vertretungsberechtigte Person sein. In Abhängigkeit von der Stellung der handelnden Person zum Antragsteller muss die Handlungsbefugnis in der Regel nachgewiesen werden (Handelsregisterauszug, Gesellschaftervertrag, Vollmacht).</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="antr:handelndePerson.id">
+               <xs:annotation>
+                  <xs:documentation>Angabe der handelnden Person als ID-Querverweis innerhalb des jeweiligen Kontextes (Nachricht, Datensatz) auf ein Element np:natuerlichePerson (oder auf ein entsprechendes abgeleitetes Element).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="handelndePerson.id" type="bdt:IDType">
+      <xs:annotation>
+         <xs:documentation>Angabe der handelnden Person als ID-Querverweis innerhalb des jeweiligen Kontextes (Nachricht, Datensatz) auf ein Element np:natuerlichePerson (oder auf ein entsprechendes abgeleitetes Element).</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="uuid" type="bdt:UUID">
+      <xs:annotation>
+         <xs:documentation>Eine vom Online-Dienst vergebene eindeutige Kennung des Vorgangs des Antrags bzw. der Anzeige.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="zeitstempel" type="xs:dateTime">
+      <xs:annotation>
+         <xs:documentation>Der vom Online-Dienst festgestellte Zeitpunkt, an welchem der Antrag bzw. die Anzeige erfolgreich durch den Nutzer gestellt wurde.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+</xs:schema>

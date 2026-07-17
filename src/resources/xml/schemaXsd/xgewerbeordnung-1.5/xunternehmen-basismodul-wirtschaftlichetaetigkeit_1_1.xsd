@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:wt="urn:xoev-de:xunternehmen:standard:basismodul:wirtschaftlichetaetigkeit_1.1"
+           xmlns:adr="urn:xoev-de:xunternehmen:standard:basismodul:adressen_1.1"
+           xmlns:bdt="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"
+           xmlns:eintr="urn:xoev-de:xunternehmen:standard:basismodul:eintragung_1.1"
+           xmlns:ename="urn:xoev-de:xunternehmen:standard:basismodul:eingetragenername_1.1"
+           xmlns:kom="urn:xoev-de:xunternehmen:standard:basismodul:kommunikation_1.1"
+           xmlns:rf="urn:xoev-de:xunternehmen:standard:basismodul:rechtsform_1.1"
+           xmlns:xoev-code="http://xoev.de/schemata/code/1_0"
+           targetNamespace="urn:xoev-de:xunternehmen:standard:basismodul:wirtschaftlichetaetigkeit_1.1"
+           version="1.1"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XUnternehmen.Basismodul</nameLang>
+            <nameKurz>XUnternehmen.Basismodul</nameKurz>
+            <nameTechnisch>basismodul</nameTechnisch>
+            <kennung>urn:xoev-de:xunternehmen:standard:basismodul</kennung>
+            <beschreibung>Basismodul des Standards XUnternehmen.</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>1.1</version>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVHandbuch>2.5</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP 2</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:import schemaLocation="xoev-code.xsd"
+              namespace="http://xoev.de/schemata/code/1_0"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-adressen_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:adressen_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-basisdatentypen_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-eingetragenername_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:eingetragenername_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-eintragung_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:eintragung_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-kommunikation_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:kommunikation_1.1"/>
+   <xs:import schemaLocation="xunternehmen-basismodul-rechtsform_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:rechtsform_1.1"/>
+   <xs:complexType name="Code.ArtNiederlassung">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Art einer Niederlassung</nameLang>
+               <nameKurz>Art einer Niederlassung</nameKurz>
+               <nameTechnisch>artniederlassung</nameTechnisch>
+               <kennung>urn:xoev-de:xunternehmen:codeliste:artniederlassung</kennung>
+               <beschreibung>Art einer Niederlassung</beschreibung>
+               <herausgebernameLang>XUnternehmen</herausgebernameLang>
+               <herausgebernameKurz>XUnternehmen</herausgebernameKurz>
+            </codeliste>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token" form="unqualified"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xunternehmen:codeliste:artniederlassung"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="artBetriebsstaette" type="wt:Code.ArtNiederlassung">
+      <xs:annotation>
+         <xs:documentation>Nähere Bestimmung der Art der Betriebsstätte. Die möglichen Ausprägungen dieses Attributes sind durch die Codeliste Art einer Niederlassung (urn: xoev-de:xunternehmen:codeliste:artniederlassung) im XRepository bestimmt.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="betriebsstaette">
+      <xs:annotation>
+         <xs:documentation>Dieses Kerndatenobjekt identifiziert einen Ort, an welchem eine wirtschaftliche Tätigkeit tatsächlich und grundsätzlich dauerhaft ausgeübt wird.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="wt:artBetriebsstaette">
+               <xs:annotation>
+                  <xs:documentation>Nähere Bestimmung der Art der Betriebsstätte. Die möglichen Ausprägungen dieses Attributes sind durch die Codeliste Art einer Niederlassung (urn: xoev-de:xunternehmen:codeliste:artniederlassung) im XRepository bestimmt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="adr:anschrift" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>(siehe Dokumentation von Anschrift)</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="wt:geschaeftsbezeichnung" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>(siehe Dokumentation von Geschäftsbezeichnung)</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="kom:kommunikation" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>(siehe Dokumentation von Kommunikation)</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="bundeseinheitlicheWirtschaftsnummer" type="bdt:String.DIN91379.C">
+      <xs:annotation>
+         <xs:documentation>Die bundeseinheitliche Wirtschaftsnummer für Unternehmen gemäß § 2 UBRegG.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="geschaeftsbezeichnung" type="bdt:String.DIN91379.C">
+      <xs:annotation>
+         <xs:documentation>Zur Außendarstellung einer wirtschaftlichen Tätigkeit oder einer Betriebsstätte verwendeter Name, der nicht im Handel-, Genossenschafts-, Partnerschafts- oder Vereinsregister eingetragen ist oder davon abweicht (z.B. Gasthof "Zum lustigen Wirt"; "Ruck-Zuck-GbR").</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="taetigkeit" type="bdt:String.DIN91379.C">
+      <xs:annotation>
+         <xs:documentation>Benennung bzw. Bezeichnung der ausgeübten Tätigkeit</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="wirtschaftlichTaetiger">
+      <xs:annotation>
+         <xs:documentation>Mit dieser Rolle wird die natürliche Person, juristische Person, rechtsfähige Personengesellschaft oder sonstige Personenvereinigung identifiziert, die bei Abschluss der zivilen Rechtsgeschäfte in Ausübung ihrer gewerblichen oder selbständigen beruflichen Tätigkeit handelt (Unternehmer im Sinne des § 14 BGB, Kaufmann im Sinne des § 1 HGB bei Handelsgewerben). Bezogen auf eine wirtschaftliche Tätigkeit bezeichnet diese Rolle die nach außen am Wirtschaftleben teilnehmende Person bzw. Personenvereinigung. Sofern dieses Subjekt im jeweiligen verwaltungsrechtlichen Kontext nicht Träger von Rechten und Pflichten sein kann, kann der Antragsteller im jeweiligen Verwaltungsverfahren vom wirtschaftlich Tätigen abweichen. Dies gilt insbesondere bei Personengesellschaften im Gewerberecht, die im Allgemeinen nicht selbst Gewerbetreibende sein können.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="wt:wirtschaftlichTaetiger.id">
+               <xs:annotation>
+                  <xs:documentation>Angabe des wirtschaftlich Tätigen als ID-Querverweis innerhalb des jeweiligen Kontextes (Nachricht, Datensatz) auf ein Element np:natuerlichePerson, jp:juristischePerson, pg:rechtsfaehigePersonengesellschaft, pv:sonstigePersonenvereinigung (oder auf ein entsprechendes abgeleitetes Element).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="wirtschaftlichTaetiger.id" type="bdt:IDType">
+      <xs:annotation>
+         <xs:documentation>Angabe des wirtschaftlich Tätigen als ID-Querverweis innerhalb des jeweiligen Kontextes (Nachricht, Datensatz) auf ein Element np:natuerlichePerson, jp:juristischePerson, pg:rechtsfaehigePersonengesellschaft, pv:sonstigePersonenvereinigung (oder auf ein entsprechendes abgeleitetes Element).</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="wirtschaftlicheTaetigkeit">
+      <xs:annotation>
+         <xs:documentation>Das Kerndatenobjekt Wirtschaftliche Tätigkeit umfasst in generischer Weise eine planmäßige, für eine gewisse Dauer bestimmte, selbstständige wirtschaftliche Tätigkeit eines wirtschaftlich Tätigen. Im Sinne des Kerndatenmodells ist dieses Kerndatenobjekt nicht auf eine gewerbliche Tätigkeit beschränkt. Auch eine freiberufliche Tätigkeit einer natürlichen Person oder Partnergesellschaft sowie Betriebe der Urproduktion fallen darunter. Das Kerndatenobjekt generalisiert in sehr weitgehender und nicht abschließender Weise die Begriffe Unternehmen, Betrieb, Betriebstätte und Gewerbe in ihren vielfältigen fachlichen Bedeutungen und Ausprägungen und ist insofern im Allgemeinen nicht ohne weiteres interoperabel zwischen verschiedenen fachlichen Kontexten, da jeweils unterschiedlich abgrenzt wird, was als (eine) wirtschaftliche Tätigkeit zu fassen ist. Trotz der aus semantischer Sicht offenen Definition definiert dieses Kerndatenobjekt einen Nukleus einheitlicher Eigenschaften, die übergreifend anwendbar sind. Diese umfassen insbesondere den wirtschaftlich Tätigen, die ausgeübte Tätigkeit (Benennung, WZ-Schlüssel), die Geschäftsbezeichnung bzw. den vom Rechtsträger abweichenden Namen (z. B. bei Einzelunternehmen und Zweigniederlassungen), und ggf. die Betriebsstätte(n), an welchen die wirtschaftliche Tätigkeit ausgeübt wird.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="wt:bundeseinheitlicheWirtschaftsnummer" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Die bundeseinheitliche Wirtschaftsnummer für Unternehmen gemäß § 2 UBRegG.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="rf:rechtsform" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Die Rechtsform einer wirtschaftlichen Tätigkeit, einer juristischen Person, einer rechtsfähigen Personengesellschaft oder einer sonstigen Personenvereinigung im Sinne der Rechtsform-Codierung.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="wt:wirtschaftlichTaetiger" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Mit dieser Rolle wird die natürliche Person, juristische Person, rechtsfähige Personengesellschaft oder sonstige Personenvereinigung identifiziert, die bei Abschluss der zivilen Rechtsgeschäfte in Ausübung ihrer gewerblichen oder selbständigen beruflichen Tätigkeit handelt (Unternehmer im Sinne des § 14 BGB, Kaufmann im Sinne des § 1 HGB bei Handelsgewerben). Bezogen auf eine wirtschaftliche Tätigkeit bezeichnet diese Rolle die nach außen am Wirtschaftleben teilnehmende Person bzw. Personenvereinigung. Sofern dieses Subjekt im jeweiligen verwaltungsrechtlichen Kontext nicht Träger von Rechten und Pflichten sein kann, kann der Antragsteller im jeweiligen Verwaltungsverfahren vom wirtschaftlich Tätigen abweichen. Dies gilt insbesondere bei Personengesellschaften im Gewerberecht, die im Allgemeinen nicht selbst Gewerbetreibende sein können.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="wt:taetigkeit" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Benennung bzw. Bezeichnung der ausgeübten Tätigkeit</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="wt:wirtschaftszweigschluessel"
+                        minOccurs="0"
+                        maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Klassifikation der wirtschaftlichen Tätigkeit gemäß der Klassifikation der Wirtschaftszweige des Statistischen Bundesamts (WZ 2008).</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="ename:eingetragenerName" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Die im Handels-, Genossenschafts oder Gesellschaftsregister eingetragene Firma eines wirtschaftlich Tätigen bzw. einer wirtschaftlichen Tätigkeit (z. B. eingetragenes Einzelunternehmen, eingetragene Zweigniederlassung) bzw. der im Vereinsregister, Partnerschaftsregister oder Stiftungsverzeichnis eingetragene Name. Der eingetragene Name kann auch in einem Register festgehalten sein, welches in einem anderen Staat geführt wird.Der eingetragene Name ist abzugrenzen von der Geschäftsbezeichnung.Das Kerndatenobjekt bildet auch die Namen juristischer Personen, rechtsfähiger Personengesellschaften oder sonstiger Personenvereinigungen ab, die nicht in einem Register, aber kraft Gesetz geführt werden.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="eintr:eintragung" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Dieses Kerndatenobjekt fasst die Daten, mit welchen die Eintragung eines wirtschaftlich Tätigen bzw. einer wirtschaftlichen Tätigkeit in ein Register (Handels-, Genossenschafts-, Partnerschafts- oder Vereinsregister) oder in ein Verzeichnis (Stiftungsverzeichnis) identifiziert werden kann. Die Eintragung kann auch in ein Register oder Verzeichnis erfolgen, welches in einem anderen Staat geführt wird. Zwischen Rechtsform und Eintragung besteht ein Zusammenhang. Welche Eintragungsarten (Handelsregister A, Handelsregister B, Genossenschaftsregister, Gesellschaftsregister, Vereinsregister, Partnerschaftsregister, Register im Ausland, Kraft Gesetz) für welche Rechtsformen zulässig sein können, wird als Information in der Codeliste der Rechtsformen mitgeführt.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="adr:anschrift" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Angaben für die Adressierung. Eine Anschrift ist entweder eine Inlands- oder ein Auslandsanschrift.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="wt:geschaeftsbezeichnung" minOccurs="0">
+               <xs:annotation>
+                  <xs:documentation>Zur Außendarstellung einer wirtschaftlichen Tätigkeit oder einer Betriebsstätte verwendeter Name, der nicht im Handel-, Genossenschafts-, Partnerschafts- oder Vereinsregister eingetragen ist oder davon abweicht (z.B. Gasthof "Zum lustigen Wirt"; "Ruck-Zuck-GbR").</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="kom:kommunikation" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Angaben zu Telefon, Telefax, Email-Adresse und/oder Webseite.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+            <xs:element ref="wt:betriebsstaette" minOccurs="0" maxOccurs="unbounded">
+               <xs:annotation>
+                  <xs:documentation>Dieses Kerndatenobjekt identifiziert einen Ort, an welchem eine wirtschaftliche Tätigkeit tatsächlich und grundsätzlich dauerhaft ausgeübt wird.</xs:documentation>
+               </xs:annotation>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="wirtschaftszweigschluessel">
+      <xs:annotation>
+         <xs:documentation>Klassifikation der wirtschaftlichen Tätigkeit gemäß der Klassifikation der Wirtschaftszweige des Statistischen Bundesamts („WZ 2008“). Umsetzungshinweis: Die Angabe erfolgt ausschließlich in Ziffern, ohne Trennzeichen ("."). Es sind bis zu 5 Ziffern zulässig.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+         <xs:annotation>
+            <xs:documentation>Klassifikation der wirtschaftlichen Tätigkeit gemäß der Klassifikation der Wirtschaftszweige des Statistischen Bundesamts („WZ 2008“). Umsetzungshinweis: Die Angabe erfolgt ausschließlich in Ziffern, ohne Trennzeichen ("."). Es sind bis zu 5 Ziffern zulässig.</xs:documentation>
+         </xs:annotation>
+         <xs:restriction base="bdt:String.DIN91379.C">
+            <xs:pattern value="\d{2,5}"/>
+         </xs:restriction>
+      </xs:simpleType>
+   </xs:element>
+</xs:schema>

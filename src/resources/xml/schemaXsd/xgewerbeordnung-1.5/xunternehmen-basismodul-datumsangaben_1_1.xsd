@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:dat="urn:xoev-de:xunternehmen:standard:basismodul:datumsangaben_1.1"
+           xmlns:bdt="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"
+           targetNamespace="urn:xoev-de:xunternehmen:standard:basismodul:datumsangaben_1.1"
+           version="1.1"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XUnternehmen.Basismodul</nameLang>
+            <nameKurz>XUnternehmen.Basismodul</nameKurz>
+            <nameTechnisch>basismodul</nameTechnisch>
+            <kennung>urn:xoev-de:xunternehmen:standard:basismodul</kennung>
+            <beschreibung>Basismodul des Standards XUnternehmen.</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>1.1</version>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVHandbuch>2.5</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP 2</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:import schemaLocation="xunternehmen-basismodul-basisdatentypen_1_1.xsd"
+              namespace="urn:xoev-de:xunternehmen:standard:basismodul:basisdatentypen_1.1"/>
+   <xs:complexType name="Datum.MitTeilbekanntType">
+      <xs:annotation>
+         <xs:documentation>Mit diesem Datentyp kann ein Datum, dass auch nur teilweise bekannt sein kann, angeben werden.</xs:documentation>
+      </xs:annotation>
+      <xs:choice>
+         <xs:element ref="dat:datum">
+            <xs:annotation>
+               <xs:documentation>Angabe eines vollständigen Datums.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="dat:jahrMonat">
+            <xs:annotation>
+               <xs:documentation>Angabe des Jahres und des Monats</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="dat:jahr">
+            <xs:annotation>
+               <xs:documentation>Angabe des Jahres</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="Datum.MitTeilbekanntUndUnbekanntType">
+      <xs:annotation>
+         <xs:documentation>Mit diesem Datentyp kann ein Datum angegeben werden, dass auch nur teilweise bekannt oder ganz sein kann, oder die Tatsache explizit angegeben werden, dass ein Datum unbekannt ist.</xs:documentation>
+      </xs:annotation>
+      <xs:choice>
+         <xs:element ref="dat:datum">
+            <xs:annotation>
+               <xs:documentation>Angabe eines vollständigen Datums.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="dat:jahrMonat">
+            <xs:annotation>
+               <xs:documentation>Angabe des Jahres und des Monats</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="dat:jahr">
+            <xs:annotation>
+               <xs:documentation>Angabe des Jahres</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="dat:unbekannt">
+            <xs:annotation>
+               <xs:documentation>Explizite Angabe der Tatsache, dass ein Datum unbekannt ist. Es ist nur der Wert "true" zulässig.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="Datum.MitUnbekanntType">
+      <xs:annotation>
+         <xs:documentation>Mit diesem Datentyp kann ein Datum angeben werden oder die Tatsache explizit angegeben werden, dass ein Datum unbekannt ist.</xs:documentation>
+      </xs:annotation>
+      <xs:choice>
+         <xs:element ref="dat:datum">
+            <xs:annotation>
+               <xs:documentation>Angabe eines vollständigen Datums.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element ref="dat:unbekannt">
+            <xs:annotation>
+               <xs:documentation>Explizite Angabe der Tatsache, dass ein Datum unbekannt ist. Es ist nur der Wert "true" zulässig.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:choice>
+   </xs:complexType>
+   <xs:element name="datum" type="xs:date">
+      <xs:annotation>
+         <xs:documentation>Angabe eines vollständigen Datums.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="jahr" type="xs:gYear">
+      <xs:annotation>
+         <xs:documentation>Angabe des Jahres</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="jahrMonat" type="xs:gYearMonth">
+      <xs:annotation>
+         <xs:documentation>Angabe des Jahres und des Monats</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   <xs:element name="unbekannt" type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation>Explizite Angabe der Tatsache, dass ein Datum unbekannt ist. Es ist nur der Wert "true" zulässig.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+</xs:schema>

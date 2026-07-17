@@ -54,7 +54,7 @@ export interface CreateGewerbeanmeldungXmlData {
   grundAnmeldungSchluessel?: string;
 }
 
-const ROOT_ATTRIBUTES = `
+const _ROOT_ATTRIBUTES_V1_6 = `
   xmlns:xga="http://www.xgewerbeordnung.de/spezifikation/xga/1.6"
   xmlns:erl="http://www.xgewerbeordnung.de/spezifikation/erl/1.6"
   xmlns:bk="http://www.xgewerbeordnung.de/spezifikation/baukasten/1.6"
@@ -85,6 +85,38 @@ const ROOT_ATTRIBUTES = `
   produktversion="1"
   standard="XGewerbeordnung"
   version="1.6"
+` as const;
+
+const ROOT_ATTRIBUTES = `
+  xmlns:xga="http://www.xgewerbeordnung.de/spezifikation/xga/1.5"
+  xmlns:erl="http://www.xgewerbeordnung.de/spezifikation/erl/1.5"
+  xmlns:bk="http://www.xgewerbeordnung.de/spezifikation/baukasten/1.5"
+  xmlns:nachr="urn:xoev-de:xunternehmen:standard:basismodul:nachrichtenstruktur_1.1"
+  xmlns:np="urn:xoev-de:xunternehmen:standard:basismodul:natuerlicheperson_1.1"
+  xmlns:jp="urn:xoev-de:xunternehmen:standard:basismodul:juristischeperson_1.1"
+  xmlns:rpg="urn:xoev-de:xunternehmen:standard:basismodul:rechtsfaehigepersonengesellschaft_1.1"
+  xmlns:eintr="urn:xoev-de:xunternehmen:standard:basismodul:eintragung_1.1"
+  xmlns:rf="urn:xoev-de:xunternehmen:standard:basismodul:rechtsform_1.1"
+  xmlns:bn-g2g="http://xoev.de/schemata/basisnachricht/g2g/1_0"
+  xmlns:bn-beh="http://xoev.de/schemata/basisnachricht/behoerde/1_0"
+  xmlns:bn-kom="http://xoev.de/schemata/basisnachricht/kommunikation/1_0"
+  xmlns:komm="urn:xoev-de:xunternehmen:standard:basismodul:kommunikation_1.1"
+  xmlns:wt="urn:xoev-de:xunternehmen:standard:basismodul:wirtschaftlichetaetigkeit_1.1"
+  xmlns:ename="urn:xoev-de:xunternehmen:standard:basismodul:eingetragenername_1.1"
+  xmlns:eintragung="urn:xoev-de:xunternehmen:standard:basismodul:eintragung_1.1"
+  xmlns:adr="urn:xoev-de:xunternehmen:standard:basismodul:adressen_1.1"
+  xmlns:antr="urn:xoev-de:xunternehmen:standard:basismodul:antraege-anzeigen_1.1"
+  xmlns:lc="urn:xoev-de:kosit:xoev:datentyp:din-spec-91379_2019-03"
+  xmlns:code="http://xoev.de/schemata/code/1_0"
+  xmlns:dat="urn:xoev-de:xunternehmen:standard:basismodul:datumsangaben_1.1"
+  xmlns:gv="urn:xoev-de:xunternehmen:standard:basismodul:gesetzlichervertreter_1.1"
+  xmlns:ges="urn:xoev-de:xunternehmen:standard:basismodul:gesellschafter_1.1"
+  xmlns:spv="urn:xoev-de:xunternehmen:standard:basismodul:sonstigepersonenvereinigung_1.1"
+  produkt="Schneller Gründen"
+  produkthersteller="DigitalService GmbH des Bundes"
+  produktversion="1"
+  standard="XGewerbeordnung"
+  version="1.5"
 ` as const;
 
 function createAutor(autor: Behoerde | undefined) {
