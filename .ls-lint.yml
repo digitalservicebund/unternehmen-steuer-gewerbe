@@ -16,7 +16,8 @@ ignore:
   - .github
   - .vscode
   - .idea
-  - .claude
+  - "**/.claude"
   - .eric-certificates
   - .fallow
   - src/resources
+  - .vitest-reports
