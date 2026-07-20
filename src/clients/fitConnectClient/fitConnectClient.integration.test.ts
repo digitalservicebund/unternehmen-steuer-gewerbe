@@ -18,7 +18,7 @@ describe("FitConnectClient", () => {
         },
         data: "<test>hello</test>",
         dataSchema: {
-          schemaUri: "urn:xoev-de:kosit:standard:xgewerbeordnung",
+          schemaUri: "urn:xoev-de:kosit:standard:xgewerbeordnung_1.6#ext.gewerbemeldung.0400",
           mimeType: "application/xml",
         },
       });
@@ -55,7 +55,7 @@ describe("FitConnectClient", () => {
         },
         data: "<test>hello</test>",
         dataSchema: {
-          schemaUri: "urn:xoev-de:kosit:standard:xgewerbeordnung",
+          schemaUri: "urn:xoev-de:kosit:standard:xgewerbeordnung_1.6#ext.gewerbemeldung.0400",
           mimeType: "application/xml",
         },
       });

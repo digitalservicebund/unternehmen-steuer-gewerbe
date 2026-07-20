@@ -66,10 +66,10 @@ async function submitGewerbeanmeldung(
       destinationId: getEnvironmentVariable("FIT_CONNECT_DESTINATION_ID"),
       publicService: {
         identifier: GEWERBEANMELDUNG_LEIKA_KEY_URN,
-        name: "Gewerbe Anmeldung",
+        name: "Gewerbeanmeldung",
       },
       dataSchema: {
-        schemaUri: "urn:xoev-de:kosit:standard:xgewerbeordnung",
+        schemaUri: "urn:xoev-de:kosit:standard:xgewerbeordnung_1.6#ext.gewerbemeldung.0400",
         mimeType: "application/xml",
       },
       data: gewerbeanmeldungXml,
