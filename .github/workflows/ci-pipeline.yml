@@ -158,6 +158,11 @@ jobs:
 
       - name: Run integration tests (shard ${{ matrix.shard }}/${{ strategy.job-total }}) with coverage report
         run: pnpm run test:integration:ci --shard=${{ matrix.shard }}/${{ strategy.job-total }} --outputFile.blob=.vitest-reports/integration-tests-shard-${{ matrix.shard }}-of-${{ strategy.job-total }}.blob.json
+        env:
+          # Not used for network calls (all API clients are mocked at this tier), but still
+          # required: ERIC_HERSTELLERID is checked at import time (fail-fast guard in
+          # transformToFsE.ts), transitively imported by every route-level integration test via app.ts.
+          ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
 
       - name: Upload coverage blob
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
