@@ -1,633 +1,633 @@
-name: CI Pipeline
-
-on:
-  # run when pushing to main
-  push:
-    branches:
-      - main
-  # run on PRs based on main
-  pull_request:
-    branches:
-      - main
-  # allow for running this workflow manually (button in GitHub Actions UI)
-  workflow_dispatch:
-
-# On each branch, the latest commit cancels the pipelines of any earlier commits.
-#
-# Goal: The latest state is processed as quickly as possible.
-#       Especially great for `main` (change lead time, no concurrency issues).
-#
-# Other consequences:
-#   * The pipeline may be cancelled during / between deployments to dev and prod.
-#   * If the latest commit fails, the ones before don't make it to production.
-#   * We don't know the state (green/red) of the cancelled flows.
-#   * We don't spend pipeline minutes on (probably) outdated outcomes.
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-env:
-  PROJECT_NAME: unternehmen-steuer-gewerbe
-  CONTAINER_REGISTRY: ghcr.io
-  CONTAINER_IMAGE_NAME: ${{ github.repository }}
-  CONTAINER_IMAGE_VERSION: ${{ github.event.pull_request.head.sha || github.sha }}
-  CONTAINER_IMAGE_CANDIDATES_NAME: ${{ github.repository }}-candidates
-  INFRA_REPO: gruenden-infra
-  SLACK_ALERTS_CHANNEL_ID: C0AQJKRSPM4
-
-jobs:
-  # Note: Formatting and linting do break the pipeline
-  # There's a Git hooks setup to fix both before pushing. Cf. the repository README
-  check-format-and-lint:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
-        with:
-          fetch-depth: 1
-
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
-        name: Install pnpm
-        with:
-          cache: true
-
-      - name: Install dependencies
-        run: pnpm install --ignore-scripts
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
-
-      - name: Check format
-        run: pnpm run format
-
-      - name: Lint
-        run: pnpm run lint
-
-      - name: ls-lint (file and directory names)
-        run: pnpm run ls-lint
-
-      - name: Send failure to Slack
-        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
-
-  test-unit:
-    strategy:
-      matrix:
-        shard: [1, 2]
-      fail-fast: false
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
-        with:
-          fetch-depth: 0
-
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
-        name: Install pnpm
-        with:
-          cache: true
-
-      - name: Install dependencies
-        run: pnpm install --ignore-scripts
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
-
-      - name: Run unit tests (shard ${{ matrix.shard }}/${{ strategy.job-total }}) with coverage report
-        run: pnpm run test:unit:ci --shard=${{ matrix.shard }}/${{ strategy.job-total }} --outputFile.blob=.vitest-reports/unit-tests-shard-${{ matrix.shard }}-of-${{ strategy.job-total }}.blob.json
-        env:
-          # Not used for network calls in unit tests, but still required:
-          # - ERIC_HERSTELLERID is checked at import time (fail-fast guard in transformToFsE.ts),
-          #   and transitively imported by nearly every route-level unit test via app.ts.
-          # - the FIT_CONNECT JWKs are used by crypto.unit.test.ts for a real (local) encrypt/decrypt roundtrip.
-          ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
-          FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK: ${{ vars.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK }}
-          FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK: ${{ secrets.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK }}
-
-      - name: Upload coverage blob
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: vitest-blob-unit-${{ matrix.shard }}
-          path: .vitest-reports/unit-tests-shard-${{ matrix.shard }}-of-${{ strategy.job-total }}.blob.json
-          retention-days: 1
-          if-no-files-found: error
-
-      - name: Send failure to Slack
-        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
-
-  test-integration:
-    strategy:
-      matrix:
-        shard: [1, 2, 3]
-      fail-fast: false
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
-        with:
-          fetch-depth: 0
-
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
-        name: Install pnpm
-        with:
-          cache: true
-
-      - name: Install dependencies
-        run: pnpm install --ignore-scripts
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
-
-      - name: Run integration tests (shard ${{ matrix.shard }}/${{ strategy.job-total }}) with coverage report
-        run: pnpm run test:integration:ci --shard=${{ matrix.shard }}/${{ strategy.job-total }} --outputFile.blob=.vitest-reports/integration-tests-shard-${{ matrix.shard }}-of-${{ strategy.job-total }}.blob.json
-        env:
-          FIT_CONNECT_OAUTH_TOKEN_URL: ${{ vars.FIT_CONNECT_OAUTH_TOKEN_URL }}
-          FIT_CONNECT_SUBMISSION_API_URL: ${{ vars.FIT_CONNECT_SUBMISSION_API_URL }}
-          FIT_CONNECT_DESTINATION_API_URL: ${{ vars.FIT_CONNECT_DESTINATION_API_URL }}
-          FIT_CONNECT_ROUTING_API_URL: ${{ vars.FIT_CONNECT_ROUTING_API_URL }}
-          FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK: ${{ vars.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK }}
-          FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK: ${{ secrets.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK }}
-          FIT_CONNECT_CLIENT_ID: ${{ vars.FIT_CONNECT_CLIENT_ID }}
-          FIT_CONNECT_CLIENT_SECRET: ${{ secrets.FIT_CONNECT_CLIENT_SECRET }}
-          FIT_CONNECT_DESTINATION_ID: ${{ vars.FIT_CONNECT_DESTINATION_ID }}
-          ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
-          ERIC_CERTIFICATE_BASE64: ${{ secrets.ERIC_CERTIFICATE_BASE64 }}
-          ERIC_CERTIFICATE_PIN: ${{ secrets.ERIC_CERTIFICATE_PIN }}
-          AKDB_BASE_URL: ${{ vars.AKDB_BASE_URL }}
-          AKDB_USERNAME: ${{ vars.AKDB_USERNAME }}
-          AKDB_PASSWORD: ${{ secrets.AKDB_PASSWORD }}
-
-      - name: Upload coverage blob
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: vitest-blob-integration-${{ matrix.shard }}
-          path: .vitest-reports/integration-tests-shard-${{ matrix.shard }}-of-${{ strategy.job-total }}.blob.json
-          retention-days: 1
-          if-no-files-found: error
-
-      - name: Send failure to Slack
-        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
-
-  ################################
-  # SonarCloud for static code and test coverage analyses
-  # requires the SonarQubeCloud GitHub app in the repository
-  ################################
-  scan-with-sonarcloud:
-    needs: [test-unit, test-integration]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
-        with:
-          fetch-depth: 0
-
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
-        name: Install pnpm
-        with:
-          cache: true
-
-      - name: Install dependencies
-        run: pnpm install --ignore-scripts
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
-
-      # fetch and combine coverage reports from every unit/integration shard
-      - name: Download all coverage blobs
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          pattern: vitest-blob-*
-          path: .vitest-reports/
-          merge-multiple: true
-
-      - name: Merge coverage reports
-        run: pnpm run test:coverage:merge
-
-      - name: Cache SonarQube packages
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@713881670b6b3676cda39549040e2d88c70d582e
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      # Break pipeline on Sonar quality gate
-      - name: SonarQube Quality Gate check
-        id: sonarqube-quality-gate-check
-        uses: sonarsource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b
-        with:
-          pollingTimeoutSec: 600
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      - name: Send failure to Slack
-        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
-
-  build-image:
-    name: Build image, run Trivy scan, push as candidate (on main)
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      security-events: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
-        with:
-          fetch-depth: 1
-
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
-        name: Install pnpm
-        with:
-          cache: true
-
-      - name: Install dependencies
-        run: pnpm install --ignore-scripts
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
-
-      - name: Build project and docker image
-        run: pnpm build:image
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
-
-      - name: Run Trivy vulnerability image scanner (all severities)
-        # Note: Results are shown in the GitHub Security tab
-        #       cf. step "Upload Trivy scan results to GitHub Security tab"
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
-        env:
-          TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
-          TRIVY_SKIP_FILES: "**/generated.spezifikation.sef.json"
-          TRIVY_JAVA_DB_REPOSITORY: ""
-          TRIVY_SEVERITY: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
-          TRIVY_SKIP_UPDATE: "true"
-        with:
-          image-ref: unternehmen-steuer-gewerbe
-          format: "json"
-          output: "trivy-image-results.json"
-          exit-code: 0
-          scanners: "vuln,config,secret"
-
-      - name: Convert Trivy results to sarif
-        run:
-          trivy convert --format sarif --output trivy-image-results.sarif trivy-image-results.json
-
-          # Not possible in public repo
-      # - name: Upload Trivy scan results to GitHub Security tab (on `main`)
-      #   uses: github/codeql-action/upload-sarif@c35d1b164463ee62a100735382aaaa525c5d3496
-      #   # only on `main`
-      #   if: ${{ github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
-      #   with:
-      #     sarif_file: "trivy-image-results.sarif"
-      - name: Fail build on High/Criticial Vulnerabilities (on branches)
-        # ignore on `main`
-        if: ${{ github.ref != 'refs/heads/main' }}
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
-        env:
-          TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
-          TRIVY_SKIP_FILES: "**/generated.spezifikation.sef.json"
-          TRIVY_JAVA_DB_REPOSITORY: ""
-          TRIVY_FORMAT: table
-          TRIVY_SEVERITY: HIGH,CRITICAL
-          TRIVY_EXIT_CODE: 1
-        with:
-          image-ref: unternehmen-steuer-gewerbe
-          # following three are ignored unfortunately -> therefore using ENV vars directly
-          # https://github.com/aquasecurity/trivy-action/issues/435
-          format: table
-          severity: HIGH,CRITICAL
-          exit-code: 1
-          # On a subsequent call to the action we know trivy is already installed so can skip this
-          skip-setup-trivy: true
-
-      - name: Convert Trivy results to cosign-vuln
-        run: trivy convert --format cosign-vuln --output ${{ env.PROJECT_NAME }}-vulnerabilities.json trivy-image-results.json
-
-      - name: Upload trivy results as artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: backend-trivy-image-results.sarif
-          retention-days: 3
-          path: trivy-image-results.sarif
-          if-no-files-found: error
-
-      - name: Print trivy results (sarif format)
-        run: cat trivy-image-results.sarif
-
-      - name: Login to GitHub Container Registry
-        if: github.ref == 'refs/heads/main'
-        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
-        with:
-          registry: ${{ env.CONTAINER_REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Push scanned image candidate to registry (on main)
-        if: github.ref == 'refs/heads/main'
-        run: |
-          docker tag unternehmen-steuer-gewerbe ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_CANDIDATES_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
-          docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_CANDIDATES_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
-
-      - name: Confirm image candidate package visibility is private
-        if: github.ref == 'refs/heads/main'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          VISIBILITY=$(gh api /orgs/${{ github.repository_owner }}/packages/container/${{ env.PROJECT_NAME }}-candidates --jq '.visibility')
-          if [ "$VISIBILITY" != "private" ]; then
-            echo "ERROR: Package visibility is '$VISIBILITY', expected 'private'."
-            exit 1
-          fi
-          echo "Package visibility confirmed: private"
-
-      - name: Upload cosign-vuln attestation as artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: vulnerabilities-attestation
-          retention-days: 1
-          path: ${{ env.PROJECT_NAME }}-vulnerabilities.json
-          if-no-files-found: error
-
-      - name: Send failure to Slack
-        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
-
-  publish-image:
-    name: Publish image to registry (main only)
-    needs:
-      [
-        check-format-and-lint,
-        test-unit,
-        test-integration,
-        scan-with-sonarcloud,
-        build-image,
-        secret-scanning,
-      ]
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write # Required for cosign to authenticate when signing the image
-      packages: write
-    steps:
-      - name: Download cosign-vuln attestation
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          name: vulnerabilities-attestation
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
-        with:
-          registry: ${{ env.CONTAINER_REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Promote image candidate to registry
-        run: |
-          docker buildx imagetools create \
-            --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }} \
-            ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_CANDIDATES_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
-
-      - name: Confirm image package visibility is private
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          VISIBILITY=$(gh api /orgs/${{ github.repository_owner }}/packages/container/${{ env.PROJECT_NAME }} --jq '.visibility')
-          if [ "$VISIBILITY" != "private" ]; then
-            echo "ERROR: Package visibility is '$VISIBILITY', expected 'private'."
-            exit 1
-          fi
-          echo "Package visibility confirmed: private"
-
-      - name: Install cosign
-        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6
-        with:
-          cosign-release: "v2.6.0" # We need this, because the kyverno policy that is validating the signature is not yet compatible with the newer version of cosign. Cosign switch the bundle format in version 3.
-
-      - name: Sign the published Docker image
-        run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
-
-      - name: Attest the vulnerability scan
-        run: cosign attest --yes --replace --predicate ${{ env.PROJECT_NAME }}-vulnerabilities.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
-
-      - name: Send failure to Slack
-        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
-
-  secret-scanning:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
-
-      - name: Install Trivy
-        env:
-          TRIVY_INSTALL_SCRIPT_SHA256: "e00df553be558995b994758bc8995956554a16937f456dc6615b0cc411bfec7a"
-        run: |
-          curl --proto '=https' --tlsv1.2 -sfLo trivy-install.sh https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh
-          echo "$TRIVY_INSTALL_SCRIPT_SHA256  trivy-install.sh" | sha256sum --check --status
-          sh trivy-install.sh -b /usr/local/bin
-
-      - name: Run Trivy secret scan
-        run: trivy fs --scanners secret --exit-code 1 .
-
-      - name: Send failure to Slack
-        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
-
-  deploy-development:
-    name: Deploy to development environment
-    needs: [publish-image]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to development
-        uses: digitalservicebund/argocd-deploy@e8f6b8f77c8b8eeef3f67fc5bba9521f89145645
-        with:
-          environment: development/unternehmen-steuer-gewerbe
-          version: ${{ github.sha }}
-          deploying_repo: ${{ github.event.repository.name }}
-          infra_repo: ${{ env.INFRA_REPO }}
-          github_app_client_id: ${{ secrets.GITOPS_GRUENDEN_APP_CLIENT_ID}}
-          github_app_private_key: ${{ secrets.GITOPS_GRUENDEN_APP_PRIVATE_KEY }}
-          app: ${{ env.PROJECT_NAME }}-development
-          argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
-          argocd_server: ${{ secrets.ARGOCD_SERVER_STACKIT }}
-
-      - name: Send failure to Slack
-        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
-
-  smoke-test-development:
-    name: Smoke test development environment
-    needs: deploy-development
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    environment: development
-    permissions:
-      contents: read
-    steps:
-      - name: Wait for development to serve the correct commit
-        run: |
-          echo "Waiting for ${{ vars.DEVELOPMENT_BASE_URL }} to serve commit ${{ github.sha }}..."
-          for i in $(seq 1 30); do
-            RESPONSE=$(curl --silent "${{ vars.DEVELOPMENT_BASE_URL }}")
-            SHA=$(echo "$RESPONSE" | jq -r '.gitCommitSHA // empty')
-            if [ "$SHA" = "${{ github.sha }}" ]; then
-              echo "Attempt $i: Development is running the correct commit."
-              exit 0
-            fi
-            echo "Attempt $i: got response '$RESPONSE', retrying in 5s..."
-            sleep 5
-          done
-          echo "Timed out waiting for development to serve commit ${{ github.sha }}"
-          exit 1
-
-      - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
-        with:
-          fetch-depth: 1
-
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
-        name: Install pnpm
-        with:
-          cache: true
-
-      - name: Install dependencies
-        run: pnpm install --ignore-scripts
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
-
-      - name: Run smoke tests against development
-        run: pnpm run test:smoke:ci
-        env:
-          TEST_BASE_URL: ${{ vars.DEVELOPMENT_BASE_URL }}
-          FIT_CONNECT_OAUTH_TOKEN_URL: ${{ vars.FIT_CONNECT_OAUTH_TOKEN_URL }}
-          FIT_CONNECT_SUBMISSION_API_URL: ${{ vars.FIT_CONNECT_SUBMISSION_API_URL }}
-          FIT_CONNECT_DESTINATION_API_URL: ${{ vars.FIT_CONNECT_DESTINATION_API_URL }}
-          FIT_CONNECT_ROUTING_API_URL: ${{ vars.FIT_CONNECT_ROUTING_API_URL }}
-          FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK: ${{ vars.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK }}
-          FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK: ${{ secrets.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK }}
-          FIT_CONNECT_CLIENT_ID: ${{ vars.FIT_CONNECT_CLIENT_ID }}
-          FIT_CONNECT_CLIENT_SECRET: ${{ secrets.FIT_CONNECT_CLIENT_SECRET }}
-          FIT_CONNECT_DESTINATION_ID: ${{ vars.FIT_CONNECT_DESTINATION_ID }}
-          ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
-
-      - name: Send failure to Slack
-        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
-
-  deploy-production:
-    name: Deploy to production environment
-    needs: smoke-test-development
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Deploy to production
-        uses: digitalservicebund/argocd-deploy@e8f6b8f77c8b8eeef3f67fc5bba9521f89145645
-        with:
-          environment: production/unternehmen-steuer-gewerbe
-          version: ${{ github.sha }}
-          deploying_repo: ${{ github.event.repository.name }}
-          infra_repo: ${{ env.INFRA_REPO }}
-          github_app_client_id: ${{ secrets.GITOPS_GRUENDEN_APP_CLIENT_ID}}
-          github_app_private_key: ${{ secrets.GITOPS_GRUENDEN_APP_PRIVATE_KEY }}
-          app: ${{ env.PROJECT_NAME }}-production
-          argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
-          argocd_server: ${{ secrets.ARGOCD_SERVER_STACKIT }}
-
-      - name: Send failure to Slack
-        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
-
-  #######################################
-  # Automerge if it's a dependabot PR and all tests are passing and it's a non-major version update
-  # cf. ../dependabot.yml for details on Dependabot like e.g. the cooldown period we're using
-  # Follows this recipe of the GitHub docs: https://docs.github.com/en/code-security/tutorials/secure-your-dependencies/automating-dependabot-with-github-actions#enabling-automerge-on-a-pull-request
-  #
-  # Important: several secrets needed to be explicitly set for Dependabot (not just"Actions") in order to successfully run this job
-  #  - all client secrets and env vars FIT_CONNECT_... and ERIC_...
-  #  - a GitHub Personal Access Token for elevated privileges for the actual merge (PRIVATE_REPOSITORY_ACCESS_TOKEN)
-  #  - a Sonar Personal Access Token so the sonar scan works
-  #######################################
-
-  dependabot-auto-merge:
-    runs-on: ubuntu-latest
-    # the ${{ success() }} is required for the "if" not to override the "needs" below
-    # (we did run into this problem and saw auto-merges even as "frontend-checks" failed)
-    needs:
-      - check-format-and-lint
-      - test-unit
-      - test-integration
-      - scan-with-sonarcloud
-      - build-image
-      - secret-scanning
-    if: ${{ github.event_name != 'schedule' && success() && github.actor ==
-      'dependabot[bot]' && !cancelled() && github.ref != 'refs/heads/main' &&
-      github.repository == 'digitalservicebund/unternehmen-steuer-gewerbe'}}
-    permissions:
-      contents: write
-      pull-requests: write
-    steps:
-      - name: Dependabot metadata
-        id: metadata
-        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98
-        with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-      - name: Auto-merge Dependabot PRs except major version updates
-        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
-        run: gh pr merge --squash "$PR_URL"
-        env:
-          PR_URL: ${{github.event.pull_request.html_url}}
-          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+# name: CI Pipeline
+
+# on:
+#   # run when pushing to main
+#   push:
+#     branches:
+#       - main
+#   # run on PRs based on main
+#   pull_request:
+#     branches:
+#       - main
+#   # allow for running this workflow manually (button in GitHub Actions UI)
+#   workflow_dispatch:
+
+# # On each branch, the latest commit cancels the pipelines of any earlier commits.
+# #
+# # Goal: The latest state is processed as quickly as possible.
+# #       Especially great for `main` (change lead time, no concurrency issues).
+# #
+# # Other consequences:
+# #   * The pipeline may be cancelled during / between deployments to dev and prod.
+# #   * If the latest commit fails, the ones before don't make it to production.
+# #   * We don't know the state (green/red) of the cancelled flows.
+# #   * We don't spend pipeline minutes on (probably) outdated outcomes.
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.ref }}
+#   cancel-in-progress: true
+
+# env:
+#   PROJECT_NAME: unternehmen-steuer-gewerbe
+#   CONTAINER_REGISTRY: ghcr.io
+#   CONTAINER_IMAGE_NAME: ${{ github.repository }}
+#   CONTAINER_IMAGE_VERSION: ${{ github.event.pull_request.head.sha || github.sha }}
+#   CONTAINER_IMAGE_CANDIDATES_NAME: ${{ github.repository }}-candidates
+#   INFRA_REPO: gruenden-infra
+#   SLACK_ALERTS_CHANNEL_ID: C0AQJKRSPM4
+
+# jobs:
+#   # Note: Formatting and linting do break the pipeline
+#   # There's a Git hooks setup to fix both before pushing. Cf. the repository README
+#   check-format-and-lint:
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+#         with:
+#           fetch-depth: 1
+
+#       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+#         name: Install pnpm
+#         with:
+#           cache: true
+
+#       - name: Install dependencies
+#         run: pnpm install --ignore-scripts
+#         env:
+#           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
+
+#       - name: Check format
+#         run: pnpm run format
+
+#       - name: Lint
+#         run: pnpm run lint
+
+#       - name: ls-lint (file and directory names)
+#         run: pnpm run ls-lint
+
+#       - name: Send failure to Slack
+#         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+#         if: ${{ failure() && github.ref == 'refs/heads/main' }}
+#         with:
+#           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+#           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
+
+#   test-unit:
+#     strategy:
+#       matrix:
+#         shard: [1, 2]
+#       fail-fast: false
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+#         with:
+#           fetch-depth: 0
+
+#       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+#         name: Install pnpm
+#         with:
+#           cache: true
+
+#       - name: Install dependencies
+#         run: pnpm install --ignore-scripts
+#         env:
+#           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
+
+#       - name: Run unit tests (shard ${{ matrix.shard }}/${{ strategy.job-total }}) with coverage report
+#         run: pnpm run test:unit:ci --shard=${{ matrix.shard }}/${{ strategy.job-total }} --outputFile.blob=.vitest-reports/unit-tests-shard-${{ matrix.shard }}-of-${{ strategy.job-total }}.blob.json
+#         env:
+#           # Not used for network calls in unit tests, but still required:
+#           # - ERIC_HERSTELLERID is checked at import time (fail-fast guard in transformToFsE.ts),
+#           #   and transitively imported by nearly every route-level unit test via app.ts.
+#           # - the FIT_CONNECT JWKs are used by crypto.unit.test.ts for a real (local) encrypt/decrypt roundtrip.
+#           ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
+#           FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK: ${{ vars.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK }}
+#           FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK: ${{ secrets.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK }}
+
+#       - name: Upload coverage blob
+#         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+#         with:
+#           name: vitest-blob-unit-${{ matrix.shard }}
+#           path: .vitest-reports/unit-tests-shard-${{ matrix.shard }}-of-${{ strategy.job-total }}.blob.json
+#           retention-days: 1
+#           if-no-files-found: error
+
+#       - name: Send failure to Slack
+#         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+#         if: ${{ failure() && github.ref == 'refs/heads/main' }}
+#         with:
+#           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+#           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
+
+#   test-integration:
+#     strategy:
+#       matrix:
+#         shard: [1, 2, 3]
+#       fail-fast: false
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+#         with:
+#           fetch-depth: 0
+
+#       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+#         name: Install pnpm
+#         with:
+#           cache: true
+
+#       - name: Install dependencies
+#         run: pnpm install --ignore-scripts
+#         env:
+#           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
+
+#       - name: Run integration tests (shard ${{ matrix.shard }}/${{ strategy.job-total }}) with coverage report
+#         run: pnpm run test:integration:ci --shard=${{ matrix.shard }}/${{ strategy.job-total }} --outputFile.blob=.vitest-reports/integration-tests-shard-${{ matrix.shard }}-of-${{ strategy.job-total }}.blob.json
+#         env:
+#           FIT_CONNECT_OAUTH_TOKEN_URL: ${{ vars.FIT_CONNECT_OAUTH_TOKEN_URL }}
+#           FIT_CONNECT_SUBMISSION_API_URL: ${{ vars.FIT_CONNECT_SUBMISSION_API_URL }}
+#           FIT_CONNECT_DESTINATION_API_URL: ${{ vars.FIT_CONNECT_DESTINATION_API_URL }}
+#           FIT_CONNECT_ROUTING_API_URL: ${{ vars.FIT_CONNECT_ROUTING_API_URL }}
+#           FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK: ${{ vars.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK }}
+#           FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK: ${{ secrets.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK }}
+#           FIT_CONNECT_CLIENT_ID: ${{ vars.FIT_CONNECT_CLIENT_ID }}
+#           FIT_CONNECT_CLIENT_SECRET: ${{ secrets.FIT_CONNECT_CLIENT_SECRET }}
+#           FIT_CONNECT_DESTINATION_ID: ${{ vars.FIT_CONNECT_DESTINATION_ID }}
+#           ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
+#           ERIC_CERTIFICATE_BASE64: ${{ secrets.ERIC_CERTIFICATE_BASE64 }}
+#           ERIC_CERTIFICATE_PIN: ${{ secrets.ERIC_CERTIFICATE_PIN }}
+#           AKDB_BASE_URL: ${{ vars.AKDB_BASE_URL }}
+#           AKDB_USERNAME: ${{ vars.AKDB_USERNAME }}
+#           AKDB_PASSWORD: ${{ secrets.AKDB_PASSWORD }}
+
+#       - name: Upload coverage blob
+#         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+#         with:
+#           name: vitest-blob-integration-${{ matrix.shard }}
+#           path: .vitest-reports/integration-tests-shard-${{ matrix.shard }}-of-${{ strategy.job-total }}.blob.json
+#           retention-days: 1
+#           if-no-files-found: error
+
+#       - name: Send failure to Slack
+#         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+#         if: ${{ failure() && github.ref == 'refs/heads/main' }}
+#         with:
+#           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+#           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
+
+#   ################################
+#   # SonarCloud for static code and test coverage analyses
+#   # requires the SonarQubeCloud GitHub app in the repository
+#   ################################
+#   scan-with-sonarcloud:
+#     needs: [test-unit, test-integration]
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+#       pull-requests: write
+
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+#         with:
+#           fetch-depth: 0
+
+#       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+#         name: Install pnpm
+#         with:
+#           cache: true
+
+#       - name: Install dependencies
+#         run: pnpm install --ignore-scripts
+#         env:
+#           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
+
+#       # fetch and combine coverage reports from every unit/integration shard
+#       - name: Download all coverage blobs
+#         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+#         with:
+#           pattern: vitest-blob-*
+#           path: .vitest-reports/
+#           merge-multiple: true
+
+#       - name: Merge coverage reports
+#         run: pnpm run test:coverage:merge
+
+#       - name: Cache SonarQube packages
+#         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+#         with:
+#           path: ~/.sonar/cache
+#           key: ${{ runner.os }}-sonar
+#           restore-keys: ${{ runner.os }}-sonar
+
+#       - name: SonarQube Scan
+#         uses: SonarSource/sonarqube-scan-action@713881670b6b3676cda39549040e2d88c70d582e
+#         env:
+#           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+#       # Break pipeline on Sonar quality gate
+#       - name: SonarQube Quality Gate check
+#         id: sonarqube-quality-gate-check
+#         uses: sonarsource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b
+#         with:
+#           pollingTimeoutSec: 600
+#         env:
+#           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+#       - name: Send failure to Slack
+#         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+#         if: ${{ failure() && github.ref == 'refs/heads/main' }}
+#         with:
+#           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+#           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
+
+#   build-image:
+#     name: Build image, run Trivy scan, push as candidate (on main)
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+#       packages: write
+#       security-events: write
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+#         with:
+#           fetch-depth: 1
+
+#       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+#         name: Install pnpm
+#         with:
+#           cache: true
+
+#       - name: Install dependencies
+#         run: pnpm install --ignore-scripts
+#         env:
+#           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
+
+#       - name: Build project and docker image
+#         run: pnpm build:image
+#         env:
+#           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
+
+#       - name: Run Trivy vulnerability image scanner (all severities)
+#         # Note: Results are shown in the GitHub Security tab
+#         #       cf. step "Upload Trivy scan results to GitHub Security tab"
+#         # Third-party action, pin to commit SHA!
+#         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+#         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+#         env:
+#           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
+#           TRIVY_SKIP_FILES: "**/generated.spezifikation.sef.json"
+#           TRIVY_JAVA_DB_REPOSITORY: ""
+#           TRIVY_SEVERITY: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+#           TRIVY_SKIP_UPDATE: "true"
+#         with:
+#           image-ref: unternehmen-steuer-gewerbe
+#           format: "json"
+#           output: "trivy-image-results.json"
+#           exit-code: 0
+#           scanners: "vuln,config,secret"
+
+#       - name: Convert Trivy results to sarif
+#         run:
+#           trivy convert --format sarif --output trivy-image-results.sarif trivy-image-results.json
+
+#           # Not possible in public repo
+#       # - name: Upload Trivy scan results to GitHub Security tab (on `main`)
+#       #   uses: github/codeql-action/upload-sarif@c35d1b164463ee62a100735382aaaa525c5d3496
+#       #   # only on `main`
+#       #   if: ${{ github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
+#       #   with:
+#       #     sarif_file: "trivy-image-results.sarif"
+#       - name: Fail build on High/Criticial Vulnerabilities (on branches)
+#         # ignore on `main`
+#         if: ${{ github.ref != 'refs/heads/main' }}
+#         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+#         env:
+#           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
+#           TRIVY_SKIP_FILES: "**/generated.spezifikation.sef.json"
+#           TRIVY_JAVA_DB_REPOSITORY: ""
+#           TRIVY_FORMAT: table
+#           TRIVY_SEVERITY: HIGH,CRITICAL
+#           TRIVY_EXIT_CODE: 1
+#         with:
+#           image-ref: unternehmen-steuer-gewerbe
+#           # following three are ignored unfortunately -> therefore using ENV vars directly
+#           # https://github.com/aquasecurity/trivy-action/issues/435
+#           format: table
+#           severity: HIGH,CRITICAL
+#           exit-code: 1
+#           # On a subsequent call to the action we know trivy is already installed so can skip this
+#           skip-setup-trivy: true
+
+#       - name: Convert Trivy results to cosign-vuln
+#         run: trivy convert --format cosign-vuln --output ${{ env.PROJECT_NAME }}-vulnerabilities.json trivy-image-results.json
+
+#       - name: Upload trivy results as artifact
+#         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+#         with:
+#           name: backend-trivy-image-results.sarif
+#           retention-days: 3
+#           path: trivy-image-results.sarif
+#           if-no-files-found: error
+
+#       - name: Print trivy results (sarif format)
+#         run: cat trivy-image-results.sarif
+
+#       - name: Login to GitHub Container Registry
+#         if: github.ref == 'refs/heads/main'
+#         uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
+#         with:
+#           registry: ${{ env.CONTAINER_REGISTRY }}
+#           username: ${{ github.actor }}
+#           password: ${{ secrets.GITHUB_TOKEN }}
+
+#       - name: Push scanned image candidate to registry (on main)
+#         if: github.ref == 'refs/heads/main'
+#         run: |
+#           docker tag unternehmen-steuer-gewerbe ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_CANDIDATES_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+#           docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_CANDIDATES_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+
+#       - name: Confirm image candidate package visibility is private
+#         if: github.ref == 'refs/heads/main'
+#         env:
+#           GH_TOKEN: ${{ github.token }}
+#         run: |
+#           VISIBILITY=$(gh api /orgs/${{ github.repository_owner }}/packages/container/${{ env.PROJECT_NAME }}-candidates --jq '.visibility')
+#           if [ "$VISIBILITY" != "private" ]; then
+#             echo "ERROR: Package visibility is '$VISIBILITY', expected 'private'."
+#             exit 1
+#           fi
+#           echo "Package visibility confirmed: private"
+
+#       - name: Upload cosign-vuln attestation as artifact
+#         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+#         with:
+#           name: vulnerabilities-attestation
+#           retention-days: 1
+#           path: ${{ env.PROJECT_NAME }}-vulnerabilities.json
+#           if-no-files-found: error
+
+#       - name: Send failure to Slack
+#         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+#         if: ${{ failure() && github.ref == 'refs/heads/main' }}
+#         with:
+#           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+#           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
+
+#   publish-image:
+#     name: Publish image to registry (main only)
+#     needs:
+#       [
+#         check-format-and-lint,
+#         test-unit,
+#         test-integration,
+#         scan-with-sonarcloud,
+#         build-image,
+#         secret-scanning,
+#       ]
+#     if: github.ref == 'refs/heads/main'
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+#       id-token: write # Required for cosign to authenticate when signing the image
+#       packages: write
+#     steps:
+#       - name: Download cosign-vuln attestation
+#         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+#         with:
+#           name: vulnerabilities-attestation
+
+#       - name: Login to GitHub Container Registry
+#         uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
+#         with:
+#           registry: ${{ env.CONTAINER_REGISTRY }}
+#           username: ${{ github.actor }}
+#           password: ${{ secrets.GITHUB_TOKEN }}
+
+#       - name: Promote image candidate to registry
+#         run: |
+#           docker buildx imagetools create \
+#             --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }} \
+#             ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_CANDIDATES_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+
+#       - name: Confirm image package visibility is private
+#         env:
+#           GH_TOKEN: ${{ github.token }}
+#         run: |
+#           VISIBILITY=$(gh api /orgs/${{ github.repository_owner }}/packages/container/${{ env.PROJECT_NAME }} --jq '.visibility')
+#           if [ "$VISIBILITY" != "private" ]; then
+#             echo "ERROR: Package visibility is '$VISIBILITY', expected 'private'."
+#             exit 1
+#           fi
+#           echo "Package visibility confirmed: private"
+
+#       - name: Install cosign
+#         uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6
+#         with:
+#           cosign-release: "v2.6.0" # We need this, because the kyverno policy that is validating the signature is not yet compatible with the newer version of cosign. Cosign switch the bundle format in version 3.
+
+#       - name: Sign the published Docker image
+#         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+
+#       - name: Attest the vulnerability scan
+#         run: cosign attest --yes --replace --predicate ${{ env.PROJECT_NAME }}-vulnerabilities.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+
+#       - name: Send failure to Slack
+#         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+#         if: ${{ failure() && github.ref == 'refs/heads/main' }}
+#         with:
+#           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+#           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
+
+#   secret-scanning:
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+
+#       - name: Install Trivy
+#         env:
+#           TRIVY_INSTALL_SCRIPT_SHA256: "e00df553be558995b994758bc8995956554a16937f456dc6615b0cc411bfec7a"
+#         run: |
+#           curl --proto '=https' --tlsv1.2 -sfLo trivy-install.sh https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh
+#           echo "$TRIVY_INSTALL_SCRIPT_SHA256  trivy-install.sh" | sha256sum --check --status
+#           sh trivy-install.sh -b /usr/local/bin
+
+#       - name: Run Trivy secret scan
+#         run: trivy fs --scanners secret --exit-code 1 .
+
+#       - name: Send failure to Slack
+#         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+#         if: ${{ failure() && github.ref == 'refs/heads/main' }}
+#         with:
+#           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+#           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
+
+#   deploy-development:
+#     name: Deploy to development environment
+#     needs: [publish-image]
+#     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Deploy to development
+#         uses: digitalservicebund/argocd-deploy@e8f6b8f77c8b8eeef3f67fc5bba9521f89145645
+#         with:
+#           environment: development/unternehmen-steuer-gewerbe
+#           version: ${{ github.sha }}
+#           deploying_repo: ${{ github.event.repository.name }}
+#           infra_repo: ${{ env.INFRA_REPO }}
+#           github_app_client_id: ${{ secrets.GITOPS_GRUENDEN_APP_CLIENT_ID}}
+#           github_app_private_key: ${{ secrets.GITOPS_GRUENDEN_APP_PRIVATE_KEY }}
+#           app: ${{ env.PROJECT_NAME }}-development
+#           argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+#           argocd_server: ${{ secrets.ARGOCD_SERVER_STACKIT }}
+
+#       - name: Send failure to Slack
+#         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+#         if: ${{ failure() && github.ref == 'refs/heads/main' }}
+#         with:
+#           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+#           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
+
+#   smoke-test-development:
+#     name: Smoke test development environment
+#     needs: deploy-development
+#     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+#     runs-on: ubuntu-latest
+#     environment: development
+#     permissions:
+#       contents: read
+#     steps:
+#       - name: Wait for development to serve the correct commit
+#         run: |
+#           echo "Waiting for ${{ vars.DEVELOPMENT_BASE_URL }} to serve commit ${{ github.sha }}..."
+#           for i in $(seq 1 30); do
+#             RESPONSE=$(curl --silent "${{ vars.DEVELOPMENT_BASE_URL }}")
+#             SHA=$(echo "$RESPONSE" | jq -r '.gitCommitSHA // empty')
+#             if [ "$SHA" = "${{ github.sha }}" ]; then
+#               echo "Attempt $i: Development is running the correct commit."
+#               exit 0
+#             fi
+#             echo "Attempt $i: got response '$RESPONSE', retrying in 5s..."
+#             sleep 5
+#           done
+#           echo "Timed out waiting for development to serve commit ${{ github.sha }}"
+#           exit 1
+
+#       - name: Checkout
+#         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+#         with:
+#           fetch-depth: 1
+
+#       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+#         name: Install pnpm
+#         with:
+#           cache: true
+
+#       - name: Install dependencies
+#         run: pnpm install --ignore-scripts
+#         env:
+#           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
+
+#       - name: Run smoke tests against development
+#         run: pnpm run test:smoke:ci
+#         env:
+#           TEST_BASE_URL: ${{ vars.DEVELOPMENT_BASE_URL }}
+#           FIT_CONNECT_OAUTH_TOKEN_URL: ${{ vars.FIT_CONNECT_OAUTH_TOKEN_URL }}
+#           FIT_CONNECT_SUBMISSION_API_URL: ${{ vars.FIT_CONNECT_SUBMISSION_API_URL }}
+#           FIT_CONNECT_DESTINATION_API_URL: ${{ vars.FIT_CONNECT_DESTINATION_API_URL }}
+#           FIT_CONNECT_ROUTING_API_URL: ${{ vars.FIT_CONNECT_ROUTING_API_URL }}
+#           FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK: ${{ vars.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK }}
+#           FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK: ${{ secrets.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK }}
+#           FIT_CONNECT_CLIENT_ID: ${{ vars.FIT_CONNECT_CLIENT_ID }}
+#           FIT_CONNECT_CLIENT_SECRET: ${{ secrets.FIT_CONNECT_CLIENT_SECRET }}
+#           FIT_CONNECT_DESTINATION_ID: ${{ vars.FIT_CONNECT_DESTINATION_ID }}
+#           ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
+
+#       - name: Send failure to Slack
+#         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+#         if: ${{ failure() && github.ref == 'refs/heads/main' }}
+#         with:
+#           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+#           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
+
+#   deploy-production:
+#     name: Deploy to production environment
+#     needs: smoke-test-development
+#     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+#     steps:
+#       - name: Deploy to production
+#         uses: digitalservicebund/argocd-deploy@e8f6b8f77c8b8eeef3f67fc5bba9521f89145645
+#         with:
+#           environment: production/unternehmen-steuer-gewerbe
+#           version: ${{ github.sha }}
+#           deploying_repo: ${{ github.event.repository.name }}
+#           infra_repo: ${{ env.INFRA_REPO }}
+#           github_app_client_id: ${{ secrets.GITOPS_GRUENDEN_APP_CLIENT_ID}}
+#           github_app_private_key: ${{ secrets.GITOPS_GRUENDEN_APP_PRIVATE_KEY }}
+#           app: ${{ env.PROJECT_NAME }}-production
+#           argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+#           argocd_server: ${{ secrets.ARGOCD_SERVER_STACKIT }}
+
+#       - name: Send failure to Slack
+#         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
+#         if: ${{ failure() && github.ref == 'refs/heads/main' }}
+#         with:
+#           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+#           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
+
+#   #######################################
+#   # Automerge if it's a dependabot PR and all tests are passing and it's a non-major version update
+#   # cf. ../dependabot.yml for details on Dependabot like e.g. the cooldown period we're using
+#   # Follows this recipe of the GitHub docs: https://docs.github.com/en/code-security/tutorials/secure-your-dependencies/automating-dependabot-with-github-actions#enabling-automerge-on-a-pull-request
+#   #
+#   # Important: several secrets needed to be explicitly set for Dependabot (not just"Actions") in order to successfully run this job
+#   #  - all client secrets and env vars FIT_CONNECT_... and ERIC_...
+#   #  - a GitHub Personal Access Token for elevated privileges for the actual merge (PRIVATE_REPOSITORY_ACCESS_TOKEN)
+#   #  - a Sonar Personal Access Token so the sonar scan works
+#   #######################################
+
+#   dependabot-auto-merge:
+#     runs-on: ubuntu-latest
+#     # the ${{ success() }} is required for the "if" not to override the "needs" below
+#     # (we did run into this problem and saw auto-merges even as "frontend-checks" failed)
+#     needs:
+#       - check-format-and-lint
+#       - test-unit
+#       - test-integration
+#       - scan-with-sonarcloud
+#       - build-image
+#       - secret-scanning
+#     if: ${{ github.event_name != 'schedule' && success() && github.actor ==
+#       'dependabot[bot]' && !cancelled() && github.ref != 'refs/heads/main' &&
+#       github.repository == 'digitalservicebund/unternehmen-steuer-gewerbe'}}
+#     permissions:
+#       contents: write
+#       pull-requests: write
+#     steps:
+#       - name: Dependabot metadata
+#         id: metadata
+#         uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98
+#         with:
+#           github-token: "${{ secrets.GITHUB_TOKEN }}"
+#       - name: Auto-merge Dependabot PRs except major version updates
+#         if: steps.metadata.outputs.update-type != 'version-update:semver-major'
+#         run: gh pr merge --squash "$PR_URL"
+#         env:
+#           PR_URL: ${{github.event.pull_request.html_url}}
+#           GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
