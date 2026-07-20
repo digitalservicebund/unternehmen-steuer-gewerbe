@@ -23,11 +23,15 @@ If you don't have access to that repository, you can check the interface and imp
 If you do have access, you still need to authenticate in order to fetch the dependency:
 
 - Create a [GitHub personal access token](https://github.com/settings/tokens), assign the `read:packages` scope.
-- Export the token as `NODE_AUTH_TOKEN` in your shell.
+- Set it in pnpm's user-level config (not this repo's committed `.npmrc` — recent pnpm versions refuse to expand env vars for auth tokens read from a committed/project `.npmrc`, as a safeguard against a malicious commit redirecting where a secret gets sent):
 
-Once set up, `pnpm install` is all that's needed; there is an `.npmrc` in this repo that routes the `@digitalservicebund` scope to `npm.pkg.github.com` and makes the install use your `NODE_AUTH_TOKEN`.
+```bash
+pnpm config set "//npm.pkg.github.com/:_authToken" "<your token>"
+```
 
-(It's also possible to extend the default GitHub CLI token (`gh auth token`) to include `read:packages`, but exporting it is a security risk.)
+This is a one-time setup per machine. Once set up, `pnpm install` is all that's needed; there is an `.npmrc` in this repo that routes the `@digitalservicebund` scope to `npm.pkg.github.com`, and pnpm reads the auth token from your user-level config set above.
+
+(It's also possible to extend the default GitHub CLI token (`gh auth token`) to include `read:packages`, but using it this way is a security risk.)
 
 ## Secrets and Environment Variables
 
