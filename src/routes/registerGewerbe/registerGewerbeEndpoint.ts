@@ -34,7 +34,7 @@ const GEWERBEANMELDUNG_LEIKA_KEY_URN = "urn:de:fim:leika:leistung:99050012104000
 const DEFAULT_MAX_CONCURRENCY = 2;
 const maxConcurrency =
   Number(getEnvironmentVariable("REGISTER_GEWERBE_MAX_CONCURRENCY")) || DEFAULT_MAX_CONCURRENCY;
-const withRegisterGewerbeConcurrencyLimit = pLimit(maxConcurrency);
+const concurrentSubmissionPairsLimit = pLimit(maxConcurrency);
 
 async function submitGewerbeanmeldung(
   data: RegisterGewerbeRequest,
@@ -204,14 +204,12 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
       // Sequential, not concurrent: each of these can hold a worker-thread heap
       // (gewerbeanmeldung) or block the event loop (fsE); running them one at a time
       // keeps the peak memory of a single request from stacking both at once.
-      const [gewerbeanmeldung, fseÜbermittlung] = await withRegisterGewerbeConcurrencyLimit(
-        async () => {
-          const gewerbeanmeldung =
-            only === "fseÜbermittlung" ? undefined : await submitGewerbeanmeldung(data);
-          const fseÜbermittlung = only === "gewerbeanmeldung" ? undefined : await submitFsE(data);
-          return [gewerbeanmeldung, fseÜbermittlung] as const;
-        },
-      );
+      const [gewerbeanmeldung, fseÜbermittlung] = await concurrentSubmissionPairsLimit(async () => {
+        const gewerbeanmeldung =
+          only === "fseÜbermittlung" ? undefined : await submitGewerbeanmeldung(data);
+        const fseÜbermittlung = only === "gewerbeanmeldung" ? undefined : await submitFsE(data);
+        return [gewerbeanmeldung, fseÜbermittlung] as const;
+      });
 
       return c.json(
         {
