@@ -1,27 +1,19 @@
-import { z } from "@hono/zod-openapi";
 import { HonoAppType } from "../../honoApp";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
 import { getOsciClient } from "../../clients/osciClient/osciClient";
-import { getEnvironmentVariable } from "../../secretsAndEnvironmentVariables";
+import { getAGS } from "../../helpers/getAgs";
 import { getEventsRoute } from "./getEventsRoute";
 
 export function addGetEventsEndpoint(app: HonoAppType): HonoAppType {
   app.openapi(getEventsRoute, async (c) => {
     try {
-      const { submissionId } = c.req.valid("param");
+      const { submissionId, ars, fitConnectDestinationId } = c.req.valid("query");
 
-      // TODO: this is a placeholder switch.
-      // For now: FIT-Connect submissionIds are UUIDs, OSCI messageIds are not
-      if (z.uuid().safeParse(submissionId).success) {
-        // The destination varies from commune to commune.
-        // We can hard‑code it here for the first iterations, but in the future we need to
-        // use the Fit‑Connect routing API to determine the destination ID.
-        const destinationId = getEnvironmentVariable("FIT_CONNECT_DESTINATION_ID");
-
-        const fitConnectClient = getFitConnectClient();
-        const submissionEvents = await fitConnectClient.getSubmissionEvents(
+      // FIT-Connect submissions carry a destinationId; its absence marks OSCI.
+      if (fitConnectDestinationId !== undefined) {
+        const submissionEvents = await getFitConnectClient().getSubmissionEvents(
           submissionId,
-          destinationId,
+          fitConnectDestinationId,
         );
 
         if (!submissionEvents) {
@@ -31,12 +23,9 @@ export function addGetEventsEndpoint(app: HonoAppType): HonoAppType {
         return c.json(submissionEvents, 200);
       }
 
-      const osciClient = getOsciClient();
-      const transportReport = await osciClient.getTransportReport({
+      const transportReport = await getOsciClient().getTransportReport({
         messageId: submissionId,
-        // TODO: create the authorityKey from the Gewerbemeldungs AGS
-        // (analogous to `MELDID:${gemeindeschluessel}` in transformToGewerbeanmeldung.ts)
-        authorityKey: "MELDID:09000099",
+        authorityKey: `MELDID:${getAGS(ars)}`,
       });
 
       const track = transportReport.tracks.find((track) => track.id === submissionId);

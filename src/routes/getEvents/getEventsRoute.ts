@@ -3,9 +3,9 @@ import { GetEventsRequestSchema, GetEventsResponseSchema } from "./getEventsInte
 
 export const getEventsRoute = createRoute({
   method: "get",
-  path: "/api/v1/register-gewerbe/{submissionId}/events", // Use {} for path params in OpenAPI
+  path: "/api/v1/register-gewerbe/gewerbemeldung/events",
   request: {
-    params: GetEventsRequestSchema,
+    query: GetEventsRequestSchema,
   },
   responses: {
     200: {

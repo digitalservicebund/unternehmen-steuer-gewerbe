@@ -15,17 +15,21 @@ vi.mock("../../clients/osciClient/osciClient", () => ({
 
 import app from "../../app";
 
-function getEvents(submissionId: string) {
-  return app.request(`/api/v1/register-gewerbe/${submissionId}/events`);
+function getEvents(query: Record<string, string>) {
+  const params = new URLSearchParams(query);
+  return app.request(`/api/v1/register-gewerbe/gewerbemeldung/events?${params}`);
 }
 
-describe("Route GET /api/v1/register-gewerbe/{submissionId}/events", () => {
+describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
   afterEach(() => vi.restoreAllMocks());
 
-  describe("when submissionId is a UUID", () => {
-    const submissionId = "dbc4efa5-58e7-4527-8898-00d58450c68e";
+  const ars = "146120000000"; // ARS Dresden -> AGS 14612000
 
-    it("returns the FIT-Connect submission events", async () => {
+  describe("with a fitConnectDestinationId (FIT-Connect)", () => {
+    const submissionId = "dbc4efa5-58e7-4527-8898-00d58450c68e";
+    const fitConnectDestinationId = "83a5a303-24a2-4e0a-8b4b-8f4c6c4b1f2b";
+
+    it("fetches the FIT-Connect submission events for the given submissionId and destinationId", async () => {
       mockGetSubmissionEvents.mockResolvedValueOnce({
         count: 1,
         offset: 0,
@@ -33,9 +37,12 @@ describe("Route GET /api/v1/register-gewerbe/{submissionId}/events", () => {
         eventLog: [{ eventType: "accept-submission" }],
       });
 
-      const response = await getEvents(submissionId);
+      const response = await getEvents({ submissionId, ars, fitConnectDestinationId });
       const json = await response.json();
 
+      const [calledSubmissionId, calledDestinationId] = mockGetSubmissionEvents.mock.calls[0]!;
+      expect(calledSubmissionId).toBe(submissionId);
+      expect(calledDestinationId).toBe(fitConnectDestinationId);
       expect(response.status).toBe(200);
       expect(json).toEqual({
         count: 1,
@@ -48,21 +55,21 @@ describe("Route GET /api/v1/register-gewerbe/{submissionId}/events", () => {
     it("returns 404 when no submission events are found", async () => {
       mockGetSubmissionEvents.mockResolvedValueOnce(undefined);
 
-      const response = await getEvents(submissionId);
+      const response = await getEvents({ submissionId, ars, fitConnectDestinationId });
 
       expect(response.status).toBe(404);
     });
   });
 
-  describe("when submissionId is not a UUID", () => {
+  describe("without a fitConnectDestinationId (OSCI)", () => {
     const messageId = "vps_by_178357726143931b13e14-2c78-4aa6-ba2c-0d911ec02d82";
 
-    it("maps the matching OSCI transport report track's events to eventType/timestamp", async () => {
+    it("derives the OSCI authorityKey MELDID:14612000 from the ars and maps the matching track's events", async () => {
       mockGetTransportReport.mockResolvedValueOnce({
         identifiers: {
           messageID: messageId,
           serviceID: "service",
-          authorityKey: "MELDID:09000099",
+          authorityKey: "MELDID:14612000",
         },
         tracks: [
           {
@@ -76,12 +83,12 @@ describe("Route GET /api/v1/register-gewerbe/{submissionId}/events", () => {
         ],
       });
 
-      const response = await getEvents(messageId);
+      const response = await getEvents({ submissionId: messageId, ars });
       const json = await response.json();
 
       const [reportOptions] = mockGetTransportReport.mock.calls[0]!;
       expect(reportOptions.messageId).toBe(messageId);
-      expect(typeof reportOptions.authorityKey).toBe("string");
+      expect(reportOptions.authorityKey).toBe("MELDID:14612000");
       expect(response.status).toBe(200);
       expect(json).toEqual({
         events: [{ eventType: "accept-submission", timestamp: "2026-01-01T00:00:00Z" }],
@@ -93,12 +100,12 @@ describe("Route GET /api/v1/register-gewerbe/{submissionId}/events", () => {
         identifiers: {
           messageID: messageId,
           serviceID: "service",
-          authorityKey: "MELDID:09000099",
+          authorityKey: "MELDID:14612000",
         },
         tracks: [],
       });
 
-      const response = await getEvents(messageId);
+      const response = await getEvents({ submissionId: messageId, ars });
 
       expect(response.status).toBe(404);
     });

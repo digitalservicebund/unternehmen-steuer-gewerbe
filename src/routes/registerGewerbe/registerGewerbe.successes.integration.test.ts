@@ -47,6 +47,7 @@ import app from "../../app";
 
 import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
+import { getEnvironmentVariable } from "../../secretsAndEnvironmentVariables";
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
 
@@ -170,6 +171,19 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       const submittedXml = mockSubmitData.mock.calls[0]![0].data;
       expect(submittedXml).toContain(
         '<xga:gemeindeschluesselErgaenzung listVersionID="1"><code>02100000</code></xga:gemeindeschluesselErgaenzung>',
+      );
+    });
+  });
+
+  describe("routing context for the events endpoint", () => {
+    it("returns the ars and the FIT-Connect destinationId the submission was sent to", async () => {
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+      expect(json.gewerbeanmeldung.ars).toBe("084210000000");
+      expect(json.gewerbeanmeldung.fitConnectDestinationId).toBe(
+        getEnvironmentVariable("FIT_CONNECT_DESTINATION_ID"),
       );
     });
   });

@@ -11,18 +11,22 @@ function postRegisterGewerbe(data = registerGewerbeSampleRequestAllFieldsFilled)
   });
 }
 
-describe("Route /api/v1/register-gewerbe/:submissionId/events", () => {
-  let submissionId: string;
+describe("Route /api/v1/register-gewerbe/gewerbemeldung/events", () => {
+  let eventsQuery: string;
 
   beforeAll(async () => {
     const response = await postRegisterGewerbe();
     expect(response.status).toEqual(HttpStatusCode.Ok);
-    submissionId = (await response.json()).gewerbeanmeldung.submissionId;
+    // The client forwards the routing context from the submission response 1:1.
+    const { submissionId, ars, fitConnectDestinationId } = (await response.json()).gewerbeanmeldung;
     expect(submissionId).toBeDefined();
+    eventsQuery = new URLSearchParams({ submissionId, ars, fitConnectDestinationId }).toString();
   });
 
-  it("Returns 200 OK on GET with /:submissionId/events", async () => {
-    const response = await app.request(`/api/v1/register-gewerbe/${submissionId}/events`);
+  it("Returns 200 OK on GET with the routing context from the submission", async () => {
+    const response = await app.request(
+      `/api/v1/register-gewerbe/gewerbemeldung/events?${eventsQuery}`,
+    );
     expect(response.status).toEqual(HttpStatusCode.Ok);
   });
 });
