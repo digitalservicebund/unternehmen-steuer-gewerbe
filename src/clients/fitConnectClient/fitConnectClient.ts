@@ -249,16 +249,20 @@ export function getFitConnectClient() {
     return result;
   }
 
+  async function fetchSubmissionEvents(submissionId: string): Promise<CaseEventsResponse> {
+    const accessToken = await authenticate();
+
+    return fetchJson<CaseEventsResponse>(
+      `${config.submissionApiUrl}/v2/submissions/${submissionId}/events`,
+      { headers: { Authorization: `Bearer ${accessToken}` } },
+    );
+  }
+
   async function getSubmissionEvents(
     submissionId: string,
     destinationId: string,
   ): Promise<SubmissionEventsResponse> {
-    const accessToken = await authenticate();
-
-    const events = await fetchJson<CaseEventsResponse>(
-      `${config.submissionApiUrl}/v2/submissions/${submissionId}/events`,
-      { headers: { Authorization: `Bearer ${accessToken}` } },
-    );
+    const events = await fetchSubmissionEvents(submissionId);
 
     const wellKnownJWKs = await fetchJson<{ keys: JWK[] }>(
       `${config.destinationApiUrl}//.well-known/jwks.json`,
@@ -291,5 +295,5 @@ export function getFitConnectClient() {
     return routingApiResponse;
   }
 
-  return { submitData, getSubmissionEvents, getRoutes };
+  return { submitData, fetchSubmissionEvents, getSubmissionEvents, getRoutes };
 }
