@@ -30,12 +30,12 @@ describe("FitConnectClient", () => {
 
   describe("getRoutes", () => {
     // Why: API has changed. Follow-up ticket has been created: SG-1096
-    it.skip("returns a routing result for a known leiKa key and AGS", async () => {
+    it.skip("returns a routing result for a known leiKa key and ARS", async () => {
       const client = getFitConnectClient();
 
       const result = await client.getRoutes(
         "99050012104000",
-        "14612000", // AGS Dresden
+        "146120000000", // ARS Dresden
       );
       expect(Array.isArray(result.routes)).toBe(true);
       expect(typeof result.count).toBe("number");
