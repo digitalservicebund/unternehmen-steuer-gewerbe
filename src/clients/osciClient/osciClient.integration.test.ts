@@ -1,81 +1,151 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { Agent, fetch, Response } from "undici";
 import { getOsciClient } from "./osciClient";
-import { createMetadata } from "./metadata";
 
-// spy-mock so the temporary alg.0300 tests can inject overridden metadata into sendMessage
-vi.mock("./metadata", { spy: true });
+// mock only fetch; the client builds a real Agent from the certificate secrets
+vi.mock("undici", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("undici")>();
+  return { ...actual, fetch: vi.fn() };
+});
 
-// Integration tests against the real AKDB OKKOMM test API (soaptest.akdb.de).
-// Require AKDB_BASE_URL / AKDB_USERNAME / AKDB_PASSWORD to be configured.
+const TOKEN_RESPONSE = JSON.stringify({
+  access_token: "token",
+  token_type: "Bearer",
+  expires_in: 300,
+});
 
-const samplesDir = path.resolve(
-  new URL(".", import.meta.url).pathname,
-  "../../resources/xml/xml-samples",
-);
-function readSample(fileName: string) {
-  return readFileSync(path.join(samplesDir, fileName), "utf8");
+function mockSendMessageFetch() {
+  const fetchMock = vi.mocked(fetch);
+  fetchMock
+    .mockResolvedValueOnce(new Response(TOKEN_RESPONSE, { status: 200 }))
+    .mockResolvedValueOnce(new Response(JSON.stringify({ metadata: {} }), { status: 200 }));
+  return fetchMock;
 }
 
-describe("osciClient.sendMessage", () => {
-  const osciClient = getOsciClient();
+function mockGetTransportReportFetch() {
+  const fetchMock = vi.mocked(fetch);
+  fetchMock
+    .mockResolvedValueOnce(new Response(TOKEN_RESPONSE, { status: 200 }))
+    .mockResolvedValueOnce(
+      new Response(JSON.stringify({ identifiers: {}, tracks: [] }), { status: 200 }),
+    );
+  return fetchMock;
+}
 
-  // alg.0300 is only used temporarily for testing; in production we will exclusively send ext.gewerbemeldung.0400
-  it("successfully sends a valid alg.gewerbemeldung.0300", async () => {
-    const metadata = createMetadata({ targetId: "MELDID:09000099" });
-
-    // createMetadata defaults to ext.0400; override the message-type-specific fields for alg.0300.
-    metadata.metadata.source.sourceId = "xga:090010030000";
-    metadata.metadata.target.targetOperation =
-      "alg.gewerbemeldung.0300##http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-alg-Aufsichtsbehoerden.wsdl##xga";
-    metadata.payload.request.message.contentReference =
-      "form-data://message/payload.ok.alg.gewerbemeldung.0300.xml";
-
-    vi.mocked(createMetadata).mockReturnValueOnce(metadata);
-
-    const result = await osciClient.sendMessage({
-      targetId: "MELDID:09000099",
-      message: readSample("payload.ok.alg.gewerbemeldung.0300.xml"),
-    });
-
-    expect(result).toBeDefined();
-    expect(result!.metadata.reply!.replyType).toBe("OK");
+describe("getOsciClient", () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+    vi.unstubAllEnvs();
   });
 
-  it("successfully sends a valid ext.gewerbemeldung.0400", async () => {
-    const metadata = createMetadata({ targetId: "MELDID:09000099" });
+  describe("sendMessage", () => {
+    it("passes a client-certificate dispatcher when the certificate secrets are set", async () => {
+      vi.stubEnv("AKDB_BASE_URL", "https://apk.akdb.de/okkommozg");
+      vi.stubEnv("AKDB_CERTIFICATE_BASE64", Buffer.from("certificate").toString("base64"));
+      vi.stubEnv("AKDB_CERTIFICATE_PASSPHRASE", "passphrase");
+      const fetchMock = mockSendMessageFetch();
 
-    // TODO: remove this override once our sender id "ds:schnellergruenden" is registered with the AKDB/DVDV
-    metadata.metadata.source.sourceId = "xga:090010030000";
+      await getOsciClient().sendMessage({ targetId: "MELDID:09000099", message: "<xml/>" });
 
-    vi.mocked(createMetadata).mockReturnValueOnce(metadata);
+      const [tokenUrl, tokenOptions] = fetchMock.mock.calls[0]!;
+      expect(tokenUrl).toBe("https://apk.akdb.de/okkommozg/restapi/v3.0/messages/token");
+      expect(tokenOptions?.dispatcher).toBeInstanceOf(Agent);
 
-    const result = await osciClient.sendMessage({
-      targetId: "MELDID:09000099",
-      message: readSample("custom-xgewo-1.6-valid-0400.xml"),
+      const [sendUrl, sendOptions] = fetchMock.mock.calls[1]!;
+
+      expect(sendUrl).toBe(
+        "https://apk.akdb.de/okkommozg/restapi/v3.0/messages/zko/json/multipart",
+      );
+      expect(sendOptions?.dispatcher).toBeInstanceOf(Agent);
     });
 
-    expect(result.metadata.reply.replyType).toBe("OK");
+    it("throws when the token request fails", async () => {
+      vi.stubEnv("AKDB_BASE_URL", "https://soaptest.akdb.de/okkommozg");
+      vi.stubEnv("AKDB_CERTIFICATE_BASE64", "");
+      vi.stubEnv("AKDB_CERTIFICATE_PASSPHRASE", "");
+      vi.mocked(fetch).mockResolvedValueOnce(
+        new Response("error", { status: 401, statusText: "Unauthorized" }),
+      );
+
+      await expect(
+        getOsciClient().sendMessage({ targetId: "MELDID:09000099", message: "<xml/>" }),
+      ).rejects.toThrow();
+    });
+
+    it("sends without a custom dispatcher when the certificate secrets are not set", async () => {
+      vi.stubEnv("AKDB_BASE_URL", "https://soaptest.akdb.de/okkommozg");
+      vi.stubEnv("AKDB_CERTIFICATE_BASE64", "");
+      vi.stubEnv("AKDB_CERTIFICATE_PASSPHRASE", "");
+      const fetchMock = mockSendMessageFetch();
+
+      await getOsciClient().sendMessage({ targetId: "MELDID:09000099", message: "<xml/>" });
+
+      const [sendUrl, sendOptions] = fetchMock.mock.calls[1]!;
+
+      expect(sendUrl).toBe(
+        "https://soaptest.akdb.de/okkommozg/restapi/v3.0/messages/zko/json/multipart",
+      );
+      expect(sendOptions?.dispatcher).toBeUndefined();
+    });
   });
 
-  it("throws for an invalid Gewerbemeldung", async () => {
-    const metadata = createMetadata({ targetId: "MELDID:12052000" });
+  describe("getTransportReport", () => {
+    it("passes a client-certificate dispatcher when the certificate secrets are set", async () => {
+      vi.stubEnv("AKDB_BASE_URL", "https://apk.akdb.de/okkommozg");
+      vi.stubEnv("AKDB_CERTIFICATE_BASE64", Buffer.from("certificate").toString("base64"));
+      vi.stubEnv("AKDB_CERTIFICATE_PASSPHRASE", "passphrase");
+      const fetchMock = mockGetTransportReportFetch();
 
-    // createMetadata defaults to ext.0400; override the message-type-specific fields for alg.0300.
-    metadata.metadata.source.sourceId = "xga:090010050000";
-    metadata.metadata.target.targetOperation =
-      "alg.gewerbemeldung.0300##http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-alg-Aufsichtsbehoerden.wsdl##xga";
-    metadata.payload.request.message.contentReference =
-      "form-data://message/payload.nok.alg.gewerbemeldung.0300.xml";
+      await getOsciClient().getTransportReport({
+        messageId: "vps_by_178357726143931b13e14-2c78-4aa6-ba2c-0d911ec02d82",
+        authorityKey: "MELDID:09000099",
+      });
 
-    vi.mocked(createMetadata).mockReturnValueOnce(metadata);
+      const [, reportOptions] = fetchMock.mock.calls[1]!;
 
-    await expect(
-      osciClient.sendMessage({
-        targetId: "MELDID:12052000",
-        message: readSample("payload.nok.alg.gewerbemeldung.0300.xml"),
-      }),
-    ).rejects.toThrow();
+      expect(reportOptions?.dispatcher).toBeInstanceOf(Agent);
+    });
+
+    it("requests the transport report for the given messageId and authorityKey", async () => {
+      vi.stubEnv("AKDB_BASE_URL", "https://soaptest.akdb.de/okkommozg");
+      vi.stubEnv("AKDB_CERTIFICATE_BASE64", "");
+      vi.stubEnv("AKDB_CERTIFICATE_PASSPHRASE", "");
+      const fetchMock = mockGetTransportReportFetch();
+
+      await getOsciClient().getTransportReport({
+        messageId: "vps_by_178357726143931b13e14-2c78-4aa6-ba2c-0d911ec02d82",
+        authorityKey: "MELDID:09000099",
+      });
+
+      const [reportUrl, reportOptions] = fetchMock.mock.calls[1]!;
+
+      expect(reportUrl).toBe(
+        "https://soaptest.akdb.de/okkommozg/restapi/v3.0/messages/transport-report/osci",
+      );
+      expect(JSON.parse(reportOptions?.body as string)).toEqual({
+        messageID: "vps_by_178357726143931b13e14-2c78-4aa6-ba2c-0d911ec02d82",
+        serviceID:
+          "http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-ext.wsdl",
+        authorityKey: "MELDID:09000099",
+      });
+    });
+
+    it("throws when the transport report request fails", async () => {
+      vi.stubEnv("AKDB_BASE_URL", "https://soaptest.akdb.de/okkommozg");
+      vi.stubEnv("AKDB_CERTIFICATE_BASE64", "");
+      vi.stubEnv("AKDB_CERTIFICATE_PASSPHRASE", "");
+      vi.mocked(fetch)
+        .mockResolvedValueOnce(new Response(TOKEN_RESPONSE, { status: 200 }))
+        .mockResolvedValueOnce(
+          new Response("error", { status: 500, statusText: "Internal Server Error" }),
+        );
+
+      await expect(
+        getOsciClient().getTransportReport({
+          messageId: "vps_by_178357726143931b13e14-2c78-4aa6-ba2c-0d911ec02d82",
+          authorityKey: "MELDID:09000099",
+        }),
+      ).rejects.toThrow();
+    });
   });
 });

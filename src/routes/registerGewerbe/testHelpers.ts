@@ -11,7 +11,7 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
     geburtsland: "Deutschland",
     staatsangehörigkeit: "deutsch",
     adresse: {
-      strasseUndHausnummer: "Musterstraße 1",
+      strasseUndHausnummer: "Musterstraße 1 a",
       postleitzahl: "03046",
       ort: "Cottbus",
     },
@@ -37,7 +37,7 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
     zahllastUeberschussAuswahl: "zahllast",
     umsatzsteuerImErstenJahr: -222,
     adresseAbweichend: {
-      strasseUndHausnummer: "Musterstraße 2",
+      strasseUndHausnummer: "Musterstraße 2 a",
       postleitzahl: "96450",
       ort: "Coburg",
     },

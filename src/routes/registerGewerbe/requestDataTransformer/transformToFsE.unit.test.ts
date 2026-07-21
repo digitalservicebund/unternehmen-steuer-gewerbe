@@ -17,6 +17,7 @@ describe("transformToEUnFsE", () => {
     expect(natPers?.adrkette?.strAdr).toMatchObject({
       str: "Musterstraße",
       hausNr: "1",
+      adressErg: "a",
       plz: "03046",
       ort: "Cottbus",
     });
@@ -88,25 +89,25 @@ describe("transformToEUnFsE", () => {
       expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toEqual(111);
     });
 
-    it("maps undefined umsatzSteuerImErstenJahr to ueberschuss and a betrag of 0", () => {
+    it("maps undefined umsatzSteuerImErstenJahr to zahllast and a betrag of 0", () => {
       const dataWithUndefined = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
 
       dataWithUndefined.unternehmensDaten.umsatzsteuerImErstenJahr = undefined;
 
       const result = transformToEUnFsE(dataWithUndefined);
 
-      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toEqual("2"); // 2 for ueberschuss
+      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toEqual("1"); // 1 for zahllast
       expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toEqual(0);
     });
 
-    it("maps 0 umsatzSteuerImErstenJahr to ueberschuss and a betrag of 0", () => {
+    it("maps 0 umsatzSteuerImErstenJahr to zahllast and a betrag of 0", () => {
       const dataWithUndefined = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
 
       dataWithUndefined.unternehmensDaten.umsatzsteuerImErstenJahr = 0;
 
       const result = transformToEUnFsE(dataWithUndefined);
 
-      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toEqual("2"); // 2 for ueberschuss
+      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toEqual("1"); // 1 for zahllast
       expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toEqual(0);
     });
 
@@ -205,6 +206,7 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
       str: "Musterstraße",
       hausNr: "2",
+      adressErg: "a",
       plz: "96450",
       ort: "Coburg",
     });

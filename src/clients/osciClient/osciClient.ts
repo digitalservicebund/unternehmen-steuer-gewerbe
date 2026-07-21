@@ -1,5 +1,8 @@
-import { createMetadata } from "./metadata";
-import { fetchJson } from "../../helpers/fetchJson";
+// undici instead of the global fetch: client certificate authentication needs an undici Agent,
+// and an Agent from the npm package only works with the fetch and FormData from the undici package,
+// not with the versions bundled into node (see https://github.com/nodejs/undici/discussions/4200)
+import { Agent, fetch, FormData } from "undici";
+import { createMetadata, GEWERBEMELDUNG_EXT_SERVICE_ID } from "./metadata";
 import { getEnvironmentVariable, getSecret } from "../../secretsAndEnvironmentVariables";
 
 interface OsciClientConfig {
@@ -53,14 +56,89 @@ interface SendMessageResponse {
   };
 }
 
+interface GetTransportReportOptions {
+  messageId: string;
+  authorityKey: string;
+}
+
+interface TransportReportIdentifiers {
+  messageID: string;
+  serviceID: string;
+  authorityKey: string;
+}
+
+interface TransportReportEvent {
+  type: string;
+  timestamp: string;
+}
+
+interface TransportReportVerification {
+  timestamp: string;
+  x509SubjectName: string;
+  x509IssuerName: string;
+  x509SerialNumber: string;
+  certType: string;
+  mathResult: string;
+  offlineResult: string;
+  onlineChecked: boolean;
+  onlineResult: boolean;
+}
+
+interface TransportReportTrack {
+  id: string;
+  subject: string;
+  recentModification: string;
+  events: TransportReportEvent[];
+  verifications: TransportReportVerification[];
+  // the OSCI ProcessCardBundle XML the report fields are derived from
+  rawData: string;
+}
+
+interface TransportReportResponse {
+  identifiers: TransportReportIdentifiers;
+  tracks: TransportReportTrack[];
+}
+
+const DEFAULT_TIMEOUT_MS = 15_000;
 const SEND_TIMEOUT_MS = 30_000;
+
+// AKDB production requires us to authenticate with a client-certificate,
+// see https://undici.nodejs.org/best-practices/client-certificate
+// (the example there uses a Client, but an Agent accepts the same connect options:
+// "Agent inherits all <PoolOptions> (and therefore all <ClientOptions>)",
+// see https://undici.nodejs.org/api/Agent#agent)
+function createClientCertificateDispatcherIfSecretsAreSet(): Agent | undefined {
+  // the base64 encoded .p12 certificate file and the password it is encrypted with,
+  // only set in environments where AKDB requires the certificate (production)
+  const certificateBase64 = getSecret("AKDB_CERTIFICATE_BASE64");
+  const certificatePassphrase = getSecret("AKDB_CERTIFICATE_PASSPHRASE");
+
+  if (certificateBase64 === "" || certificatePassphrase === "") {
+    return undefined;
+  }
+
+  // the Agent passes the connect options through to tls.connect(), which reads the
+  // certificate and key from pfx and decrypts them with the passphrase,
+  // see https://nodejs.org/api/tls.html#tlscreatesecurecontextoptions
+  const tls = {
+    pfx: Buffer.from(certificateBase64, "base64"),
+    passphrase: certificatePassphrase,
+  };
+  return new Agent({
+    connect: tls,
+  });
+}
 
 export function getOsciClient() {
   const config: OsciClientConfig = {
     baseUrl: getEnvironmentVariable("AKDB_BASE_URL"),
-    username: getSecret("AKDB_USERNAME"),
+    username: getEnvironmentVariable("AKDB_USERNAME"),
     password: getSecret("AKDB_PASSWORD"),
   };
+
+  // fetch performs a request through the dispatcher passed in its init options
+  // ("Default: the global dispatcher", see https://undici.nodejs.org/api/Fetch#fetchinput-init)
+  const dispatcher = createClientCertificateDispatcherIfSecretsAreSet();
 
   async function getAccessToken(): Promise<string> {
     const body = new URLSearchParams({
@@ -69,12 +147,22 @@ export function getOsciClient() {
       client_secret: config.password,
     }).toString();
 
-    const data = await fetchJson<TokenResponse>(`${config.baseUrl}/restapi/v3.0/messages/token`, {
+    const url = `${config.baseUrl}/restapi/v3.0/messages/token`;
+    const response = await fetch(url, {
       method: "POST",
       body,
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      signal: AbortSignal.timeout(DEFAULT_TIMEOUT_MS),
+      dispatcher,
     });
 
+    if (!response.ok) {
+      throw new Error(
+        `HTTP ${response.status} ${response.statusText} for ${url}: ${await response.text()}`,
+      );
+    }
+
+    const data = (await response.json()) as TokenResponse;
     return data.access_token;
   }
 
@@ -102,6 +190,7 @@ export function getOsciClient() {
       headers: { Authorization: `Bearer ${accessToken}` },
       body: form,
       signal: AbortSignal.timeout(SEND_TIMEOUT_MS),
+      dispatcher,
     });
 
     if (!response.ok) {
@@ -113,5 +202,38 @@ export function getOsciClient() {
     return (await response.json()) as SendMessageResponse;
   }
 
-  return { sendMessage };
+  // fetches the "OSCI-Laufzettel" with status information about a previously sent message
+  async function getTransportReport(
+    options: GetTransportReportOptions,
+  ): Promise<TransportReportResponse> {
+    const accessToken = await getAccessToken();
+
+    const url = `${config.baseUrl}/restapi/v3.0/messages/transport-report/osci`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "Accept-Encoding": "deflate, br",
+      },
+      body: JSON.stringify({
+        messageID: options.messageId,
+        serviceID: GEWERBEMELDUNG_EXT_SERVICE_ID,
+        authorityKey: options.authorityKey,
+      }),
+      signal: AbortSignal.timeout(DEFAULT_TIMEOUT_MS),
+      dispatcher,
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `HTTP ${response.status} ${response.statusText} for ${url}: ${await response.text()}`,
+      );
+    }
+
+    return (await response.json()) as TransportReportResponse;
+  }
+
+  return { sendMessage, getTransportReport };
 }

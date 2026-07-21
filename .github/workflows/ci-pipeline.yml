@@ -44,7 +44,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 1
 
@@ -54,7 +54,9 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: |
+          pnpm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
+          pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
@@ -75,13 +77,17 @@ jobs:
           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
   test-unit:
+    strategy:
+      matrix:
+        shard: [1, 2]
+      fail-fast: false
     runs-on: ubuntu-latest
     permissions:
       contents: read
 
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
 
@@ -91,12 +97,14 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: |
+          pnpm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
+          pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
-      - name: Run unit tests with coverage report
-        run: pnpm run test:unit:ci
+      - name: Run unit tests (shard ${{ matrix.shard }}/${{ strategy.job-total }}) with coverage report
+        run: pnpm run test:unit:ci --shard=${{ matrix.shard }}/${{ strategy.job-total }} --outputFile.blob=.vitest-reports/unit-tests-shard-${{ matrix.shard }}-of-${{ strategy.job-total }}.blob.json
         env:
           # Not used for network calls in unit tests, but still required:
           # - ERIC_HERSTELLERID is checked at import time (fail-fast guard in transformToFsE.ts),
@@ -109,8 +117,8 @@ jobs:
       - name: Upload coverage blob
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: vitest-blob-unit
-          path: .vitest-reports/unit.blob.json
+          name: vitest-blob-unit-${{ matrix.shard }}
+          path: .vitest-reports/unit-tests-shard-${{ matrix.shard }}-of-${{ strategy.job-total }}.blob.json
           retention-days: 1
           if-no-files-found: error
 
@@ -122,13 +130,17 @@ jobs:
           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
   test-integration:
+    strategy:
+      matrix:
+        shard: [1, 2, 3]
+      fail-fast: false
     runs-on: ubuntu-latest
     permissions:
       contents: read
 
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
 
@@ -138,34 +150,25 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: |
+          pnpm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
+          pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
-      - name: Run integration tests with coverage report
-        run: pnpm run test:integration:ci
+      - name: Run integration tests (shard ${{ matrix.shard }}/${{ strategy.job-total }}) with coverage report
+        run: pnpm run test:integration:ci --shard=${{ matrix.shard }}/${{ strategy.job-total }} --outputFile.blob=.vitest-reports/integration-tests-shard-${{ matrix.shard }}-of-${{ strategy.job-total }}.blob.json
         env:
-          FIT_CONNECT_OAUTH_TOKEN_URL: ${{ vars.FIT_CONNECT_OAUTH_TOKEN_URL }}
-          FIT_CONNECT_SUBMISSION_API_URL: ${{ vars.FIT_CONNECT_SUBMISSION_API_URL }}
-          FIT_CONNECT_DESTINATION_API_URL: ${{ vars.FIT_CONNECT_DESTINATION_API_URL }}
-          FIT_CONNECT_ROUTING_API_URL: ${{ vars.FIT_CONNECT_ROUTING_API_URL }}
-          FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK: ${{ vars.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK }}
-          FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK: ${{ secrets.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK }}
-          FIT_CONNECT_CLIENT_ID: ${{ vars.FIT_CONNECT_CLIENT_ID }}
-          FIT_CONNECT_CLIENT_SECRET: ${{ secrets.FIT_CONNECT_CLIENT_SECRET }}
-          FIT_CONNECT_DESTINATION_ID: ${{ vars.FIT_CONNECT_DESTINATION_ID }}
+          # Not used for network calls (all API clients are mocked at this tier), but still
+          # required: ERIC_HERSTELLERID is checked at import time (fail-fast guard in
+          # transformToFsE.ts), transitively imported by every route-level integration test via app.ts.
           ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
-          ERIC_CERTIFICATE_BASE64: ${{ secrets.ERIC_CERTIFICATE_BASE64 }}
-          ERIC_CERTIFICATE_PIN: ${{ secrets.ERIC_CERTIFICATE_PIN }}
-          AKDB_BASE_URL: ${{ vars.AKDB_BASE_URL }}
-          AKDB_USERNAME: ${{ vars.AKDB_USERNAME }}
-          AKDB_PASSWORD: ${{ secrets.AKDB_PASSWORD }}
 
       - name: Upload coverage blob
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: vitest-blob-integration
-          path: .vitest-reports/integration.blob.json
+          name: vitest-blob-integration-${{ matrix.shard }}
+          path: .vitest-reports/integration-tests-shard-${{ matrix.shard }}-of-${{ strategy.job-total }}.blob.json
           retention-days: 1
           if-no-files-found: error
 
@@ -189,7 +192,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
 
@@ -199,22 +202,19 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: |
+          pnpm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
+          pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
-      # fetch and combine coverage reports
-      - name: Download unit test coverage blob
+      # fetch and combine coverage reports from every unit/integration shard
+      - name: Download all coverage blobs
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: vitest-blob-unit
+          pattern: vitest-blob-*
           path: .vitest-reports/
-
-      - name: Download integration test coverage blob
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          name: vitest-blob-integration
-          path: .vitest-reports/
+          merge-multiple: true
 
       - name: Merge coverage reports
         run: pnpm run test:coverage:merge
@@ -227,7 +227,7 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
 
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@713881670b6b3676cda39549040e2d88c70d582e
+        uses: SonarSource/sonarqube-scan-action@22918119ff8e1ca75a623e15c8296b6ea4fbe28f
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
@@ -256,7 +256,7 @@ jobs:
       security-events: write
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 1
 
@@ -266,7 +266,9 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: |
+          pnpm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
+          pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
@@ -452,7 +454,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
       - name: Install Trivy
         env:
@@ -524,7 +526,7 @@ jobs:
           exit 1
 
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 1
 
@@ -534,7 +536,9 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: pnpm install --ignore-scripts
+        run: |
+          pnpm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
+          pnpm install --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PRIVATE_REPOSITORY_ACCESS_TOKEN }}
 
@@ -620,11 +624,14 @@ jobs:
       - name: Dependabot metadata
         id: metadata
         uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
         with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          client-id: ${{ secrets.AUTO_MERGE_GRUENDEN_APP_CLIENT_ID }}
+          private-key: ${{ secrets.AUTO_MERGE_GRUENDEN_APP_PRIVATE_KEY }}
       - name: Auto-merge Dependabot PRs except major version updates
         if: steps.metadata.outputs.update-type != 'version-update:semver-major'
-        run: gh pr merge --squash "$PR_URL"
+        run: gh pr merge --auto --squash "${{ github.event.pull_request.html_url }}"
         env:
-          PR_URL: ${{github.event.pull_request.html_url}}
-          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GH_TOKEN: ${{steps.app-token.outputs.token}}

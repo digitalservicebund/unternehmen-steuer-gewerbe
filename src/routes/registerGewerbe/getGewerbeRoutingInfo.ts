@@ -47,7 +47,7 @@ export async function getGewerbeRoutingInfo(
 
   if (isSupportingFitConnect(address.postleitzahl)) {
     const fitConnectClient = getFitConnectClient();
-    const res = await fitConnectClient.getRoutes(GEWERBEANMELDUNG_LEIKA_KEY, ags);
+    const res = await fitConnectClient.getRoutes(GEWERBEANMELDUNG_LEIKA_KEY, ars);
 
     if (res.routes.length === 0) {
       return undefined;

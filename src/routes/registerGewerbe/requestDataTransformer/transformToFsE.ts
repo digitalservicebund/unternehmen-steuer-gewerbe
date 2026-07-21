@@ -30,7 +30,7 @@ function getUnternehmensAnschrift(data: RegisterGewerbeRequest) {
   if (adresseAbweichend === undefined) {
     return { entsprichtWohnanschrift: true };
   }
-  const { strasse, hausnummer, hausnummerBis } = splitStrasseHausnummer(
+  const { strasse, hausnummer, hausnummerBis, hausnummerZusatz } = splitStrasseHausnummer(
     adresseAbweichend.strasseUndHausnummer,
   );
   return {
@@ -39,6 +39,7 @@ function getUnternehmensAnschrift(data: RegisterGewerbeRequest) {
         str: strasse,
         hausNr: hausnummer,
         hausNrZu: hausnummerBis,
+        adressErg: hausnummerZusatz?.trim(),
         plz: adresseAbweichend.postleitzahl,
         ort: adresseAbweichend.ort,
       },
@@ -68,12 +69,11 @@ function getIstVersteuerungGrund({
 
 function getZahllastUeberschuss(data: RegisterGewerbeRequest) {
   return {
-    // 1 for zahllast (user needs to pay), 2 for Überschuss (tax office ows the user)
     auswahl:
       data.unternehmensDaten.umsatzsteuerImErstenJahr !== undefined &&
-      data.unternehmensDaten.umsatzsteuerImErstenJahr > 0
-        ? "1"
-        : "2",
+      data.unternehmensDaten.umsatzsteuerImErstenJahr < 0
+        ? "2" // überschuss (tax office ows the user)
+        : "1", // zahllast (user needs to pay)
     betrag:
       data.unternehmensDaten.umsatzsteuerImErstenJahr === undefined
         ? 0
@@ -152,7 +152,7 @@ export function transformToEUnFsE(
                 str: persönlicheStrasseHausnummer.strasse,
                 hausNr: persönlicheStrasseHausnummer.hausnummer,
                 hausNrZu: persönlicheStrasseHausnummer.hausnummerBis,
-                // adressErg: undefined,
+                adressErg: persönlicheStrasseHausnummer.hausnummerZusatz?.trim(),
                 plz: data.persönlicheDaten.adresse.postleitzahl,
                 ort: data.persönlicheDaten.adresse.ort,
               },

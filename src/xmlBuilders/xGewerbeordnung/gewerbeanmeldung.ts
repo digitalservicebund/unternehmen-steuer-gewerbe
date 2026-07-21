@@ -56,6 +56,8 @@ export interface CreateGewerbeanmeldungXmlData {
 
 const ROOT_ATTRIBUTES = `
   xmlns:xga="http://www.xgewerbeordnung.de/spezifikation/xga/1.6"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.xgewerbeordnung.de/spezifikation/xga/1.6 xgewerbeordnung-gewerbeanzeige.xsd"
   xmlns:erl="http://www.xgewerbeordnung.de/spezifikation/erl/1.6"
   xmlns:bk="http://www.xgewerbeordnung.de/spezifikation/baukasten/1.6"
   xmlns:nachr="urn:xoev-de:xunternehmen:standard:basismodul:nachrichtenstruktur_1.2"
