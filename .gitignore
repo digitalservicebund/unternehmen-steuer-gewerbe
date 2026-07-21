@@ -159,3 +159,6 @@ vite.config.ts.timestamp-*
 # JWK
 *.jwk
 *.jwk.json
+
+# Load test results
+loadtest-results/
