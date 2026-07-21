@@ -8,7 +8,7 @@ import {
   validateFsE,
 } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 import { getEnvironmentVariable } from "../../secretsAndEnvironmentVariables";
-import { createConcurrencyLimiter } from "../../helpers/concurrencyLimiter";
+import pLimit from "p-limit";
 import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import {
   ErrorTypeSchema,
@@ -34,7 +34,7 @@ const GEWERBEANMELDUNG_LEIKA_KEY_URN = "urn:de:fim:leika:leistung:99050012104000
 const DEFAULT_MAX_CONCURRENCY = 2;
 const maxConcurrency =
   Number(getEnvironmentVariable("REGISTER_GEWERBE_MAX_CONCURRENCY")) || DEFAULT_MAX_CONCURRENCY;
-const withRegisterGewerbeConcurrencyLimit = createConcurrencyLimiter(maxConcurrency);
+const withRegisterGewerbeConcurrencyLimit = pLimit(maxConcurrency);
 
 async function submitGewerbeanmeldung(
   data: RegisterGewerbeRequest,
