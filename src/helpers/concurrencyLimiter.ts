@@ -1,9 +1,8 @@
 /**
- * Bounds how many tasks run at once. Excess calls queue up (FIFO) and run as slots free.
+ * Counting semaphore.
+ * Function called in "withLimits()" is restricted in how many such tasks run at once. Excess calls queue up (FIFO) and run as soon as slots are free.
  *
- * Used to cap concurrent /register-gewerbe processing: each request spins up a fresh
- * xmllint-wasm worker thread (its own heap) and makes blocking ERiC native calls, so
- * unbounded concurrency multiplies memory/CPU pressure per in-flight request.
+ * Used to cap concurrent /register-gewerbe processing of gewerbeanmeldung/FsE submission pairs.
  */
 export function createConcurrencyLimiter(maxConcurrent: number) {
   let active = 0;
