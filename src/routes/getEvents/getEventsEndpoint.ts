@@ -3,6 +3,10 @@ import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectCl
 import { getOsciClient } from "../../clients/osciClient/osciClient";
 import { getAGS } from "../../helpers/getAgs";
 import { getEventsRoute } from "./getEventsRoute";
+import {
+  toSubmissionEventFromFitConnectPayload,
+  toSubmissionEventFromOsciEvent,
+} from "./submissionEventStatus";
 
 export function addGetEventsEndpoint(app: HonoAppType): HonoAppType {
   app.openapi(getEventsRoute, async (c) => {
@@ -20,7 +24,11 @@ export function addGetEventsEndpoint(app: HonoAppType): HonoAppType {
           return c.json({ message: "Not Found" }, 404);
         }
 
-        return c.json(submissionEvents, 200);
+        const events = submissionEvents.eventLog
+          .map(toSubmissionEventFromFitConnectPayload)
+          .filter((event) => event !== undefined);
+
+        return c.json({ events }, 200);
       }
 
       const transportReport = await getOsciClient().getTransportReport({
@@ -33,10 +41,9 @@ export function addGetEventsEndpoint(app: HonoAppType): HonoAppType {
         return c.json({ message: "Not Found" }, 404);
       }
 
-      const events = track.events.map((event) => ({
-        eventType: event.type,
-        timestamp: event.timestamp,
-      }));
+      const events = track.events
+        .map(toSubmissionEventFromOsciEvent)
+        .filter((event) => event !== undefined);
 
       return c.json({ events }, 200);
     } catch (error) {

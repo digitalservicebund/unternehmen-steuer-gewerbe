@@ -20,6 +20,14 @@ function getEvents(query: Record<string, string>) {
   return app.request(`/api/v1/register-gewerbe/gewerbemeldung/events?${params}`);
 }
 
+function fitConnectEvent(eventName: string, iat: number) {
+  return {
+    iat,
+    sub: "submission:02bf1d9f-282d-4abf-810a-c4104baf0afe",
+    events: { [`https://schema.fitko.de/fit-connect/events/${eventName}`]: {} },
+  };
+}
+
 describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
   afterEach(() => vi.restoreAllMocks());
 
@@ -29,12 +37,16 @@ describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
     const submissionId = "dbc4efa5-58e7-4527-8898-00d58450c68e";
     const fitConnectDestinationId = "83a5a303-24a2-4e0a-8b4b-8f4c6c4b1f2b";
 
-    it("fetches the FIT-Connect submission events for the given submissionId and destinationId", async () => {
+    it("normalizes the FIT-Connect eventLog to lifecycle statuses, dropping null and unmapped events", async () => {
       mockGetSubmissionEvents.mockResolvedValueOnce({
-        count: 1,
+        count: 3,
         offset: 0,
-        totalCount: 1,
-        eventLog: [{ eventType: "accept-submission" }],
+        totalCount: 3,
+        eventLog: [
+          fitConnectEvent("accept-submission", 1622796532),
+          null,
+          fitConnectEvent("delete-submission", 1622799999),
+        ],
       });
 
       const response = await getEvents({ submissionId, ars, fitConnectDestinationId });
@@ -45,10 +57,7 @@ describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
       expect(calledDestinationId).toBe(fitConnectDestinationId);
       expect(response.status).toBe(200);
       expect(json).toEqual({
-        count: 1,
-        offset: 0,
-        totalCount: 1,
-        eventLog: [{ eventType: "accept-submission" }],
+        events: [{ timestamp: "2021-06-04T08:48:52.000Z", status: "accepted" }],
       });
     });
 
@@ -64,7 +73,7 @@ describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
   describe("without a fitConnectDestinationId (OSCI)", () => {
     const messageId = "vps_by_178357726143931b13e14-2c78-4aa6-ba2c-0d911ec02d82";
 
-    it("derives the OSCI authorityKey MELDID:14612000 from the ars and maps the matching track's events", async () => {
+    it("normalizes the matching track's events to lifecycle statuses, dropping unmapped types", async () => {
       mockGetTransportReport.mockResolvedValueOnce({
         identifiers: {
           messageID: messageId,
@@ -75,8 +84,12 @@ describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
           {
             id: messageId,
             subject: "subject",
-            recentModification: "2026-01-01T00:00:00Z",
-            events: [{ type: "accept-submission", timestamp: "2026-01-01T00:00:00Z" }],
+            recentModification: "2026-01-03T00:00:00Z",
+            events: [
+              { type: "Creation", timestamp: "2026-01-01T00:00:00Z" },
+              { type: "Reception", timestamp: "2026-01-02T00:00:00Z" },
+              { type: "SomethingElse", timestamp: "2026-01-03T00:00:00Z" },
+            ],
             verifications: [],
             rawData: "<xml/>",
           },
@@ -91,7 +104,10 @@ describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
       expect(reportOptions.authorityKey).toBe("MELDID:14612000");
       expect(response.status).toBe(200);
       expect(json).toEqual({
-        events: [{ eventType: "accept-submission", timestamp: "2026-01-01T00:00:00Z" }],
+        events: [
+          { timestamp: "2026-01-01T00:00:00Z", status: "created" },
+          { timestamp: "2026-01-02T00:00:00Z", status: "received" },
+        ],
       });
     });
 

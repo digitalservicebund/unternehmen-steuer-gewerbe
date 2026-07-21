@@ -1,4 +1,5 @@
 import { z } from "@hono/zod-openapi";
+import { SUBMISSION_EVENT_STATUS_KEYS } from "./submissionEventStatus";
 
 // Routing context echoed back 1:1 from the registerGewerbe response so the stateless
 // events endpoint can locate the submission. The presence of fitConnectDestinationId
@@ -38,15 +39,14 @@ export const GetEventsRequestSchema = z.object({
     }),
 });
 
-// Schema for the event log response, shared by the FIT-Connect and OSCI paths.
-// OSCI transport report events have no eventId equivalent, so it is optional.
+// Unified event log response, shared by the FIT-Connect and OSCI paths. Both transports
+// are normalized to the same lifecycle status; transport-specific raw fields are dropped.
 export const GetEventsResponseSchema = z
   .object({
     events: z.array(
       z.object({
-        eventId: z.string().optional(),
-        eventType: z.string().openapi({ example: "accept-submission" }),
         timestamp: z.iso.datetime(),
+        status: z.enum(SUBMISSION_EVENT_STATUS_KEYS).openapi({ example: "accepted" }),
       }),
     ),
   })
