@@ -18,8 +18,7 @@ function readSample(fileName: string) {
   return readFileSync(path.join(samplesDir, fileName), "utf8");
 }
 
-// too unreliable; proper fix: https://github.com/digitalservicebund/unternehmen-steuer-gewerbe/pull/296
-describe.skip("osciClient", () => {
+describe("osciClient", () => {
   const osciClient = getOsciClient();
 
   describe("sendMessage", () => {
