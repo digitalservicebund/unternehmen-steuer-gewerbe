@@ -44,7 +44,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 1
 
@@ -87,7 +87,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
 
@@ -140,7 +140,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
 
@@ -159,21 +159,10 @@ jobs:
       - name: Run integration tests (shard ${{ matrix.shard }}/${{ strategy.job-total }}) with coverage report
         run: pnpm run test:integration:ci --shard=${{ matrix.shard }}/${{ strategy.job-total }} --outputFile.blob=.vitest-reports/integration-tests-shard-${{ matrix.shard }}-of-${{ strategy.job-total }}.blob.json
         env:
-          FIT_CONNECT_OAUTH_TOKEN_URL: ${{ vars.FIT_CONNECT_OAUTH_TOKEN_URL }}
-          FIT_CONNECT_SUBMISSION_API_URL: ${{ vars.FIT_CONNECT_SUBMISSION_API_URL }}
-          FIT_CONNECT_DESTINATION_API_URL: ${{ vars.FIT_CONNECT_DESTINATION_API_URL }}
-          FIT_CONNECT_ROUTING_API_URL: ${{ vars.FIT_CONNECT_ROUTING_API_URL }}
-          FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK: ${{ vars.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK }}
-          FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK: ${{ secrets.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK }}
-          FIT_CONNECT_CLIENT_ID: ${{ vars.FIT_CONNECT_CLIENT_ID }}
-          FIT_CONNECT_CLIENT_SECRET: ${{ secrets.FIT_CONNECT_CLIENT_SECRET }}
-          FIT_CONNECT_DESTINATION_ID: ${{ vars.FIT_CONNECT_DESTINATION_ID }}
+          # Not used for network calls (all API clients are mocked at this tier), but still
+          # required: ERIC_HERSTELLERID is checked at import time (fail-fast guard in
+          # transformToFsE.ts), transitively imported by every route-level integration test via app.ts.
           ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
-          ERIC_CERTIFICATE_BASE64: ${{ secrets.ERIC_CERTIFICATE_BASE64 }}
-          ERIC_CERTIFICATE_PIN: ${{ secrets.ERIC_CERTIFICATE_PIN }}
-          AKDB_BASE_URL: ${{ vars.AKDB_BASE_URL }}
-          AKDB_USERNAME: ${{ vars.AKDB_USERNAME }}
-          AKDB_PASSWORD: ${{ secrets.AKDB_PASSWORD }}
 
       - name: Upload coverage blob
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -203,7 +192,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
 
@@ -267,7 +256,7 @@ jobs:
       security-events: write
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 1
 
@@ -465,7 +454,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
       - name: Install Trivy
         env:
@@ -537,7 +526,7 @@ jobs:
           exit 1
 
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 1
 

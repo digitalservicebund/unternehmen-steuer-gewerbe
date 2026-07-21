@@ -11,6 +11,7 @@ export default defineConfig({
       "**/dist/**",
       "**/*.load.test.ts",
       "**/*.smoke.test.ts",
+      "**/*.contract.test.ts",
     ],
     coverage: {
       reporter: ["text", "lcov"],
