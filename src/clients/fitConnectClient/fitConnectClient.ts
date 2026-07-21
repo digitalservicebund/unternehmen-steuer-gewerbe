@@ -281,10 +281,10 @@ export function getFitConnectClient() {
     return { ...events, eventLog };
   }
 
-  async function getRoutes(leikaKey: string, ags: string): Promise<RoutingApiResponse> {
+  async function getRoutes(leikaKey: string, ars: string): Promise<RoutingApiResponse> {
     const url = new URL(`${config.routingApiUrl}/v1/routes`);
     url.searchParams.set("leikaKey", leikaKey);
-    url.searchParams.set("ags", ags);
+    url.searchParams.set("ars", ars);
     const routingApiResponse = await fetchJson<RoutingApiResponse>(url.toString(), {
       headers: { Accept: "application/json" },
     });
