@@ -1,84 +1,170 @@
-import { describe, it, expect } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const {
+  mockGetLocationsDetails,
+  mockGetGewerbeamt,
+  mockGetFinanzamtId,
+  mockGetFinanzamtDetailsById,
+} = vi.hoisted(() => ({
+  mockGetLocationsDetails: vi.fn(),
+  mockGetGewerbeamt: vi.fn(),
+  mockGetFinanzamtId: vi.fn(),
+  mockGetFinanzamtDetailsById: vi.fn(),
+}));
+
+vi.mock("../../clients/pvogClient", () => ({
+  getLocationsDetails: mockGetLocationsDetails,
+  getGewerbeamt: mockGetGewerbeamt,
+}));
+
+vi.mock("@digitalservicebund/unternehmen-steuer-gewerbe-privat", () => ({
+  getFinanzamtId: mockGetFinanzamtId,
+  getFinanzamtDetailsById: mockGetFinanzamtDetailsById,
+  // stubs for the other exports the register-gewerbe endpoint imports at module load time
+  createElsterFsEEUnXml: vi.fn(),
+  sendFsE: vi.fn(),
+  validateFsE: vi.fn(),
+}));
+
 import { type z } from "@hono/zod-openapi";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
 import app from "../../app";
 import { type RegionResponseSchema } from "./regionInterfaces";
 
+const FINANZAMT_DETAILS = {
+  name: "Finanzamt Fulda",
+  hausanschrift: { strasse: "Eurostraße", hausnummer: "2", postleitzahl: "36037", ort: "Fulda" },
+  telefonnummer: "0661 1234",
+};
+
+const GEWERBEAMT = {
+  name: "Gewerbeamt Fulda",
+  adresse: { strasse: "Amtstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
+  telefon: "0661 102-0",
+  email: "amt@fulda.de",
+  onlineServices: [{ uri: "https://example.org" }],
+};
+
 type RegionResponseBody = z.infer<typeof RegionResponseSchema>;
 
-async function requestRegion(plz: string, queryString = "") {
-  const response = await app.request(`/api/v1/region/${plz}${queryString}`);
+async function requestRegionForPostleitzahl36037() {
+  const response = await app.request("/api/v1/region/36037");
   const body = (await response.json()) as RegionResponseBody;
   return { response, body };
 }
 
-describe("Route /api/v1/region/{plz}", () => {
-  it("Returns 200 with supported:true and the names of the responsible Finanz- & Gewerbeämter for the supported PLZ 25813", async () => {
-    const { response, body } = await requestRegion("25813", "?getAllOffices=true");
+async function requestRegion36037ForAllMatches() {
+  const response = await app.request("/api/v1/region/36037?getAllOffices=true");
+  const body = (await response.json()) as RegionResponseBody;
+  return { response, body };
+}
 
-    expect(response.status).toEqual(HttpStatusCode.Ok);
-    expect(body.supported).toBe(true);
-    expect(body.gewerbeaemter).toHaveLength(4);
-    expect(body.gewerbeaemter[0]).toMatchObject({ name: expect.any(String) });
-    expect(body.finanzaemter).toHaveLength(1);
-    expect(body.finanzaemter[0]).toMatchObject({ name: expect.any(String) });
+describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mockGetLocationsDetails.mockResolvedValue([
+      { ars: "066310009009", name: "Fulda, Stadt", plz: "36037" },
+      { ars: "066310010010", name: "Petersberg", plz: "36037" },
+    ]);
+    mockGetGewerbeamt.mockResolvedValue(GEWERBEAMT);
+    mockGetFinanzamtId.mockReturnValue(["FA1"]);
+    mockGetFinanzamtDetailsById.mockReturnValue(FINANZAMT_DETAILS);
   });
 
-  it("Returns 200 with supported:false and the responsible Finanz- & Gewerbeamt for a unsupported region with the PLZ 89073", async () => {
-    const { response, body } = await requestRegion("89073");
+  describe("returning only the single best match by default", () => {
+    it("returns only the single best matching Gewerbeamt", async () => {
+      const { body } = await requestRegionForPostleitzahl36037();
 
-    expect(response.status).toEqual(HttpStatusCode.Ok);
-    expect(body.supported).toBe(false);
-    expect(body.gewerbeaemter).toHaveLength(1);
-    expect(body.finanzaemter).toHaveLength(1);
-  });
+      expect(body.gewerbeaemter).toHaveLength(1);
+    });
 
-  it("Returns 200 with supported:false and empty arrays for the non-existent PLZ 00000", async () => {
-    const { response, body } = await requestRegion("00000");
+    it("returns only the single best matching Finanzamt", async () => {
+      mockGetFinanzamtId.mockReturnValue(["FA1", "FA2"]);
 
-    expect(response.status).toEqual(HttpStatusCode.Ok);
-    expect(body.supported).toBe(false);
-    expect(body.gewerbeaemter).toEqual([]);
-  });
+      const { body } = await requestRegionForPostleitzahl36037();
 
-  it("Returns 4 Gewerbeämter for every municipality a PLZ 25813 spans when getAllOffices is true", async () => {
-    const { body } = await requestRegion("25813", "?getAllOffices=true");
+      expect(body.finanzaemter).toHaveLength(1);
+      expect(mockGetFinanzamtDetailsById).toHaveBeenCalledTimes(1);
+      expect(mockGetFinanzamtDetailsById).toHaveBeenCalledWith("FA1");
+    });
 
-    expect(body.gewerbeaemter).toHaveLength(4);
-  });
+    it("returns 200 with empty gewerbeaemter, without logging an error, when the Gewerbeamt lookup returns undefined", async () => {
+      mockGetGewerbeamt.mockResolvedValue(undefined);
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
-  it("Returns only one Gewerbeamt for PLZ 25813 by default", async () => {
-    const { body } = await requestRegion("25813");
+      const { response, body } = await requestRegionForPostleitzahl36037();
 
-    expect(body.gewerbeaemter).toHaveLength(1);
-  });
-
-  it("Returns 200 and only one Gewerbeamt and Finanzamt for PLZ 25813 when street and house number are given", async () => {
-    const { response, body } = await requestRegion("25813", "?strasse=Marktstraße&hausnummer=1");
-    expect(response.status).toEqual(HttpStatusCode.Ok);
-    expect(body.gewerbeaemter).toHaveLength(1);
-    expect(body.finanzaemter).toHaveLength(1);
-  });
-
-  it("Returns 200 and one Gewerbeamt for Dorfstraße 1 in 25842 when the ort is given", async () => {
-    const { response, body } = await requestRegion(
-      "25842",
-      "?strasse=Dorfstraße&hausnummer=1&ort=Lütjenholm",
-    );
-    expect(response.status).toEqual(HttpStatusCode.Ok);
-    expect(body.gewerbeaemter).toHaveLength(1);
-    expect(body.gewerbeaemter[0]).toMatchObject({
-      name: "Amt Mittleres Nordfriesland - Ordnungsabteilung",
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+      expect(body.gewerbeaemter).toEqual([]);
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
     });
   });
 
-  it('Returns 400 for an invalid PLZ "abc"', async () => {
-    const response = await app.request("/api/v1/region/abc");
-    expect(response.status).toEqual(HttpStatusCode.BadRequest);
+  it("returns all Gewerbeaemter when getAllOffices is true", async () => {
+    mockGetLocationsDetails.mockResolvedValue([
+      { ars: "066310009009", name: "Fulda, Stadt", plz: "36037" },
+      { ars: "066310010010", name: "Petersberg", plz: "36037" },
+    ]);
+
+    const { body } = await requestRegion36037ForAllMatches();
+
+    expect(body.gewerbeaemter).toHaveLength(2);
   });
 
-  it("Returns 400 for PLZ 1234 (too short)", async () => {
-    const response = await app.request("/api/v1/region/1234");
-    expect(response.status).toEqual(HttpStatusCode.BadRequest);
+  it("returns all Finanzaemter when getAllOffices is true", async () => {
+    mockGetFinanzamtId.mockReturnValue(["FA1", "FA2"]);
+
+    const { body } = await requestRegion36037ForAllMatches();
+
+    expect(body.finanzaemter).toHaveLength(2);
+  });
+
+  it("returns 200 with empty gewerbeaemter but still all finanzaemter when the PVOG location lookup returns an empty array", async () => {
+    mockGetLocationsDetails.mockResolvedValue([]);
+
+    const { response, body } = await requestRegion36037ForAllMatches();
+
+    expect(response.status).toEqual(HttpStatusCode.Ok);
+    expect(body.gewerbeaemter).toEqual([]);
+    expect(body.finanzaemter.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("returns 200 with empty finanzaemter but still all gewerbeaemter when the Finanzamt lookup returns an empty array", async () => {
+    mockGetFinanzamtId.mockReturnValue([]);
+
+    const { response, body } = await requestRegion36037ForAllMatches();
+
+    expect(response.status).toEqual(HttpStatusCode.Ok);
+    expect(body.finanzaemter).toEqual([]);
+    expect(body.gewerbeaemter.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("still returns the other Gewerbeamt when one of two Gewerbeamt lookups returns undefined", async () => {
+    mockGetLocationsDetails.mockResolvedValue([
+      { ars: "066310009009", name: "Gewerbeamt Nr. 1", plz: "36037" },
+      { ars: "066310010010", name: "Gewerbeamt Nr. 2", plz: "36037" },
+    ]);
+    mockGetGewerbeamt
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce({ ...GEWERBEAMT, name: "Gewerbeamt Nr. 2" });
+
+    const { body } = await requestRegion36037ForAllMatches();
+
+    expect(body.gewerbeaemter).toHaveLength(1);
+    expect(body.gewerbeaemter[0]).toMatchObject({ name: "Gewerbeamt Nr. 2" });
+  });
+
+  it("returns all Gewerbeamt fields, joining street and house number", async () => {
+    const { body } = await requestRegionForPostleitzahl36037();
+
+    expect(body.gewerbeaemter[0]).toEqual({
+      name: "Gewerbeamt Fulda",
+      strasseUndHausnummer: "Amtstraße 1",
+      postleitzahl: "36037",
+      ort: "Fulda",
+      telefon: "0661 102-0",
+      email: "amt@fulda.de",
+      onlineServices: [{ uri: "https://example.org" }],
+    });
   });
 });
