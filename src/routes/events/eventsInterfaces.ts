@@ -54,4 +54,4 @@ export const EventsResponseSchema = z
       }),
     ),
   })
-  .openapi("SubmissionEvents");
+  .openapi("GewerbemeldungSubmissionEvents");
