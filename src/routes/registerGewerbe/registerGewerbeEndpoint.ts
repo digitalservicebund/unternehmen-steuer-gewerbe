@@ -8,6 +8,7 @@ import {
   validateFsE,
 } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 import { getEnvironmentVariable } from "../../secretsAndEnvironmentVariables";
+import pLimit from "p-limit";
 import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import {
   ErrorTypeSchema,
@@ -26,6 +27,14 @@ import {
 import { getFirstAssumingItsTheBestMatch } from "../../helpers/getFirstAssumingItsTheBestMatch";
 
 const GEWERBEANMELDUNG_LEIKA_KEY_URN = "urn:de:fim:leika:leistung:99050012104000";
+
+// Each submission spawns an xmllint-wasm worker thread (own heap) and makes blocking
+// ERiC native calls, so unbounded request concurrency multiplies memory/CPU pressure.
+// Cap how many submissions are processed at once; excess requests queue.
+const DEFAULT_MAX_CONCURRENCY = 2;
+const maxConcurrency =
+  Number(getEnvironmentVariable("REGISTER_GEWERBE_MAX_CONCURRENCY")) || DEFAULT_MAX_CONCURRENCY;
+const concurrentSubmissionPairsLimit = pLimit(maxConcurrency);
 
 async function submitGewerbeanmeldung(
   data: RegisterGewerbeRequest,
@@ -192,10 +201,15 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
       const { only } = c.req.valid("query");
       const data = c.req.valid("json");
 
-      const [gewerbeanmeldung, fseÜbermittlung] = await Promise.all([
-        only === "fseÜbermittlung" ? undefined : submitGewerbeanmeldung(data),
-        only === "gewerbeanmeldung" ? undefined : submitFsE(data),
-      ]);
+      // Sequential, not concurrent: each of these can hold a worker-thread heap
+      // (gewerbeanmeldung) or block the event loop (fsE); running them one at a time
+      // keeps the peak memory of a single request from stacking both at once.
+      const [gewerbeanmeldung, fseÜbermittlung] = await concurrentSubmissionPairsLimit(async () => {
+        const gewerbeanmeldung =
+          only === "fseÜbermittlung" ? undefined : await submitGewerbeanmeldung(data);
+        const fseÜbermittlung = only === "gewerbeanmeldung" ? undefined : await submitFsE(data);
+        return [gewerbeanmeldung, fseÜbermittlung] as const;
+      });
 
       return c.json(
         {
