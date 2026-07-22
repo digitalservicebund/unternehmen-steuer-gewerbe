@@ -1,4 +1,5 @@
 import { type JWTPayload } from "jose";
+import { type TransportReportEvent } from "../../clients/osciClient/osciClient";
 
 // Unified event status shared by the FIT-Connect and OSCI
 const SUBMISSION_EVENT_STATUS = {
@@ -60,10 +61,9 @@ export function toSubmissionEventFromFitConnectPayload(
   return { timestamp: new Date(iat * 1000).toISOString(), status };
 }
 
-export function toSubmissionEventFromOsciEvent(event: {
-  type: string;
-  timestamp: string;
-}): SubmissionEvent | undefined {
+export function toSubmissionEventFromOsciEvent(
+  event: TransportReportEvent,
+): SubmissionEvent | undefined {
   const status = OSCI_EVENT_STATUS[event.type];
   if (status === undefined) return undefined;
 
