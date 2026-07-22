@@ -150,7 +150,7 @@ function findCommunicationValue(
   return communications.find((communication) => communication.code === code)?.value;
 }
 
-export async function fetchServiceDescriptionsByArs(
+export async function fetchServiceDescriptions(
   ars: string,
 ): Promise<ServiceDescriptionsResponse> {
   const validDate = new Date().toISOString().split("T")[0]!;
