@@ -150,9 +150,7 @@ function findCommunicationValue(
   return communications.find((communication) => communication.code === code)?.value;
 }
 
-export async function fetchServiceDescriptions(
-  ars: string,
-): Promise<ServiceDescriptionsResponse> {
+export async function fetchServiceDescriptions(ars: string): Promise<ServiceDescriptionsResponse> {
   const validDate = new Date().toISOString().split("T")[0]!;
   return fetchJson<ServiceDescriptionsResponse>(
     `${PVOG_SUCHDIENST_API_URL}/v3/servicedescriptions/leikaid`,
@@ -194,7 +192,7 @@ export async function fetchOrganisationUnitDetail(
 }
 
 export async function getGewerbeamt(ars: string): Promise<Gewerbeamt | undefined> {
-  const serviceDescriptions = await fetchServiceDescriptionsByArs(ars);
+  const serviceDescriptions = await fetchServiceDescriptions(ars);
   const serviceDescription = findServiceDescriptionWithMostPreciseArs(
     serviceDescriptions.content,
     ars,

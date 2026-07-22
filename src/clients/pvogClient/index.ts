@@ -3,7 +3,7 @@ export {
   fetchOrganisationUnitDetail,
   fetchOrganisationUnitTitles,
   fetchServiceDescriptionDetail,
-  fetchServiceDescriptionsByArs,
+  fetchServiceDescriptions as fetchServiceDescriptionsByArs,
   getGewerbeamt,
 } from "./getGewerbeamt";
 export type { LocationDetails, LocationQuery } from "./getLocationsDetails";
