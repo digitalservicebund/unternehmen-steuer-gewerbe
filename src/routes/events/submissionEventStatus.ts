@@ -12,11 +12,13 @@ const SUBMISSION_EVENT_STATUS = {
 
 export type SubmissionEventStatus = keyof typeof SUBMISSION_EVENT_STATUS;
 
+// The abstracted set of states we expose to clients, unified over both
+// transports (FIT-Connect and OSCI); used as the response schema enum.
 export const SUBMISSION_EVENT_STATUS_KEYS = Object.keys(
   SUBMISSION_EVENT_STATUS,
 ) as SubmissionEventStatus[];
 
-// FIT-Connect submission events
+// Maps FIT-Connect submission events to the unified SUBMISSION_EVENT_STATUS.
 // see https://docs.fitko.de/fit-connect/docs/getting-started/event-log/events#submission-events for details
 const FIT_CONNECT_EVENT_STATUS: Record<string, SubmissionEventStatus> = {
   "create-submission": SUBMISSION_EVENT_STATUS.created,

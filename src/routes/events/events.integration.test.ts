@@ -74,10 +74,16 @@ describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
       expect(json).toEqual({ events: [{ timestamp, status }] });
     });
 
-    it("drops unknown FIT-Connect event entries", async () => {
-      mockGetSubmissionEvents.mockResolvedValueOnce({
-        eventLog: [fitConnectEvent("unknown-status", iat)],
-      });
+    it.each([
+      { label: "the payload is null", entry: null },
+      { label: "the event has no name", entry: { iat } },
+      {
+        label: "the event has no iat",
+        entry: { events: { "https://schema.fitko.de/fit-connect/events/accept-submission": {} } },
+      },
+      { label: "the event name is unknown", entry: fitConnectEvent("unknown-status", iat) },
+    ])("drops the FIT-Connect entry when $label", async ({ entry }) => {
+      mockGetSubmissionEvents.mockResolvedValueOnce({ eventLog: [entry] });
 
       const response = await getEvents({ submissionId, ars, fitConnectDestinationId });
       const json = await response.json();
