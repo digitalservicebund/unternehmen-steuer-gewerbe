@@ -167,4 +167,43 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
       onlineServices: [{ uri: "https://example.org" }],
     });
   });
+
+  it("returns supported:true for a PLZ within a supported region (36037, Fulda)", async () => {
+    const { body } = await requestRegionForPostleitzahl36037();
+
+    expect(body.supported).toBe(true);
+  });
+
+  it("returns supported:false for a PLZ outside every supported region, while still returning matches", async () => {
+    const response = await app.request("/api/v1/region/89073");
+    const body = (await response.json()) as RegionResponseBody;
+
+    expect(response.status).toEqual(HttpStatusCode.Ok);
+    expect(body.supported).toBe(false);
+    expect(body.gewerbeaemter).toHaveLength(1);
+    expect(body.finanzaemter).toHaveLength(1);
+  });
+
+  it("returns supported:false and empty arrays when neither lookup finds a match", async () => {
+    mockGetLocationsDetails.mockResolvedValue([]);
+    mockGetFinanzamtId.mockReturnValue([]);
+
+    const response = await app.request("/api/v1/region/00000");
+    const body = (await response.json()) as RegionResponseBody;
+
+    expect(response.status).toEqual(HttpStatusCode.Ok);
+    expect(body.supported).toBe(false);
+    expect(body.gewerbeaemter).toEqual([]);
+    expect(body.finanzaemter).toEqual([]);
+  });
+
+  it('returns 400 for an invalid PLZ "abc"', async () => {
+    const response = await app.request("/api/v1/region/abc");
+    expect(response.status).toEqual(HttpStatusCode.BadRequest);
+  });
+
+  it("returns 400 for PLZ 1234 (too short)", async () => {
+    const response = await app.request("/api/v1/region/1234");
+    expect(response.status).toEqual(HttpStatusCode.BadRequest);
+  });
 });

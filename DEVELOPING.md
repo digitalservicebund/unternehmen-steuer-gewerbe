@@ -93,21 +93,24 @@ The VSCode test runner is not able to read required secrets from 1Password. As a
 
 - `build` — Type-check only, no output; use `build:dev` or `build:prod` to produce `dist/`
 - `build:dev` — Compile TypeScript to `./dist/` (keeps dev dependencies)
-- `build:prod` — Compile TypeScript to `./dist/` and prune to prod dependencies (restores dev dependencies afterwards)
-- `build:image` — Build app and Docker image
+- `build:prod` — Compile TypeScript to `./dist/` and prune to prod dependencies
+- `build:image` — Build app and Docker image (via `build:prod`); restores dev dependencies afterwards
 - `format` — Check format, fail on error (used in CI)
 - `format:fix` — Check format, fix if possible (used in pre-commit Git hook)
 - `lint` — Lint, fail on error (used in CI)
 - `lint:fix` — Lint, fix if possible (used in pre-commit Git hook)
+- `ls-lint` — Lint file/folder naming conventions
 - `start` — Start API locally via tsx (no building involved)
 - `start:image` — Start API via Docker (built via `build:image`)
 - `start:watch` — Start API locally via nodemon, restart on changes to TS, JSON, YAML, MD files
 - `test` — Run all tests once (unit + integration)
 - `test:unit` — Run only unit tests (`*.unit.test.ts`, mocked/no network, no secrets needed)
-- `test:unit:ci` — Same as `test:unit`, plus coverage and a blob report for later merging (for CI)
+- `test:unit:ci` — Same as `test:unit` but without 1Password secrets injection, plus coverage and a blob report for later merging (for CI)
 - `test:integration` — Run only integration tests (`*.integration.test.ts`, real network calls)
 - `test:integration:ci` — Same as `test:integration` but without 1Password secrets injection, plus coverage and a blob report for later merging (for CI)
-- `test:coverage:merge` — Merge the unit and integration blob reports from `.vitest-reports/` into a single coverage report at `./coverage/` (lcov for SonarCloud); used in CI after both test jobs complete
+- `test:contract` — Run only contract tests (`*.contract.test.ts`), via 1Password
+- `test:contract:ci` — Same as `test:contract` but without 1Password secrets injection, plus coverage and a blob report for later merging (for CI)
+- `test:coverage:merge` — Merge the unit, integration, and contract blob reports from `.vitest-reports/` into a single coverage report at `./coverage/` (lcov for SonarCloud); used in CI after the test jobs complete
 - `test:load` — Run load tests once
 - `test:load:ci` — Same as `test:load` but without 1Password secrets injection (for CI)
 - `test:smoke:ci` — Run smoke tests (CI only, no 1Password)

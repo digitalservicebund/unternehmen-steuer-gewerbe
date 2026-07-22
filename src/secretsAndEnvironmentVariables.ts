@@ -20,7 +20,8 @@ export type EnvironmentVariableName =
   | "FIT_CONNECT_DESTINATION_ID"
   | "FIT_CONNECT_OAUTH_TOKEN_URL"
   | "FIT_CONNECT_ROUTING_API_URL"
-  | "FIT_CONNECT_SUBMISSION_API_URL";
+  | "FIT_CONNECT_SUBMISSION_API_URL"
+  | "REGISTER_GEWERBE_MAX_CONCURRENCY";
 
 export function getSecret(name: SecretName): string {
   if (process.env.SECRETS_FILE_PATH) {

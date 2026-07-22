@@ -150,13 +150,49 @@ function findCommunicationValue(
   return communications.find((communication) => communication.code === code)?.value;
 }
 
-export async function getGewerbeamt(ars: string): Promise<Gewerbeamt | undefined> {
+export async function fetchServiceDescriptions(ars: string): Promise<ServiceDescriptionsResponse> {
   const validDate = new Date().toISOString().split("T")[0]!;
-
-  const serviceDescriptions = await fetchJson<ServiceDescriptionsResponse>(
+  return fetchJson<ServiceDescriptionsResponse>(
     `${PVOG_SUCHDIENST_API_URL}/v3/servicedescriptions/leikaid`,
     { params: { ars, leikaIds: GEWERBEANMELDUNG_LEIKA_ID, page: 0, size: 10, validDate } },
   );
+}
+
+export async function fetchServiceDescriptionDetail(
+  lbId: string,
+  ars: string,
+): Promise<ServiceDescriptionDetail> {
+  return fetchJson<ServiceDescriptionDetail>(
+    `${PVOG_SUCHDIENST_API_URL}/v6/servicedescriptions/${lbId}/detail`,
+    { params: { ars } },
+  );
+}
+
+export async function fetchOrganisationUnitTitles(
+  ars: string,
+  lbId: string,
+): Promise<OrganisationUnitTitle[]> {
+  const validDate = new Date().toISOString().split("T")[0]!;
+  return fetchJson<OrganisationUnitTitle[]>(
+    `${PVOG_SUCHDIENST_API_URL}/v2/organisationunits/titles`,
+    { params: { ars, lbId, validDate } },
+  );
+}
+
+export async function fetchOrganisationUnitDetail(
+  ars: string,
+  lbId: string,
+  organisationUnitId: string,
+): Promise<OrganisationUnitDetail> {
+  const validDate = new Date().toISOString().split("T")[0]!;
+  return fetchJson<OrganisationUnitDetail>(
+    `${PVOG_SUCHDIENST_API_URL}/v5/organisationunits/detail`,
+    { params: { ars, lbId, q: organisationUnitId, validDate } },
+  );
+}
+
+export async function getGewerbeamt(ars: string): Promise<Gewerbeamt | undefined> {
+  const serviceDescriptions = await fetchServiceDescriptions(ars);
   const serviceDescription = findServiceDescriptionWithMostPreciseArs(
     serviceDescriptions.content,
     ars,
@@ -166,15 +202,9 @@ export async function getGewerbeamt(ars: string): Promise<Gewerbeamt | undefined
   }
   const lbId = serviceDescription.id;
 
-  const serviceDescriptionDetail = await fetchJson<ServiceDescriptionDetail>(
-    `${PVOG_SUCHDIENST_API_URL}/v6/servicedescriptions/${lbId}/detail`,
-    { params: { ars } },
-  );
+  const serviceDescriptionDetail = await fetchServiceDescriptionDetail(lbId, ars);
 
-  const organisationUnits = await fetchJson<OrganisationUnitTitle[]>(
-    `${PVOG_SUCHDIENST_API_URL}/v2/organisationunits/titles`,
-    { params: { ars, lbId, validDate } },
-  );
+  const organisationUnits = await fetchOrganisationUnitTitles(ars, lbId);
   // falling back to the first unit equals FITKO's recommended fallback to role 03 (Ansprechpunkt),
   // since the role code list only contains the codes 01, 02 and 03
   const organisationUnit = organisationUnits.find(isZustaendigeStelle) ?? organisationUnits[0];
@@ -183,10 +213,7 @@ export async function getGewerbeamt(ars: string): Promise<Gewerbeamt | undefined
     throw new Error(`No organisation unit found for ARS ${ars} and lbId ${lbId}`);
   }
 
-  const detail = await fetchJson<OrganisationUnitDetail>(
-    `${PVOG_SUCHDIENST_API_URL}/v5/organisationunits/detail`,
-    { params: { ars, lbId, q: organisationUnit.id, validDate } },
-  );
+  const detail = await fetchOrganisationUnitDetail(ars, lbId, organisationUnit.id);
 
   return {
     name: detail.title.trim(),
