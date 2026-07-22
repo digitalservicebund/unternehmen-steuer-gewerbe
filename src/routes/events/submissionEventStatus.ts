@@ -43,20 +43,35 @@ export interface SubmissionEvent {
   status: SubmissionEventStatus;
 }
 
+// FIT-Connect event keys are URIs like
+// "https://schema.fitko.de/fit-connect/events/accept-submission";
+// we only need the last path segment ("accept-submission").
+function getEventName(payload: JWTPayload): string | undefined {
+  const events = payload.events as Record<string, unknown> | undefined;
+  // The object `events` contains exactly one event
+  // see https://docs.fitko.de/fit-connect/docs/getting-started/event-log/set-validation#cryptoRequirements
+  return Object.keys(events ?? {})[0]
+    ?.split("/")
+    .pop();
+}
+
 export function toSubmissionEventFromFitConnectPayload(
   payload: JWTPayload | null,
 ): SubmissionEvent | undefined {
   if (payload === null) return undefined;
 
-  const events = payload.events as Record<string, unknown> | undefined;
-  const eventName = Object.keys(events ?? {})[0]
-    ?.split("/")
-    .pop();
+  const eventName = getEventName(payload);
   const { iat } = payload;
-  if (eventName === undefined || iat === undefined) return undefined;
+
+  if (eventName === undefined || iat === undefined) {
+    return undefined;
+  }
 
   const status = FIT_CONNECT_EVENT_STATUS[eventName];
-  if (status === undefined) return undefined;
+
+  if (status === undefined) {
+    return undefined;
+  }
 
   return { timestamp: new Date(iat * 1000).toISOString(), status };
 }
@@ -65,7 +80,10 @@ export function toSubmissionEventFromOsciEvent(
   event: TransportReportEvent,
 ): SubmissionEvent | undefined {
   const status = OSCI_EVENT_STATUS[event.type];
-  if (status === undefined) return undefined;
+
+  if (status === undefined) {
+    return undefined;
+  }
 
   return { timestamp: event.timestamp, status };
 }
