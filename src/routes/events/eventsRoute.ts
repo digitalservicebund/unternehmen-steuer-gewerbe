@@ -23,6 +23,6 @@ export const eventsRoute = createRoute({
       description: "Internal Server Error",
     },
   },
-  tags: ["Experimental"],
-  summary: "Experimental implementation",
+  tags: ["Active Development"],
+  summary: "Get the events (status history) of a submitted Gewerbemeldung",
 });
