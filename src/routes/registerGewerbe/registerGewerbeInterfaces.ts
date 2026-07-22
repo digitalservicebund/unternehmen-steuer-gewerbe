@@ -37,7 +37,6 @@ const PersönlicheDatenSchema = z.object({
   geburtsdatum: z.iso.date().openapi({ example: "1988-09-10" }),
   geschlecht: z.enum(["d", "w", "m"]).openapi({ example: "d", deprecated: true }).optional(),
   geburtsort: z.string().openapi({ example: "Musterstadt" }).optional(),
-  geburtsland: z.string().openapi({ example: "Deutschland", deprecated: true }).optional(),
   staatsangehörigkeitDeutsch: z
     .boolean()
     .openapi({
