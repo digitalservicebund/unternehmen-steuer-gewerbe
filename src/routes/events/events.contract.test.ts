@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import app from "../../app";
-import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
+import { registerGewerbeSampleRequestAllFieldsFilled } from "../registerGewerbe/testHelpers";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
 
 function postRegisterGewerbe(data = registerGewerbeSampleRequestAllFieldsFilled) {
