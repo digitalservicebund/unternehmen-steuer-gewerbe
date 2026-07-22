@@ -37,7 +37,7 @@ describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
     const submissionId = "dbc4efa5-58e7-4527-8898-00d58450c68e";
     const fitConnectDestinationId = "83a5a303-24a2-4e0a-8b4b-8f4c6c4b1f2b";
 
-    it("normalizes the FIT-Connect eventLog to lifecycle statuses, dropping null and unmapped events", async () => {
+    it("maps accept-submission to accepted and notify-submission to notify, dropping unknown entries", async () => {
       mockGetSubmissionEvents.mockResolvedValueOnce({
         count: 4,
         offset: 0,
@@ -45,8 +45,7 @@ describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
         eventLog: [
           fitConnectEvent("notify-submission", 1622796500),
           fitConnectEvent("accept-submission", 1622796532),
-          null,
-          fitConnectEvent("delete-submission", 1622799999),
+          fitConnectEvent("unknown-status", 1622799999),
         ],
       });
 
@@ -65,7 +64,7 @@ describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
       });
     });
 
-    it("returns 404 when no submission events are found", async () => {
+    it("returns 404 when no FIT-Connect submission is found", async () => {
       mockGetSubmissionEvents.mockResolvedValueOnce(undefined);
 
       const response = await getEvents({ submissionId, ars, fitConnectDestinationId });
@@ -77,7 +76,7 @@ describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
   describe("without a fitConnectDestinationId (OSCI)", () => {
     const messageId = "vps_by_178357726143931b13e14-2c78-4aa6-ba2c-0d911ec02d82";
 
-    it("normalizes the matching track's events to lifecycle statuses, dropping unmapped types", async () => {
+    it("maps creation to submitted, forwarding to notify and reception to accepted, dropping unknown event type", async () => {
       mockGetTransportReport.mockResolvedValueOnce({
         identifiers: {
           messageID: messageId,
