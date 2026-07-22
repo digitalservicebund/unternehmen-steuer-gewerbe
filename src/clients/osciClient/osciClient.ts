@@ -67,7 +67,7 @@ interface TransportReportIdentifiers {
   authorityKey: string;
 }
 
-interface TransportReportEvent {
+export interface TransportReportEvent {
   type: string;
   timestamp: string;
 }

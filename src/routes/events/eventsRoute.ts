@@ -1,17 +1,17 @@
 import { createRoute } from "@hono/zod-openapi";
-import { GetEventsRequestSchema, GetEventsResponseSchema } from "./getEventsInterfaces";
+import { EventsRequestSchema, EventsResponseSchema } from "./eventsInterfaces";
 
-export const getEventsRoute = createRoute({
+export const eventsRoute = createRoute({
   method: "get",
-  path: "/api/v1/register-gewerbe/{submissionId}/events", // Use {} for path params in OpenAPI
+  path: "/api/v1/register-gewerbe/gewerbemeldung/events",
   request: {
-    params: GetEventsRequestSchema,
+    query: EventsRequestSchema,
   },
   responses: {
     200: {
       content: {
         "application/json": {
-          schema: GetEventsResponseSchema,
+          schema: EventsResponseSchema,
         },
       },
       description: "The list of lifecycle events for the submission",
@@ -23,6 +23,6 @@ export const getEventsRoute = createRoute({
       description: "Internal Server Error",
     },
   },
-  tags: ["Experimental"],
-  summary: "Experimental implementation",
+  tags: ["Active Development"],
+  summary: "Get the events (status history) of a submitted Gewerbemeldung",
 });
