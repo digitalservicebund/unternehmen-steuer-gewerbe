@@ -1,24 +1,68 @@
 import { describe, expect, it } from "vitest";
-import { getGewerbeamt } from ".";
+import {
+  fetchOrganisationUnitDetail,
+  fetchOrganisationUnitTitles,
+  fetchServiceDescriptionDetail,
+  fetchServiceDescriptionsByArs,
+  getGewerbeamt,
+} from ".";
 
-describe("getGewerbeamt", () => {
-  it("returns the Gewerbeamt Ulm with address, contact details and online service links for ARS 084210000000", async () => {
-    const gewerbeamt = await getGewerbeamt("084210000000");
-    expect(gewerbeamt!.name).toEqual(expect.any(String));
-    expect(gewerbeamt).toMatchObject({
-      adresse: {
-        strasse: "Olgastraße",
-        hausnummer: "66",
-        postleitzahl: "89073",
-        ort: "Ulm",
-      },
-      telefon: "+49 731 161 3216",
-      email: "gewerbe@ulm.de",
-    });
-    expect(gewerbeamt!.onlineServices.length).toBeGreaterThan(0);
-    for (const link of gewerbeamt!.onlineServices) {
-      expect(link).toMatchObject({ uri: expect.any(String) });
-    }
+// Fixed IDs for Ulm (ARS 084210000000), discovered via a live PVOG lookup - these let each raw
+// endpoint be called directly with a literal, known-valid input, without going through
+// getGewerbeamt's own ARS-matching/role-selection logic (which getGewerbeamt.integration.test.ts
+// already covers against mocked responses).
+const ARS_ULM = "084210000000";
+const LB_ID_ULM = "L100022.LB.496-99050012104000";
+const ORGANISATION_UNIT_ID_ULM = "L100022.OE.6017613";
+
+describe("getGewerbeamt raw PVOG endpoints", () => {
+  it("returns the service description for Ulm (ARS 084210000000) with its lbId", async () => {
+    const result = await fetchServiceDescriptionsByArs(ARS_ULM);
+
+    expect(result.content).toContainEqual(
+      expect.objectContaining({ id: LB_ID_ULM, ars: ["080000000000"] }),
+    );
+  });
+
+  it("returns service description detail with the online service links for Ulm", async () => {
+    const result = await fetchServiceDescriptionDetail(LB_ID_ULM, ARS_ULM);
+
+    expect(result.onlineServiceLinks).toContainEqual(
+      expect.objectContaining({
+        title: "Terminvereinbarung bei den Bürgerdiensten in der Olgastraße 66, 89073 Ulm",
+        uri: "http://www.ulm.de/mb",
+      }),
+    );
+  });
+
+  it("returns the organisation unit title for Ulm, with role 'Zuständige Stelle und Ansprechpunkt'", async () => {
+    const result = await fetchOrganisationUnitTitles(ARS_ULM, LB_ID_ULM);
+
+    expect(result).toContainEqual(
+      expect.objectContaining({
+        id: ORGANISATION_UNIT_ID_ULM,
+        role: expect.objectContaining({ code: "01" }),
+      }),
+    );
+  });
+
+  it("returns organisation unit detail with address, phone and email for Ulm", async () => {
+    const result = await fetchOrganisationUnitDetail(ARS_ULM, LB_ID_ULM, ORGANISATION_UNIT_ID_ULM);
+
+    expect(result.location.addresses).toContainEqual(
+      expect.objectContaining({
+        street: "Olgastraße",
+        houseNumber: "66",
+        zip: "89073",
+        city: "Ulm",
+      }),
+    );
+    expect(result.location.communications).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: "02", value: "+49 731 161 3216" }),
+        expect.objectContaining({ code: "01", value: "gewerbe@ulm.de" }),
+      ]),
+    );
   });
 
   // temporarily skipped because of unstable API
@@ -29,7 +73,9 @@ describe("getGewerbeamt", () => {
     expect(gewerbeamt!.onlineServices).toEqual([]);
   });
 
-  it("returns undefined if no service description was found for ARS 000000000000", async () => {
-    expect(await getGewerbeamt("000000000000")).toBeUndefined();
+  it("returns no service description for the non-existent ARS 000000000000", async () => {
+    const result = await fetchServiceDescriptionsByArs("000000000000");
+
+    expect(result.content).toEqual([]);
   });
 });
