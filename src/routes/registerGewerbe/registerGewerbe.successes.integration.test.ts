@@ -44,7 +44,7 @@ vi.mock("./getGewerbeRoutingInfo", () => ({
 }));
 
 const { testFitConnectDestinationId } = vi.hoisted(() => ({
-  testFitConnectDestinationId: "fa63ede0-0ef6-4ca6-abd2-6bd16729ddc1",
+  testFitConnectDestinationId: "mock-destination-id",
 }));
 
 // Override only FIT_CONNECT_DESTINATION_ID so the events routing context is asserted
@@ -191,7 +191,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
   });
 
   describe("routing context for the events endpoint", () => {
-    it("returns the ars 084210000000 and the FIT-Connect destinationId fa63ede0-0ef6-4ca6-abd2-6bd16729ddc1 the submission was sent to", async () => {
+    it("returns the ars 084210000000 and the FIT-Connect destinationId the submission was sent to", async () => {
       const response = await postRegisterGewerbe();
       const json = await response.json();
 
