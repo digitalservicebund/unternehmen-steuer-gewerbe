@@ -1,9 +1,6 @@
 import { z } from "@hono/zod-openapi";
 import { SUBMISSION_EVENT_STATUS_KEYS } from "./submissionEventStatus";
 
-// Routing context echoed back 1:1 from the registerGewerbe response so the stateless
-// events endpoint can locate the submission. The presence of fitConnectDestinationId
-// marks a FIT-Connect submission; its absence marks an OSCI submission.
 export const EventsRequestSchema = z.object({
   submissionId: z
     .string()
