@@ -39,10 +39,11 @@ describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
 
     it("normalizes the FIT-Connect eventLog to lifecycle statuses, dropping null and unmapped events", async () => {
       mockGetSubmissionEvents.mockResolvedValueOnce({
-        count: 3,
+        count: 4,
         offset: 0,
-        totalCount: 3,
+        totalCount: 4,
         eventLog: [
+          fitConnectEvent("notify-submission", 1622796500),
           fitConnectEvent("accept-submission", 1622796532),
           null,
           fitConnectEvent("delete-submission", 1622799999),
@@ -57,7 +58,10 @@ describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
       expect(calledDestinationId).toBe(fitConnectDestinationId);
       expect(response.status).toBe(200);
       expect(json).toEqual({
-        events: [{ timestamp: "2021-06-04T08:48:52.000Z", status: "accepted" }],
+        events: [
+          { timestamp: "2021-06-04T08:48:20.000Z", status: "notify" },
+          { timestamp: "2021-06-04T08:48:52.000Z", status: "accepted" },
+        ],
       });
     });
 
@@ -86,9 +90,10 @@ describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
             subject: "subject",
             recentModification: "2026-01-03T00:00:00Z",
             events: [
-              { type: "Creation", timestamp: "2026-01-01T00:00:00Z" },
-              { type: "Reception", timestamp: "2026-01-02T00:00:00Z" },
-              { type: "SomethingElse", timestamp: "2026-01-03T00:00:00Z" },
+              { type: "creation", timestamp: "2026-01-01T00:00:00Z" },
+              { type: "forwarding", timestamp: "2026-01-02T00:00:00Z" },
+              { type: "reception", timestamp: "2026-01-03T00:00:00Z" },
+              { type: "somethingElse", timestamp: "2026-01-04T00:00:00Z" },
             ],
             verifications: [],
             rawData: "<xml/>",
@@ -105,8 +110,9 @@ describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
       expect(response.status).toBe(200);
       expect(json).toEqual({
         events: [
-          { timestamp: "2026-01-01T00:00:00Z", status: "created" },
-          { timestamp: "2026-01-02T00:00:00Z", status: "received" },
+          { timestamp: "2026-01-01T00:00:00Z", status: "submitted" },
+          { timestamp: "2026-01-02T00:00:00Z", status: "notify" },
+          { timestamp: "2026-01-03T00:00:00Z", status: "accepted" },
         ],
       });
     });

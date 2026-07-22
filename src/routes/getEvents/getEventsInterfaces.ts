@@ -46,7 +46,11 @@ export const GetEventsResponseSchema = z
     events: z.array(
       z.object({
         timestamp: z.iso.datetime(),
-        status: z.enum(SUBMISSION_EVENT_STATUS_KEYS).openapi({ example: "accepted" }),
+        status: z.enum(SUBMISSION_EVENT_STATUS_KEYS).openapi({
+          example: "accepted",
+          description:
+            "Lifecycle status of the submission.  \nMeanings:  \n- `created`: the submission was created by the online service (FIT-Connect only).  \n- `submitted`: the submission has been sent to the recipient (FIT-Connect: dispatched to the Destination; OSCI: placed in the recipient's postbox).  \n- `notify`: the receiving Fachverfahren has fetched the submission but not yet acknowledged it.  \n- `accepted`: the submission was technically accepted/acknowledged by the Fachverfahren (OSCI: quittiert). This only confirms technical acceptance of the data, NOT that the application itself has been approved.  \n- `rejected`: the submission was technically rejected by the Fachverfahren (FIT-Connect only).",
+        }),
       }),
     ),
   })

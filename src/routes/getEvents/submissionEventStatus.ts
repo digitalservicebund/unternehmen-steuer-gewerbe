@@ -1,35 +1,41 @@
 import { type JWTPayload } from "jose";
 
+// Unified event status shared by the FIT-Connect and OSCI
+const SUBMISSION_EVENT_STATUS = {
+  created: "created", // FIT-Connect only
+  submitted: "submitted",
+  notify: "notify",
+  accepted: "accepted",
+  rejected: "rejected", // FIT-Connect only
+} as const;
+
+export type SubmissionEventStatus = keyof typeof SUBMISSION_EVENT_STATUS;
+
+export const SUBMISSION_EVENT_STATUS_KEYS = Object.keys(
+  SUBMISSION_EVENT_STATUS,
+) as SubmissionEventStatus[];
+
 // FIT-Connect submission events
 // see https://docs.fitko.de/fit-connect/docs/getting-started/event-log/events#submission-events for details
 const FIT_CONNECT_EVENT_STATUS: Record<string, SubmissionEventStatus> = {
-  "create-submission": "created",
-  "submit-submission": "submitted",
-  "notify-submission": "received",
-  "accept-submission": "accepted",
-  "reject-submission": "rejected",
+  "create-submission": SUBMISSION_EVENT_STATUS.created,
+  "submit-submission": SUBMISSION_EVENT_STATUS.submitted,
+  "notify-submission": SUBMISSION_EVENT_STATUS.notify,
+  "accept-submission": SUBMISSION_EVENT_STATUS.accepted,
+  "reject-submission": SUBMISSION_EVENT_STATUS.rejected,
 };
 
-// OSCI transport report (Laufzettel) events
-// TODO: the exact `event.type` strings the AKDB REST API emits still need to be verified
-// against a real transport report response (including the rejection case).
+// OSCI transport report (Laufzettel) events:
+// - creation: the message was placed in the recipient's postbox -> submitted
+// - forwarding: the receiving client fetched the message but has not acknowledged it yet
+//   -> notify
+// - reception: the recipient acknowledged (quittiert) the message -> accepted
+// OSCI has no equivalent of the created or rejected statuses.
 const OSCI_EVENT_STATUS: Record<string, SubmissionEventStatus> = {
-  Creation: "created",
-  Forwarding: "submitted",
-  Reception: "received",
-  AcceptDelivery: "accepted",
+  creation: SUBMISSION_EVENT_STATUS.submitted,
+  forwarding: SUBMISSION_EVENT_STATUS.notify,
+  reception: SUBMISSION_EVENT_STATUS.accepted,
 };
-
-// Unified event status shared by the FIT-Connect and OSCI
-export const SUBMISSION_EVENT_STATUS_KEYS = [
-  "created",
-  "submitted",
-  "received",
-  "accepted",
-  "rejected",
-] as const;
-
-export type SubmissionEventStatus = (typeof SUBMISSION_EVENT_STATUS_KEYS)[number];
 
 export interface SubmissionEvent {
   timestamp: string;
