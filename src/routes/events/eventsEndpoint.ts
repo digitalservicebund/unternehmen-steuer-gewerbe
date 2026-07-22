@@ -2,14 +2,14 @@ import { HonoAppType } from "../../honoApp";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
 import { getOsciClient } from "../../clients/osciClient/osciClient";
 import { getAGS } from "../../helpers/getAgs";
-import { getEventsRoute } from "./getEventsRoute";
+import { eventsRoute } from "./eventsRoute";
 import {
   toSubmissionEventFromFitConnectPayload,
   toSubmissionEventFromOsciEvent,
 } from "./submissionEventStatus";
 
-export function addGetEventsEndpoint(app: HonoAppType): HonoAppType {
-  app.openapi(getEventsRoute, async (c) => {
+export function addEventsEndpoint(app: HonoAppType): HonoAppType {
+  app.openapi(eventsRoute, async (c) => {
     try {
       const { submissionId, ars, fitConnectDestinationId } = c.req.valid("query");
 

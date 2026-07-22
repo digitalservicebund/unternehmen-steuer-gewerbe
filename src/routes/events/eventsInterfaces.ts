@@ -4,7 +4,7 @@ import { SUBMISSION_EVENT_STATUS_KEYS } from "./submissionEventStatus";
 // Routing context echoed back 1:1 from the registerGewerbe response so the stateless
 // events endpoint can locate the submission. The presence of fitConnectDestinationId
 // marks a FIT-Connect submission; its absence marks an OSCI submission.
-export const GetEventsRequestSchema = z.object({
+export const EventsRequestSchema = z.object({
   submissionId: z
     .string()
     .min(1)
@@ -41,7 +41,7 @@ export const GetEventsRequestSchema = z.object({
 
 // Unified event log response, shared by the FIT-Connect and OSCI paths. Both transports
 // are normalized to the same lifecycle status; transport-specific raw fields are dropped.
-export const GetEventsResponseSchema = z
+export const EventsResponseSchema = z
   .object({
     events: z.array(
       z.object({
