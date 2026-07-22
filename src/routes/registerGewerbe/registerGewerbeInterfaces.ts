@@ -74,7 +74,7 @@ const PersönlicheDatenSchema = z.object({
   religion: z.enum(RELIGIONSSCHLUESSEL_KEYS).openapi({
     example: "nichtKirchensteuerpflichtig",
   }),
-  vertrauensniveau: z.enum(VERTRAUENSNIVEAU_KEYS).default("unbestimmt").openapi({
+  vertrauensniveau: z.enum(VERTRAUENSNIVEAU_KEYS).openapi({
     example: "substantiell",
     description: "Vertrauensniveau des verwendeten Identifizierungsmittels gemäß eIDAS-Verordnung",
   }),
