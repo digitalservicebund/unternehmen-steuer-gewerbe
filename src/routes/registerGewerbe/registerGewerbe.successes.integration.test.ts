@@ -43,6 +43,22 @@ vi.mock("./getGewerbeRoutingInfo", () => ({
   getGewerbeRoutingInfo: mockGetGewerbeRoutingInfo,
 }));
 
+const { testFitConnectDestinationId } = vi.hoisted(() => ({
+  testFitConnectDestinationId: "fa63ede0-0ef6-4ca6-abd2-6bd16729ddc1",
+}));
+
+// Override only FIT_CONNECT_DESTINATION_ID so the events routing context is asserted
+// against a known value; every other env var still resolves through the real getter.
+// NOTE: this can be removed as soon as we use the routing service from fit connect ([SG-1015])
+vi.mock("../../secretsAndEnvironmentVariables", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../secretsAndEnvironmentVariables")>();
+  const getEnvironmentVariable: typeof actual.getEnvironmentVariable = (name) =>
+    name === "FIT_CONNECT_DESTINATION_ID"
+      ? testFitConnectDestinationId
+      : actual.getEnvironmentVariable(name);
+  return { ...actual, getEnvironmentVariable };
+});
+
 import app from "../../app";
 
 import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
@@ -181,9 +197,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
 
       expect(response.status).toEqual(HttpStatusCode.Ok);
       expect(json.gewerbeanmeldung.ars).toBe("084210000000");
-      expect(json.gewerbeanmeldung.fitConnectDestinationId).toBe(
-        "fa63ede0-0ef6-4ca6-abd2-6bd16729ddc1",
-      );
+      expect(json.gewerbeanmeldung.fitConnectDestinationId).toBe(testFitConnectDestinationId);
     });
   });
 });
