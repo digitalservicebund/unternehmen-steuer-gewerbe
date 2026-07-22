@@ -27,7 +27,7 @@ const FIT_CONNECT_EVENT_STATUS: Record<string, SubmissionEventStatus> = {
 };
 
 // OSCI transport report (Laufzettel) events:
-// - creation: the message was placed in the recipient's postbox -> submitted
+// - creation: the message was placed in the recipient's intermediär -> submitted
 // - forwarding: the receiving client fetched the message but has not acknowledged it yet
 //   -> notify
 // - reception: the recipient acknowledged (quittiert) the message -> accepted
@@ -61,9 +61,9 @@ export function toSubmissionEventFromFitConnectPayload(
   if (payload === null) return undefined;
 
   const eventName = getEventName(payload);
-  const { iat } = payload;
+  const { iat: timestamtWithoutMs } = payload;
 
-  if (eventName === undefined || iat === undefined) {
+  if (eventName === undefined || timestamtWithoutMs === undefined) {
     return undefined;
   }
 
@@ -73,7 +73,7 @@ export function toSubmissionEventFromFitConnectPayload(
     return undefined;
   }
 
-  return { timestamp: new Date(iat * 1000).toISOString(), status };
+  return { timestamp: new Date(timestamtWithoutMs * 1000).toISOString(), status };
 }
 
 export function toSubmissionEventFromOsciEvent(

@@ -53,32 +53,47 @@ describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
   describe("with a fitConnectDestinationId (FIT-Connect)", () => {
     const submissionId = "dbc4efa5-58e7-4527-8898-00d58450c68e";
     const fitConnectDestinationId = "83a5a303-24a2-4e0a-8b4b-8f4c6c4b1f2b";
+    const iat = 1622796500;
+    const timestamp = "2021-06-04T08:48:20.000Z";
 
-    it("maps accept-submission to accepted and notify-submission to notify, dropping unknown entries", async () => {
+    it.each([
+      { eventName: "create-submission", status: "created" },
+      { eventName: "submit-submission", status: "submitted" },
+      { eventName: "notify-submission", status: "notify" },
+      { eventName: "accept-submission", status: "accepted" },
+      { eventName: "reject-submission", status: "rejected" },
+    ])("maps FIT-Connect $eventName to $status", async ({ eventName, status }) => {
       mockGetSubmissionEvents.mockResolvedValueOnce({
-        count: 4,
-        offset: 0,
-        totalCount: 4,
-        eventLog: [
-          fitConnectEvent("notify-submission", 1622796500),
-          fitConnectEvent("accept-submission", 1622796532),
-          fitConnectEvent("unknown-status", 1622799999),
-        ],
+        eventLog: [fitConnectEvent(eventName, iat)],
       });
 
       const response = await getEvents({ submissionId, ars, fitConnectDestinationId });
       const json = await response.json();
 
+      expect(response.status).toBe(200);
+      expect(json).toEqual({ events: [{ timestamp, status }] });
+    });
+
+    it("drops unknown FIT-Connect event entries", async () => {
+      mockGetSubmissionEvents.mockResolvedValueOnce({
+        eventLog: [fitConnectEvent("unknown-status", iat)],
+      });
+
+      const response = await getEvents({ submissionId, ars, fitConnectDestinationId });
+      const json = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(json).toEqual({ events: [] });
+    });
+
+    it("forwards submissionId and fitConnectDestinationId to the FIT-Connect client", async () => {
+      mockGetSubmissionEvents.mockResolvedValueOnce({ eventLog: [] });
+
+      await getEvents({ submissionId, ars, fitConnectDestinationId });
+
       const [calledSubmissionId, calledDestinationId] = mockGetSubmissionEvents.mock.calls[0]!;
       expect(calledSubmissionId).toBe(submissionId);
       expect(calledDestinationId).toBe(fitConnectDestinationId);
-      expect(response.status).toBe(200);
-      expect(json).toEqual({
-        events: [
-          { timestamp: "2021-06-04T08:48:20.000Z", status: "notify" },
-          { timestamp: "2021-06-04T08:48:52.000Z", status: "accepted" },
-        ],
-      });
     });
 
     it("returns 404 when no FIT-Connect submission is found", async () => {
@@ -93,8 +108,8 @@ describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
   describe("without a fitConnectDestinationId (OSCI)", () => {
     const messageId = "vps_by_178357726143931b13e14-2c78-4aa6-ba2c-0d911ec02d82";
 
-    it("maps creation to submitted, forwarding to notify and reception to accepted, dropping unknown event type", async () => {
-      mockGetTransportReport.mockResolvedValueOnce({
+    function osciTransportReport(events: { type: string; timestamp: string }[]) {
+      return {
         identifiers: {
           messageID: messageId,
           serviceID: "service",
@@ -105,32 +120,49 @@ describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
             id: messageId,
             subject: "subject",
             recentModification: "2026-01-03T00:00:00Z",
-            events: [
-              { type: "creation", timestamp: "2026-01-01T00:00:00Z" },
-              { type: "forwarding", timestamp: "2026-01-02T00:00:00Z" },
-              { type: "reception", timestamp: "2026-01-03T00:00:00Z" },
-              { type: "somethingElse", timestamp: "2026-01-04T00:00:00Z" },
-            ],
+            events,
             verifications: [],
             rawData: "<xml/>",
           },
         ],
-      });
+      };
+    }
+
+    it.each([
+      { type: "creation", status: "submitted" },
+      { type: "forwarding", status: "notify" },
+      { type: "reception", status: "accepted" },
+    ])("maps OSCI $type to $status", async ({ type, status }) => {
+      const timestamp = "2026-01-01T00:00:00Z";
+      mockGetTransportReport.mockResolvedValueOnce(osciTransportReport([{ type, timestamp }]));
 
       const response = await getEvents({ submissionId: messageId, ars });
       const json = await response.json();
 
+      expect(response.status).toBe(200);
+      expect(json).toEqual({ events: [{ timestamp, status }] });
+    });
+
+    it("drops unknown OSCI event types", async () => {
+      mockGetTransportReport.mockResolvedValueOnce(
+        osciTransportReport([{ type: "somethingElse", timestamp: "2026-01-04T00:00:00Z" }]),
+      );
+
+      const response = await getEvents({ submissionId: messageId, ars });
+      const json = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(json).toEqual({ events: [] });
+    });
+
+    it("queries the transport report with the messageId and MELDID authorityKey derived from the ars", async () => {
+      mockGetTransportReport.mockResolvedValueOnce(osciTransportReport([]));
+
+      await getEvents({ submissionId: messageId, ars });
+
       const [reportOptions] = mockGetTransportReport.mock.calls[0]!;
       expect(reportOptions.messageId).toBe(messageId);
       expect(reportOptions.authorityKey).toBe("MELDID:14612000");
-      expect(response.status).toBe(200);
-      expect(json).toEqual({
-        events: [
-          { timestamp: "2026-01-01T00:00:00Z", status: "submitted" },
-          { timestamp: "2026-01-02T00:00:00Z", status: "notify" },
-          { timestamp: "2026-01-03T00:00:00Z", status: "accepted" },
-        ],
-      });
     });
 
     it("returns 404 when no track matches the messageId", async () => {
