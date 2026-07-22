@@ -43,8 +43,8 @@ describe("FitConnectClient", () => {
     });
   });
 
-  describe("getSubmissionEvents", () => {
-    it("returns events for a submission", async () => {
+  describe("fetchSubmissionEvents", () => {
+    it("returns the raw events for a submission", async () => {
       const client = getFitConnectClient();
 
       const submission = await client.submitData({
@@ -60,9 +60,15 @@ describe("FitConnectClient", () => {
         },
       });
 
-      const result = await client.getSubmissionEvents(submission.submissionId, DESTINATION_ID);
+      const result = await client.fetchSubmissionEvents(submission.submissionId);
 
-      expect(result.eventLog).toBeDefined();
+      expect(result.count).toEqual(expect.any(Number));
+      expect(result.offset).toEqual(expect.any(Number));
+      expect(result.totalCount).toEqual(expect.any(Number));
+      expect(Array.isArray(result.eventLog)).toBe(true);
+      for (const entry of result.eventLog) {
+        expect(entry).toEqual(expect.any(String));
+      }
     });
   });
 });
