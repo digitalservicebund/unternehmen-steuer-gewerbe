@@ -13,12 +13,6 @@ import {
   IST_VERSTEUERUNG_GRUND,
 } from "./fsECodes";
 
-function toAnredeId(geschlecht: "d" | "w" | "m" | undefined): string | undefined {
-  if (geschlecht === "m") return "1";
-  if (geschlecht === "w") return "2";
-  return undefined; // "d" (divers) hat keinen ELSTER-Code
-}
-
 function getKleinunternehmerRegelung(data: RegisterGewerbeRequest) {
   return data.unternehmensDaten.kleinunternehmerRegelung
     ? { kleinUnternUSt: true }
@@ -137,7 +131,6 @@ export function transformToEUnFsE(
       allgAngaben: {
         inhaber: {
           natPers: {
-            anredeId: toAnredeId(data.persönlicheDaten.geschlecht),
             vorname: data.persönlicheDaten.vorname,
             name: data.persönlicheDaten.nachname,
             //titel: undefined,

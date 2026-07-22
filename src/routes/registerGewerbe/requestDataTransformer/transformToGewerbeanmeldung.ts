@@ -146,7 +146,6 @@ export function transformToGewerbeanmeldung(
             ort: data.persönlicheDaten.geburtsort,
             staat: data.persönlicheDaten.geburtsland,
           },
-          geschlecht: data.persönlicheDaten.geschlecht ?? "x",
           staatsangehoerigkeit: STAATSANGEHOERIGKEIT[data.persönlicheDaten.staatsangehörigkeit],
           anschrift: {
             strasse: personStrasseHausnummer.strasse,
