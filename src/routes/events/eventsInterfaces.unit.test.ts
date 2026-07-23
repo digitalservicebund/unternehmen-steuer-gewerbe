@@ -20,9 +20,9 @@ describe("EventsRequestSchema", () => {
 
   it("fails when submissionId is missing or empty", () => {
     expect(EventsRequestSchema.safeParse({ ars: "066310009009" }).success).toBe(false);
-    expect(
-      EventsRequestSchema.safeParse({ submissionId: "", ars: "066310009009" }).success,
-    ).toBe(false);
+    expect(EventsRequestSchema.safeParse({ submissionId: "", ars: "066310009009" }).success).toBe(
+      false,
+    );
   });
 
   it("requires ars to be exactly 12 digits", () => {
@@ -30,9 +30,7 @@ describe("EventsRequestSchema", () => {
     expect(EventsRequestSchema.safeParse(request).success).toBe(true);
 
     expect(EventsRequestSchema.safeParse({ ...request, ars: "123" }).success).toBe(false);
-    expect(EventsRequestSchema.safeParse({ ...request, ars: "abcdefghijkl" }).success).toBe(
-      false,
-    );
+    expect(EventsRequestSchema.safeParse({ ...request, ars: "abcdefghijkl" }).success).toBe(false);
   });
 
   it("accepts an optional fitConnectDestinationId", () => {

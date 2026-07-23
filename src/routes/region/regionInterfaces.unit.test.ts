@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  RegionParamsSchema,
-  RegionQuerySchema,
-  OfficeDetailsSchema,
-} from "./regionInterfaces";
+import { RegionParamsSchema, RegionQuerySchema, OfficeDetailsSchema } from "./regionInterfaces";
 
 describe("RegionParamsSchema", () => {
   it("requires a 5-digit plz", () => {
