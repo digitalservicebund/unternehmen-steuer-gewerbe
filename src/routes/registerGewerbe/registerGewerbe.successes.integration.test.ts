@@ -200,4 +200,19 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(json.gewerbeanmeldung.fitConnectDestinationId).toBe(testFitConnectDestinationId);
     });
   });
+
+  describe("gewinnGründungsjahr and gewinnFolgejahr", () => {
+    it("accepts negative values (a projected loss)", async () => {
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          gewinnGründungsjahr: -5000,
+          gewinnFolgejahr: -1000,
+        },
+      });
+
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+    });
+  });
 });

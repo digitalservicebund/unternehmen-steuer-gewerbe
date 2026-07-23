@@ -214,5 +214,21 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       });
       expect(response.status).toEqual(HttpStatusCode.BadRequest);
     });
+
+    it.each(["gewinnGründungsjahr", "gewinnFolgejahr"] as const)(
+      "Returns 400 BAD REQUEST when %s is missing",
+      async (field) => {
+        const unternehmensDaten = {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+        };
+        delete (unternehmensDaten as Record<string, unknown>)[field];
+
+        const response = await postRegisterGewerbe({
+          ...registerGewerbeSampleRequestAllFieldsFilled,
+          unternehmensDaten,
+        });
+        expect(response.status).toEqual(HttpStatusCode.BadRequest);
+      },
+    );
   });
 });
