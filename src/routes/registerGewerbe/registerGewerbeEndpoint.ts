@@ -68,11 +68,12 @@ async function submitGewerbeanmeldung(
   // Before using FIT-Connect -> Check in context if FIT-Connect or OSCI is supported by
   // the Communes as soon as we have Pilot-Communes
   try {
+    // The destination varies from commune to commune.
+    // We can hard‑code it here for the first iterations, but in the future we need to
+    // use the Fit‑Connect routing API to determine the destination ID.
+    const destinationId = getEnvironmentVariable("FIT_CONNECT_DESTINATION_ID");
     const response = await getFitConnectClient().submitData({
-      // The destination varies from commune to commune.
-      // We can hard‑code it here for the first iterations, but in the future we need to
-      // use the Fit‑Connect routing API to determine the destination ID.
-      destinationId: getEnvironmentVariable("FIT_CONNECT_DESTINATION_ID"),
+      destinationId,
       publicService: {
         identifier: GEWERBEANMELDUNG_LEIKA_KEY_URN,
         name: "Gewerbe Anmeldung",
@@ -86,6 +87,10 @@ async function submitGewerbeanmeldung(
     return {
       success: true,
       submissionId: response.submissionId,
+      ars: routingInfo.ars,
+      // Set only on the FIT-Connect path; once the OSCI submit is wired up its branch
+      // returns just `ars`, which the events endpoint reads as an OSCI submission.
+      fitConnectDestinationId: destinationId,
       pdfReceiptBase64: gewerbeanmeldungPdfReceipt,
       officeDetails: gewerbeamtDetails,
     };

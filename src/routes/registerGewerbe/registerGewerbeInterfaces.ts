@@ -214,6 +214,11 @@ export type RegisterGewerbeRequest = z.infer<typeof RegisterGewerbeRequestSchema
 const RegisterGewerbeResponseItemSchema = z.object({
   success: z.boolean(),
   submissionId: z.string().optional(),
+  // Routing context for the events endpoint, echoed back to the client 1:1.
+  // ars is always set for the gewerbeanmeldung item; fitConnectDestinationId only
+  // when the submission was sent via FIT-Connect (its absence marks OSCI).
+  ars: z.string().optional(),
+  fitConnectDestinationId: z.string().optional(),
   info: z.string().optional(),
   errorType: ErrorTypeSchema.optional(),
   pdfReceiptBase64: z.base64().optional(),
