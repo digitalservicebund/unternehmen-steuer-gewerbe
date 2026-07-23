@@ -143,7 +143,7 @@ export function transformToGewerbeanmeldung(
           },
           geburt: {
             geburtsdatum: data.persönlicheDaten.geburtsdatum,
-            ort: data.persönlicheDaten.geburtsort,
+            ort: data.persönlicheDaten.geburtsort ?? "keine Angabe",
             staat: data.persönlicheDaten.geburtsland,
           },
           geschlecht: data.persönlicheDaten.geschlecht ?? "x",
