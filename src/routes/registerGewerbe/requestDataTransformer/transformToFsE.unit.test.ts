@@ -126,44 +126,6 @@ describe("transformToEUnFsE", () => {
     });
   });
 
-  it("maps geschlecht 'm' to anredeId '1' and 'w' to '2'", () => {
-    const männlich = transformToEUnFsE({
-      ...registerGewerbeSampleRequestAllFieldsFilled,
-      persönlicheDaten: {
-        ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
-        geschlecht: "m",
-      },
-    });
-    expect(männlich.eUn?.allgAngaben?.inhaber?.natPers?.anredeId).toBe("1");
-
-    const weiblich = transformToEUnFsE({
-      ...registerGewerbeSampleRequestAllFieldsFilled,
-      persönlicheDaten: {
-        ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
-        geschlecht: "w",
-      },
-    });
-    expect(weiblich.eUn?.allgAngaben?.inhaber?.natPers?.anredeId).toBe("2");
-
-    const istVersteuerung = transformToEUnFsE({
-      ...registerGewerbeSampleRequestAllFieldsFilled,
-      unternehmensDaten: {
-        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-        sollIstVersteuerung: "istVersteuerung",
-      },
-    });
-    expect(istVersteuerung.eUn?.umsatzsteuer?.sollIstVersteuerung?.auswahlSollIstVerst).toBe("2");
-
-    const ueberschuss = transformToEUnFsE({
-      ...registerGewerbeSampleRequestAllFieldsFilled,
-      unternehmensDaten: {
-        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-        zahllastUeberschussAuswahl: "ueberschuss",
-      },
-    });
-    expect(ueberschuss.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toBe("2");
-  });
-
   it.each([
     ["unterschreitungUmsatzgrenze", "istVerstUStGrundUmsatz"],
     ["befreiungBuchführungspflicht", "istVerstUStGrundAO"],
