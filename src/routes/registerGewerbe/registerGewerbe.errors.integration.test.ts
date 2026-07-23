@@ -216,7 +216,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
     });
 
     it("Returns 400 BAD REQUEST when vertrauensniveau is missing", async () => {
-      const { vertrauensniveau, ...persönlicheDatenOhneVertrauensniveau } =
+      const { vertrauensniveau: _vertrauensniveau, ...persönlicheDatenOhneVertrauensniveau } =
         registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten;
 
       const response = await postRegisterGewerbe({
