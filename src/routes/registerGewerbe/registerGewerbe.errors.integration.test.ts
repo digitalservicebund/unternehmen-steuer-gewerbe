@@ -52,7 +52,7 @@ import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanme
 import * as pdfGenerator from "./registerGewerbePdfGenerator";
 
 import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
-import { ErrorTypeSchema } from "./registerGewerbeInterfaces";
+import { ErrorTypeSchema, type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
 
 function postRegisterGewerbe(data = registerGewerbeSampleRequestAllFieldsFilled, queryString = "") {
@@ -212,6 +212,17 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
           istVersteuerungGrund: "unterschreitungUmsatzgrenze",
         },
       });
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+    });
+
+    it("Returns 400 BAD REQUEST when geburtsort is missing", async () => {
+      const { geburtsort: _geburtsort, ...persönlicheDatenOhneGeburtsort } =
+        registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten;
+
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        persönlicheDaten: persönlicheDatenOhneGeburtsort,
+      } as unknown as RegisterGewerbeRequest);
       expect(response.status).toEqual(HttpStatusCode.BadRequest);
     });
   });
