@@ -18,7 +18,6 @@ describe("transformToGewerbeanmeldung", () => {
       persönlicheDaten: {
         ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
         geburtsname: undefined,
-        geschlecht: undefined,
       },
       unternehmensDaten: {
         ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
