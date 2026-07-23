@@ -144,7 +144,7 @@ export function transformToGewerbeanmeldung(
           geburt: {
             geburtsdatum: data.persönlicheDaten.geburtsdatum,
             ort: data.persönlicheDaten.geburtsort ?? "keine Angabe",
-            staat: data.persönlicheDaten.geburtsland,
+            staat: data.persönlicheDaten.geburtsland ?? "keine Angabe",
           },
           // XGewerbeordnung Schematron requires np:geschlecht to be present (SCH-EXISTS-xga-natuerlichePerson-np-geschlecht);
           // we no longer collect it, so always report "keine Angabe".
