@@ -146,7 +146,9 @@ export function transformToGewerbeanmeldung(
             ort: data.persönlicheDaten.geburtsort,
             staat: data.persönlicheDaten.geburtsland,
           },
-          geschlecht: data.persönlicheDaten.geschlecht ?? "x",
+          // XGewerbeordnung Schematron requires np:geschlecht to be present (SCH-EXISTS-xga-natuerlichePerson-np-geschlecht);
+          // we no longer collect it, so always report "keine Angabe".
+          geschlecht: "x",
           staatsangehoerigkeit: STAATSANGEHOERIGKEIT[data.persönlicheDaten.staatsangehörigkeit],
           anschrift: {
             strasse: personStrasseHausnummer.strasse,

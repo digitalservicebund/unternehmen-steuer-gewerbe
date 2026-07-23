@@ -6,7 +6,6 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
     nachname: "Mustermann",
     geburtsname: "Muster",
     geburtsdatum: "1988-09-10",
-    geschlecht: "d",
     geburtsort: "Musterstadt",
     geburtsland: "Deutschland",
     staatsangehörigkeit: "deutsch",
