@@ -46,6 +46,15 @@ describe("transformToGewerbeanmeldung", () => {
     expect(person.name!.geburtsname).toBeUndefined();
   });
 
+  it("statically sets geburt.staat to Deutschland since geburtsland is no longer collected", () => {
+    const result = transformToGewerbeanmeldung(
+      registerGewerbeSampleRequestAllFieldsFilled,
+      testRoutingInfo,
+    );
+
+    expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.geburt!.staat).toBe("keine Angabe");
+  });
+
   it("maps the staatsangehörigkeit key to its destatis code (deutsch = 000, französisch = 129)", async () => {
     const deutsch = transformToGewerbeanmeldung(
       registerGewerbeSampleRequestAllFieldsFilled,
