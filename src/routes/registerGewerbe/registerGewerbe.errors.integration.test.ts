@@ -214,5 +214,17 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       });
       expect(response.status).toEqual(HttpStatusCode.BadRequest);
     });
+
+    it("Returns 400 BAD REQUEST when vertrauensniveau is missing", async () => {
+      const { vertrauensniveau, ...persönlicheDatenOhneVertrauensniveau } =
+        registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten;
+
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        persönlicheDaten: persönlicheDatenOhneVertrauensniveau,
+      } as unknown as typeof registerGewerbeSampleRequestAllFieldsFilled);
+
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+    });
   });
 });
