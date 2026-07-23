@@ -56,7 +56,6 @@ describe("RegisterGewerbeRequestSchema", () => {
   describe("optional fields", () => {
     it.each([
       ["persönlicheDaten.geburtsname"],
-      ["persönlicheDaten.geschlecht"],
       ["persönlicheDaten.geburtsort"],
       ["persönlicheDaten.staatsangehörigkeitDeutsch"],
       ["persönlicheDaten.steuernummer"],
@@ -138,7 +137,6 @@ describe("RegisterGewerbeRequestSchema", () => {
 
   describe("enum fields", () => {
     it.each([
-      ["persönlicheDaten", "geschlecht", "d"],
       ["persönlicheDaten", "staatsangehörigkeit", "deutsch"],
       ["persönlicheDaten", "religion", "nichtKirchensteuerpflichtig"],
       ["persönlicheDaten", "vertrauensniveau", "substantiell"],
@@ -157,7 +155,6 @@ describe("RegisterGewerbeRequestSchema", () => {
     });
 
     it.each([
-      ["persönlicheDaten", "geschlecht"],
       ["persönlicheDaten", "staatsangehörigkeit"],
       ["persönlicheDaten", "religion"],
       ["persönlicheDaten", "vertrauensniveau"],
