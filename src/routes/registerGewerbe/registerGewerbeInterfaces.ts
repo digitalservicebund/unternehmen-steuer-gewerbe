@@ -39,13 +39,13 @@ const PersönlicheDatenSchema = z.object({
   geburtsort: z.string().openapi({ example: "Musterstadt" }).optional(),
   staatsangehörigkeitDeutsch: z
     .boolean()
+    .optional()
     .openapi({
       deprecated: true,
       example: true,
       description:
         "Whether the person holds German citizenship. Deprecated: redundant with `staatsangehörigkeit` (derivable from it). Must be consistent with `staatsangehörigkeit`: true exactly when `staatsangehörigkeit` is 'deutsch' (code 000).",
-    })
-    .optional(),
+    }),
   staatsangehörigkeit: z.enum(STAATSANGEHOERIGKEIT_KEYS).default("deutsch").openapi({
     example: "deutsch",
     description:
@@ -81,13 +81,13 @@ const PersönlicheDatenSchema = z.object({
 
 const UnternehmensDatenSchema = z
   .object({
-    adresseAbweichend: AdresseSchema.openapi({
+    adresseAbweichend: AdresseSchema.optional().openapi({
       example: {
         strasseUndHausnummer: "Musterstraße 2",
         postleitzahl: "36037",
         ort: "Fulda",
       },
-    }).optional(),
+    }),
     tätigkeitsbeschreibung: z.string().openapi({ example: "Vertrieb von Vertriebsmustern" }),
     tätigkeitsbereich: z
       .enum(["industrie", "handwerk", "handel", "sonstiges"])
