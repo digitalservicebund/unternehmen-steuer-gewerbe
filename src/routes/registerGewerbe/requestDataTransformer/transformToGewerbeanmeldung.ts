@@ -144,6 +144,7 @@ export function transformToGewerbeanmeldung(
           geburt: {
             geburtsdatum: data.persönlicheDaten.geburtsdatum,
             ort: data.persönlicheDaten.geburtsort,
+            staat: "keine Angabe", // removed from API; xGewerbe still requires this Freitext.
           },
           geschlecht: data.persönlicheDaten.geschlecht ?? "x",
           staatsangehoerigkeit: STAATSANGEHOERIGKEIT[data.persönlicheDaten.staatsangehörigkeit],
