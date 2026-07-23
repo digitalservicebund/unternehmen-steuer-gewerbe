@@ -12,7 +12,7 @@ const testRoutingInfo = {
 const testRoutingInfoHamburg = { ...testRoutingInfo, ags: "02000000" };
 
 describe("transformToGewerbeanmeldung", () => {
-  it("maps default values, applies the geschlecht fallback if the geschlecht is not given and drops optional fields", () => {
+  it("maps default values, applies the geschlecht and geburtsort fallbacks if not given and drops optional fields", () => {
     const request: RegisterGewerbeRequest = {
       ...registerGewerbeSampleRequestAllFieldsFilled,
       persönlicheDaten: {
@@ -44,6 +44,7 @@ describe("transformToGewerbeanmeldung", () => {
     });
     expect(person.geschlecht).toBe("x");
     expect(person.name!.geburtsname).toBeUndefined();
+    expect(person.geburt!.ort).toBe("keine Angabe");
   });
 
   it("maps the staatsangehörigkeit key to its destatis code (deutsch = 000, französisch = 129)", async () => {
