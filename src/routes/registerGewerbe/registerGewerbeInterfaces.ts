@@ -36,15 +36,12 @@ const PersönlicheDatenSchema = z.object({
   geburtsname: z.string().openapi({ example: "Muster" }).optional(),
   geburtsdatum: z.iso.date().openapi({ example: "1988-09-10" }),
   geburtsort: z.string().openapi({ example: "Musterstadt" }).optional(),
-  staatsangehörigkeitDeutsch: z
-    .boolean()
-    .optional()
-    .openapi({
-      deprecated: true,
-      example: true,
-      description:
-        "Whether the person holds German citizenship. Deprecated: redundant with `staatsangehörigkeit` (derivable from it). Must be consistent with `staatsangehörigkeit`: true exactly when `staatsangehörigkeit` is 'deutsch' (code 000).",
-    }),
+  staatsangehörigkeitDeutsch: z.boolean().optional().openapi({
+    deprecated: true,
+    example: true,
+    description:
+      "Whether the person holds German citizenship. Deprecated: redundant with `staatsangehörigkeit` (derivable from it). Must be consistent with `staatsangehörigkeit`: true exactly when `staatsangehörigkeit` is 'deutsch' (code 000).",
+  }),
   staatsangehörigkeit: z.enum(STAATSANGEHOERIGKEIT_KEYS).default("deutsch").openapi({
     example: "deutsch",
     description:
