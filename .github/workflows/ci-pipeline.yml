@@ -12,20 +12,6 @@ on:
   # allow for running this workflow manually (button in GitHub Actions UI)
   workflow_dispatch:
 
-# On each branch, the latest commit cancels the pipelines of any earlier commits.
-#
-# Goal: The latest state is processed as quickly as possible.
-#       Especially great for `main` (change lead time, no concurrency issues).
-#
-# Other consequences:
-#   * The pipeline may be cancelled during / between deployments to dev and prod.
-#   * If the latest commit fails, the ones before don't make it to production.
-#   * We don't know the state (green/red) of the cancelled flows.
-#   * We don't spend pipeline minutes on (probably) outdated outcomes.
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 env:
   PROJECT_NAME: unternehmen-steuer-gewerbe
   CONTAINER_REGISTRY: ghcr.io
@@ -474,11 +460,23 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
-  deploy-development:
-    name: Deploy to development environment
+  # Deploy-development, smoke-test and deploy-production are one job (not three) so the
+  # concurrency group below holds for the whole deploy phase. Splitting them into separate
+  # jobs would let a later run's deploy-development jump the queue ahead of an earlier run's
+  # smoke-test/deploy-production, since GitHub's concurrency FIFO only orders entries into a
+  # single job, not across a chain of jobs.
+  deploy:
+    name: Deploy to development and production environments
     needs: [publish-image]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    environment: development
+    permissions:
+      contents: read
+    concurrency:
+      group: deploy-${{ github.ref }}
+      cancel-in-progress: false
+      queue: max
     steps:
       - name: Deploy to development
         uses: digitalservicebund/argocd-deploy@e8f6b8f77c8b8eeef3f67fc5bba9521f89145645
@@ -493,22 +491,6 @@ jobs:
           argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
           argocd_server: ${{ secrets.ARGOCD_SERVER_STACKIT }}
 
-      - name: Send failure to Slack
-        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
-
-  smoke-test-development:
-    name: Smoke test development environment
-    needs: deploy-development
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    environment: development
-    permissions:
-      contents: read
-    steps:
       - name: Wait for development to serve the correct commit
         run: |
           echo "Waiting for ${{ vars.DEVELOPMENT_BASE_URL }} to serve commit ${{ github.sha }}..."
@@ -557,21 +539,6 @@ jobs:
           FIT_CONNECT_DESTINATION_ID: ${{ vars.FIT_CONNECT_DESTINATION_ID }}
           ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
 
-      - name: Send failure to Slack
-        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
-
-  deploy-production:
-    name: Deploy to production environment
-    needs: smoke-test-development
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
       - name: Deploy to production
         uses: digitalservicebund/argocd-deploy@e8f6b8f77c8b8eeef3f67fc5bba9521f89145645
         with:
