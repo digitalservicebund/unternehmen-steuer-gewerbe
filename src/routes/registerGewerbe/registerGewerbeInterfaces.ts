@@ -15,19 +15,28 @@ import {
 } from "./requestDataTransformer/fsECodes";
 
 // ELSTER "Standard_E_V2" charset (FsE StringBaseSType) — no line breaks.
-const STANDARD_E_V2_CHARS =
-  "\\x20-\\x7E\\xA1-\\xA3\\xA5\\xA7\\xAA-\\xAC\\xAE-\\xB3\\xB5\\xB9-\\xBB\\xBF-\\xFF\\u0152-\\u0153\\u0160-\\u0161\\u0178\\u017D-\\u017E\\u20AC";
+// The " -~" span is the full printable ASCII block (U+0020-007E), which already
+// covers a-z/A-Z/digits/punctuation; "¿-ÿ" is the tail of Latin-1 Supplement
+// (U+00BF-00FF), which covers ä/ö/ü/Ä/Ö/Ü/ß — neither is spelled out letter by letter.
+const STANDARD_E_V2_CHARS = " -~¡-£¥§ª-¬®-³µ¹-»¿-ÿŒ-œŠ-šŸŽ-ž€";
 const STANDARD_E_V2_PATTERN = new RegExp(`^[${STANDARD_E_V2_CHARS}]*$`, "u");
 // Same charset but line breaks allowed (FsE StringZUBaseSType) — used only for tätigkeitsbeschreibung.
 const STANDARD_E_V2_ZU_PATTERN = new RegExp(`^[\\n\\r${STANDARD_E_V2_CHARS}]*$`, "u");
 
-// DIN SPEC 91379 datatype C (2022-08) — XGewerbe's shared free-text charset.
-// Transcribed from the XSD's single-codepoint ranges only; the handful of
-// precomposed-letter + combining-diacritic *sequences* it also permits (for
-// rare Baltic/Vietnamese name spellings) are not modeled here.
-const DIN_91379_C_CHARS =
-  "\\t\\n\\r\\x20-\\x7E\\xA0-\\xAC\\xAE-\\u017E\\u0187-\\u0188\\u018F\\u0197\\u01A0-\\u01A1\\u01AF-\\u01B0\\u01B7\\u01CD-\\u01DC\\u01DE-\\u01DF\\u01E2-\\u01F0\\u01F4-\\u01F5\\u01F8-\\u01FF\\u0212-\\u0213\\u0218-\\u021B\\u021E-\\u021F\\u0227-\\u0233\\u0259\\u0268\\u0292\\u02B9-\\u02BA\\u02BE-\\u02BF\\u02C8\\u02CC\\u1E02-\\u1E03\\u1E06-\\u1E07\\u1E0A-\\u1E11\\u1E1C-\\u1E2B\\u1E2F-\\u1E37\\u1E3A-\\u1E3B\\u1E40-\\u1E49\\u1E52-\\u1E5B\\u1E5E-\\u1E63\\u1E6A-\\u1E6F\\u1E80-\\u1E87\\u1E8C-\\u1E97\\u1E9E\\u1EA0-\\u1EF9\\u2019\\u2021\\u20AC";
-const DIN_91379_C_PATTERN = new RegExp(`^[${DIN_91379_C_CHARS}]*$`, "u");
+// DIN SPEC 91379 datatype C (2022-08 edition, din-norm-91379-datatypes.xsd) —
+// XGewerbe's shared free-text charset. Includes both the single-codepoint
+// ranges and the base-letter + combining-diacritic *sequences* the XSD's
+// xs:pattern permits in addition (e.g. "K" + U+035F + "h" for Vietnamese, or
+// "C" + one of several combining marks for Baltic spellings) — precomposed
+// letters alone aren't enough to represent those names in NFC form.
+const DIN_91379_C_BASE_CHARS =
+  "\t-\n\r -~ -¬®-žƇ-ƈƏƗƠ-ơƯ-ưƷǍ-ǜǞ-ǟǢ-ǰǴ-ǵǸ-ǿȒ-ȓȘ-țȞ-ȟȧ-ȳəɨʒʹ-ʺʾ-ʿˈˌḂ-ḃḆ-ḇḊ-ḑḗḜ-ḫḯ-ḷḺ-ḻṀ-ṉṒ-ṛṞ-ṣṪ-ṯẀ-ẇẌ-ẗẞẠ-ỹ’‡€";
+const DIN_91379_C_SEQUENCES =
+  "A̋|C(?:̀|̄|̆|̈|̕|̣|̦|̨̆)|D̂|F(?:̀|̄)|G̀|H(?:̄|̦|̱)|J(?:́|̌)|K(?:̀|̂|̄|̇|̕|̛|̦|͟H|͟h)|L(?:̂|̥|̥̄|̦)|M(?:̀|̂|̆|̐)|N(?:̂|̄|̆|̦)|P(?:̀|̄|̕|̣)|R(?:̆|̥|̥̄)|S(?:̀|̄|̛̄|̱)|T(?:̀|̄|̈|̕|̛)|U̇|Z(?:̀|̄|̆|̈|̧)|a̋|c(?:̀|̄|̆|̈|̕|̣|̦|̨̆)|d̂|f(?:̀|̄)|g̀|h(?:̄|̦)|j́|k(?:̀|̂|̄|̇|̕|̛|̦|͟h)|l(?:̂|̥|̥̄|̦)|m(?:̀|̂|̆|̐)|n(?:̂|̄|̆|̦)|p(?:̀|̄|̕|̣)|r(?:̆|̥|̥̄)|s(?:̀|̄|̛̄|̱)|t(?:̀|̄|̕|̛)|u̇|z(?:̀|̄|̆|̈|̧)|Ç̆|Û̄|ç̆|û̄|ÿ́|Č(?:̕|̣)|č(?:̕|̣)|ē̍|Ī́|ī́|ō̍|Ž(?:̦|̧)|ž(?:̦|̧)|Ḳ̄|ḳ̄|Ṣ̄|ṣ̄|Ṭ̄|ṭ̄|Ạ̈|ạ̈|Ọ̈|ọ̈|Ụ(?:̄|̈)|ụ(?:̄|̈)";
+const DIN_91379_C_PATTERN = new RegExp(
+  `^(?:[${DIN_91379_C_BASE_CHARS}]|${DIN_91379_C_SEQUENCES})*$`,
+  "u",
+);
 
 const AdresseSchema = z.object({
   strasseUndHausnummer: z
