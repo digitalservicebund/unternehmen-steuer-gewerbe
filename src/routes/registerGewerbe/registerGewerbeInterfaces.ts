@@ -14,6 +14,11 @@ import {
   ZAHLLAST_UEBERSCHUSS_KEYS,
 } from "./requestDataTransformer/fsECodes";
 
+// ELSTER FsE integer bounds (FsE_EUn XSD), derived from totalDigits restrictions on the
+// GanzzahlNichtNegOhneFuehrNull/GanzzahlOhneFuehrNull base types.
+const MAX_VK_12 = 999_999_999_999; // 12 digits (GesUmsatz.*, EinkGewBetr.*)
+const MAX_VK_10 = 9_999_999_999; // 10 digits (ZahllastUeberschuss.Betrag)
+
 const AdresseSchema = z.object({
   strasseUndHausnummer: z
     .string()
@@ -110,22 +115,22 @@ const UnternehmensDatenSchema = z
       example: false,
       description: "Wird die Kleinunternehmer-Regelung (§ 19 UStG) in Anspruch genommen?",
     }),
-    umsatzGruendungsjahr: z.number().int().min(0).default(1).openapi({
+    umsatzGruendungsjahr: z.number().int().min(0).max(MAX_VK_12).default(1).openapi({
       example: 25000,
       description: "Voraussichtlicher Gesamtumsatz (in Euro) im Jahr der Betriebseröffnung.",
     }),
-    umsatzFolgejahr: z.number().int().min(0).default(1).openapi({
+    umsatzFolgejahr: z.number().int().min(0).max(MAX_VK_12).default(1).openapi({
       example: 26000,
       description: "Voraussichtlicher Gesamtumsatz (in Euro) im Folgejahr.",
     }),
     umsatzsteuerIdMitbeantragen: z.boolean().default(false).optional().openapi({
       description: "Soll mit dem FsE auch eine UmsatzsteuerId mitbeantragt werden?",
     }),
-    gewinnGründungsjahr: z.number().int().min(0).default(1).openapi({
+    gewinnGründungsjahr: z.number().int().min(-MAX_VK_12).max(MAX_VK_12).default(1).openapi({
       example: 25000,
       description: "Voraussichtlicher Gewinn (in Euro) im Jahr der Betriebseröffnung.",
     }),
-    gewinnFolgejahr: z.number().int().min(0).default(1).openapi({
+    gewinnFolgejahr: z.number().int().min(-MAX_VK_12).max(MAX_VK_12).default(1).openapi({
       example: 26000,
       description: "Voraussichtlicher Gewinn (in Euro) im Folgejahr.",
     }),
@@ -145,13 +150,17 @@ const UnternehmensDatenSchema = z
         "Deprecated. Use 'umsatzsteuerImErstenJahr instead. (Ob voraussichtlich eine Zahllast oder ein Überschuss erwartet wird.)",
       deprecated: true,
     }),
-    zahllastUeberschussBetrag: z.number().int().min(0).default(0).openapi({
+    zahllastUeberschussBetrag: z.number().int().min(0).max(MAX_VK_10).default(0).openapi({
       example: 0,
       description:
         "Deprecated. Use 'umsatzsteuerImErstenJahr instead. (Voraussichtliche Zahllast oder Überschuss in Euro.)",
       deprecated: true,
     }),
-    umsatzsteuerImErstenJahr: z.int().optional().openapi({
+    // Sign is an application-level convention (positive = Zahllast, negative/zero = Überschuss),
+    // consumed by getZahllastUeberschuss() in transformToFsE.ts, which takes Math.abs() before
+    // mapping to the XSD's non-negative 10-digit Betrag field — hence the range here is symmetric
+    // around that bound, unlike the other (always non-negative) integer fields.
+    umsatzsteuerImErstenJahr: z.number().int().min(-MAX_VK_10).max(MAX_VK_10).optional().openapi({
       example: 100,
       description:
         "Voraussichtliche Umsatzsteuer im ersten Jahr. (Größer als 0 => Nutzer hat 'Zahllast' => muss was bezahlen; kleiner oder gleich 0 => 'Überschuss' => Rückzahlung vom / Guthaben beim Finanzamt.)",
