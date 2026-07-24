@@ -21,7 +21,7 @@ import {
 const STANDARD_E_V2_CHARS = " -~¡-£¥§ª-¬®-³µ¹-»¿-ÿŒ-œŠ-šŸŽ-ž€";
 const STANDARD_E_V2_PATTERN = new RegExp(`^[${STANDARD_E_V2_CHARS}]*$`, "u");
 // Same charset but line breaks allowed (FsE StringZUBaseSType) — used only for tätigkeitsbeschreibung.
-const STANDARD_E_V2_ZU_PATTERN = new RegExp(`^[\\n\\r${STANDARD_E_V2_CHARS}]*$`, "u");
+const STANDARD_E_V2_ZU_PATTERN = new RegExp(String.raw`^[\n\r${STANDARD_E_V2_CHARS}]*$`, "u");
 
 // DIN SPEC 91379 datatype C (2022-08 edition, din-norm-91379-datatypes.xsd) —
 // XGewerbe's shared free-text charset. Includes both the single-codepoint
