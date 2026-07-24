@@ -49,7 +49,7 @@ export function joinStrasseUndHausnummer(
 
 export function splitTelefonnummer(telefonnummer: string) {
   const match =
-    /^(?<intVorw>\+\d{1,5})\s(?<natVorw>\d{1,5})\s(?<rufNr>\d{1,13})(?:-(?<durchwahl>\d{1,5}))?$/.exec(
+    /^(?<intVorw>\+\d{1,5})\s(?<natVorw>\d{1,5})\s(?<rufNr>\d{2,13})(?:-(?<durchwahl>\d{1,5}))?$/.exec(
       telefonnummer,
     );
 
