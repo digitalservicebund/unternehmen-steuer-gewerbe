@@ -214,5 +214,18 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       });
       expect(response.status).toEqual(HttpStatusCode.BadRequest);
     });
+
+    it("Returns 400 BAD REQUEST when gründungsdatum is missing", async () => {
+      const unternehmensDaten = {
+        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+      };
+      delete (unternehmensDaten as Record<string, unknown>).gründungsdatum;
+
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten,
+      });
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+    });
   });
 });
