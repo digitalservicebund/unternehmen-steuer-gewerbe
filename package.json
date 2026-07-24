@@ -42,7 +42,7 @@
     "fast-xml-parser": "^5.10.1",
     "hono": "^4.12.31",
     "jose": "^6.2.3",
-    "koffi": "^3.1.1",
+    "koffi": "^3.1.2",
     "p-limit": "^7.3.1",
     "pdfkit": "^0.19.1",
     "saxonjs-he": "3.0.0-beta2",
