@@ -118,7 +118,7 @@ jobs:
   test-integration:
     strategy:
       matrix:
-        shard: [1]
+        shard: [1, 2]
       fail-fast: false
     runs-on: ubuntu-latest
     permissions:
