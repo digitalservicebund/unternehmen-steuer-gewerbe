@@ -1,17 +1,20 @@
 import { describe, it, expect, vi } from "vitest";
 
-const { mockGetLocationsDetails, mockGetGewerbeamt, mockGetRoutes } = vi.hoisted(() => ({
-  mockGetLocationsDetails: vi
-    .fn()
-    .mockResolvedValue([{ ars: "030460014004", name: "Cottbus, Stadt", plz: "03046" }]),
-  mockGetGewerbeamt: vi.fn().mockResolvedValue({
-    name: "Stadt Fulda",
-    adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
-    telefon: "0661 102-0",
-    onlineServices: [],
-  }),
-  mockGetRoutes: vi.fn(),
-}));
+const { mockGetLocationsDetails, mockGetGewerbeamt, mockGetRoutes, mockDestinationIdOverride } =
+  vi.hoisted(() => ({
+    mockGetLocationsDetails: vi
+      .fn()
+      .mockResolvedValue([{ ars: "030460014004", name: "Cottbus, Stadt", plz: "03046" }]),
+    mockGetGewerbeamt: vi.fn().mockResolvedValue({
+      name: "Stadt Fulda",
+      adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
+      telefon: "0661 102-0",
+      onlineServices: [],
+    }),
+    mockGetRoutes: vi.fn().mockResolvedValue({ count: 0, offset: 0, totalCount: 0, routes: [] }),
+    // unset FIT_CONNECT_DESTINATION_ID resolves to an empty string
+    mockDestinationIdOverride: vi.fn().mockReturnValue(""),
+  }));
 
 vi.mock("../../clients/pvogClient", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../../clients/pvogClient")>()),
@@ -22,6 +25,16 @@ vi.mock("../../clients/pvogClient", async (importOriginal) => ({
 vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
   getFitConnectClient: () => ({ getRoutes: mockGetRoutes }),
 }));
+
+// Override only FIT_CONNECT_DESTINATION_ID; every other env var still resolves through the real getter.
+vi.mock("../../secretsAndEnvironmentVariables", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../secretsAndEnvironmentVariables")>();
+  const getEnvironmentVariable: typeof actual.getEnvironmentVariable = (name) =>
+    name === "FIT_CONNECT_DESTINATION_ID"
+      ? mockDestinationIdOverride()
+      : actual.getEnvironmentVariable(name);
+  return { ...actual, getEnvironmentVariable };
+});
 
 import { getGewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
 import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
@@ -110,20 +123,11 @@ describe("getGewerbeRoutingInfo", () => {
   });
 
   describe("FIT-Connect routing", () => {
-    const requestWithFitConnectSupport = {
-      ...registerGewerbeSampleRequestAllFieldsFilled,
-      persönlicheDaten: {
-        ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
-        adresse: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten.adresse,
-          postleitzahl: "00000",
-        },
-      },
-      unternehmensDaten: {
-        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-        adresseAbweichend: undefined,
-      },
-    };
+    it("asks the routing service for the Gewerbeanmeldung LEIKA key and the resolved ARS", async () => {
+      await getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled);
+
+      expect(mockGetRoutes).toHaveBeenCalledWith("99050012104000", "030460014004");
+    });
 
     it("returns destinationId from the first route when FIT-Connect is supported", async () => {
       mockGetRoutes.mockResolvedValueOnce({
@@ -136,16 +140,29 @@ describe("getGewerbeRoutingInfo", () => {
         ],
       });
 
-      const result = await getGewerbeRoutingInfo(requestWithFitConnectSupport);
+      const result = await getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled);
 
       expect(result!.fitConnectDestinationInformation!.destinationId).toBe("mock-destination-id");
       expect(result!.ags).toBe("03046004");
     });
 
-    it("returns undefined when FIT-Connect returns no routes for the AGS", async () => {
+    it("returns fitConnectDestinationInformation null when the routing service returns no routes", async () => {
       mockGetRoutes.mockResolvedValueOnce({ count: 0, offset: 0, totalCount: 0, routes: [] });
 
-      expect(await getGewerbeRoutingInfo(requestWithFitConnectSupport)).toBeUndefined();
+      const result = await getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled);
+
+      expect(result!.fitConnectDestinationInformation).toBeNull();
+    });
+
+    it("prefers the FIT_CONNECT_DESTINATION_ID override over the routing service result", async () => {
+      mockDestinationIdOverride.mockReturnValueOnce("override-destination-id");
+      mockGetRoutes.mockResolvedValueOnce({ count: 0, offset: 0, totalCount: 0, routes: [] });
+
+      const result = await getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled);
+
+      expect(result!.fitConnectDestinationInformation!.destinationId).toBe(
+        "override-destination-id",
+      );
     });
   });
 });
