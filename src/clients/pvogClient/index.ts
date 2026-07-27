@@ -1,5 +1,6 @@
 export type { Gewerbeamt, GewerbeamtAdresse, OnlineServiceLink } from "./getGewerbeamt";
 export {
+  fetchOrganisationUnitArs,
   fetchOrganisationUnitDetail,
   fetchOrganisationUnitTitles,
   fetchServiceDescriptionDetail,

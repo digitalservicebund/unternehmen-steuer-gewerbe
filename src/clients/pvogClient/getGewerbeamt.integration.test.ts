@@ -17,15 +17,18 @@ interface MockedPvogResponses {
   serviceDescriptions?: object;
   serviceDescriptionDetail?: object;
   organisationUnits?: object[];
+  organisationUnitArsById?: Record<string, string[]>;
   organisationUnitDetail?: object;
 }
 
-// mocks the results of the four PVOG requests getGewerbeamt makes, in call order
+// mocks the PVOG requests getGewerbeamt makes, dispatched by URL rather than by call order:
+// how many ARS requests it makes depends on the number of responsible organisation units
 function mockPvogApi(overrides: MockedPvogResponses) {
   const responses: MockedPvogResponses = {
     serviceDescriptions: { content: [{ id: "L1.LB.1", ars: ["080000000000"] }] },
     serviceDescriptionDetail: { onlineServiceLinks: [] },
     organisationUnits: [{ id: "L1.OE.1", title: "Gewerbeamt", role: { code: "01", name: "" } }],
+    organisationUnitArsById: {},
     organisationUnitDetail: {
       title: "Gewerbeamt",
       location: { addresses: [], communications: [] },
@@ -33,11 +36,25 @@ function mockPvogApi(overrides: MockedPvogResponses) {
     ...overrides,
   };
 
-  mockFetchJson
-    .mockResolvedValueOnce(responses.serviceDescriptions)
-    .mockResolvedValueOnce(responses.serviceDescriptionDetail)
-    .mockResolvedValueOnce(responses.organisationUnits)
-    .mockResolvedValueOnce(responses.organisationUnitDetail);
+  mockFetchJson.mockImplementation((url: string) => {
+    if (url.includes("/servicedescriptions/leikaid")) {
+      return Promise.resolve(responses.serviceDescriptions);
+    }
+    if (url.includes("/servicedescriptions/")) {
+      return Promise.resolve(responses.serviceDescriptionDetail);
+    }
+    if (url.includes("/organisationunits/titles")) {
+      return Promise.resolve(responses.organisationUnits);
+    }
+    if (url.endsWith("/ars")) {
+      const organisationUnitId = url.split("/").at(-2)!;
+      return Promise.resolve(responses.organisationUnitArsById![organisationUnitId] ?? []);
+    }
+    if (url.includes("/organisationunits/detail")) {
+      return Promise.resolve(responses.organisationUnitDetail);
+    }
+    return Promise.reject(new Error(`unexpected PVOG request to ${url}`));
+  });
 }
 
 describe("getGewerbeamt with mocked PVOG responses", () => {
@@ -80,6 +97,41 @@ describe("getGewerbeamt with mocked PVOG responses", () => {
           ars: "064120000000",
           lbId: "L1.LB.1",
           q: "L1.OE.ZUSTAENDIG",
+          validDate: VALID_DATE,
+        },
+      },
+    );
+  });
+
+  it("prefers the organisation unit with ARS 010540056056 over an Einheitlicher Ansprechpartner registered for the Land 010000000000", async () => {
+    mockPvogApi({
+      organisationUnits: [
+        {
+          id: "L1.OE.EINHEITLICHER_ANSPRECHPARTNER",
+          title: "Einheitlicher Ansprechpartner Schleswig-Holstein",
+          role: { code: "02", name: "Zuständige Stelle" },
+        },
+        {
+          id: "L1.OE.GEWERBEAMT",
+          title: "Stadt Husum - Der Bürgermeister - Ordnungsamt - Gewerbewesen",
+          role: { code: "02", name: "Zuständige Stelle" },
+        },
+      ],
+      organisationUnitArsById: {
+        "L1.OE.EINHEITLICHER_ANSPRECHPARTNER": ["010000000000"],
+        "L1.OE.GEWERBEAMT": ["010540056056", "010545459000"],
+      },
+    });
+
+    await getGewerbeamt("010540056056");
+
+    expect(mockFetchJson).toHaveBeenCalledWith(
+      `${PVOG_SUCHDIENST_API_URL}/v5/organisationunits/detail`,
+      {
+        params: {
+          ars: "010540056056",
+          lbId: "L1.LB.1",
+          q: "L1.OE.GEWERBEAMT",
           validDate: VALID_DATE,
         },
       },
