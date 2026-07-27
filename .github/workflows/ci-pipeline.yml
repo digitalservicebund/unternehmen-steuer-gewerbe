@@ -537,6 +537,7 @@ jobs:
           FIT_CONNECT_CLIENT_ID: ${{ vars.FIT_CONNECT_CLIENT_ID }}
           FIT_CONNECT_CLIENT_SECRET: ${{ secrets.FIT_CONNECT_CLIENT_SECRET }}
           FIT_CONNECT_DESTINATION_ID: ${{ vars.FIT_CONNECT_DESTINATION_ID }}
+          OSCI_ARS_OVERRIDE: ${{ vars.OSCI_ARS_OVERRIDE }}
           ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
 
       - name: Deploy to production

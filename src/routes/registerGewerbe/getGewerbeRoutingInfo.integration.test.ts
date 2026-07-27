@@ -1,20 +1,26 @@
 import { describe, it, expect, vi } from "vitest";
 
-const { mockGetLocationsDetails, mockGetGewerbeamt, mockGetRoutes, mockDestinationIdOverride } =
-  vi.hoisted(() => ({
-    mockGetLocationsDetails: vi
-      .fn()
-      .mockResolvedValue([{ ars: "030460014004", name: "Cottbus, Stadt", plz: "03046" }]),
-    mockGetGewerbeamt: vi.fn().mockResolvedValue({
-      name: "Stadt Fulda",
-      adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
-      telefon: "0661 102-0",
-      onlineServices: [],
-    }),
-    mockGetRoutes: vi.fn().mockResolvedValue({ count: 0, offset: 0, totalCount: 0, routes: [] }),
-    // unset FIT_CONNECT_DESTINATION_ID resolves to an empty string
-    mockDestinationIdOverride: vi.fn().mockReturnValue(""),
-  }));
+const {
+  mockGetLocationsDetails,
+  mockGetGewerbeamt,
+  mockGetRoutes,
+  mockDestinationIdOverride,
+  mockArsOverride,
+} = vi.hoisted(() => ({
+  mockGetLocationsDetails: vi
+    .fn()
+    .mockResolvedValue([{ ars: "030460014004", name: "Cottbus, Stadt", plz: "03046" }]),
+  mockGetGewerbeamt: vi.fn().mockResolvedValue({
+    name: "Stadt Fulda",
+    adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
+    telefon: "0661 102-0",
+    onlineServices: [],
+  }),
+  mockGetRoutes: vi.fn().mockResolvedValue({ count: 0, offset: 0, totalCount: 0, routes: [] }),
+  // unset env vars resolve to an empty string
+  mockDestinationIdOverride: vi.fn().mockReturnValue(""),
+  mockArsOverride: vi.fn().mockReturnValue(""),
+}));
 
 vi.mock("../../clients/pvogClient", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../../clients/pvogClient")>()),
@@ -26,13 +32,18 @@ vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
   getFitConnectClient: () => ({ getRoutes: mockGetRoutes }),
 }));
 
-// Override only FIT_CONNECT_DESTINATION_ID; every other env var still resolves through the real getter.
+// Override only the two test knobs; every other env var still resolves through the real getter.
 vi.mock("../../secretsAndEnvironmentVariables", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../secretsAndEnvironmentVariables")>();
-  const getEnvironmentVariable: typeof actual.getEnvironmentVariable = (name) =>
-    name === "FIT_CONNECT_DESTINATION_ID"
-      ? mockDestinationIdOverride()
-      : actual.getEnvironmentVariable(name);
+  const getEnvironmentVariable: typeof actual.getEnvironmentVariable = (name) => {
+    if (name === "FIT_CONNECT_DESTINATION_ID") {
+      return mockDestinationIdOverride();
+    }
+    if (name === "OSCI_ARS_OVERRIDE") {
+      return mockArsOverride();
+    }
+    return actual.getEnvironmentVariable(name);
+  };
   return { ...actual, getEnvironmentVariable };
 });
 
@@ -163,6 +174,25 @@ describe("getGewerbeRoutingInfo", () => {
       expect(result!.fitConnectDestinationInformation!.destinationId).toBe(
         "override-destination-id",
       );
+    });
+  });
+
+  describe("OSCI_ARS_OVERRIDE", () => {
+    it("returns the overridden ars 090000000099 and the ags 09000099 derived from it", async () => {
+      mockArsOverride.mockReturnValueOnce("090000000099");
+
+      const result = await getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled);
+
+      expect(result!.ars).toBe("090000000099");
+      expect(result!.ags).toBe("09000099");
+    });
+
+    it("looks up the Gewerbeamt with the ARS resolved from the address", async () => {
+      mockArsOverride.mockReturnValueOnce("090000000099");
+
+      await getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled);
+
+      expect(mockGetGewerbeamt).toHaveBeenCalledWith("030460014004");
     });
   });
 });

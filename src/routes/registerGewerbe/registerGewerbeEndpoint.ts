@@ -127,8 +127,6 @@ async function submitGewerbeanmeldung(
   const gewerbeamtDetails = createOfficeDetailsFromGewerbeamt(routingInfo.gewerbeamt);
   const { fitConnectDestinationInformation } = routingInfo;
 
-  console.log(fitConnectDestinationInformation);
-
   try {
     let transportResult: GewerbeanmeldungTransportResult;
     if (fitConnectDestinationInformation === null) {

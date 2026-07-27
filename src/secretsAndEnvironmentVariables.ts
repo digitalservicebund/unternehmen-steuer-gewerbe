@@ -13,6 +13,7 @@ export type SecretName =
 export type EnvironmentVariableName =
   | "AKDB_BASE_URL"
   | "AKDB_USERNAME"
+  | "OSCI_ARS_OVERRIDE"
   | "ERIC_ENABLE_CUSTOM_FINANZAMT_IDS"
   | "ERIC_HERSTELLERID"
   | "FIT_CONNECT_CLIENT_ID"
