@@ -17,7 +17,8 @@ import {
 } from "./registerGewerbeInterfaces";
 import { registerGewerbeRoute } from "./registerGewerbeRoute";
 import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTransformer";
-import { getGewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
+import { getGewerbeRoutingInfo, type GewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
+import { getOsciClient } from "../../clients/osciClient/osciClient";
 import { generatePdfReceipt } from "./registerGewerbePdfGenerator";
 import { splitStrasseHausnummer } from "../../helpers/formFieldTransformations";
 import {
@@ -36,10 +37,69 @@ const maxConcurrency =
   Number(getEnvironmentVariable("REGISTER_GEWERBE_MAX_CONCURRENCY")) || DEFAULT_MAX_CONCURRENCY;
 const concurrentSubmissionPairsLimit = pLimit(maxConcurrency);
 
+interface GewerbeanmeldungTransportResult {
+  submissionId: string;
+  // Set only on the FIT-Connect path; its absence marks an OSCI submission for the events endpoint.
+  fitConnectDestinationId?: string;
+}
+
+interface SubmitViaFitConnectOptions {
+  destinationId: string;
+  gewerbeanmeldungXml: string;
+}
+
+async function submitViaFitConnect({
+  destinationId,
+  gewerbeanmeldungXml,
+}: SubmitViaFitConnectOptions): Promise<GewerbeanmeldungTransportResult> {
+  const response = await getFitConnectClient().submitData({
+    destinationId,
+    publicService: {
+      identifier: GEWERBEANMELDUNG_LEIKA_KEY_URN,
+      name: "Gewerbe Anmeldung",
+    },
+    dataSchema: {
+      schemaUri: "urn:xoev-de:kosit:standard:xgewerbeordnung",
+      mimeType: "application/xml",
+    },
+    data: gewerbeanmeldungXml,
+  });
+
+  return { submissionId: response.submissionId, fitConnectDestinationId: destinationId };
+}
+
+interface SubmitViaOsciOptions {
+  ags: string;
+  gewerbeanmeldungXml: string;
+}
+
+async function submitViaOsci({
+  ags,
+  gewerbeanmeldungXml,
+}: SubmitViaOsciOptions): Promise<GewerbeanmeldungTransportResult> {
+  const response = await getOsciClient().sendMessage({
+    targetId: `MELDID:${ags}`,
+    message: gewerbeanmeldungXml,
+  });
+
+  return { submissionId: response.metadata.source.sourceMessageId };
+}
+
 async function submitGewerbeanmeldung(
   data: RegisterGewerbeRequest,
 ): Promise<RegisterGewerbeResponseItem> {
-  const routingInfo = await getGewerbeRoutingInfo(data);
+  let routingInfo: GewerbeRoutingInfo | undefined;
+  try {
+    routingInfo = await getGewerbeRoutingInfo(data);
+  } catch (error) {
+    console.error("Gewerbe routing lookup failed", error);
+    return {
+      success: false,
+      errorType: ErrorTypeSchema.enum.upstream_error,
+      info: "Upstream service unavailable",
+    };
+  }
+
   if (!routingInfo) {
     return {
       success: false,
@@ -65,37 +125,31 @@ async function submitGewerbeanmeldung(
   const gewerbeanmeldungPdfReceipt = await generatePdfReceipt(gewerbeanmeldungXml);
 
   const gewerbeamtDetails = createOfficeDetailsFromGewerbeamt(routingInfo.gewerbeamt);
-  // Before using FIT-Connect -> Check in context if FIT-Connect or OSCI is supported by
-  // the Communes as soon as we have Pilot-Communes
+  const { fitConnectDestinationInformation } = routingInfo;
+
+  console.log(fitConnectDestinationInformation);
+
   try {
-    // The destination varies from commune to commune.
-    // We can hard‑code it here for the first iterations, but in the future we need to
-    // use the Fit‑Connect routing API to determine the destination ID.
-    const destinationId = getEnvironmentVariable("FIT_CONNECT_DESTINATION_ID");
-    const response = await getFitConnectClient().submitData({
-      destinationId,
-      publicService: {
-        identifier: GEWERBEANMELDUNG_LEIKA_KEY_URN,
-        name: "Gewerbe Anmeldung",
-      },
-      dataSchema: {
-        schemaUri: "urn:xoev-de:kosit:standard:xgewerbeordnung",
-        mimeType: "application/xml",
-      },
-      data: gewerbeanmeldungXml,
-    });
+    let transportResult: GewerbeanmeldungTransportResult;
+    if (fitConnectDestinationInformation === null) {
+      transportResult = await submitViaOsci({ ags: routingInfo.ags, gewerbeanmeldungXml });
+    } else {
+      transportResult = await submitViaFitConnect({
+        destinationId: fitConnectDestinationInformation.destinationId,
+        gewerbeanmeldungXml,
+      });
+    }
+
     return {
       success: true,
-      submissionId: response.submissionId,
+      submissionId: transportResult.submissionId,
       ars: routingInfo.ars,
-      // Set only on the FIT-Connect path; once the OSCI submit is wired up its branch
-      // returns just `ars`, which the events endpoint reads as an OSCI submission.
-      fitConnectDestinationId: destinationId,
+      fitConnectDestinationId: transportResult.fitConnectDestinationId,
       pdfReceiptBase64: gewerbeanmeldungPdfReceipt,
       officeDetails: gewerbeamtDetails,
     };
   } catch (error) {
-    console.error("FIT-Connect submission failed", error);
+    console.error("Gewerbeanmeldung submission failed", error);
     return {
       success: false,
       errorType: ErrorTypeSchema.enum.upstream_error,

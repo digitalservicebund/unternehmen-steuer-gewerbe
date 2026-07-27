@@ -3,6 +3,7 @@ import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectCl
 import { splitStrasseHausnummer } from "../../helpers/formFieldTransformations";
 import { getAGS } from "../../helpers/getAgs";
 import { getFirstAssumingItsTheBestMatch } from "../../helpers/getFirstAssumingItsTheBestMatch";
+import { getEnvironmentVariable } from "../../secretsAndEnvironmentVariables";
 import { type RegisterGewerbeRequest } from "./registerGewerbeInterfaces";
 
 const GEWERBEANMELDUNG_LEIKA_KEY = "99050012104000";
@@ -15,8 +16,28 @@ export interface GewerbeRoutingInfo {
   ags: string;
   ars: string;
   gewerbeamt: Gewerbeamt;
-  /** FIT-Connect destination info. null if FIT-Connect is not supported */
+  /** FIT-Connect destination info. null means the Gewerbeanmeldung has to be sent via OSCI */
   fitConnectDestinationInformation: FitConnectDestinationInformation | null;
+}
+
+async function getFitConnectDestinationInformation(
+  ars: string,
+): Promise<FitConnectDestinationInformation | null> {
+  // Test override: a configured destination forces FIT-Connect regardless of the routing result
+  const configuredDestinationId = getEnvironmentVariable("FIT_CONNECT_DESTINATION_ID");
+  if (configuredDestinationId) {
+    return { destinationId: configuredDestinationId };
+  }
+
+  const fitConnectClient = getFitConnectClient();
+  const res = await fitConnectClient.getRoutes(GEWERBEANMELDUNG_LEIKA_KEY, ars);
+
+  if (res.routes.length === 0) {
+    return null;
+  }
+
+  // TODO: double-check response as soon as we have communes that support FIT-Connect
+  return { destinationId: res.routes[0]!.destinationId };
 }
 
 export async function getGewerbeRoutingInfo(
@@ -43,19 +64,7 @@ export async function getGewerbeRoutingInfo(
     return undefined;
   }
 
-  let fitConnectDestinationInformation = null;
-
-  if (isSupportingFitConnect(address.postleitzahl)) {
-    const fitConnectClient = getFitConnectClient();
-    const res = await fitConnectClient.getRoutes(GEWERBEANMELDUNG_LEIKA_KEY, ars);
-
-    if (res.routes.length === 0) {
-      return undefined;
-    }
-
-    // TODO: double-check response as soon as we have communes that support FIT-Connect
-    fitConnectDestinationInformation = { destinationId: res.routes[0]!.destinationId };
-  }
+  const fitConnectDestinationInformation = await getFitConnectDestinationInformation(ars);
 
   return {
     ags,
@@ -63,9 +72,4 @@ export async function getGewerbeRoutingInfo(
     gewerbeamt,
     fitConnectDestinationInformation,
   };
-}
-
-function isSupportingFitConnect(postleitzahl: string) {
-  const communesWithFitConnect = ["00000"]; // currently no commune is supporting FIT-Connect; "00000" can be used for testing
-  return communesWithFitConnect.includes(postleitzahl);
 }
