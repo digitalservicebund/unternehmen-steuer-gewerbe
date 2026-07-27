@@ -39,10 +39,9 @@ describe("Route /api/v1/register-gewerbe (Gewerbeanmeldung via OSCI)", { timeout
   let json: z.infer<typeof RegisterGewerbeResponseSchema>;
 
   beforeAll(async () => {
-    const metadata = createMetadata({ targetId: AKDB_TEST_AUTHORITY_ID });
-    // TODO: remove this override once our sender id "ds:schnellergruenden" is registered
-    metadata.metadata.source.sourceId = "xga:090010030000";
-    vi.mocked(createMetadata).mockReturnValueOnce(metadata);
+    vi.mocked(createMetadata).mockReturnValueOnce(
+      createMetadata({ targetId: AKDB_TEST_AUTHORITY_ID }),
+    );
 
     response = await app.request("/api/v1/register-gewerbe?only=gewerbeanmeldung", {
       method: "POST",
