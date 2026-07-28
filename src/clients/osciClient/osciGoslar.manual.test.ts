@@ -72,6 +72,7 @@ async function createGoslarGewerbeanmeldung(logging = false) {
   }
 
   const gewerbeanmeldung = transformToGewerbeanmeldung(goslarRequest, routingInfo);
+  // gewerbeanmeldung.nachrichtenkopf!.autor!.kennung = "xga:090010030000";
 
   if (logging) {
     console.log("*** Gewerbemeldung Data:");
@@ -94,7 +95,7 @@ describe("Gewerbemeldung to Goslar via OSCI", () => {
     expect(message).toContain(`<bn-beh:name>${routingInfo.gewerbeamt.name}</bn-beh:name>`);
   });
 
-  it(`successfully sends Gewerbemeldung to Goslar (MELDID:${GOSLAR_AGS})`, async () => {
+  it.skip(`successfully sends Gewerbemeldung to Goslar (MELDID:${GOSLAR_AGS})`, async () => {
     expect(process.env["AKDB_BASE_URL"]).toContain("apk.akdb.de");
 
     const { routingInfo, message } = await createGoslarGewerbeanmeldung(true);
@@ -112,7 +113,7 @@ describe("Gewerbemeldung to Goslar via OSCI", () => {
     console.log("*** ARS:         ", routingInfo.ars);
   });
 
-  it(`successfully sends Gewerbemeldung to Goslar (MELDID:${GOSLAR_AGS}) with sendXoevMessage`, async () => {
+  it.skip(`successfully sends Gewerbemeldung to Goslar (MELDID:${GOSLAR_AGS}) with sendXoevMessage`, async () => {
     expect(process.env["AKDB_BASE_URL"]).toContain("apk.akdb.de");
 
     let { message } = await createGoslarGewerbeanmeldung(true);
