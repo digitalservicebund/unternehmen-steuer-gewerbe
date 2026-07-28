@@ -36,10 +36,10 @@ vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
 vi.mock("../../secretsAndEnvironmentVariables", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../secretsAndEnvironmentVariables")>();
   const getEnvironmentVariable: typeof actual.getEnvironmentVariable = (name) => {
-    if (name === "FIT_CONNECT_DESTINATION_ID") {
+    if (name === "TEST_FIT_CONNECT_DESTINATION_ID_OVERRIDE") {
       return mockDestinationIdOverride();
     }
-    if (name === "OSCI_ARS_OVERRIDE") {
+    if (name === "TEST_OSCI_ARS_OVERRIDE") {
       return mockArsOverride();
     }
     return actual.getEnvironmentVariable(name);
@@ -165,7 +165,7 @@ describe("getGewerbeRoutingInfo", () => {
       expect(result!.fitConnectDestinationInformation).toBeNull();
     });
 
-    it("prefers the FIT_CONNECT_DESTINATION_ID override over the routing service result", async () => {
+    it("prefers the TEST_FIT_CONNECT_DESTINATION_ID_OVERRIDE override over the routing service result", async () => {
       mockDestinationIdOverride.mockReturnValueOnce("override-destination-id");
       mockGetRoutes.mockResolvedValueOnce({ count: 0, offset: 0, totalCount: 0, routes: [] });
 
@@ -177,7 +177,7 @@ describe("getGewerbeRoutingInfo", () => {
     });
   });
 
-  describe("OSCI_ARS_OVERRIDE", () => {
+  describe("TEST_OSCI_ARS_OVERRIDE", () => {
     it("returns the overridden ars 090000000099 and the ags 09000099 derived from it", async () => {
       mockArsOverride.mockReturnValueOnce("090000000099");
 

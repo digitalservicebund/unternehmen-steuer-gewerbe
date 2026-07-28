@@ -3,7 +3,7 @@ import { describe, it, expect } from "vitest";
 import { getFitConnectClient } from "./fitConnectClient";
 import { getEnvironmentVariable } from "../../secretsAndEnvironmentVariables";
 
-const DESTINATION_ID = getEnvironmentVariable("FIT_CONNECT_DESTINATION_ID");
+const DESTINATION_ID = getEnvironmentVariable("TEST_FIT_CONNECT_DESTINATION_ID_OVERRIDE");
 
 describe("FitConnectClient", () => {
   describe("submitData", () => {

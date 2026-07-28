@@ -15,7 +15,7 @@ const { mockGetGewerbeRoutingInfo } = vi.hoisted(() => ({
 }));
 
 // Routing is mocked so the submission takes the OSCI branch, independently of what the routing
-// service answers and of a configured FIT_CONNECT_DESTINATION_ID. Everything after that -
+// service answers and of a configured TEST_FIT_CONNECT_DESTINATION_ID_OVERRIDE. Everything after that -
 // transform, XML validation, PDF receipt and the OSCI send itself - runs for real.
 vi.mock("./getGewerbeRoutingInfo", () => ({
   getGewerbeRoutingInfo: mockGetGewerbeRoutingInfo,

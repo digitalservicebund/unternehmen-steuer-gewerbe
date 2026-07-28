@@ -24,7 +24,9 @@ async function getFitConnectDestinationInformation(
   ars: string,
 ): Promise<FitConnectDestinationInformation | null> {
   // Test override: a configured destination forces FIT-Connect regardless of the routing result
-  const configuredDestinationId = getEnvironmentVariable("FIT_CONNECT_DESTINATION_ID");
+  const configuredDestinationId = getEnvironmentVariable(
+    "TEST_FIT_CONNECT_DESTINATION_ID_OVERRIDE",
+  );
   if (configuredDestinationId) {
     return { destinationId: configuredDestinationId };
   }
@@ -67,7 +69,7 @@ export async function getGewerbeRoutingInfo(
 
   // Test override: submit for a fixed ARS (e.g. the registered AKDB test authority) instead of the
   // one resolved from the address. Gewerbeamt and FIT-Connect routing still use the resolved ARS.
-  const arsOverride = getEnvironmentVariable("OSCI_ARS_OVERRIDE");
+  const arsOverride = getEnvironmentVariable("TEST_OSCI_ARS_OVERRIDE");
   const ars = arsOverride || resolvedArs;
   const ags = getAGS(ars);
 
