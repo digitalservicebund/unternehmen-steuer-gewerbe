@@ -88,6 +88,8 @@ async function submitViaOsci({
 async function submitGewerbeanmeldung(
   data: RegisterGewerbeRequest,
 ): Promise<RegisterGewerbeResponseItem> {
+  // NOTE: a failing routing lookup has no OSCI fallback, because it cannot be told apart from a
+  // successful one without a route — only the latter means "this commune uses OSCI".
   let routingInfo: GewerbeRoutingInfo | undefined;
   try {
     routingInfo = await getGewerbeRoutingInfo(data);
