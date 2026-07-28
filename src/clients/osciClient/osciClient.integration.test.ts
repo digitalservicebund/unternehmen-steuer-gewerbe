@@ -89,6 +89,29 @@ describe("getOsciClient", () => {
     });
   });
 
+  describe("sendXoevMessage", () => {
+    it("posts the XML as the raw request body, without metadata", async () => {
+      vi.stubEnv("AKDB_BASE_URL", "https://soaptest.akdb.de/okkommozg");
+      vi.stubEnv("AKDB_CERTIFICATE_BASE64", "");
+      vi.stubEnv("AKDB_CERTIFICATE_PASSPHRASE", "");
+      const fetchMock = vi.mocked(fetch);
+      fetchMock
+        .mockResolvedValueOnce(new Response(TOKEN_RESPONSE, { status: 200 }))
+        .mockResolvedValueOnce(new Response(null, { status: 204 }));
+
+      await getOsciClient().sendXoevMessage("<xml/>");
+
+      const [sendUrl, sendOptions] = fetchMock.mock.calls[1]!;
+
+      expect(sendUrl).toBe("https://soaptest.akdb.de/okkommozg/restapi/v3.0/messages/xoev");
+      expect(sendOptions?.headers).toEqual({
+        Authorization: "Bearer token",
+        "Content-Type": "application/xml; charset=UTF-8",
+      });
+      expect((sendOptions!.body as Buffer).toString("utf8")).toBe("<xml/>");
+    });
+  });
+
   describe("getTransportReport", () => {
     it("passes a client-certificate dispatcher when the certificate secrets are set", async () => {
       vi.stubEnv("AKDB_BASE_URL", "https://apk.akdb.de/okkommozg");

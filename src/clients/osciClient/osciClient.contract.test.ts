@@ -81,6 +81,26 @@ describe("osciClient", () => {
     });
   });
 
+  describe("sendXoevMessage", () => {
+    it.skip("successfully sends a valid ext.gewerbemeldung.0400 without metadata", async () => {
+      // without metadata the sender is taken from the message itself
+      // TODO: remove this override once our sender id "ds:schnellergruenden" is registered
+      const message = readSample("custom-xgewo-1.6-valid-0400.xml")
+        .replace(
+          "<bn-beh:kennung>ds:schnellergruenden</bn-beh:kennung>",
+          "<bn-beh:kennung>xga:090010030000</bn-beh:kennung>",
+        )
+        // without metadata the receiver is taken from the nachrichtenkopf leser
+        .replace(
+          "<bn-beh:kennung>xga:121499900001</bn-beh:kennung>",
+          "<bn-beh:kennung>MELDID:09000099</bn-beh:kennung>",
+        );
+
+      // the endpoint answers with an empty body; a rejected message would throw
+      await expect(osciClient.sendXoevMessage(message)).resolves.toBeUndefined();
+    });
+  });
+
   describe("getTransportReport", () => {
     it("successfully fetches the transport report for a sent message", async () => {
       const metadata = createMetadata({ targetId: "MELDID:09000099" });

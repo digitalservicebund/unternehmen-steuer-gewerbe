@@ -202,6 +202,36 @@ export function getOsciClient() {
     return (await response.json()) as SendMessageResponse;
   }
 
+  /**
+   * NOTE: for Testing only!
+   * Sends a pure XÖV message without metadata: the body is nothing but the XML and the API derives
+   * the routing from the message itself. A transportReport cannot be requested for messages sent
+   * this way (use sendMessage instead). The API answers with an empty body, so a successful send
+   * is only signalled by the status code.
+   */
+  async function sendXoevMessage(message: string): Promise<void> {
+    const accessToken = await getAccessToken();
+
+    const url = `${config.baseUrl}/restapi/v3.0/messages/xoev`;
+    const response = await fetch(url, {
+      method: "POST",
+      // the API expects the raw file content, multipart or application/xml answer with a 415
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/xml; charset=UTF-8",
+      },
+      body: Buffer.from(message, "utf8"),
+      signal: AbortSignal.timeout(SEND_TIMEOUT_MS),
+      dispatcher,
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `HTTP ${response.status} ${response.statusText} for ${url}: ${await response.text()}`,
+      );
+    }
+  }
+
   // fetches the "OSCI-Laufzettel" with status information about a previously sent message
   async function getTransportReport(
     options: GetTransportReportOptions,
@@ -235,5 +265,5 @@ export function getOsciClient() {
     return (await response.json()) as TransportReportResponse;
   }
 
-  return { sendMessage, getTransportReport };
+  return { sendMessage, sendXoevMessage, getTransportReport };
 }
