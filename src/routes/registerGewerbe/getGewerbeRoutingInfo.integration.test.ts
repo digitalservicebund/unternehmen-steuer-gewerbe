@@ -171,7 +171,7 @@ describe("getGewerbeRoutingInfo", () => {
       expect(result!.fitConnectDestinationInformation).toBeNull();
     });
 
-    it("verifies the destination signature of the used route against the queried LEIKA key and ARS", async () => {
+    it("verifies the destinationSignature of the used route against the LEIKA key and the resolved ARS", async () => {
       mockGetRoutes.mockResolvedValueOnce({
         count: 1,
         offset: 0,
@@ -189,7 +189,7 @@ describe("getGewerbeRoutingInfo", () => {
       });
     });
 
-    it("throws when the destination signature of the used route cannot be verified", async () => {
+    it("throws when the destinationSignature of the used route cannot be verified", async () => {
       mockGetRoutes.mockResolvedValueOnce({
         count: 1,
         offset: 0,

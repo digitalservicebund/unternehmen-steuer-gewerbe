@@ -85,7 +85,10 @@ export async function getGewerbeRoutingInfo(
 
   // Test override: submit for a fixed ARS (e.g. the registered AKDB test authority) instead of the
   // one resolved from the address. Gewerbeamt and FIT-Connect routing still use the resolved ARS.
-  const arsOverride = getEnvironmentVariable("TEST_OSCI_ARS_OVERRIDE");
+  const arsOverride =
+    fitConnectDestinationInformation === null
+      ? getEnvironmentVariable("TEST_OSCI_ARS_OVERRIDE")
+      : null;
   const ars = arsOverride || resolvedArs;
   const ags = getAGS(ars);
 

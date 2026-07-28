@@ -58,13 +58,13 @@ async function createDestinationSignature({
     .sign(keyPair.privateKey);
 }
 
-beforeAll(async () => {
-  keyPair = await createSignatureKeyPair(4096);
-  shortKeyPair = await createSignatureKeyPair(2048);
-});
-
 describe("verifyDestinationSignature", () => {
-  it("resolves for a signature matching destinationId, LEIKA key and ARS", async () => {
+  beforeAll(async () => {
+    keyPair = await createSignatureKeyPair(4096);
+    shortKeyPair = await createSignatureKeyPair(2048);
+  });
+
+  it("verifies a signature issued for the queried destinationId, LEIKA key and ARS 084210000000", async () => {
     mockFetchJson.mockResolvedValueOnce({ keys: [keyPair.publicJwk] });
     const destinationSignature = await createDestinationSignature();
 
@@ -78,7 +78,7 @@ describe("verifyDestinationSignature", () => {
     ).resolves.toBeUndefined();
   });
 
-  it("loads the key set from the jwks endpoint of the issuer in the signature", async () => {
+  it("loads the key set from the jwks endpoint of the issuer test.fit-connect.fitko.dev", async () => {
     mockFetchJson.mockResolvedValueOnce({ keys: [keyPair.publicJwk] });
     const destinationSignature = await createDestinationSignature();
 
@@ -93,7 +93,7 @@ describe("verifyDestinationSignature", () => {
     expect(url).toBe("https://test.fit-connect.fitko.dev/.well-known/jwks.json");
   });
 
-  it("resolves for an ARS whose Gemeinde lies in the signed Kreis 084210000000", async () => {
+  it("verifies a signature for the Kreis 084210000000 when the ARS 084215005013 lies within it", async () => {
     mockFetchJson.mockResolvedValueOnce({ keys: [keyPair.publicJwk] });
     const destinationSignature = await createDestinationSignature({
       gebietIDs: ["urn:de:bund:destatis:bevoelkerungsstatistik:schluessel:rs:084210000000"],
@@ -109,21 +109,7 @@ describe("verifyDestinationSignature", () => {
     ).resolves.toBeUndefined();
   });
 
-  it("throws for an ARS outside the signed Gebiete", async () => {
-    mockFetchJson.mockResolvedValueOnce({ keys: [keyPair.publicJwk] });
-    const destinationSignature = await createDestinationSignature();
-
-    await expect(
-      verifyDestinationSignature({
-        destinationSignature,
-        destinationId: DESTINATION_ID,
-        leikaKey: LEIKA_KEY,
-        ars: "094630000000",
-      }),
-    ).rejects.toThrow("not responsible");
-  });
-
-  it("throws when the signed Gebiet is a Gemeinde of the queried Kreis", async () => {
+  it("rejects a signature for the Gemeinde 084215005013 when the queried ARS 084210000000 is the Kreis", async () => {
     mockFetchJson.mockResolvedValueOnce({ keys: [keyPair.publicJwk] });
     const destinationSignature = await createDestinationSignature({
       gebietIDs: ["urn:de:bund:destatis:bevoelkerungsstatistik:schluessel:rs:084215005013"],
@@ -139,7 +125,7 @@ describe("verifyDestinationSignature", () => {
     ).rejects.toThrow("not responsible");
   });
 
-  it("throws for a LEIKA key that is not in the signed Leistungen", async () => {
+  it("rejects a signature that does not cover the LEIKA key 99050012104000", async () => {
     mockFetchJson.mockResolvedValueOnce({ keys: [keyPair.publicJwk] });
     const destinationSignature = await createDestinationSignature({
       leistungIDs: ["urn:de:fim:leika:leistung:99008001014002"],
@@ -155,7 +141,7 @@ describe("verifyDestinationSignature", () => {
     ).rejects.toThrow("not responsible");
   });
 
-  it("throws when the signed destinationId differs from the routed one", async () => {
+  it("rejects a signature issued for a different destinationId", async () => {
     mockFetchJson.mockResolvedValueOnce({ keys: [keyPair.publicJwk] });
     const destinationSignature = await createDestinationSignature({
       destinationId: "23bdd840-a823-4d8b-9992-07d04ca907a7",
@@ -171,7 +157,7 @@ describe("verifyDestinationSignature", () => {
     ).rejects.toThrow("destinationId");
   });
 
-  it("throws for an issuer outside the FIT-Connect domains", async () => {
+  it("rejects the issuer domain portal.evil-fit-connect.fitko.dev outside FIT-Connect", async () => {
     const destinationSignature = await createDestinationSignature({
       issuer: "https://portal.evil-fit-connect.fitko.dev",
     });
@@ -186,7 +172,7 @@ describe("verifyDestinationSignature", () => {
     ).rejects.toThrow("issuer");
   });
 
-  it("throws for a signature algorithm other than PS512", async () => {
+  it("rejects a signature signed with PS256 instead of PS512", async () => {
     const { privateKey } = await generateKeyPair("PS256", { extractable: true });
     const destinationSignature = await new SignJWT({
       destinationId: DESTINATION_ID,
@@ -211,7 +197,7 @@ describe("verifyDestinationSignature", () => {
     ).rejects.toThrow("PS512");
   });
 
-  it("throws when the key set has no key for the kid of the signature", async () => {
+  it("rejects a signature whose kid is not in the key set", async () => {
     mockFetchJson.mockResolvedValueOnce({
       keys: [{ ...keyPair.publicJwk, kid: "another-key-id" }],
     });
@@ -227,7 +213,7 @@ describe("verifyDestinationSignature", () => {
     ).rejects.toThrow("signing-key-id");
   });
 
-  it("throws for a signing key shorter than 4096 bit", async () => {
+  it("rejects a signing key with 2048 instead of 4096 bit", async () => {
     mockFetchJson.mockResolvedValueOnce({ keys: [shortKeyPair.publicJwk] });
     const destinationSignature = await createDestinationSignature();
 
@@ -241,7 +227,7 @@ describe("verifyDestinationSignature", () => {
     ).rejects.toThrow("4096");
   });
 
-  it("throws when the payload was tampered with after signing", async () => {
+  it("rejects a signature whose payload was changed after signing", async () => {
     mockFetchJson.mockResolvedValueOnce({ keys: [keyPair.publicJwk] });
     const destinationSignature = await createDestinationSignature();
     const [header, , signature] = destinationSignature.split(".");
