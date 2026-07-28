@@ -12,6 +12,7 @@ export default defineConfig({
       "**/*.load.test.ts",
       "**/*.smoke.test.ts",
       "**/*.contract.test.ts",
+      "**/*.manual.test.ts",
     ],
     coverage: {
       reporter: ["text", "lcov"],
