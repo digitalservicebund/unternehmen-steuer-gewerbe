@@ -27,7 +27,7 @@
     "test:contract": "NODE_EXTRA_CA_CERTS=akdb-ca.public.test.pem op run --env-file .env -- vitest run --config vitest.contract.config.ts",
     "test:contract:ci": "NODE_EXTRA_CA_CERTS=akdb-ca.public.test.pem vitest run --config vitest.contract.config.ts --coverage --reporter=blob --reporter=default",
     "test:coverage:merge": "vitest --mergeReports .vitest-reports --coverage",
-    "test:manual": "op run --env-file .env -- vitest run --config vitest.manual.config.ts",
+    "test:manual": "op run --env-file .env.akdb.prod -- vitest run --config vitest.manual.config.ts",
     "test:load": "op run --env-file .env -- vitest run --config vitest.load.config.ts",
     "test:load:ci": "vitest run --config vitest.load.config.ts",
     "test:smoke:ci": "vitest run --config vitest.smoke.config.ts",
