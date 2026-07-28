@@ -4,6 +4,7 @@ const {
   mockGetLocationsDetails,
   mockGetGewerbeamt,
   mockGetRoutes,
+  mockVerifyDestinationSignature,
   mockDestinationIdOverride,
   mockArsOverride,
 } = vi.hoisted(() => ({
@@ -17,6 +18,7 @@ const {
     onlineServices: [],
   }),
   mockGetRoutes: vi.fn().mockResolvedValue({ count: 0, offset: 0, totalCount: 0, routes: [] }),
+  mockVerifyDestinationSignature: vi.fn().mockResolvedValue(undefined),
   // unset env vars resolve to an empty string
   mockDestinationIdOverride: vi.fn().mockReturnValue(""),
   mockArsOverride: vi.fn().mockReturnValue(""),
@@ -30,6 +32,10 @@ vi.mock("../../clients/pvogClient", async (importOriginal) => ({
 
 vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
   getFitConnectClient: () => ({ getRoutes: mockGetRoutes }),
+}));
+
+vi.mock("../../clients/fitConnectClient/destinationSignature", () => ({
+  verifyDestinationSignature: mockVerifyDestinationSignature,
 }));
 
 // Override only the two test knobs; every other env var still resolves through the real getter.
@@ -163,6 +169,38 @@ describe("getGewerbeRoutingInfo", () => {
       const result = await getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled);
 
       expect(result!.fitConnectDestinationInformation).toBeNull();
+    });
+
+    it("verifies the destination signature of the used route against the queried LEIKA key and ARS", async () => {
+      mockGetRoutes.mockResolvedValueOnce({
+        count: 1,
+        offset: 0,
+        totalCount: 1,
+        routes: [{ destinationId: "mock-destination-id", destinationSignature: "sig.nat.ure" }],
+      });
+
+      await getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled);
+
+      expect(mockVerifyDestinationSignature).toHaveBeenCalledWith({
+        destinationSignature: "sig.nat.ure",
+        destinationId: "mock-destination-id",
+        leikaKey: "99050012104000",
+        ars: "030460014004",
+      });
+    });
+
+    it("throws when the destination signature of the used route cannot be verified", async () => {
+      mockGetRoutes.mockResolvedValueOnce({
+        count: 1,
+        offset: 0,
+        totalCount: 1,
+        routes: [{ destinationId: "mock-destination-id", destinationSignature: "sig.nat.ure" }],
+      });
+      mockVerifyDestinationSignature.mockRejectedValueOnce(new Error("untrusted issuer"));
+
+      await expect(
+        getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled),
+      ).rejects.toThrow("untrusted issuer");
     });
 
     it("prefers the TEST_FIT_CONNECT_DESTINATION_ID_OVERRIDE override over the routing service result", async () => {

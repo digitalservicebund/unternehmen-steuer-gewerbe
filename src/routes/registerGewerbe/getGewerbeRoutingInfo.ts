@@ -1,4 +1,5 @@
 import { getGewerbeamt, getLocationsDetails, type Gewerbeamt } from "../../clients/pvogClient";
+import { verifyDestinationSignature } from "../../clients/fitConnectClient/destinationSignature";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
 import { splitStrasseHausnummer } from "../../helpers/formFieldTransformations";
 import { getAGS } from "../../helpers/getAgs";
@@ -34,12 +35,27 @@ async function getFitConnectDestinationInformation(
   const fitConnectClient = getFitConnectClient();
   const res = await fitConnectClient.getRoutes(GEWERBEANMELDUNG_LEIKA_KEY, ars);
 
-  if (res.routes.length === 0) {
+  const route = getFirstAssumingItsTheBestMatch(res.routes);
+  if (route === undefined) {
     return null;
   }
 
-  // TODO: double-check response as soon as we have communes that support FIT-Connect
-  return { destinationId: res.routes[0]!.destinationId };
+  if (res.routes.length > 1) {
+    console.warn(
+      `FIT-Connect routing returned ${res.routes.length} routes for ARS ${ars}, using destination ${route.destinationId}`,
+    );
+  }
+
+  // Throws if the route cannot be trusted, so we rather submit nothing than to an unverified
+  // destination. Only a route with no destination at all (above) means "commune uses OSCI".
+  await verifyDestinationSignature({
+    destinationSignature: route.destinationSignature,
+    destinationId: route.destinationId,
+    leikaKey: GEWERBEANMELDUNG_LEIKA_KEY,
+    ars,
+  });
+
+  return { destinationId: route.destinationId };
 }
 
 export async function getGewerbeRoutingInfo(
