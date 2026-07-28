@@ -3,7 +3,6 @@ import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gew
 import { getGewerbeRoutingInfo } from "../../routes/registerGewerbe/getGewerbeRoutingInfo";
 import { type RegisterGewerbeRequest } from "../../routes/registerGewerbe/registerGewerbeInterfaces";
 import { transformToGewerbeanmeldung } from "../../routes/registerGewerbe/requestDataTransformer/transformToGewerbeanmeldung";
-import { registerGewerbeSampleRequestAllFieldsFilled } from "../../routes/registerGewerbe/testHelpers";
 import { getOsciClient } from "./osciClient";
 
 // TEMPORARY manual test: sends a Gewerbeanmeldung to the real Gewerbeamt Goslar through
@@ -15,34 +14,71 @@ import { getOsciClient } from "./osciClient";
 // AKDB_BASE_URL, AKDB_USERNAME, AKDB_PASSWORD, AKDB_CERTIFICATE_BASE64 and
 // AKDB_CERTIFICATE_PASSPHRASE must point at production (https://apk.akdb.de/okkommozg).
 
-// Charley-Jacob-Str. 2, 38640 Goslar => ARS 031530017017 (confirmed via PVOG v3 locations)
+// Charley-Jacob-Str. 2, 38640 Goslar => ARS 031530017017
 const GOSLAR_ARS = "031530017017";
 const GOSLAR_AGS = "03153017";
 
-// Test data: the shared sample request with the Betriebsstätte moved to Goslar, since the
-// business address is what routes the Gewerbeanmeldung to the Gewerbeamt.
-const goslarRequest: RegisterGewerbeRequest = {
-  ...registerGewerbeSampleRequestAllFieldsFilled,
+// Test data: the shared sample request for Goslar
+export const goslarRequest: RegisterGewerbeRequest = {
+  persönlicheDaten: {
+    vorname: "Erika",
+    nachname: "Mustermann",
+    geburtsname: "DigitalService",
+    geburtsdatum: "1988-09-10",
+    geburtsort: "Musterstadt",
+    geburtsland: "Deutschland",
+    staatsangehörigkeit: "deutsch",
+    adresse: {
+      strasseUndHausnummer: "Charley-Jacob-Straße 2",
+      postleitzahl: "38640",
+      ort: "Goslar",
+    },
+    telefon: "+49 234 121314",
+    email: "e.mustermann@example.org",
+    religion: "nichtKirchensteuerpflichtig",
+    vertrauensniveau: "substantiell",
+  },
   unternehmensDaten: {
-    ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-    tätigkeitsbeschreibung: "Testeintrag Schneller Gründen - Vertrieb von Vertriebsmustern",
+    tätigkeitsbeschreibung: "Testeintrag Schneller Gründen",
+    tätigkeitsbereich: "handwerk",
+    tätigkeitsbeginn: "2026-07-28",
+    gründungsdatum: "2026-07-28",
+    gewerbeart: "hauptgewerbe",
+    gewinnErmittlung: "einnahmenüberschussrechnung",
+    kleinunternehmerRegelung: false,
+    umsatzGruendungsjahr: 1,
+    umsatzFolgejahr: 1,
+    gewinnGründungsjahr: 1,
+    gewinnFolgejahr: 1,
+    sollIstVersteuerung: "sollVersteuerung",
+    zahllastUeberschussBetrag: 0,
+    zahllastUeberschussAuswahl: "zahllast",
+    umsatzsteuerImErstenJahr: 0,
     adresseAbweichend: {
       strasseUndHausnummer: "Charley-Jacob-Straße 2",
       postleitzahl: "38640",
       ort: "Goslar",
     },
+    umsatzsteuerIdMitbeantragen: true,
   },
 };
 
 // the receiving Gewerbeamt should not see the same ids twice; the transform generates fresh
 // UUIDs and timestamps on every call
-async function createGoslarGewerbeanmeldung() {
+async function createGoslarGewerbeanmeldung(logging = false) {
   const routingInfo = await getGewerbeRoutingInfo(goslarRequest);
   if (routingInfo === undefined) {
     throw new Error("No Gewerbeamt found for the Goslar test address");
   }
 
   const gewerbeanmeldung = transformToGewerbeanmeldung(goslarRequest, routingInfo);
+
+  if (logging) {
+    console.log("*** Gewerbemeldung Data:");
+    console.log(JSON.stringify(gewerbeanmeldung, null, 2));
+    console.log("************************");
+  }
+
   const message = await createGewerbeanmeldungXml(gewerbeanmeldung);
 
   return { routingInfo, message };
@@ -58,22 +94,21 @@ describe("Gewerbemeldung to Goslar via OSCI", () => {
     expect(message).toContain(`<bn-beh:name>${routingInfo.gewerbeamt.name}</bn-beh:name>`);
   });
 
-  it(`sends to MELDID:${GOSLAR_AGS} and reports the message as accepted`, async () => {
+  it(`successfully sends Gewerbemeldung to Goslar (MELDID:${GOSLAR_AGS})`, async () => {
     expect(process.env["AKDB_BASE_URL"]).toContain("apk.akdb.de");
 
-    const { routingInfo, message } = await createGoslarGewerbeanmeldung();
+    const { routingInfo, message } = await createGoslarGewerbeanmeldung(true);
     const targetId = `MELDID:${routingInfo.ags}`;
 
     const sendResult = await getOsciClient().sendMessage({ targetId, message });
 
-    console.log("send result:", JSON.stringify(sendResult.metadata, undefined, 2));
+    console.log("*** Send result:");
+    console.log(JSON.stringify(sendResult.metadata, undefined, 2));
+    console.log("****************");
+
     expect(sendResult.metadata.reply.replyType).toBe("OK");
 
-    const report = await getOsciClient().getTransportReport({
-      messageId: sendResult.metadata.source.sourceMessageId,
-      authorityKey: targetId,
-    });
-
-    console.log("transport report:", JSON.stringify(report, undefined, 2));
+    console.log("*** SubmissionID:", sendResult.metadata.source.sourceMessageId);
+    console.log("*** ARS:         ", routingInfo.ars);
   });
 });
