@@ -111,4 +111,12 @@ describe("Gewerbemeldung to Goslar via OSCI", () => {
     console.log("*** SubmissionID:", sendResult.metadata.source.sourceMessageId);
     console.log("*** ARS:         ", routingInfo.ars);
   });
+
+  it(`successfully sends Gewerbemeldung to Goslar (MELDID:${GOSLAR_AGS}) with sendXoevMessage`, async () => {
+    expect(process.env["AKDB_BASE_URL"]).toContain("apk.akdb.de");
+
+    let { message } = await createGoslarGewerbeanmeldung(true);
+
+    await expect(getOsciClient().sendXoevMessage(message)).resolves.toBeUndefined();
+  });
 });
