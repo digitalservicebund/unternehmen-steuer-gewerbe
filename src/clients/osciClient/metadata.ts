@@ -50,7 +50,7 @@ export function createMetadata({ targetId, sourceTimestamp }: CreateMetadataOpti
       },
       source: {
         sourceProcessType: "XGA", // TODO: we need to change this probably
-        sourceId: "ds:schnellergruenden",
+        sourceId: "xga:090010030000",
         // AKDB rejects sub-second precision, so emit seconds-only ISO 8601 (e.g. 2026-06-30T09:29:06Z).
         sourceTimestamp: sourceTimestamp ?? new Date().toISOString().replace(/\.\d{3}Z$/, "Z"),
       },
