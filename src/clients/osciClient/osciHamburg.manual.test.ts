@@ -5,21 +5,21 @@ import { type RegisterGewerbeRequest } from "../../routes/registerGewerbe/regist
 import { transformToGewerbeanmeldung } from "../../routes/registerGewerbe/requestDataTransformer/transformToGewerbeanmeldung";
 import { getOsciClient } from "./osciClient";
 
-// TEMPORARY manual test: sends a Gewerbeanmeldung to the real Gewerbeamt Goslar through
+// TEMPORARY manual test: sends a Gewerbeanmeldung to the real Gewerbeamt Hamburg through
 // the AKDB production API. It runs the same chain as the endpoint (routing -> transform ->
-// XML builder incl. XSD/Schematron validation), so what arrives in Goslar is what production sends.
+// XML builder incl. XSD/Schematron validation), so what arrives in Hamburg is what production sends.
 // Delete this file, vitest.manual.config.ts and the test:manual script once the test send is done.
 //
 // Run with:
 // AKDB_BASE_URL, AKDB_USERNAME, AKDB_PASSWORD, AKDB_CERTIFICATE_BASE64 and
 // AKDB_CERTIFICATE_PASSPHRASE must point at production (https://apk.akdb.de/okkommozg).
 
-// Charley-Jacob-Str. 2, 38640 Goslar => ARS 031530017017
-const GOSLAR_ARS = "031530017017";
-const GOSLAR_AGS = "03153017";
+// Harburger Rathausforum 2, 21073 Hamburg => ARS 020000000000
+const HAMBURG_ARS = "020000000000";
+const HAMBURG_AGS = "02000000";
 
-// Test data: the shared sample request for Goslar
-export const goslarRequest: RegisterGewerbeRequest = {
+// Test data: the shared sample request for Hamburg
+export const hamburgRequest: RegisterGewerbeRequest = {
   persönlicheDaten: {
     vorname: "Erika",
     nachname: "Mustermann",
@@ -29,9 +29,9 @@ export const goslarRequest: RegisterGewerbeRequest = {
     geburtsland: "Deutschland",
     staatsangehörigkeit: "deutsch",
     adresse: {
-      strasseUndHausnummer: "Charley-Jacob-Straße 2",
-      postleitzahl: "38640",
-      ort: "Goslar",
+      strasseUndHausnummer: "Harburger Rathausforum 2",
+      postleitzahl: "21073",
+      ort: "Hamburg",
     },
     telefon: "+49 234 121314",
     email: "e.mustermann@example.org",
@@ -55,9 +55,9 @@ export const goslarRequest: RegisterGewerbeRequest = {
     zahllastUeberschussAuswahl: "zahllast",
     umsatzsteuerImErstenJahr: 0,
     adresseAbweichend: {
-      strasseUndHausnummer: "Charley-Jacob-Straße 2",
-      postleitzahl: "38640",
-      ort: "Goslar",
+      strasseUndHausnummer: "Harburger Rathausforum 2",
+      postleitzahl: "21073",
+      ort: "Hamburg",
     },
     umsatzsteuerIdMitbeantragen: true,
   },
@@ -65,13 +65,13 @@ export const goslarRequest: RegisterGewerbeRequest = {
 
 // the receiving Gewerbeamt should not see the same ids twice; the transform generates fresh
 // UUIDs and timestamps on every call
-async function createGoslarGewerbeanmeldung(logging = false) {
-  const routingInfo = await getGewerbeRoutingInfo(goslarRequest);
+async function createHamburgGewerbeanmeldung(logging = false) {
+  const routingInfo = await getGewerbeRoutingInfo(hamburgRequest);
   if (routingInfo === undefined) {
-    throw new Error("No Gewerbeamt found for the Goslar test address");
+    throw new Error("No Gewerbeamt found for the Hamburg test address");
   }
 
-  const gewerbeanmeldung = transformToGewerbeanmeldung(goslarRequest, routingInfo);
+  const gewerbeanmeldung = transformToGewerbeanmeldung(hamburgRequest, routingInfo);
   // gewerbeanmeldung.nachrichtenkopf!.autor!.kennung = "xga:090010030000";
 
   if (logging) {
@@ -85,20 +85,20 @@ async function createGoslarGewerbeanmeldung(logging = false) {
   return { routingInfo, message };
 }
 
-describe("Gewerbemeldung to Goslar via OSCI", () => {
-  it("routes the Goslar address to the Stadt Goslar and builds a valid XML for it", async () => {
-    const { routingInfo, message } = await createGoslarGewerbeanmeldung();
+describe("Gewerbemeldung to Hamburg via OSCI", () => {
+  it("routes the Hamburg address to the Stadt Hamburg and builds a valid XML for it", async () => {
+    const { routingInfo, message } = await createHamburgGewerbeanmeldung();
 
-    expect(routingInfo.ars).toBe(GOSLAR_ARS);
-    expect(routingInfo.ags).toBe(GOSLAR_AGS);
-    expect(message).toContain(`<bn-beh:kennung>MELDID:${GOSLAR_AGS}</bn-beh:kennung>`);
+    expect(routingInfo.ars).toBe(HAMBURG_ARS);
+    expect(routingInfo.ags).toBe(HAMBURG_AGS);
+    expect(message).toContain(`<bn-beh:kennung>MELDID:${HAMBURG_AGS}</bn-beh:kennung>`);
     expect(message).toContain(`<bn-beh:name>${routingInfo.gewerbeamt.name}</bn-beh:name>`);
   });
 
-  it.skip(`successfully sends Gewerbemeldung to Goslar (MELDID:${GOSLAR_AGS})`, async () => {
+  it.skip(`successfully sends Gewerbemeldung to Hamburg (MELDID:${HAMBURG_AGS})`, async () => {
     expect(process.env["AKDB_BASE_URL"]).toContain("apk.akdb.de");
 
-    const { routingInfo, message } = await createGoslarGewerbeanmeldung(true);
+    const { routingInfo, message } = await createHamburgGewerbeanmeldung(true);
     const targetId = `MELDID:${routingInfo.ags}`;
 
     const sendResult = await getOsciClient().sendMessage({ targetId, message });
@@ -113,10 +113,10 @@ describe("Gewerbemeldung to Goslar via OSCI", () => {
     console.log("*** ARS:         ", routingInfo.ars);
   });
 
-  it.skip(`successfully sends Gewerbemeldung to Goslar (MELDID:${GOSLAR_AGS}) with sendXoevMessage`, async () => {
+  it.skip(`successfully sends Gewerbemeldung to Hamburg (MELDID:${HAMBURG_AGS}) with sendXoevMessage`, async () => {
     expect(process.env["AKDB_BASE_URL"]).toContain("apk.akdb.de");
 
-    let { message } = await createGoslarGewerbeanmeldung(true);
+    let { message } = await createHamburgGewerbeanmeldung(true);
 
     await expect(getOsciClient().sendXoevMessage(message)).resolves.toBeUndefined();
   });
