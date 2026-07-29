@@ -28,7 +28,7 @@ export interface Gewerbeamt {
   adresse?: GewerbeamtAdresse;
   telefon?: string;
   email?: string;
-  onlineServices: OnlineServiceLink[];
+  onlineServices?: OnlineServiceLink[];
 }
 
 interface ServiceDescription {

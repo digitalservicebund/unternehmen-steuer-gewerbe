@@ -1,9 +1,10 @@
 import "dotenv/config";
 import { describe, it, expect } from "vitest";
+import { verifyDestinationSignature } from "./destinationSignature";
 import { getFitConnectClient } from "./fitConnectClient";
 import { getEnvironmentVariable } from "../../secretsAndEnvironmentVariables";
 
-const DESTINATION_ID = getEnvironmentVariable("FIT_CONNECT_DESTINATION_ID");
+const DESTINATION_ID = getEnvironmentVariable("TEST_FIT_CONNECT_DESTINATION_ID_OVERRIDE");
 
 describe("FitConnectClient", () => {
   describe("submitData", () => {
@@ -29,17 +30,32 @@ describe("FitConnectClient", () => {
   });
 
   describe("getRoutes", () => {
-    // Why: API has changed. Follow-up ticket has been created: SG-1096
-    it.skip("returns a routing result for a known leiKa key and ARS", async () => {
+    // A Zustellpunkt for the Gewerbeanmeldung is registered for this ARS in FIT-Connect testing.
+    const ARS_ULM = "084210000000";
+    const GEWERBEANMELDUNG_LEIKA_KEY = "99050012104000";
+
+    it("returns a route for the Gewerbeanmeldung LEIKA key and ARS Ulm 084210000000", async () => {
       const client = getFitConnectClient();
 
-      const result = await client.getRoutes(
-        "99050012104000",
-        "146120000000", // ARS Dresden
-      );
-      expect(Array.isArray(result.routes)).toBe(true);
-      expect(typeof result.count).toBe("number");
+      const result = await client.getRoutes(GEWERBEANMELDUNG_LEIKA_KEY, ARS_ULM);
+
+      expect(result.totalCount).toBeGreaterThan(0);
       expect(typeof result.routes[0]!.destinationId).toBe("string");
+    });
+
+    it("returns a route whose destinationSignature verifies against the live key set", async () => {
+      const client = getFitConnectClient();
+      const result = await client.getRoutes(GEWERBEANMELDUNG_LEIKA_KEY, ARS_ULM);
+      const route = result.routes[0]!;
+
+      await expect(
+        verifyDestinationSignature({
+          destinationSignature: route.destinationSignature,
+          destinationId: route.destinationId,
+          leikaKey: GEWERBEANMELDUNG_LEIKA_KEY,
+          ars: ARS_ULM,
+        }),
+      ).resolves.toBeUndefined();
     });
   });
 
