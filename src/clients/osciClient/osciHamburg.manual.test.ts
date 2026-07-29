@@ -75,6 +75,9 @@ async function createHamburgGewerbeanmeldung(logging = false) {
   // gewerbeanmeldung.nachrichtenkopf!.autor!.kennung = "xga:090010030000";
 
   if (logging) {
+    console.log("*** Routing Info:");
+    console.log(JSON.stringify(routingInfo, null, 2));
+    console.log("************************");
     console.log("*** Gewerbemeldung Data:");
     console.log(JSON.stringify(gewerbeanmeldung, null, 2));
     console.log("************************");
@@ -87,7 +90,7 @@ async function createHamburgGewerbeanmeldung(logging = false) {
 
 describe("Gewerbemeldung to Hamburg via OSCI", () => {
   it("routes the Hamburg address to the Stadt Hamburg and builds a valid XML for it", async () => {
-    const { routingInfo, message } = await createHamburgGewerbeanmeldung();
+    const { routingInfo, message } = await createHamburgGewerbeanmeldung(true);
 
     expect(routingInfo.ars).toBe(HAMBURG_ARS);
     expect(routingInfo.ags).toBe(HAMBURG_AGS);
