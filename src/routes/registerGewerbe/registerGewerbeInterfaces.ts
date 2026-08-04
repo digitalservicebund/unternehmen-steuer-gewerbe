@@ -59,6 +59,15 @@ const PersönlicheDatenSchema = z.object({
         "Phone numbers are encoded according to the DIN 5008 standard as follows: +[Country code] (up to 5 digits) [Area code] (up to 5 digits) [Phone number] (up to 13 digits) [-Extension] (optional, up to 5 digits).",
     }),
   email: z.email().openapi({ example: "e.mustermann@example.org" }),
+  steuerId: z
+    .string()
+    .regex(/^\d{11}$/)
+    .optional()
+    .openapi({
+      example: "06646829576",
+      description:
+        "Steuerliche Identifikationsnummer (IdNr) der Person, 11 Ziffern. ELSTER prüft zusätzlich die Prüfziffer; Nummern mit führender 0 sind Test-IdNr und nur im Testbetrieb zugelassen.",
+    }),
   steuernummer: z
     .string()
     .regex(/^\d{4}0\d{8}$/)

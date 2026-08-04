@@ -137,7 +137,7 @@ export function transformToEUnFsE(
             gebName: data.persönlicheDaten.geburtsname,
             gebDat: formatDatumDE(data.persönlicheDaten.geburtsdatum),
             // berufsbez: undefined,
-            // persIdNr: undefined,
+            persIdNr: data.persönlicheDaten.steuerId,
             stNr: data.persönlicheDaten.steuernummer,
             religion: RELIGIONSSCHLUESSEL[data.persönlicheDaten.religion],
             adrkette: {
