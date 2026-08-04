@@ -60,7 +60,6 @@ describe("transformToGewerbeanmeldung", () => {
         ...registerGewerbeSampleRequestAllFieldsFilled,
         persönlicheDaten: {
           ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
-          staatsangehörigkeitDeutsch: false,
           staatsangehörigkeit: "französisch",
         },
       },
@@ -69,6 +68,47 @@ describe("transformToGewerbeanmeldung", () => {
     expect(französisch.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe(
       "129",
     );
+  });
+
+  it.each([
+    { icao: "D", expected: "000" },
+    { icao: "FRA", expected: "129" },
+    { icao: "GBD", expected: "185" },
+    { icao: "XXX", expected: "999" },
+  ] as const)(
+    "maps the staatsangehörigkeitIcao $icao to the destatis code $expected",
+    ({ icao, expected }) => {
+      const result = transformToGewerbeanmeldung(
+        {
+          ...registerGewerbeSampleRequestAllFieldsFilled,
+          persönlicheDaten: {
+            ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
+            staatsangehörigkeitIcao: icao,
+          },
+        },
+        testRoutingInfo,
+      );
+
+      expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe(
+        expected,
+      );
+    },
+  );
+
+  it("prefers staatsangehörigkeitIcao over the deprecated staatsangehörigkeit", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        persönlicheDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
+          staatsangehörigkeit: "französisch",
+          staatsangehörigkeitIcao: "ITA",
+        },
+      },
+      testRoutingInfo,
+    );
+
+    expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe("137");
   });
 
   it("uses adresseAbweichend as betriebsstaette anschrift when provided", () => {

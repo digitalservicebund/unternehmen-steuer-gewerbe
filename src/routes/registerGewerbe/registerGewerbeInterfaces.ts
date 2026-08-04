@@ -5,6 +5,7 @@ import {
   UNFALLVERSICHERUNGSTRAEGER_KEYS,
   VERTRAUENSNIVEAU_KEYS,
   STAATSANGEHOERIGKEIT_KEYS,
+  STAATSANGEHOERIGKEIT_ICAO_KEYS,
 } from "./requestDataTransformer/xGewerbeordnungCodes";
 import {
   RELIGIONSSCHLUESSEL_KEYS,
@@ -37,19 +38,16 @@ const PersönlicheDatenSchema = z.object({
   geburtsdatum: z.iso.date().openapi({ example: "1988-09-10" }),
   geburtsort: z.string().openapi({ example: "Musterstadt" }).optional(),
   geburtsland: z.string().openapi({ example: "Deutschland" }).optional(),
-  staatsangehörigkeitDeutsch: z
-    .boolean()
-    .openapi({
-      deprecated: true,
-      example: true,
-      description:
-        "Whether the person holds German citizenship. Deprecated: redundant with `staatsangehörigkeit` (derivable from it). Must be consistent with `staatsangehörigkeit`: true exactly when `staatsangehörigkeit` is 'deutsch' (code 000).",
-    })
-    .optional(),
+  staatsangehörigkeitIcao: z.enum(STAATSANGEHOERIGKEIT_ICAO_KEYS).optional().openapi({
+    example: "D",
+    description:
+      "Citizenship of the person as an ICAO Doc 9303 nationality code (e.g. 'D' for Germany). Takes precedence over the deprecated `staatsangehörigkeit`.",
+  }),
   staatsangehörigkeit: z.enum(STAATSANGEHOERIGKEIT_KEYS).default("deutsch").openapi({
+    deprecated: true,
     example: "deutsch",
     description:
-      "Citizenship of the person according to the code list of the German Federal Statistical Office. Defaults to 'deutsch' (code 000).",
+      "Citizenship of the person according to the code list of the German Federal Statistical Office. Defaults to 'deutsch' (code 000). Deprecated: still transmitted to the Gewerbeamt, but will stop being read in a future version.",
   }),
   adresse: AdresseSchema,
   telefon: z
