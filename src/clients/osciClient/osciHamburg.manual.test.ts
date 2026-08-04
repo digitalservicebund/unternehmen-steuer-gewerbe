@@ -90,7 +90,7 @@ async function createHamburgGewerbeanmeldung(logging = false) {
 
 describe("Gewerbemeldung to Hamburg via OSCI", () => {
   it("routes the Hamburg address to the Stadt Hamburg and builds a valid XML for it", async () => {
-    const { routingInfo, message } = await createHamburgGewerbeanmeldung(true);
+    const { routingInfo, message } = await createHamburgGewerbeanmeldung();
 
     expect(routingInfo.ars).toBe(HAMBURG_ARS);
     expect(routingInfo.ags).toBe(HAMBURG_AGS);
@@ -98,7 +98,7 @@ describe("Gewerbemeldung to Hamburg via OSCI", () => {
     expect(message).toContain(`<bn-beh:name>${routingInfo.gewerbeamt.name}</bn-beh:name>`);
   });
 
-  it.skip(`successfully sends Gewerbemeldung to Hamburg (MELDID:${HAMBURG_AGS})`, async () => {
+  it(`successfully sends Gewerbemeldung to Hamburg (MELDID:${HAMBURG_AGS})`, async () => {
     expect(process.env["AKDB_BASE_URL"]).toContain("apk.akdb.de");
 
     const { routingInfo, message } = await createHamburgGewerbeanmeldung(true);
