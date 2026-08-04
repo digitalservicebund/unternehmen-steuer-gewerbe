@@ -62,7 +62,6 @@ const PersönlicheDatenSchema = z.object({
   steuerId: z
     .string()
     .regex(/^\d{11}$/)
-    .optional()
     .openapi({
       example: "06646829576",
       description:
