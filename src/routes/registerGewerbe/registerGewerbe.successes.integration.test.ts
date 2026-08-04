@@ -20,8 +20,11 @@ vi.mock("@digitalservicebund/unternehmen-steuer-gewerbe-privat", () => ({
   }),
 }));
 
-const { mockSubmitData, mockGetGewerbeRoutingInfo } = vi.hoisted(() => ({
+const { mockSubmitData, mockSendMessage, mockGetGewerbeRoutingInfo } = vi.hoisted(() => ({
   mockSubmitData: vi.fn().mockResolvedValue({ submissionId: "mock-submission-id" }),
+  mockSendMessage: vi.fn().mockResolvedValue({
+    metadata: { source: { sourceMessageId: "mock-osci-message-id" } },
+  }),
   mockGetGewerbeRoutingInfo: vi.fn().mockResolvedValue({
     ags: "03046001",
     ars: "084210000000",
@@ -37,6 +40,10 @@ const { mockSubmitData, mockGetGewerbeRoutingInfo } = vi.hoisted(() => ({
 
 vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
   getFitConnectClient: () => ({ submitData: mockSubmitData }),
+}));
+
+vi.mock("../../clients/osciClient/osciClient", () => ({
+  getOsciClient: () => ({ sendMessage: mockSendMessage }),
 }));
 
 vi.mock("./getGewerbeRoutingInfo", () => ({
@@ -151,6 +158,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
           },
           onlineServices: [],
         },
+        fitConnectDestinationInformation: { destinationId: "mock-destination-id" },
       });
 
       const response = await postRegisterGewerbe({
@@ -171,6 +179,59 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(submittedXml).toContain(
         '<xga:gemeindeschluesselErgaenzung listVersionID="1"><code>02100000</code></xga:gemeindeschluesselErgaenzung>',
       );
+    });
+  });
+
+  describe("routing context for the events endpoint", () => {
+    it("returns the ars 084210000000 and the FIT-Connect destinationId the submission was sent to", async () => {
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+      expect(json.gewerbeanmeldung.ars).toBe("084210000000");
+      expect(json.gewerbeanmeldung.fitConnectDestinationId).toBe("mock-destination-id");
+    });
+  });
+
+  describe("OSCI submission when no FIT-Connect destination exists", () => {
+    const routingInfoWithoutFitConnect = {
+      ags: "03046001",
+      ars: "084210000000",
+      gewerbeamt: {
+        name: "Stadt Fulda",
+        adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
+        telefon: "0661 102-0",
+        onlineServices: [],
+      },
+      fitConnectDestinationInformation: null,
+    };
+
+    it("sends the Gewerbeanmeldung XML via OSCI to MELDID:03046001", async () => {
+      mockSendMessage.mockClear();
+      mockGetGewerbeRoutingInfo.mockResolvedValueOnce(routingInfoWithoutFitConnect);
+
+      const response = await postRegisterGewerbe();
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+
+      const [{ targetId, message }] = mockSendMessage.mock.calls[0]!;
+      expect(targetId).toBe("MELDID:03046001");
+      const xGewO = parser.parse(message)["xga:ext.gewerbemeldung.0400"];
+      expect(xGewO["xga:satz"]["xga:anmeldung"]["xga:autor"]["bn-beh:kennung"]).toBe(
+        "MELDID:03046001",
+      );
+    });
+
+    it("returns the OSCI sourceMessageId as submissionId and no fitConnectDestinationId", async () => {
+      mockGetGewerbeRoutingInfo.mockResolvedValueOnce(routingInfoWithoutFitConnect);
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+      expect(json.gewerbeanmeldung.success).toBe(true);
+      expect(json.gewerbeanmeldung.submissionId).toBe("mock-osci-message-id");
+      expect(json.gewerbeanmeldung.ars).toBe("084210000000");
+      expect(json.gewerbeanmeldung.fitConnectDestinationId).toBeUndefined();
     });
   });
 });

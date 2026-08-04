@@ -24,7 +24,7 @@ describe("createMetadata", () => {
         },
         source: {
           sourceProcessType: "XGA",
-          sourceId: "ds:schnellergruenden",
+          sourceId: "xga:090010030000",
           sourceTimestamp: "2024-10-24T15:00:39+02:00",
         },
       },

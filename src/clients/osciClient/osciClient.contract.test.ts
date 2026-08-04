@@ -27,7 +27,6 @@ describe("osciClient", () => {
       const metadata = createMetadata({ targetId: "MELDID:09000099" });
 
       // createMetadata defaults to ext.0400; override the message-type-specific fields for alg.0300.
-      metadata.metadata.source.sourceId = "xga:090010030000";
       metadata.metadata.target.targetOperation =
         "alg.gewerbemeldung.0300##http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-alg-Aufsichtsbehoerden.wsdl##xga";
       metadata.payload.request.message.contentReference =
@@ -45,13 +44,6 @@ describe("osciClient", () => {
     });
 
     it("successfully sends a valid ext.gewerbemeldung.0400", async () => {
-      const metadata = createMetadata({ targetId: "MELDID:09000099" });
-
-      // TODO: remove this override once our sender id "ds:schnellergruenden" is registered
-      metadata.metadata.source.sourceId = "xga:090010030000";
-
-      vi.mocked(createMetadata).mockReturnValueOnce(metadata);
-
       const result = await osciClient.sendMessage({
         targetId: "MELDID:09000099",
         message: readSample("custom-xgewo-1.6-valid-0400.xml"),
@@ -83,13 +75,6 @@ describe("osciClient", () => {
 
   describe("getTransportReport", () => {
     it("successfully fetches the transport report for a sent message", async () => {
-      const metadata = createMetadata({ targetId: "MELDID:09000099" });
-
-      // TODO: remove this override once our sender id "ds:schnellergruenden" is registered
-      metadata.metadata.source.sourceId = "xga:090010030000";
-
-      vi.mocked(createMetadata).mockReturnValueOnce(metadata);
-
       const sendResult = await osciClient.sendMessage({
         targetId: "MELDID:09000099",
         message: readSample("custom-xgewo-1.6-valid-0400.xml"),
@@ -100,8 +85,8 @@ describe("osciClient", () => {
         authorityKey: "MELDID:09000099",
       });
 
-      expect(report.identifiers.messageID).toBe(sendResult.metadata.source.sourceMessageId);
-      expect(report.tracks.length).toBeGreaterThan(0);
+      expect(report!.identifiers.messageID).toBe(sendResult.metadata.source.sourceMessageId);
+      expect(report!.tracks.length).toBeGreaterThan(0);
     });
   });
 });

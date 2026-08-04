@@ -12,13 +12,12 @@ const testRoutingInfo = {
 const testRoutingInfoHamburg = { ...testRoutingInfo, ags: "02000000" };
 
 describe("transformToGewerbeanmeldung", () => {
-  it("maps default values, applies the geschlecht and geburtsort fallbacks if not given and drops optional fields", () => {
+  it("maps default values, applies the geschlecht, geburtsort and geburtsland fallbacks if not given and drops optional fields", () => {
     const request: RegisterGewerbeRequest = {
       ...registerGewerbeSampleRequestAllFieldsFilled,
       persönlicheDaten: {
         ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
         geburtsname: undefined,
-        geschlecht: undefined,
         geburtsort: undefined,
         geburtsland: undefined,
       },
@@ -46,6 +45,7 @@ describe("transformToGewerbeanmeldung", () => {
     expect(person.geschlecht).toBe("x");
     expect(person.name!.geburtsname).toBeUndefined();
     expect(person.geburt!.ort).toBe("keine Angabe");
+    expect(person.geburt!.staat).toBe("keine Angabe");
   });
 
   it("maps the staatsangehörigkeit key to its destatis code (deutsch = 000, französisch = 129)", async () => {
@@ -60,7 +60,6 @@ describe("transformToGewerbeanmeldung", () => {
         ...registerGewerbeSampleRequestAllFieldsFilled,
         persönlicheDaten: {
           ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
-          staatsangehörigkeitDeutsch: false,
           staatsangehörigkeit: "französisch",
         },
       },
@@ -69,6 +68,47 @@ describe("transformToGewerbeanmeldung", () => {
     expect(französisch.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe(
       "129",
     );
+  });
+
+  it.each([
+    { icao: "D", expected: "000" },
+    { icao: "FRA", expected: "129" },
+    { icao: "GBD", expected: "185" },
+    { icao: "XXX", expected: "999" },
+  ] as const)(
+    "maps the staatsangehörigkeitIcao $icao to the destatis code $expected",
+    ({ icao, expected }) => {
+      const result = transformToGewerbeanmeldung(
+        {
+          ...registerGewerbeSampleRequestAllFieldsFilled,
+          persönlicheDaten: {
+            ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
+            staatsangehörigkeitIcao: icao,
+          },
+        },
+        testRoutingInfo,
+      );
+
+      expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe(
+        expected,
+      );
+    },
+  );
+
+  it("prefers staatsangehörigkeitIcao over the deprecated staatsangehörigkeit", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        persönlicheDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
+          staatsangehörigkeit: "französisch",
+          staatsangehörigkeitIcao: "ITA",
+        },
+      },
+      testRoutingInfo,
+    );
+
+    expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe("137");
   });
 
   it("uses adresseAbweichend as betriebsstaette anschrift when provided", () => {

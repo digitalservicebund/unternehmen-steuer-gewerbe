@@ -19,8 +19,11 @@ vi.mock("@digitalservicebund/unternehmen-steuer-gewerbe-privat", () => ({
   }),
 }));
 
-const { mockSubmitData, mockGetGewerbeRoutingInfo } = vi.hoisted(() => ({
+const { mockSubmitData, mockSendMessage, mockGetGewerbeRoutingInfo } = vi.hoisted(() => ({
   mockSubmitData: vi.fn().mockResolvedValue({ submissionId: "mock-submission-id" }),
+  mockSendMessage: vi.fn().mockResolvedValue({
+    metadata: { source: { sourceMessageId: "mock-osci-message-id" } },
+  }),
   mockGetGewerbeRoutingInfo: vi.fn().mockResolvedValue({
     ags: "03046001",
     ars: "084210000000",
@@ -36,6 +39,10 @@ const { mockSubmitData, mockGetGewerbeRoutingInfo } = vi.hoisted(() => ({
 
 vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
   getFitConnectClient: () => ({ submitData: mockSubmitData }),
+}));
+
+vi.mock("../../clients/osciClient/osciClient", () => ({
+  getOsciClient: () => ({ sendMessage: mockSendMessage }),
 }));
 
 vi.mock("./getGewerbeRoutingInfo", () => ({
@@ -76,6 +83,34 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(json.gewerbeanmeldung.success).toBe(false);
       expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.invalid_data);
       expect(json.gewerbeanmeldung.info).toBe("No Gewerbeamt found for address");
+      expect(json.fseÜbermittlung.success).toBe(true);
+    });
+
+    it("Returns 207 MULTI-STATUS with gewerbeanmeldung upstream_error when the routing lookup throws, fseÜbermittlung still succeeds", async () => {
+      mockGetGewerbeRoutingInfo.mockRejectedValueOnce(new Error("Routing API unavailable"));
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+      expect(response.status).toEqual(HttpStatusCode.MultiStatus);
+      expect(json.gewerbeanmeldung.success).toBe(false);
+      expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
+      expect(json.fseÜbermittlung.success).toBe(true);
+    });
+
+    it("Returns 207 MULTI-STATUS with gewerbeanmeldung upstream_error when the OSCI submission fails, fseÜbermittlung still succeeds", async () => {
+      mockGetGewerbeRoutingInfo.mockResolvedValueOnce({
+        ags: "03046001",
+        ars: "084210000000",
+        gewerbeamt: { name: "Stadt Fulda", onlineServices: [] },
+        fitConnectDestinationInformation: null,
+      });
+      mockSendMessage.mockRejectedValueOnce(new Error("AKDB unavailable"));
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+      expect(response.status).toEqual(HttpStatusCode.MultiStatus);
+      expect(json.gewerbeanmeldung.success).toBe(false);
+      expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
       expect(json.fseÜbermittlung.success).toBe(true);
     });
 
