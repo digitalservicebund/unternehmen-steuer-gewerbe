@@ -262,7 +262,9 @@ export function getFitConnectClient() {
         { headers: { Authorization: `Bearer ${accessToken}` } },
       );
     } catch (error) {
-      if (error instanceof HttpError && error.status === 404) return undefined;
+      if (error instanceof HttpError && error.status === 404) {
+        return undefined;
+      }
       throw error;
     }
   }

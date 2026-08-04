@@ -232,7 +232,9 @@ export function getOsciClient() {
       dispatcher,
     });
 
-    if (response.status === 404) return undefined;
+    if (response.status === 404) {
+      return undefined;
+    }
 
     if (!response.ok) {
       const body = await response.text();
