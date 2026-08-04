@@ -1,3 +1,5 @@
+import { createHttpError } from "./httpError";
+
 export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 type QueryParams = Record<string, string | number | boolean>;
@@ -21,7 +23,7 @@ function createUrlWithParams(url: string, params: QueryParams): string {
 }
 
 /**
- * fetch wrapper that throws an error if the response is not ok, and otherwise returns the parsed JSON.
+ * fetch wrapper that throws an HttpError if the response is not ok, and otherwise returns the parsed JSON.
  */
 export async function fetchJson<T>(url: string, options: RequestOptions = {}): Promise<T> {
   const { method = "GET", headers = {}, params, body, timeoutMs = DEFAULT_TIMEOUT_MS } = options;
@@ -40,9 +42,13 @@ export async function fetchJson<T>(url: string, options: RequestOptions = {}): P
   });
 
   if (!response.ok) {
-    throw new Error(
-      `HTTP ${response.status} ${response.statusText} for ${requestUrl}: ${await response.text()}`,
-    );
+    const body = await response.text();
+    throw createHttpError({
+      status: response.status,
+      statusText: response.statusText,
+      url: requestUrl,
+      body,
+    });
   }
 
   return (await response.json()) as T;

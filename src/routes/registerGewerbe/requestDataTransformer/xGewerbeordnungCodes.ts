@@ -459,6 +459,241 @@ export const STAATSANGEHOERIGKEIT_KEYS = Object.keys(STAATSANGEHOERIGKEIT) as [
   ...Staatsangehoerigkeit[],
 ];
 
+// ICAO Doc 9303 nationality code -> DESTATIS Staatsangehörigkeit code.
+// ICAO takes its three-letter codes from ISO 3166-1, so the "ISO-3" column of the DESTATIS code list
+// yields the mapping directly; where DESTATIS lists one ISO-3 code
+// twice, the currently existing state wins (SRB, SDN), among historic ones the later (YUG), see
+// https://www.xrepository.de/api/xrepository/urn:de:bund:destatis:bevoelkerungsstatistik:schluessel:staatsangehoerigkeit_2024-08-01/download/DESTATIS_Staatsangeh_rigkeit_2024-08-01.md
+// The exceptions ICAO defines on top of ISO 3166-1 are added below the generated block, see Doc 9303
+// Part 3 (8th ed. 2021) section 5 "Codes for Nationality, Place of Birth, Location of Issuing
+// State/Authority and Other Purposes":
+// https://www.icao.int/sites/default/files/publications/DocSeries/9303_p3_cons_en.pdf
+export const STAATSANGEHOERIGKEIT_ICAO = {
+  AFG: "423", // Afghanistan
+  AGO: "223", // Angola
+  ALB: "121", // Albanien
+  AND: "123", // Andorra
+  ARE: "469", // Vereinigte Arabische Emirate
+  ARG: "323", // Argentinien
+  ARM: "422", // Armenien
+  ATG: "320", // Antigua und Barbuda
+  AUS: "523", // Australien
+  AUT: "151", // Österreich
+  AZE: "425", // Aserbaidschan
+  BDI: "291", // Burundi
+  BEL: "124", // Belgien
+  BEN: "229", // Benin
+  BFA: "258", // Burkina Faso
+  BGD: "460", // Bangladesch
+  BGR: "125", // Bulgarien
+  BHR: "424", // Bahrain
+  BHS: "324", // Bahamas
+  BIH: "122", // Bosnien und Herzegowina
+  BLR: "169", // Belarus
+  BLZ: "330", // Belize
+  BOL: "326", // Plurinationaler Staat Bolivien
+  BRA: "327", // Brasilien
+  BRB: "322", // Barbados
+  BRN: "429", // Brunei Darussalam
+  BTN: "426", // Bhutan
+  BWA: "227", // Botsuana
+  CAF: "289", // Zentralafrikanische Republik
+  CAN: "348", // Kanada
+  CHE: "158", // Schweiz
+  CHL: "332", // Chile
+  CHN: "479", // China
+  CIV: "231", // Côte d’Ivoire
+  CMR: "262", // Kamerun
+  COD: "246", // Demokratische Republik Kongo
+  COG: "245", // Kongo
+  COL: "349", // Kolumbien
+  COM: "244", // Komoren
+  CPV: "242", // Cabo Verde
+  CRI: "334", // Costa Rica
+  CSK: "162", // Tschechoslowakei (bis 1992-12-31)
+  CUB: "351", // Kuba
+  CYP: "181", // Zypern
+  CZE: "164", // Tschechien
+  DEU: "000", // Deutschland
+  DJI: "230", // Dschibuti
+  DMA: "333", // Dominica
+  DNK: "126", // Dänemark
+  DOM: "335", // Dominikanische Republik
+  DZA: "221", // Algerien
+  ECU: "336", // Ecuador
+  EGY: "287", // Ägypten
+  ERI: "224", // Eritrea
+  ESP: "161", // Spanien
+  EST: "127", // Estland
+  ETH: "225", // Äthiopien
+  FIN: "128", // Finnland
+  FJI: "526", // Fidschi
+  FRA: "129", // Frankreich
+  FSM: "545", // Föderierte Staaten von Mikronesien
+  GAB: "236", // Gabun
+  GBR: "168", // Vereinigtes Königreich
+  GEO: "430", // Georgien
+  GHA: "238", // Ghana
+  GIN: "261", // Guinea
+  GMB: "237", // Gambia
+  GNB: "259", // Guinea-Bissau
+  GNQ: "274", // Äquatorialguinea
+  GRC: "134", // Griechenland
+  GRD: "340", // Grenada
+  GTM: "345", // Guatemala
+  GUY: "328", // Guyana
+  HKG: "411", // Hongkong
+  HND: "347", // Honduras
+  HRV: "130", // Kroatien
+  HTI: "346", // Haiti
+  HUN: "165", // Ungarn
+  IDN: "437", // Indonesien
+  IND: "436", // Indien
+  IRL: "135", // Irland
+  IRN: "439", // Islamische Republik Iran
+  IRQ: "438", // Irak
+  ISL: "136", // Island
+  ISR: "441", // Israel
+  ITA: "137", // Italien
+  JAM: "355", // Jamaika
+  JOR: "445", // Jordanien
+  JPN: "442", // Japan
+  KAZ: "444", // Kasachstan
+  KEN: "243", // Kenia
+  KGZ: "450", // Kirgisistan
+  KHM: "446", // Kambodscha
+  KIR: "530", // Kiribati
+  KNA: "370", // St. Kitts und Nevis
+  KOR: "467", // Republik Korea
+  KWT: "448", // Kuwait
+  LAO: "449", // Demokratische Volksrepublik Laos
+  LBN: "451", // Libanon
+  LBR: "247", // Liberia
+  LBY: "248", // Libyen
+  LCA: "366", // St. Lucia
+  LIE: "141", // Liechtenstein
+  LKA: "431", // Sri Lanka
+  LSO: "226", // Lesotho
+  LTU: "142", // Litauen
+  LUX: "143", // Luxemburg
+  LVA: "139", // Lettland
+  MAC: "412", // Macau
+  MAR: "252", // Marokko
+  MCO: "147", // Monaco
+  MDA: "146", // Republik Moldau
+  MDG: "249", // Madagaskar
+  MDV: "454", // Malediven
+  MEX: "353", // Mexiko
+  MHL: "544", // Marshallinseln
+  MKD: "144", // Nordmazedonien
+  MLI: "251", // Mali
+  MLT: "145", // Malta
+  MMR: "427", // Myanmar
+  MNE: "140", // Montenegro
+  MNG: "457", // Mongolei
+  MOZ: "254", // Mosambik
+  MRT: "239", // Mauretanien
+  MUS: "253", // Mauritius
+  MWI: "256", // Malawi
+  MYS: "482", // Malaysia
+  NAM: "267", // Namibia
+  NER: "255", // Niger
+  NGA: "232", // Nigeria
+  NIC: "354", // Nicaragua
+  NLD: "148", // Königreich der Niederlande
+  NOR: "149", // Norwegen
+  NPL: "458", // Nepal
+  NRU: "531", // Nauru
+  NZL: "536", // Neuseeland
+  OMN: "456", // Oman
+  PAK: "461", // Pakistan
+  PAN: "357", // Panama
+  PER: "361", // Peru
+  PHL: "462", // Philippinen
+  PLW: "537", // Palau
+  PNG: "538", // Papua-Neuguinea
+  POL: "152", // Polen
+  PRK: "434", // Demokratische Volksrepublik Korea
+  PRT: "153", // Portugal
+  PRY: "359", // Paraguay
+  QAT: "447", // Katar
+  ROU: "154", // Rumänien
+  RUS: "160", // Russische Föderation
+  RWA: "265", // Ruanda
+  SAU: "472", // Saudi-Arabien
+  SCG: "132", // Serbien und Montenegro (bis 2006-06-02)
+  SDN: "277", // Sudan
+  SEN: "269", // Senegal
+  SGP: "474", // Singapur
+  SLB: "524", // Salomonen
+  SLE: "272", // Sierra Leone
+  SLV: "337", // El Salvador
+  SMR: "156", // San Marino
+  SOM: "273", // Somalia
+  SRB: "170", // Serbien
+  SSD: "278", // Südsudan
+  STP: "268", // São Tomé und Príncipe
+  SUN: "159", // Sowjetunion (bis 1991-12-25)
+  SUR: "364", // Suriname
+  SVK: "155", // Slowakei
+  SVN: "131", // Slowenien
+  SWE: "157", // Schweden
+  SWZ: "281", // Eswatini
+  SYC: "271", // Seychellen
+  SYR: "475", // Arabische Republik Syrien
+  TCD: "284", // Tschad
+  TGO: "283", // Togo
+  THA: "476", // Thailand
+  TJK: "470", // Tadschikistan
+  TKM: "471", // Turkmenistan
+  TLS: "483", // Timor-Leste
+  TON: "541", // Tonga
+  TTO: "371", // Trinidad und Tobago
+  TUN: "285", // Tunesien
+  TUR: "163", // Türkei
+  TUV: "540", // Tuvalu
+  TWN: "465", // Taiwan
+  TZA: "282", // Vereinigte Republik Tansania
+  UGA: "286", // Uganda
+  UKR: "166", // Ukraine
+  URY: "365", // Uruguay
+  USA: "368", // Vereinigte Staaten
+  UZB: "477", // Usbekistan
+  VAT: "167", // Vatikanstadt
+  VCT: "369", // St. Vincent und die Grenadinen
+  VEN: "367", // Bolivarische Republik Venezuela
+  VNM: "432", // Vietnam
+  VUT: "532", // Vanuatu
+  WSM: "543", // Samoa
+  XXA: "997", // staatenlos
+  XXK: "150", // Kosovo
+  YEM: "421", // Jemen
+  YUG: "138", // Bundesrepublik Jugoslawien (bis 2003-02-04)
+  ZAF: "263", // Südafrika
+  ZMB: "257", // Sambia
+  ZWE: "233", // Simbabwe
+  // Section 5 Part A: codes that deviate from ISO 3166-1
+  D: "000", // Deutschland — ICAO uses "D", DEU above is the ISO alias
+  GBD: "185", // British Overseas Territories Citizen -> Britische Überseegebiete
+  GBN: "168", // British National (Overseas) — DESTATIS only knows "britisch"
+  GBO: "168", // British Overseas Citizen
+  GBP: "168", // British Protected Person
+  GBS: "168", // British Subject
+  RKS: "150", // Kosovo — ICAO uses RKS, XXK above is the ISO user-assigned alias
+  // Section 5 Part E: persons without a defined nationality (XXA is in the generated block above)
+  XXB: "998", // Refugee per 1951 Convention -> ungeklärt
+  XXC: "998", // Refugee other than XXB -> ungeklärt
+  XXX: "999", // Person of unspecified nationality -> ohne Angabe
+  // Plain ISO 3166-1 code that the DESTATIS list carries without an ISO column entry
+  PSE: "459", // Palästinensische Gebiete
+} as const;
+
+type StaatsangehoerigkeitIcao = keyof typeof STAATSANGEHOERIGKEIT_ICAO;
+export const STAATSANGEHOERIGKEIT_ICAO_KEYS = Object.keys(STAATSANGEHOERIGKEIT_ICAO) as [
+  StaatsangehoerigkeitIcao,
+  ...StaatsangehoerigkeitIcao[],
+];
+
 // Amtlicher Gemeindeschlüssel (AGS) of Hamburg
 export const HAMBURG_GEMEINDESCHLUESSEL = "02000000";
 // Hamburg district (Stadtbezirke) Postleitzahlen, grouped by Gemeindeschlüssel-Ergänzung Codes

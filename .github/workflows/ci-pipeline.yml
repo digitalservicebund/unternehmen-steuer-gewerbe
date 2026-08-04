@@ -330,7 +330,7 @@ jobs:
 
       - name: Login to GitHub Container Registry
         if: github.ref == 'refs/heads/main'
-        uses: docker/login-action@06fb636fac595d6fb4b28a5dfcb21a6f5091859c # v4.5.0
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -393,7 +393,7 @@ jobs:
           name: vulnerabilities-attestation
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@06fb636fac595d6fb4b28a5dfcb21a6f5091859c # v4.5.0
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -536,7 +536,8 @@ jobs:
           FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK: ${{ secrets.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK }}
           FIT_CONNECT_CLIENT_ID: ${{ vars.FIT_CONNECT_CLIENT_ID }}
           FIT_CONNECT_CLIENT_SECRET: ${{ secrets.FIT_CONNECT_CLIENT_SECRET }}
-          FIT_CONNECT_DESTINATION_ID: ${{ vars.FIT_CONNECT_DESTINATION_ID }}
+          TEST_FIT_CONNECT_DESTINATION_ID_OVERRIDE: ${{ vars.TEST_FIT_CONNECT_DESTINATION_ID_OVERRIDE }}
+          TEST_OSCI_ARS_OVERRIDE: ${{ vars.TEST_OSCI_ARS_OVERRIDE }}
           ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
 
       - name: Deploy to production

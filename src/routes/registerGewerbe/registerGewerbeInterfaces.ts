@@ -5,6 +5,7 @@ import {
   UNFALLVERSICHERUNGSTRAEGER_KEYS,
   VERTRAUENSNIVEAU_KEYS,
   STAATSANGEHOERIGKEIT_KEYS,
+  STAATSANGEHOERIGKEIT_ICAO_KEYS,
 } from "./requestDataTransformer/xGewerbeordnungCodes";
 import {
   RELIGIONSSCHLUESSEL_KEYS,
@@ -37,19 +38,16 @@ const PersönlicheDatenSchema = z.object({
   geburtsdatum: z.iso.date().openapi({ example: "1988-09-10" }),
   geburtsort: z.string().openapi({ example: "Musterstadt" }).optional(),
   geburtsland: z.string().openapi({ example: "Deutschland" }).optional(),
-  staatsangehörigkeitDeutsch: z
-    .boolean()
-    .openapi({
-      deprecated: true,
-      example: true,
-      description:
-        "Whether the person holds German citizenship. Deprecated: redundant with `staatsangehörigkeit` (derivable from it). Must be consistent with `staatsangehörigkeit`: true exactly when `staatsangehörigkeit` is 'deutsch' (code 000).",
-    })
-    .optional(),
+  staatsangehörigkeitIcao: z.enum(STAATSANGEHOERIGKEIT_ICAO_KEYS).optional().openapi({
+    example: "D",
+    description:
+      "Citizenship of the person as an ICAO Doc 9303 nationality code (e.g. 'D' for Germany). Takes precedence over the deprecated `staatsangehörigkeit`.",
+  }),
   staatsangehörigkeit: z.enum(STAATSANGEHOERIGKEIT_KEYS).default("deutsch").openapi({
+    deprecated: true,
     example: "deutsch",
     description:
-      "Citizenship of the person according to the code list of the German Federal Statistical Office. Defaults to 'deutsch' (code 000).",
+      "Citizenship of the person according to the code list of the German Federal Statistical Office. Defaults to 'deutsch' (code 000). Deprecated: still transmitted to the Gewerbeamt, but will stop being read in a future version.",
   }),
   adresse: AdresseSchema,
   telefon: z
@@ -61,6 +59,15 @@ const PersönlicheDatenSchema = z.object({
         "Phone numbers are encoded according to the DIN 5008 standard as follows: +[Country code] (up to 5 digits) [Area code] (up to 5 digits) [Phone number] (up to 13 digits) [-Extension] (optional, up to 5 digits).",
     }),
   email: z.email().openapi({ example: "e.mustermann@example.org" }),
+  steuerId: z
+    .string()
+    .regex(/^\d{11}$/)
+    .optional()
+    .openapi({
+      example: "06646829576",
+      description:
+        "Steuerliche Identifikationsnummer (IdNr) der Person, 11 Ziffern. ELSTER prüft zusätzlich die Prüfziffer; Nummern mit führender 0 sind Test-IdNr und nur im Testbetrieb zugelassen.",
+    }),
   steuernummer: z
     .string()
     .regex(/^\d{4}0\d{8}$/)
@@ -73,7 +80,7 @@ const PersönlicheDatenSchema = z.object({
   religion: z.enum(RELIGIONSSCHLUESSEL_KEYS).openapi({
     example: "nichtKirchensteuerpflichtig",
   }),
-  vertrauensniveau: z.enum(VERTRAUENSNIVEAU_KEYS).default("unbestimmt").openapi({
+  vertrauensniveau: z.enum(VERTRAUENSNIVEAU_KEYS).openapi({
     example: "substantiell",
     description: "Vertrauensniveau des verwendeten Identifizierungsmittels gemäß eIDAS-Verordnung",
   }),
@@ -105,11 +112,11 @@ const UnternehmensDatenSchema = z
       example: false,
       description: "Wird die Kleinunternehmer-Regelung (§ 19 UStG) in Anspruch genommen?",
     }),
-    umsatzGruendungsjahr: z.number().int().min(0).default(1).openapi({
+    umsatzGruendungsjahr: z.number().int().min(0).openapi({
       example: 25000,
       description: "Voraussichtlicher Gesamtumsatz (in Euro) im Jahr der Betriebseröffnung.",
     }),
-    umsatzFolgejahr: z.number().int().min(0).default(1).openapi({
+    umsatzFolgejahr: z.number().int().min(0).openapi({
       example: 26000,
       description: "Voraussichtlicher Gesamtumsatz (in Euro) im Folgejahr.",
     }),

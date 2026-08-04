@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { fetchJson } from "./fetchJson";
+import { HttpError } from "./httpError";
 
 function mockFetch(response: Response) {
   return vi.spyOn(globalThis, "fetch").mockResolvedValue(response);
@@ -94,5 +95,14 @@ describe("fetchJson", () => {
     await expect(fetchJson("https://example.de/missing")).rejects.toThrow(
       "HTTP 404 Not Found for https://example.de/missing: not found",
     );
+  });
+
+  it("throws an HttpError with the response status on a non-ok response", async () => {
+    mockFetch(new Response("not found", { status: 404, statusText: "Not Found" }));
+
+    const error = await fetchJson("https://example.de/missing").catch((error: unknown) => error);
+
+    expect(error).toBeInstanceOf(HttpError);
+    expect((error as HttpError).status).toBe(404);
   });
 });

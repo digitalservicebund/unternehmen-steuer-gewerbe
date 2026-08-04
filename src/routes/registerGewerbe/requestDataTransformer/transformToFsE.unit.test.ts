@@ -43,6 +43,21 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.umsatzsteuer?.uStIdNr?.uStIdAntrag?.merkerAntragUStId).toBe(true);
   });
 
+  it("maps steuerId 06646829576 to natPers.persIdNr", () => {
+    const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+
+    expect(result.eUn?.allgAngaben?.inhaber?.natPers?.persIdNr).toBe("06646829576");
+  });
+
+  it("leaves persIdNr empty when steuerId is not given", () => {
+    const dataWithoutSteuerId = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+    dataWithoutSteuerId.persönlicheDaten.steuerId = undefined;
+
+    const result = transformToEUnFsE(dataWithoutSteuerId);
+
+    expect(result.eUn?.allgAngaben?.inhaber?.natPers?.persIdNr).toBeUndefined();
+  });
+
   describe("finanzamtId", () => {
     it("uses default testfinanzamt (instead of the given 0000) if ERIC_ENABLE_CUSTOM_FINANZAMT_IDS is not set", () => {
       vi.stubEnv("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS", "");
