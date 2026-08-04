@@ -78,11 +78,11 @@ describe("FitConnectClient", () => {
 
       const result = await client.fetchSubmissionEvents(submission.submissionId);
 
-      expect(result.count).toEqual(expect.any(Number));
-      expect(result.offset).toEqual(expect.any(Number));
-      expect(result.totalCount).toEqual(expect.any(Number));
-      expect(Array.isArray(result.eventLog)).toBe(true);
-      for (const entry of result.eventLog) {
+      expect(result!.count).toEqual(expect.any(Number));
+      expect(result!.offset).toEqual(expect.any(Number));
+      expect(result!.totalCount).toEqual(expect.any(Number));
+      expect(Array.isArray(result!.eventLog)).toBe(true);
+      for (const entry of result!.eventLog) {
         expect(entry).toEqual(expect.any(String));
       }
     });
