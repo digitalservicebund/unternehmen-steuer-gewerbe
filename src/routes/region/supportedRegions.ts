@@ -11,7 +11,7 @@ const SUPPORTED_REGIONS = {
   dresden: [rangeOfPLZs("01067", "01328"), "01465"],
   fulda: [rangeOfPLZs("36037", "36043")],
   münchen: [rangeOfPLZs("80331", "81929")],
-  nordfriesland: [rangeOfPLZs("25811", "25999")],
+  husum: ["25813"],
   // This range is reserved for Düsseldorf, but not all of them are in use.
   // Range source: https://de.wikipedia.org/wiki/D%C3%BCsseldorf)
   // Reference with gaps: https://www.dasoertliche.de/?st=&ci=D%C3%BCsseldorf&form_name=search_pc
