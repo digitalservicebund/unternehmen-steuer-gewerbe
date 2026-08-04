@@ -64,7 +64,6 @@ describe("transformToGewerbeanmeldung", () => {
         ...registerGewerbeSampleRequestAllFieldsFilled,
         persönlicheDaten: {
           ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
-          staatsangehörigkeitDeutsch: false,
           staatsangehörigkeit: "französisch",
         },
       },
