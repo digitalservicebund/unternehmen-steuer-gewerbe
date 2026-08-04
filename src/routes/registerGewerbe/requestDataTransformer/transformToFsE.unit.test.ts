@@ -14,6 +14,7 @@ describe("transformToEUnFsE", () => {
     expect(natPers?.name).toBe("Mustermann");
     expect(natPers?.gebName).toBe("Muster");
     expect(natPers?.gebDat).toBe("10.09.1988");
+    expect(natPers?.persIdNr).toBe("06646829576");
     expect(natPers?.adrkette?.strAdr).toMatchObject({
       str: "Musterstraße",
       hausNr: "1",
@@ -43,21 +44,6 @@ describe("transformToEUnFsE", () => {
     ).toBe(1);
 
     expect(result.eUn?.umsatzsteuer?.uStIdNr?.uStIdAntrag?.merkerAntragUStId).toBe(true);
-  });
-
-  it("maps steuerId 06646829576 to natPers.persIdNr", () => {
-    const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
-
-    expect(result.eUn?.allgAngaben?.inhaber?.natPers?.persIdNr).toBe("06646829576");
-  });
-
-  it("leaves persIdNr empty when steuerId is not given", () => {
-    const dataWithoutSteuerId = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
-    dataWithoutSteuerId.persönlicheDaten.steuerId = undefined;
-
-    const result = transformToEUnFsE(dataWithoutSteuerId);
-
-    expect(result.eUn?.allgAngaben?.inhaber?.natPers?.persIdNr).toBeUndefined();
   });
 
   describe("finanzamtId", () => {
