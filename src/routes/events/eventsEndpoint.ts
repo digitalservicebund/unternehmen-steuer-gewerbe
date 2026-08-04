@@ -20,7 +20,7 @@ export function addEventsEndpoint(app: HonoAppType): HonoAppType {
           fitConnectDestinationId,
         );
 
-        if (!submissionEvents) {
+        if (submissionEvents === undefined) {
           return c.json({ message: "Not Found" }, 404);
         }
 
@@ -36,8 +36,12 @@ export function addEventsEndpoint(app: HonoAppType): HonoAppType {
         authorityKey: `MELDID:${getAGS(ars)}`,
       });
 
+      if (transportReport === undefined) {
+        return c.json({ message: "Not Found" }, 404);
+      }
+
       const track = transportReport.tracks.find((track) => track.id === submissionId);
-      if (!track) {
+      if (track === undefined) {
         return c.json({ message: "Not Found" }, 404);
       }
 

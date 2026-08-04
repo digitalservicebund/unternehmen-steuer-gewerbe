@@ -85,8 +85,8 @@ describe("osciClient", () => {
         authorityKey: "MELDID:09000099",
       });
 
-      expect(report.identifiers.messageID).toBe(sendResult.metadata.source.sourceMessageId);
-      expect(report.tracks.length).toBeGreaterThan(0);
+      expect(report!.identifiers.messageID).toBe(sendResult.metadata.source.sourceMessageId);
+      expect(report!.tracks.length).toBeGreaterThan(0);
     });
   });
 });

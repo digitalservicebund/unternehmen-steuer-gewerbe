@@ -2,6 +2,7 @@ import { decodeProtectedHeader, type JWK, type JWTPayload } from "jose";
 import { encryptData, verifyEventToken } from "./crypto";
 import { createMetadata, type DataSchema } from "./metadata";
 import { fetchJson } from "../../helpers/fetchJson";
+import { HttpError } from "../../helpers/httpError";
 import { getEnvironmentVariable, getSecret } from "../../secretsAndEnvironmentVariables";
 
 interface FitConnectClientConfig {
@@ -249,20 +250,29 @@ export function getFitConnectClient() {
     return result;
   }
 
-  async function fetchSubmissionEvents(submissionId: string): Promise<CaseEventsResponse> {
+  // returns undefined if the submission is unknown to FIT-Connect
+  async function fetchSubmissionEvents(
+    submissionId: string,
+  ): Promise<CaseEventsResponse | undefined> {
     const accessToken = await authenticate();
 
-    return fetchJson<CaseEventsResponse>(
-      `${config.submissionApiUrl}/v2/submissions/${submissionId}/events`,
-      { headers: { Authorization: `Bearer ${accessToken}` } },
-    );
+    try {
+      return await fetchJson<CaseEventsResponse>(
+        `${config.submissionApiUrl}/v2/submissions/${submissionId}/events`,
+        { headers: { Authorization: `Bearer ${accessToken}` } },
+      );
+    } catch (error) {
+      if (error instanceof HttpError && error.status === 404) return undefined;
+      throw error;
+    }
   }
 
   async function getSubmissionEvents(
     submissionId: string,
     destinationId: string,
-  ): Promise<SubmissionEventsResponse> {
+  ): Promise<SubmissionEventsResponse | undefined> {
     const events = await fetchSubmissionEvents(submissionId);
+    if (events === undefined) return undefined;
 
     const wellKnownJWKs = await fetchJson<{ keys: JWK[] }>(
       `${config.destinationApiUrl}//.well-known/jwks.json`,
