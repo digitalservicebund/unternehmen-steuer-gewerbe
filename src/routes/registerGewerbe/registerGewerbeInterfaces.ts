@@ -47,9 +47,10 @@ const PersönlicheDatenSchema = z.object({
     })
     .optional(),
   staatsangehörigkeit: z.enum(STAATSANGEHOERIGKEIT_KEYS).default("deutsch").openapi({
+    deprecated: true,
     example: "deutsch",
     description:
-      "Citizenship of the person according to the code list of the German Federal Statistical Office. Defaults to 'deutsch' (code 000).",
+      "Citizenship of the person according to the code list of the German Federal Statistical Office. Defaults to 'deutsch' (code 000). Deprecated: still transmitted to the Gewerbeamt, but will stop being read in a future version.",
   }),
   adresse: AdresseSchema,
   telefon: z
