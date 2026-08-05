@@ -6,10 +6,6 @@ function validRequest() {
   return structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
 }
 
-function todayIsoDate() {
-  return new Date().toISOString().split("T")[0]!;
-}
-
 describe("RegisterGewerbeRequestSchema", () => {
   it("parses the fully-populated sample request", () => {
     const result = RegisterGewerbeRequestSchema.safeParse(validRequest());
@@ -25,11 +21,16 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["persönlicheDaten.telefon"],
       ["persönlicheDaten.email"],
       ["persönlicheDaten.religion"],
+      ["persönlicheDaten.vertrauensniveau"],
       ["unternehmensDaten.tätigkeitsbeschreibung"],
       ["unternehmensDaten.tätigkeitsbereich"],
       ["unternehmensDaten.tätigkeitsbeginn"],
+      ["unternehmensDaten.gründungsdatum"],
       ["unternehmensDaten.gewerbeart"],
       ["unternehmensDaten.gewinnErmittlung"],
+      ["unternehmensDaten.umsatzGruendungsjahr"],
+      ["unternehmensDaten.umsatzFolgejahr"],
+      ["unternehmensDaten.umsatzsteuerIdMitbeantragen"],
     ])("fails when %s is missing", (fieldPath) => {
       const request = validRequest() as Record<string, unknown>;
       const [section, field] = fieldPath.split(".");
@@ -57,7 +58,9 @@ describe("RegisterGewerbeRequestSchema", () => {
     it.each([
       ["persönlicheDaten.geburtsname"],
       ["persönlicheDaten.geburtsort"],
-      ["persönlicheDaten.staatsangehörigkeitDeutsch"],
+      ["persönlicheDaten.geburtsland"],
+      ["persönlicheDaten.staatsangehörigkeitIcao"],
+      ["persönlicheDaten.steuerId"],
       ["persönlicheDaten.steuernummer"],
       ["unternehmensDaten.adresseAbweichend"],
       ["unternehmensDaten.umsatzsteuerImErstenJahr"],
@@ -91,16 +94,12 @@ describe("RegisterGewerbeRequestSchema", () => {
   describe("defaults", () => {
     it.each([
       ["persönlicheDaten", "staatsangehörigkeit", "deutsch"],
-      ["persönlicheDaten", "vertrauensniveau", "unbestimmt"],
       ["unternehmensDaten", "kleinunternehmerRegelung", false],
-      ["unternehmensDaten", "umsatzGruendungsjahr", 1],
-      ["unternehmensDaten", "umsatzFolgejahr", 1],
       ["unternehmensDaten", "gewinnGründungsjahr", 1],
       ["unternehmensDaten", "gewinnFolgejahr", 1],
       ["unternehmensDaten", "sollIstVersteuerung", "sollVersteuerung"],
       ["unternehmensDaten", "zahllastUeberschussAuswahl", "zahllast"],
       ["unternehmensDaten", "zahllastUeberschussBetrag", 0],
-      ["unternehmensDaten", "umsatzsteuerIdMitbeantragen", false],
     ])("defaults %s.%s to %j when omitted", (section, field, defaultValue) => {
       const request = validRequest() as Record<string, unknown>;
       delete (request[section] as Record<string, unknown>)[field];
@@ -121,18 +120,6 @@ describe("RegisterGewerbeRequestSchema", () => {
         expect(parsedSection[field]).toEqual(defaultValue);
       }
     });
-
-    it("defaults gründungsdatum to today's date when omitted", () => {
-      const request = validRequest();
-      delete (request.unternehmensDaten as Record<string, unknown>).gründungsdatum;
-
-      const result = RegisterGewerbeRequestSchema.safeParse(request);
-
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.unternehmensDaten.gründungsdatum).toBe(todayIsoDate());
-      }
-    });
   });
 
   describe("enum fields", () => {
@@ -140,6 +127,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["persönlicheDaten", "staatsangehörigkeit", "deutsch"],
       ["persönlicheDaten", "religion", "nichtKirchensteuerpflichtig"],
       ["persönlicheDaten", "vertrauensniveau", "substantiell"],
+      ["persönlicheDaten", "staatsangehörigkeitIcao", "AUT"],
       ["unternehmensDaten", "tätigkeitsbereich", "handwerk"],
       ["unternehmensDaten", "gewerbeart", "hauptgewerbe"],
       ["unternehmensDaten", "gewinnErmittlung", "einnahmenüberschussrechnung"],
@@ -158,6 +146,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["persönlicheDaten", "staatsangehörigkeit"],
       ["persönlicheDaten", "religion"],
       ["persönlicheDaten", "vertrauensniveau"],
+      ["persönlicheDaten", "staatsangehörigkeitIcao"],
       ["unternehmensDaten", "tätigkeitsbereich"],
       ["unternehmensDaten", "gewerbeart"],
       ["unternehmensDaten", "gewinnErmittlung"],
@@ -211,6 +200,16 @@ describe("RegisterGewerbeRequestSchema", () => {
 
       const invalid = validRequest();
       invalid.persönlicheDaten.steuernummer = "12345";
+      expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
+    });
+
+    it("accepts a valid steuerId and rejects a malformed one", () => {
+      const valid = validRequest();
+      valid.persönlicheDaten.steuerId = "06646829576";
+      expect(RegisterGewerbeRequestSchema.safeParse(valid).success).toBe(true);
+
+      const invalid = validRequest();
+      invalid.persönlicheDaten.steuerId = "12345";
       expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
     });
 
