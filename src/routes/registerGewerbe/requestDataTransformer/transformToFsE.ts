@@ -20,14 +20,15 @@ function getKleinunternehmerRegelung(data: RegisterGewerbeRequest) {
 }
 
 function getUnternehmensAnschrift(data: RegisterGewerbeRequest) {
-  const { adresseAbweichend } = data.unternehmensDaten;
+  const { adresseAbweichend, geschäftsbezeichnung } = data.unternehmensDaten;
   if (adresseAbweichend === undefined) {
-    return { entsprichtWohnanschrift: true };
+    return { entsprichtWohnanschrift: true, abwFirmenname: geschäftsbezeichnung };
   }
   const { strasse, hausnummer, hausnummerBis, hausnummerZusatz } = splitStrasseHausnummer(
     adresseAbweichend.strasseUndHausnummer,
   );
   return {
+    abwFirmenname: geschäftsbezeichnung,
     adrkette: {
       strAdr: {
         str: strasse,

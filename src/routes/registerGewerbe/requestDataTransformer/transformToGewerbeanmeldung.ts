@@ -116,6 +116,7 @@ export function transformToGewerbeanmeldung(
       // We currently only support non-registered sole proprietorships (412000), which must
       // not carry a registered name (SCH-0205), so eingetragenerName stays undefined.
       eingetragenerName: undefined,
+      geschaeftsbezeichnung: data.unternehmensDaten.geschäftsbezeichnung,
       betriebsstaette: {
         artBetriebsstaette: "01",
         anschrift: betriebsAnschrift,
