@@ -143,6 +143,36 @@ describe("transformToGewerbeanmeldung", () => {
     });
   });
 
+  it("maps geschäftsbezeichnung to gewerbebetrieb.geschaeftsbezeichnung", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          geschäftsbezeichnung: "Musterhandel Schmidt",
+        },
+      },
+      testRoutingInfo,
+    );
+
+    expect(result.gewerbebetrieb!.geschaeftsbezeichnung).toBe("Musterhandel Schmidt");
+  });
+
+  it("omits gewerbebetrieb.geschaeftsbezeichnung when geschäftsbezeichnung is not given", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          geschäftsbezeichnung: undefined,
+        },
+      },
+      testRoutingInfo,
+    );
+
+    expect(result.gewerbebetrieb!.geschaeftsbezeichnung).toBeUndefined();
+  });
+
   it("uses routingInfo.ags as gemeindeSchluessel", () => {
     const result = transformToGewerbeanmeldung(
       registerGewerbeSampleRequestAllFieldsFilled,

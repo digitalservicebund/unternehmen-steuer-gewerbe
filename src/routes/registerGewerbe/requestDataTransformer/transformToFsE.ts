@@ -19,15 +19,16 @@ function getKleinunternehmerRegelung(data: RegisterGewerbeRequest) {
     : { kleinUnternUStVerzicht: true };
 }
 
-function getUnternehmensAnschrift(data: RegisterGewerbeRequest) {
-  const { adresseAbweichend } = data.unternehmensDaten;
+function getUnternehmen(data: RegisterGewerbeRequest) {
+  const { adresseAbweichend, geschäftsbezeichnung } = data.unternehmensDaten;
   if (adresseAbweichend === undefined) {
-    return { entsprichtWohnanschrift: true };
+    return { entsprichtWohnanschrift: true, abwFirmenname: geschäftsbezeichnung };
   }
   const { strasse, hausnummer, hausnummerBis, hausnummerZusatz } = splitStrasseHausnummer(
     adresseAbweichend.strasseUndHausnummer,
   );
   return {
+    abwFirmenname: geschäftsbezeichnung,
     adrkette: {
       strAdr: {
         str: strasse,
@@ -269,7 +270,7 @@ export function transformToEUnFsE(
         // },
       },
       betrieb: {
-        unternehmen: getUnternehmensAnschrift(data),
+        unternehmen: getUnternehmen(data),
         betrBeginn: {
           betriebsbeginn: formatDatumDE(data.unternehmensDaten.tätigkeitsbeginn),
         },
