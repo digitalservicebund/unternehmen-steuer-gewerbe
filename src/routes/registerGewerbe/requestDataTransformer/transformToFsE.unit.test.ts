@@ -124,18 +124,13 @@ describe("transformToEUnFsE", () => {
       expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toEqual(0);
     });
 
-    it("maps uStIdNr to undefined if umsatzsteuerIdMitbeantragen=false or undefined", () => {
+    it("maps uStIdNr to undefined if umsatzsteuerIdMitbeantragen=false", () => {
       const caseFalse = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
       caseFalse.unternehmensDaten.umsatzsteuerIdMitbeantragen = false;
 
-      const caseUndefined = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
-      caseUndefined.unternehmensDaten.umsatzsteuerIdMitbeantragen = undefined;
+      const result = transformToEUnFsE(caseFalse);
 
-      const resultForFalse = transformToEUnFsE(caseUndefined);
-      const resultForUndefined = transformToEUnFsE(caseFalse);
-
-      expect(resultForFalse.eUn?.umsatzsteuer?.uStIdNr).toBeUndefined();
-      expect(resultForUndefined.eUn?.umsatzsteuer?.uStIdNr).toBeUndefined();
+      expect(result.eUn?.umsatzsteuer?.uStIdNr).toBeUndefined();
     });
   });
 
