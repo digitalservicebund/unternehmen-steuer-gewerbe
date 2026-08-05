@@ -87,27 +87,22 @@ const PersönlicheDatenSchema = z.object({
 
 const UnternehmensDatenSchema = z
   .object({
-    adresseAbweichend: AdresseSchema.openapi({
+    adresseAbweichend: AdresseSchema.optional().openapi({
       example: {
         strasseUndHausnummer: "Musterstraße 2",
         postleitzahl: "36037",
         ort: "Fulda",
       },
-    }).optional(),
+    }),
     tätigkeitsbeschreibung: z.string().openapi({ example: "Vertrieb von Vertriebsmustern" }),
     tätigkeitsbereich: z
       .enum(["industrie", "handwerk", "handel", "sonstiges"])
       .openapi({ example: "handwerk" }),
     tätigkeitsbeginn: z.iso.date().openapi({ example: "2026-04-17" }),
-    // TODO: temporary default — remove it (make gründungsdatum required) once the OSS
-    // always sends the field.
-    gründungsdatum: z.iso
-      .date()
-      .default(() => new Date().toISOString().split("T")[0]!)
-      .openapi({
-        example: "2026-04-17",
-        description: "Founding date of the business.",
-      }),
+    gründungsdatum: z.iso.date().openapi({
+      example: "2026-04-17",
+      description: "Founding date of the business.",
+    }),
     gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
     gewinnErmittlung: z.enum(GEWINN_ERMITTLUNG_KEYS).openapi({
       example: "einnahmenüberschussrechnung",
@@ -116,15 +111,16 @@ const UnternehmensDatenSchema = z
       example: false,
       description: "Wird die Kleinunternehmer-Regelung (§ 19 UStG) in Anspruch genommen?",
     }),
-    umsatzGruendungsjahr: z.number().int().min(0).default(1).openapi({
+    umsatzGruendungsjahr: z.number().int().min(0).openapi({
       example: 25000,
       description: "Voraussichtlicher Gesamtumsatz (in Euro) im Jahr der Betriebseröffnung.",
     }),
-    umsatzFolgejahr: z.number().int().min(0).default(1).openapi({
+    umsatzFolgejahr: z.number().int().min(0).openapi({
       example: 26000,
       description: "Voraussichtlicher Gesamtumsatz (in Euro) im Folgejahr.",
     }),
-    umsatzsteuerIdMitbeantragen: z.boolean().default(false).optional().openapi({
+    umsatzsteuerIdMitbeantragen: z.boolean().openapi({
+      example: false,
       description: "Soll mit dem FsE auch eine UmsatzsteuerId mitbeantragt werden?",
     }),
     gewinnGründungsjahr: z.number().int().min(0).default(1).openapi({

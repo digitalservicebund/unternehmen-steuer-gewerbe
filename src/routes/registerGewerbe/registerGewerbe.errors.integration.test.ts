@@ -262,6 +262,48 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(response.status).toEqual(HttpStatusCode.BadRequest);
     });
 
+    it.each(["umsatzGruendungsjahr", "umsatzFolgejahr"] as const)(
+      "Returns 400 BAD REQUEST when %s is missing",
+      async (field) => {
+        const unternehmensDaten = {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+        };
+        delete (unternehmensDaten as Record<string, unknown>)[field];
+
+        const response = await postRegisterGewerbe({
+          ...registerGewerbeSampleRequestAllFieldsFilled,
+          unternehmensDaten,
+        });
+        expect(response.status).toEqual(HttpStatusCode.BadRequest);
+      },
+    );
+
+    it("Returns 400 BAD REQUEST when gründungsdatum is missing", async () => {
+      const unternehmensDaten = {
+        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+      };
+      delete (unternehmensDaten as Record<string, unknown>).gründungsdatum;
+
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten,
+      });
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+    });
+
+    it("Returns 400 BAD REQUEST when umsatzsteuerIdMitbeantragen is missing", async () => {
+      const unternehmensDaten = {
+        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+      };
+      delete (unternehmensDaten as Record<string, unknown>).umsatzsteuerIdMitbeantragen;
+
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten,
+      });
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+    });
+
     it("Returns 400 BAD REQUEST when steuerId is missing", async () => {
       const { steuerId: _steuerId, ...persönlicheDatenOhneSteuerId } =
         registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten;
