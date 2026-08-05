@@ -95,6 +95,8 @@ describe("RegisterGewerbeRequestSchema", () => {
     it.each([
       ["persönlicheDaten", "staatsangehörigkeit", "deutsch"],
       ["unternehmensDaten", "kleinunternehmerRegelung", false],
+      ["unternehmensDaten", "anzahlVollzeitBeschaeftigte", 0],
+      ["unternehmensDaten", "anzahlTeilzeitBeschaeftigte", 0],
       ["unternehmensDaten", "gewinnGründungsjahr", 1],
       ["unternehmensDaten", "gewinnFolgejahr", 1],
       ["unternehmensDaten", "sollIstVersteuerung", "sollVersteuerung"],
@@ -234,6 +236,8 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["gewinnGründungsjahr"],
       ["gewinnFolgejahr"],
       ["zahllastUeberschussBetrag"],
+      ["anzahlVollzeitBeschaeftigte"],
+      ["anzahlTeilzeitBeschaeftigte"],
     ])("rejects a negative value for %s", (field) => {
       const request = validRequest();
       (request.unternehmensDaten as Record<string, unknown>)[field] = -1;
@@ -249,6 +253,8 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["gewinnGründungsjahr"],
       ["gewinnFolgejahr"],
       ["zahllastUeberschussBetrag"],
+      ["anzahlVollzeitBeschaeftigte"],
+      ["anzahlTeilzeitBeschaeftigte"],
     ])("rejects a non-integer value for %s", (field) => {
       const request = validRequest();
       (request.unternehmensDaten as Record<string, unknown>)[field] = 1.5;

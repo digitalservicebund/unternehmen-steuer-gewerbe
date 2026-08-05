@@ -25,6 +25,8 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
     tätigkeitsbeginn: "2026-04-17",
     gründungsdatum: "2026-05-18",
     gewerbeart: "hauptgewerbe",
+    anzahlVollzeitBeschaeftigte: 2,
+    anzahlTeilzeitBeschaeftigte: 1,
     gewinnErmittlung: "einnahmenüberschussrechnung",
     kleinunternehmerRegelung: false,
     umsatzGruendungsjahr: 1,

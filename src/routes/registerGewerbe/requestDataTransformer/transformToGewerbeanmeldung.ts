@@ -127,8 +127,8 @@ export function transformToGewerbeanmeldung(
         },
       },
       istNebenerwerb: data.unternehmensDaten.gewerbeart === "nebengewerbe",
-      anzahlVollzeitBeschaeftigte: 0,
-      anzahlTeilzeitBeschaeftigte: 0,
+      anzahlVollzeitBeschaeftigte: data.unternehmensDaten.anzahlVollzeitBeschaeftigte,
+      anzahlTeilzeitBeschaeftigte: data.unternehmensDaten.anzahlTeilzeitBeschaeftigte,
       // For later: this property has a cross-relation to artNiederlassung (which we don't have, right now)
       istReisegewerbe: false,
       beteiligungOeffentlicheHand: "0",
