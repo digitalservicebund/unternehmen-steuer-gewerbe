@@ -4,6 +4,7 @@
 import { Agent, fetch, FormData } from "undici";
 import { createMetadata, GEWERBEMELDUNG_EXT_SERVICE_ID } from "./metadata";
 import { getEnvironmentVariable, getSecret } from "../../secretsAndEnvironmentVariables";
+import { createHttpError } from "../../helpers/httpError";
 
 interface OsciClientConfig {
   baseUrl: string;
@@ -194,18 +195,23 @@ export function getOsciClient() {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `HTTP ${response.status} ${response.statusText} for ${url}: ${await response.text()}`,
-      );
+      const body = await response.text();
+      throw createHttpError({
+        status: response.status,
+        statusText: response.statusText,
+        url,
+        body,
+      });
     }
 
     return (await response.json()) as SendMessageResponse;
   }
 
-  // fetches the "OSCI-Laufzettel" with status information about a previously sent message
+  // fetches the "OSCI-Laufzettel" with status information about a previously sent message,
+  // or undefined if the message is unknown
   async function getTransportReport(
     options: GetTransportReportOptions,
-  ): Promise<TransportReportResponse> {
+  ): Promise<TransportReportResponse | undefined> {
     const accessToken = await getAccessToken();
 
     const url = `${config.baseUrl}/restapi/v3.0/messages/transport-report/osci`;
@@ -226,10 +232,18 @@ export function getOsciClient() {
       dispatcher,
     });
 
+    if (response.status === 404) {
+      return undefined;
+    }
+
     if (!response.ok) {
-      throw new Error(
-        `HTTP ${response.status} ${response.statusText} for ${url}: ${await response.text()}`,
-      );
+      const body = await response.text();
+      throw createHttpError({
+        status: response.status,
+        statusText: response.statusText,
+        url,
+        body,
+      });
     }
 
     return (await response.json()) as TransportReportResponse;

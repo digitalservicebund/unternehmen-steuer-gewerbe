@@ -1,8 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { defaultFinanzamtId, transformToEUnFsE } from "./transformToFsE";
 import { registerGewerbeSampleRequestAllFieldsFilled } from "../testHelpers";
-import { RegisterGewerbeRequestSchema } from "../registerGewerbeInterfaces";
-import { formatDatumDE } from "../../../helpers/formFieldTransformations";
 import { ElsterFsEEUn } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 
 describe("transformToEUnFsE", () => {
@@ -43,6 +41,21 @@ describe("transformToEUnFsE", () => {
     ).toBe(1);
 
     expect(result.eUn?.umsatzsteuer?.uStIdNr?.uStIdAntrag?.merkerAntragUStId).toBe(true);
+  });
+
+  it("maps steuerId 06646829576 to natPers.persIdNr", () => {
+    const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+
+    expect(result.eUn?.allgAngaben?.inhaber?.natPers?.persIdNr).toBe("06646829576");
+  });
+
+  it("leaves persIdNr empty when steuerId is not given", () => {
+    const dataWithoutSteuerId = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+    dataWithoutSteuerId.persönlicheDaten.steuerId = undefined;
+
+    const result = transformToEUnFsE(dataWithoutSteuerId);
+
+    expect(result.eUn?.allgAngaben?.inhaber?.natPers?.persIdNr).toBeUndefined();
   });
 
   describe("finanzamtId", () => {
@@ -191,22 +204,5 @@ describe("transformToEUnFsE", () => {
     expect(
       result.eUn?.umsatzsteuer?.kleinunternehmerRegelung?.kleinUnternUStVerzicht,
     ).toBeUndefined();
-  });
-
-  // Note: temporary — the gründungsdatum default exists only to give the OSS time to
-  // start sending the field. Remove this test together with the schema default once
-  // gründungsdatum is always provided (field made required).
-  it("falls back to today's date for uebertrStichtag when gründungsdatum is omitted", () => {
-    const { gründungsdatum: _, ...unternehmensDatenOhneGründung } =
-      registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten;
-    const parsed = RegisterGewerbeRequestSchema.parse({
-      ...registerGewerbeSampleRequestAllFieldsFilled,
-      unternehmensDaten: unternehmensDatenOhneGründung,
-    });
-
-    const result = transformToEUnFsE(parsed);
-
-    const heute = formatDatumDE(new Date().toISOString().split("T")[0]!);
-    expect(result.eUn?.betrieb?.gruendungsangaben?.gruendungsForm?.uebertrStichtag).toBe(heute);
   });
 });
