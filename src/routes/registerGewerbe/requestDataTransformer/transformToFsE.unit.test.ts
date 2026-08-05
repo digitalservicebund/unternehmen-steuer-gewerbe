@@ -30,8 +30,8 @@ describe("transformToEUnFsE", () => {
       "18.05.2026",
     );
     expect(result.eUn?.umsatzsteuer?.sollIstVersteuerung?.auswahlSollIstVerst).toBe("1");
-    expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toBe("2"); // 1 means "zahllast", 2 means "überschuss"
-    expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toBe(222);
+    expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toBe("1"); // 1 means "zahllast", 2 means "überschuss"
+    expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toBe(0);
 
     expect(
       result.eUn?.festsetzungsAngaben?.voraussichtlicheEinkuenfte?.einkGewBetr?.gruendJahrA,
@@ -85,44 +85,41 @@ describe("transformToEUnFsE", () => {
   });
 
   describe("umsatzsteuer", () => {
-    it("maps a positive number to zahllast and it's absolute value", () => {
-      const dataWithNegativeNumberAsUmsatzImErstenJahr = structuredClone(
-        registerGewerbeSampleRequestAllFieldsFilled,
-      );
-      // set deprecated values to the opposite of what we expect the new value to result in
-      dataWithNegativeNumberAsUmsatzImErstenJahr.unternehmensDaten.zahllastUeberschussAuswahl =
-        "ueberschuss";
-      dataWithNegativeNumberAsUmsatzImErstenJahr.unternehmensDaten.zahllastUeberschussBetrag = 0;
-      // set the new value
-      dataWithNegativeNumberAsUmsatzImErstenJahr.unternehmensDaten.umsatzsteuerImErstenJahr = 111;
+    it.each([
+      {
+        zahllastUeberschussAuswahl: "zahllast" as const,
+        zahllastUeberschussBetrag: 111,
+        expectedAuswahl: "1",
+        deprecatedUmsatzsteuerImErstenJahr: -111,
+      },
+      {
+        zahllastUeberschussAuswahl: "ueberschuss" as const,
+        zahllastUeberschussBetrag: 222,
+        expectedAuswahl: "2",
+        deprecatedUmsatzsteuerImErstenJahr: 222,
+      },
+    ])(
+      "maps zahllastUeberschussAuswahl $zahllastUeberschussAuswahl and zahllastUeberschussBetrag $zahllastUeberschussBetrag, ignoring the deprecated umsatzsteuerImErstenJahr",
+      ({
+        zahllastUeberschussAuswahl,
+        zahllastUeberschussBetrag,
+        expectedAuswahl,
+        deprecatedUmsatzsteuerImErstenJahr,
+      }) => {
+        const data = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+        data.unternehmensDaten.zahllastUeberschussAuswahl = zahllastUeberschussAuswahl;
+        data.unternehmensDaten.zahllastUeberschussBetrag = zahllastUeberschussBetrag;
+        // deprecated field must be ignored; set to a value that would flip the result if it were still read
+        data.unternehmensDaten.umsatzsteuerImErstenJahr = deprecatedUmsatzsteuerImErstenJahr;
 
-      const result = transformToEUnFsE(dataWithNegativeNumberAsUmsatzImErstenJahr);
+        const result = transformToEUnFsE(data);
 
-      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toEqual("1"); // 1 for zahllast
-      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toEqual(111);
-    });
-
-    it("maps undefined umsatzSteuerImErstenJahr to zahllast and a betrag of 0", () => {
-      const dataWithUndefined = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
-
-      dataWithUndefined.unternehmensDaten.umsatzsteuerImErstenJahr = undefined;
-
-      const result = transformToEUnFsE(dataWithUndefined);
-
-      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toEqual("1"); // 1 for zahllast
-      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toEqual(0);
-    });
-
-    it("maps 0 umsatzSteuerImErstenJahr to zahllast and a betrag of 0", () => {
-      const dataWithUndefined = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
-
-      dataWithUndefined.unternehmensDaten.umsatzsteuerImErstenJahr = 0;
-
-      const result = transformToEUnFsE(dataWithUndefined);
-
-      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toEqual("1"); // 1 for zahllast
-      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toEqual(0);
-    });
+        expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toEqual(expectedAuswahl);
+        expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toEqual(
+          zahllastUeberschussBetrag,
+        );
+      },
+    );
 
     it("maps uStIdNr to undefined if umsatzsteuerIdMitbeantragen=false", () => {
       const caseFalse = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);

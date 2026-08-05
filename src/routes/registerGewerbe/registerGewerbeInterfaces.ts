@@ -149,20 +149,17 @@ const UnternehmensDatenSchema = z
     }),
     zahllastUeberschussAuswahl: z.enum(ZAHLLAST_UEBERSCHUSS_KEYS).default("zahllast").openapi({
       example: "zahllast",
-      description:
-        "Deprecated. Use 'umsatzsteuerImErstenJahr instead. (Ob voraussichtlich eine Zahllast oder ein Überschuss erwartet wird.)",
-      deprecated: true,
+      description: "Ob voraussichtlich eine Zahllast oder ein Überschuss erwartet wird.",
     }),
     zahllastUeberschussBetrag: z.number().int().min(0).default(0).openapi({
       example: 0,
-      description:
-        "Deprecated. Use 'umsatzsteuerImErstenJahr instead. (Voraussichtliche Zahllast oder Überschuss in Euro.)",
-      deprecated: true,
+      description: "Voraussichtliche Zahllast oder Überschuss in Euro.",
     }),
     umsatzsteuerImErstenJahr: z.int().optional().openapi({
       example: 100,
       description:
-        "Voraussichtliche Umsatzsteuer im ersten Jahr. (Größer als 0 => Nutzer hat 'Zahllast' => muss was bezahlen; kleiner oder gleich 0 => 'Überschuss' => Rückzahlung vom / Guthaben beim Finanzamt.)",
+        "Deprecated. Use 'zahllastUeberschussAuswahl'/'zahllastUeberschussBetrag' instead. (Voraussichtliche Umsatzsteuer im ersten Jahr. Größer als 0 => Nutzer hat 'Zahllast' => muss was bezahlen; kleiner oder gleich 0 => 'Überschuss' => Rückzahlung vom / Guthaben beim Finanzamt.)",
+      deprecated: true,
     }),
   })
   .refine(

@@ -11,6 +11,7 @@ import {
   GEWINN_ERMITTLUNG,
   SOLL_IST_VERSTEUERUNG,
   IST_VERSTEUERUNG_GRUND,
+  ZAHLLAST_UEBERSCHUSS,
 } from "./fsECodes";
 
 function getKleinunternehmerRegelung(data: RegisterGewerbeRequest) {
@@ -62,17 +63,13 @@ function getIstVersteuerungGrund({
   return { [IST_VERSTEUERUNG_GRUND[istVersteuerungGrund]]: true };
 }
 
-function getZahllastUeberschuss(data: RegisterGewerbeRequest) {
+function getZahllastUeberschuss({
+  zahllastUeberschussAuswahl,
+  zahllastUeberschussBetrag,
+}: RegisterGewerbeRequest["unternehmensDaten"]) {
   return {
-    auswahl:
-      data.unternehmensDaten.umsatzsteuerImErstenJahr !== undefined &&
-      data.unternehmensDaten.umsatzsteuerImErstenJahr < 0
-        ? "2" // überschuss (tax office ows the user)
-        : "1", // zahllast (user needs to pay)
-    betrag:
-      data.unternehmensDaten.umsatzsteuerImErstenJahr === undefined
-        ? 0
-        : Math.abs(data.unternehmensDaten.umsatzsteuerImErstenJahr),
+    auswahl: ZAHLLAST_UEBERSCHUSS[zahllastUeberschussAuswahl],
+    betrag: zahllastUeberschussBetrag,
   };
 }
 
@@ -302,7 +299,7 @@ export function transformToEUnFsE(
           auswahlSollIstVerst: SOLL_IST_VERSTEUERUNG[data.unternehmensDaten.sollIstVersteuerung],
           ...getIstVersteuerungGrund(data.unternehmensDaten),
         },
-        zahllastUeberschuss: getZahllastUeberschuss(data),
+        zahllastUeberschuss: getZahllastUeberschuss(data.unternehmensDaten),
         uStIdNr: getUstIdNr(data),
       },
     },
