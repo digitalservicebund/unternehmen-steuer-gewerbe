@@ -110,6 +110,16 @@ const UnternehmensDatenSchema = z
       description: "Founding date of the business.",
     }),
     gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
+    anzahlVollzeitBeschaeftigte: z.number().int().min(0).default(0).openapi({
+      example: 0,
+      description:
+        "Anzahl der Vollzeitbeschäftigten (inklusive Ehe- oder Lebenspartner, Aushilfen, jedoch stets ohne den Inhaber selbst), die zum Zeitpunkt der Gewerbemeldung in der Betriebsstätte tätig sind.",
+    }),
+    anzahlTeilzeitBeschaeftigte: z.number().int().min(0).default(0).openapi({
+      example: 0,
+      description:
+        "Anzahl der Teilzeitbeschäftigten (inklusive Ehe- oder Lebenspartner, Aushilfen, jedoch stets ohne den Inhaber selbst), die zum Zeitpunkt der Gewerbemeldung in der Betriebsstätte tätig sind.",
+    }),
     gewinnErmittlung: z.enum(GEWINN_ERMITTLUNG_KEYS).openapi({
       example: "einnahmenüberschussrechnung",
     }),
