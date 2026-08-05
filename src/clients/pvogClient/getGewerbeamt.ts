@@ -28,7 +28,7 @@ export interface Gewerbeamt {
   adresse?: GewerbeamtAdresse;
   telefon?: string;
   email?: string;
-  onlineServices: OnlineServiceLink[];
+  onlineServices?: OnlineServiceLink[];
 }
 
 interface ServiceDescription {
@@ -107,7 +107,30 @@ function findServiceDescriptionWithMostPreciseArs(
   let bestPrecision = -1;
 
   for (const candidate of serviceDescriptions) {
-    const precision = getArsMatchPrecision(candidate, searchedArs);
+    const precision = getArsMatchPrecision(candidate.ars, searchedArs);
+    if (precision > bestPrecision) {
+      bestMatch = candidate;
+      bestPrecision = precision;
+    }
+  }
+
+  return bestMatch;
+}
+
+// Sometimes a "Einheitlicher Ansprechpartner" of a Kreis or Land are registered as responsible for the
+// Gewerbeanmeldung as well, so filtering by role alone can pick them over the municipality's
+// Gewerbeamt. They are registered for the ARS of their Kreis or Land, so the same ARS matching
+// as for the service descriptions finds the unit closest to the searched municipality.
+async function findOrganisationUnitWithMostPreciseArs(
+  organisationUnits: OrganisationUnitTitle[],
+  searchedArs: string,
+): Promise<OrganisationUnitTitle | undefined> {
+  let bestMatch: OrganisationUnitTitle | undefined;
+  let bestPrecision = -1;
+
+  for (const candidate of organisationUnits) {
+    const candidateArs = await fetchOrganisationUnitArs(candidate.id);
+    const precision = getArsMatchPrecision(candidateArs, searchedArs);
     if (precision > bestPrecision) {
       bestMatch = candidate;
       bestPrecision = precision;
@@ -118,11 +141,11 @@ function findServiceDescriptionWithMostPreciseArs(
 }
 
 // The ARS is hierarchical: its digits encode federal state, government district, county and
-// municipality from left to right. So the more leading digits a service description's ARS shares
+// municipality from left to right. So the more leading digits a candidate's ARS shares
 // with the searched ARS, the closer its administrative level is to the searched municipality.
-// A service description carries a list of ARS values; its precision is the best match among them.
-function getArsMatchPrecision(serviceDescription: ServiceDescription, searchedArs: string): number {
-  const precisions = serviceDescription.ars.map((candidateArs) => {
+// A candidate carries a list of ARS values; its precision is the best match among them.
+function getArsMatchPrecision(candidateArsValues: string[], searchedArs: string): number {
+  const precisions = candidateArsValues.map((candidateArs) => {
     // the number of matching leading digits is the index of the first mismatching digit
     const indexOfFirstMismatch = [...searchedArs].findIndex(
       (digit, index) => candidateArs[index] !== digit,
@@ -179,6 +202,14 @@ export async function fetchOrganisationUnitTitles(
   );
 }
 
+// the ARS values an organisation unit offers the Gewerbeanmeldung for, i.e. its area of responsibility
+export async function fetchOrganisationUnitArs(organisationUnitId: string): Promise<string[]> {
+  return fetchJson<string[]>(
+    `${PVOG_SUCHDIENST_API_URL}/v1/organisationunits/${organisationUnitId}/ars`,
+    { params: { leikaId: GEWERBEANMELDUNG_LEIKA_ID } },
+  );
+}
+
 export async function fetchOrganisationUnitDetail(
   ars: string,
   lbId: string,
@@ -205,9 +236,11 @@ export async function getGewerbeamt(ars: string): Promise<Gewerbeamt | undefined
   const serviceDescriptionDetail = await fetchServiceDescriptionDetail(lbId, ars);
 
   const organisationUnits = await fetchOrganisationUnitTitles(ars, lbId);
+  const zustaendigeStellen = organisationUnits.filter(isZustaendigeStelle);
+  const zustaendigeStelle = await findOrganisationUnitWithMostPreciseArs(zustaendigeStellen, ars);
   // falling back to the first unit equals FITKO's recommended fallback to role 03 (Ansprechpunkt),
   // since the role code list only contains the codes 01, 02 and 03
-  const organisationUnit = organisationUnits.find(isZustaendigeStelle) ?? organisationUnits[0];
+  const organisationUnit = zustaendigeStelle ?? organisationUnits[0];
 
   if (organisationUnit === undefined) {
     throw new Error(`No organisation unit found for ARS ${ars} and lbId ${lbId}`);

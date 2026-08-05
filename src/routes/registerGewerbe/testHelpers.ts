@@ -15,6 +15,7 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
     },
     telefon: "+49 234 121314",
     email: "e.mustermann@example.org",
+    steuerId: "06646829576",
     religion: "nichtKirchensteuerpflichtig",
     vertrauensniveau: "substantiell",
   },

@@ -109,6 +109,15 @@ describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
 
       expect(response.status).toBe(404);
     });
+
+    it("returns 500 when the FIT-Connect request fails", async () => {
+      vi.spyOn(console, "error").mockImplementation(() => {});
+      mockGetSubmissionEvents.mockRejectedValueOnce(new Error("HTTP 503 Service Unavailable"));
+
+      const response = await getEvents({ submissionId, ars, fitConnectDestinationId });
+
+      expect(response.status).toBe(500);
+    });
   });
 
   describe("without a fitConnectDestinationId (OSCI)", () => {
@@ -169,6 +178,14 @@ describe("Route GET /api/v1/register-gewerbe/gewerbemeldung/events", () => {
       const [reportOptions] = mockGetTransportReport.mock.calls[0]!;
       expect(reportOptions.messageId).toBe(messageId);
       expect(reportOptions.authorityKey).toBe("MELDID:14612000");
+    });
+
+    it("returns 404 when no transport report exists for the messageId", async () => {
+      mockGetTransportReport.mockResolvedValueOnce(undefined);
+
+      const response = await getEvents({ submissionId: messageId, ars });
+
+      expect(response.status).toBe(404);
     });
 
     it("returns 404 when no track matches the messageId", async () => {

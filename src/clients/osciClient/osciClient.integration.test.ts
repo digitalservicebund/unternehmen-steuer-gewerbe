@@ -130,6 +130,22 @@ describe("getOsciClient", () => {
       });
     });
 
+    it("returns undefined when the transport report request responds 404", async () => {
+      vi.stubEnv("AKDB_BASE_URL", "https://soaptest.akdb.de/okkommozg");
+      vi.stubEnv("AKDB_CERTIFICATE_BASE64", "");
+      vi.stubEnv("AKDB_CERTIFICATE_PASSPHRASE", "");
+      vi.mocked(fetch)
+        .mockResolvedValueOnce(new Response(TOKEN_RESPONSE, { status: 200 }))
+        .mockResolvedValueOnce(new Response("not found", { status: 404, statusText: "Not Found" }));
+
+      const report = await getOsciClient().getTransportReport({
+        messageId: "vps_by_178357726143931b13e14-2c78-4aa6-ba2c-0d911ec02d82",
+        authorityKey: "MELDID:09000099",
+      });
+
+      expect(report).toBeUndefined();
+    });
+
     it("throws when the transport report request fails", async () => {
       vi.stubEnv("AKDB_BASE_URL", "https://soaptest.akdb.de/okkommozg");
       vi.stubEnv("AKDB_CERTIFICATE_BASE64", "");

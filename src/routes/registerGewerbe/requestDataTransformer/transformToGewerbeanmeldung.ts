@@ -7,6 +7,7 @@ import {
   VERTRAUENSNIVEAU,
   RECHTSFORM,
   STAATSANGEHOERIGKEIT,
+  STAATSANGEHOERIGKEIT_ICAO,
   HAMBURG_GEMEINDESCHLUESSEL,
   HAMBURG_STADTBEZIRK_PLZ,
 } from "./xGewerbeordnungCodes";
@@ -73,6 +74,11 @@ export function transformToGewerbeanmeldung(
     data.unternehmensDaten.adresseAbweichend,
     data.persönlicheDaten.adresse,
   );
+
+  const { staatsangehörigkeitIcao } = data.persönlicheDaten;
+  const staatsangehoerigkeitCode = staatsangehörigkeitIcao
+    ? STAATSANGEHOERIGKEIT_ICAO[staatsangehörigkeitIcao]
+    : STAATSANGEHOERIGKEIT[data.persönlicheDaten.staatsangehörigkeit];
 
   const gemeindeSchluessel = routingInfo.ags;
   const gewerbeamtKennung = `MELDID:${gemeindeSchluessel}`;
@@ -143,13 +149,13 @@ export function transformToGewerbeanmeldung(
           },
           geburt: {
             geburtsdatum: data.persönlicheDaten.geburtsdatum,
-            ort: data.persönlicheDaten.geburtsort,
-            staat: "keine Angabe", // removed from API; xGewerbe still requires this Freitext.
+            ort: data.persönlicheDaten.geburtsort ?? "keine Angabe",
+            staat: data.persönlicheDaten.geburtsland ?? "keine Angabe",
           },
           // XGewerbeordnung Schematron requires np:geschlecht to be present (SCH-EXISTS-xga-natuerlichePerson-np-geschlecht);
           // we no longer collect it, so always report "keine Angabe".
           geschlecht: "x",
-          staatsangehoerigkeit: STAATSANGEHOERIGKEIT[data.persönlicheDaten.staatsangehörigkeit],
+          staatsangehoerigkeit: staatsangehoerigkeitCode,
           anschrift: {
             strasse: personStrasseHausnummer.strasse,
             hausnummerVon: joinHausnummerUndZusatz(
