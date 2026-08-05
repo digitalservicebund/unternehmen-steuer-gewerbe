@@ -19,7 +19,6 @@ describe("transformToGewerbeanmeldung", () => {
         ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
         geburtsname: undefined,
         geburtsort: undefined,
-        geburtsland: undefined,
       },
       unternehmensDaten: {
         ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
@@ -46,6 +45,15 @@ describe("transformToGewerbeanmeldung", () => {
     expect(person.name!.geburtsname).toBeUndefined();
     expect(person.geburt!.ort).toBe("keine Angabe");
     expect(person.geburt!.staat).toBe("keine Angabe");
+  });
+
+  it("statically sets geburt.staat to 'keine Angabe' since geburtsland is no longer collected", () => {
+    const result = transformToGewerbeanmeldung(
+      registerGewerbeSampleRequestAllFieldsFilled,
+      testRoutingInfo,
+    );
+
+    expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.geburt!.staat).toBe("keine Angabe");
   });
 
   it("maps the staatsangehörigkeit key to its destatis code (deutsch = 000, französisch = 129)", async () => {
