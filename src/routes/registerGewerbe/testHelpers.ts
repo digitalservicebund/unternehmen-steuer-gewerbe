@@ -23,8 +23,8 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
   unternehmensDaten: {
     tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
     tätigkeitsbereich: "handwerk",
-    tätigkeitsbeginn: "2026-04-17",
-    gründungsdatum: "2026-05-18",
+    datumFinanzamt: "2026-04-17",
+    datumGewerbeamt: "2026-05-18",
     gewerbeart: "hauptgewerbe",
     gewinnErmittlung: "einnahmenüberschussrechnung",
     kleinunternehmerRegelung: false,

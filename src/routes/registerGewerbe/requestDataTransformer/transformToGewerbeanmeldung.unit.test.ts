@@ -111,6 +111,20 @@ describe("transformToGewerbeanmeldung", () => {
     expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe("137");
   });
 
+  it("uses datumGewerbeamt (not datumFinanzamt) for gueltigAb", () => {
+    const result = transformToGewerbeanmeldung(
+      registerGewerbeSampleRequestAllFieldsFilled,
+      testRoutingInfo,
+    );
+
+    expect(result.gueltigAb).toBe(
+      registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten.datumGewerbeamt,
+    );
+    expect(result.gueltigAb).not.toBe(
+      registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten.datumFinanzamt,
+    );
+  });
+
   it("uses adresseAbweichend as betriebsstaette anschrift when provided", () => {
     const result = transformToGewerbeanmeldung(
       {

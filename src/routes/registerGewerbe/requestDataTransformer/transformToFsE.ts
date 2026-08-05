@@ -271,12 +271,12 @@ export function transformToEUnFsE(
       betrieb: {
         unternehmen: getUnternehmensAnschrift(data),
         betrBeginn: {
-          betriebsbeginn: formatDatumDE(data.unternehmensDaten.tätigkeitsbeginn),
+          betriebsbeginn: formatDatumDE(data.unternehmensDaten.datumFinanzamt),
         },
         gruendungsangaben: {
           gruendungsForm: {
             gruendungsArt: "1",
-            uebertrStichtag: formatDatumDE(data.unternehmensDaten.gründungsdatum),
+            uebertrStichtag: formatDatumDE(data.unternehmensDaten.datumFinanzamt),
           },
         },
       },
