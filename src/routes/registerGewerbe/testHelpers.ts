@@ -7,7 +7,6 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
     geburtsname: "Muster",
     geburtsdatum: "1988-09-10",
     geburtsort: "Musterstadt",
-    geburtsland: "Deutschland",
     staatsangehörigkeit: "deutsch",
     adresse: {
       strasseUndHausnummer: "Musterstraße 1 a",

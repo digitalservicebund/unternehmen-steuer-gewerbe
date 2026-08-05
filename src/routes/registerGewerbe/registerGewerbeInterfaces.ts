@@ -88,13 +88,13 @@ const PersönlicheDatenSchema = z.object({
 
 const UnternehmensDatenSchema = z
   .object({
-    adresseAbweichend: AdresseSchema.openapi({
+    adresseAbweichend: AdresseSchema.optional().openapi({
       example: {
         strasseUndHausnummer: "Musterstraße 2",
         postleitzahl: "36037",
         ort: "Fulda",
       },
-    }).optional(),
+    }),
     tätigkeitsbeschreibung: z.string().openapi({ example: "Vertrieb von Vertriebsmustern" }),
     tätigkeitsbereich: z
       .enum(["industrie", "handwerk", "handel", "sonstiges"])
