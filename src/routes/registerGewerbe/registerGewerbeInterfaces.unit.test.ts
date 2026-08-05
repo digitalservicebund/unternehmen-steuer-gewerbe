@@ -33,7 +33,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten.umsatzsteuerIdMitbeantragen"],
     ])("fails when %s is missing", (fieldPath) => {
       const request = validRequest() as Record<string, unknown>;
-      const [section, field] = fieldPath.split(".");
+      const [section, field] = fieldPath.split(".") as [string, string];
       delete (request[section] as Record<string, unknown>)[field];
 
       const result = RegisterGewerbeRequestSchema.safeParse(request);
@@ -66,7 +66,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten.umsatzsteuerImErstenJahr"],
     ])("succeeds and stays absent when %s is missing", (fieldPath) => {
       const request = validRequest() as Record<string, unknown>;
-      const [section, field] = fieldPath.split(".");
+      const [section, field] = fieldPath.split(".") as [string, string];
       delete (request[section] as Record<string, unknown>)[field];
 
       const result = RegisterGewerbeRequestSchema.safeParse(request);
