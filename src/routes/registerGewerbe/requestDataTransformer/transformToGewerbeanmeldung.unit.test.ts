@@ -47,7 +47,7 @@ describe("transformToGewerbeanmeldung", () => {
     expect(person.geburt!.staat).toBe("keine Angabe");
   });
 
-  it("statically sets geburt.staat to Deutschland since geburtsland is no longer collected", () => {
+  it("statically sets geburt.staat to 'keine Angabe' since geburtsland is no longer collected", () => {
     const result = transformToGewerbeanmeldung(
       registerGewerbeSampleRequestAllFieldsFilled,
       testRoutingInfo,
