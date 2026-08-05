@@ -95,6 +95,11 @@ const UnternehmensDatenSchema = z
         ort: "Fulda",
       },
     }),
+    geschäftsbezeichnung: z.string().max(120).optional().openapi({
+      example: "Musterhandel",
+      description:
+        "Bezeichnung des Unternehmens, falls abweichend vom Namen des Gewerbetreibenden.",
+    }),
     tätigkeitsbeschreibung: z.string().openapi({ example: "Vertrieb von Vertriebsmustern" }),
     tätigkeitsbereich: z
       .enum(["industrie", "handwerk", "handel", "sonstiges"])

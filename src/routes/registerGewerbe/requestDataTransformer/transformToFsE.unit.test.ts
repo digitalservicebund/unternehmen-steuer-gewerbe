@@ -160,6 +160,28 @@ describe("transformToEUnFsE", () => {
     },
   );
 
+  it("maps geschäftsbezeichnung to eUn.betrieb.unternehmen.abwFirmenname", () => {
+    const result = transformToEUnFsE({
+      ...registerGewerbeSampleRequestAllFieldsFilled,
+      unternehmensDaten: {
+        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+        geschäftsbezeichnung: "Musterhandel Schmidt",
+      },
+    });
+    expect(result.eUn?.betrieb?.unternehmen?.abwFirmenname).toBe("Musterhandel Schmidt");
+  });
+
+  it("omits eUn.betrieb.unternehmen.abwFirmenname when geschäftsbezeichnung is not given", () => {
+    const result = transformToEUnFsE({
+      ...registerGewerbeSampleRequestAllFieldsFilled,
+      unternehmensDaten: {
+        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+        geschäftsbezeichnung: undefined,
+      },
+    });
+    expect(result.eUn?.betrieb?.unternehmen?.abwFirmenname).toBeUndefined();
+  });
+
   it("sets entsprichtWohnanschrift: true when adresseAbweichend is not set", () => {
     const { adresseAbweichend: _, ...unternehmensDatenOhneAbweichung } =
       registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten;

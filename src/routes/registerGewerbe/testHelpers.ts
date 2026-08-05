@@ -40,6 +40,7 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
       postleitzahl: "96450",
       ort: "Coburg",
     },
+    geschäftsbezeichnung: "Musterhandel",
     umsatzsteuerIdMitbeantragen: true,
   },
 };
