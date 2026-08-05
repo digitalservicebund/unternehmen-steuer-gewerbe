@@ -111,17 +111,17 @@ describe("transformToGewerbeanmeldung", () => {
     expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe("137");
   });
 
-  it("uses datumGewerbeamt (not datumFinanzamt) for gueltigAb", () => {
+  it("uses anmeldedatumGewerbeamt (not anmeldedatumFinanzamt) for gueltigAb", () => {
     const result = transformToGewerbeanmeldung(
       registerGewerbeSampleRequestAllFieldsFilled,
       testRoutingInfo,
     );
 
     expect(result.gueltigAb).toBe(
-      registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten.datumGewerbeamt,
+      registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten.anmeldedatumGewerbeamt,
     );
     expect(result.gueltigAb).not.toBe(
-      registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten.datumFinanzamt,
+      registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten.anmeldedatumFinanzamt,
     );
   });
 

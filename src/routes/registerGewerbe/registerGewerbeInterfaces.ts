@@ -99,11 +99,11 @@ const UnternehmensDatenSchema = z
     tätigkeitsbereich: z
       .enum(["industrie", "handwerk", "handel", "sonstiges"])
       .openapi({ example: "handwerk" }),
-    datumFinanzamt: z.iso.date().openapi({
+    anmeldedatumFinanzamt: z.iso.date().openapi({
       example: "2026-04-17",
       description: "Date reported to the Finanzamt as the start of business activity.",
     }),
-    datumGewerbeamt: z.iso.date().openapi({
+    anmeldedatumGewerbeamt: z.iso.date().openapi({
       example: "2026-04-17",
       description: "Date reported to the Gewerbeamt as the business's founding date.",
     }),

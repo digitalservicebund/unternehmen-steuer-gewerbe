@@ -265,8 +265,8 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
     it.each([
       "umsatzGruendungsjahr",
       "umsatzFolgejahr",
-      "datumFinanzamt",
-      "datumGewerbeamt",
+      "anmeldedatumFinanzamt",
+      "anmeldedatumGewerbeamt",
     ] as const)("Returns 400 BAD REQUEST when %s is missing", async (field) => {
       const unternehmensDaten = {
         ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
