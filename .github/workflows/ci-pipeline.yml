@@ -283,8 +283,7 @@ jobs:
           scanners: "vuln,config,secret"
 
       - name: Convert Trivy results to sarif
-        run:
-          trivy convert --format sarif --output trivy-image-results.sarif trivy-image-results.json
+        run: trivy convert --format sarif --output trivy-image-results.sarif trivy-image-results.json
 
           # Not possible in public repo
       # - name: Upload Trivy scan results to GitHub Security tab (on `main`)
