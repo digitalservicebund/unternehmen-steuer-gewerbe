@@ -321,6 +321,32 @@ describe("createGewerbeanmeldungXml", () => {
     expect(generatedXml).toContain("A &gt; B &amp; C &lt; D");
   });
 
+  it("includes wt:geschaeftsbezeichnung when set on gewerbebetrieb", async () => {
+    const withGeschaeftsbezeichnung: DataForCreateGewerbeanmeldungXml = {
+      ...gewerbeanmeldung,
+      gewerbebetrieb: {
+        ...gewerbeanmeldung.gewerbebetrieb,
+        geschaeftsbezeichnung: "Musterhandel Schmidt",
+      },
+    };
+
+    const parsed = parser.parse(await createGewerbeanmeldungXml(withGeschaeftsbezeichnung));
+    expect(
+      parsed["xga:ext.gewerbemeldung.0400"]["xga:satz"]["xga:anmeldung"]["xga:gewerbebetrieb"][
+        "wt:geschaeftsbezeichnung"
+      ],
+    ).toBe("Musterhandel Schmidt");
+  });
+
+  it("omits wt:geschaeftsbezeichnung when not set on gewerbebetrieb", async () => {
+    const parsed = parser.parse(await createGewerbeanmeldungXml(gewerbeanmeldung));
+    expect(
+      parsed["xga:ext.gewerbemeldung.0400"]["xga:satz"]["xga:anmeldung"]["xga:gewerbebetrieb"][
+        "wt:geschaeftsbezeichnung"
+      ],
+    ).toBeUndefined();
+  });
+
   it("includes housenumber range and suffix in the business address", async () => {
     const withRange: DataForCreateGewerbeanmeldungXml = {
       ...gewerbeanmeldung,
