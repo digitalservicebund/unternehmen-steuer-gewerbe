@@ -19,7 +19,6 @@ describe("transformToGewerbeanmeldung", () => {
         ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
         geburtsname: undefined,
         geburtsort: undefined,
-        geburtsland: undefined,
       },
       unternehmensDaten: {
         ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
@@ -48,6 +47,15 @@ describe("transformToGewerbeanmeldung", () => {
     expect(person.geburt!.staat).toBe("keine Angabe");
   });
 
+  it("statically sets geburt.staat to 'keine Angabe' since geburtsland is no longer collected", () => {
+    const result = transformToGewerbeanmeldung(
+      registerGewerbeSampleRequestAllFieldsFilled,
+      testRoutingInfo,
+    );
+
+    expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.geburt!.staat).toBe("keine Angabe");
+  });
+
   it("maps the staatsangehörigkeit key to its destatis code (deutsch = 000, französisch = 129)", async () => {
     const deutsch = transformToGewerbeanmeldung(
       registerGewerbeSampleRequestAllFieldsFilled,
@@ -60,7 +68,6 @@ describe("transformToGewerbeanmeldung", () => {
         ...registerGewerbeSampleRequestAllFieldsFilled,
         persönlicheDaten: {
           ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
-          staatsangehörigkeitDeutsch: false,
           staatsangehörigkeit: "französisch",
         },
       },
@@ -69,6 +76,47 @@ describe("transformToGewerbeanmeldung", () => {
     expect(französisch.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe(
       "129",
     );
+  });
+
+  it.each([
+    { icao: "D", expected: "000" },
+    { icao: "FRA", expected: "129" },
+    { icao: "GBD", expected: "185" },
+    { icao: "XXX", expected: "999" },
+  ] as const)(
+    "maps the staatsangehörigkeitIcao $icao to the destatis code $expected",
+    ({ icao, expected }) => {
+      const result = transformToGewerbeanmeldung(
+        {
+          ...registerGewerbeSampleRequestAllFieldsFilled,
+          persönlicheDaten: {
+            ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
+            staatsangehörigkeitIcao: icao,
+          },
+        },
+        testRoutingInfo,
+      );
+
+      expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe(
+        expected,
+      );
+    },
+  );
+
+  it("prefers staatsangehörigkeitIcao over the deprecated staatsangehörigkeit", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        persönlicheDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
+          staatsangehörigkeit: "französisch",
+          staatsangehörigkeitIcao: "ITA",
+        },
+      },
+      testRoutingInfo,
+    );
+
+    expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe("137");
   });
 
   it("uses adresseAbweichend as betriebsstaette anschrift when provided", () => {
@@ -93,6 +141,53 @@ describe("transformToGewerbeanmeldung", () => {
       postleitzahl: "23936",
       ort: "Testorf-Steinfort",
     });
+  });
+
+  it("maps geschäftsbezeichnung to gewerbebetrieb.geschaeftsbezeichnung", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          geschäftsbezeichnung: "Musterhandel Schmidt",
+        },
+      },
+      testRoutingInfo,
+    );
+
+    expect(result.gewerbebetrieb!.geschaeftsbezeichnung).toBe("Musterhandel Schmidt");
+  });
+
+  it("omits gewerbebetrieb.geschaeftsbezeichnung when geschäftsbezeichnung is not given", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          geschäftsbezeichnung: undefined,
+        },
+      },
+      testRoutingInfo,
+    );
+
+    expect(result.gewerbebetrieb!.geschaeftsbezeichnung).toBeUndefined();
+  });
+
+  it("maps anzahlVollzeitBeschaeftigte and anzahlTeilzeitBeschaeftigte to gewerbebetrieb", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          anzahlVollzeitBeschaeftigte: 3,
+          anzahlTeilzeitBeschaeftigte: 4,
+        },
+      },
+      testRoutingInfo,
+    );
+
+    expect(result.gewerbebetrieb!.anzahlVollzeitBeschaeftigte).toBe(3);
+    expect(result.gewerbebetrieb!.anzahlTeilzeitBeschaeftigte).toBe(4);
   });
 
   it("uses routingInfo.ags as gemeindeSchluessel", () => {

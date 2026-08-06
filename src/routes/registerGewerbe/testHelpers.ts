@@ -7,7 +7,6 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
     geburtsname: "Muster",
     geburtsdatum: "1988-09-10",
     geburtsort: "Musterstadt",
-    geburtsland: "Deutschland",
     staatsangehörigkeit: "deutsch",
     adresse: {
       strasseUndHausnummer: "Musterstraße 1 a",
@@ -16,6 +15,7 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
     },
     telefon: "+49 234 121314",
     email: "e.mustermann@example.org",
+    steuerId: "06646829576",
     religion: "nichtKirchensteuerpflichtig",
     vertrauensniveau: "substantiell",
   },
@@ -25,6 +25,8 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
     tätigkeitsbeginn: "2026-04-17",
     gründungsdatum: "2026-05-18",
     gewerbeart: "hauptgewerbe",
+    anzahlVollzeitBeschaeftigte: 2,
+    anzahlTeilzeitBeschaeftigte: 1,
     gewinnErmittlung: "einnahmenüberschussrechnung",
     kleinunternehmerRegelung: false,
     umsatzGruendungsjahr: 1,
@@ -40,6 +42,7 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
       postleitzahl: "96450",
       ort: "Coburg",
     },
+    geschäftsbezeichnung: "Musterhandel",
     umsatzsteuerIdMitbeantragen: true,
   },
 };

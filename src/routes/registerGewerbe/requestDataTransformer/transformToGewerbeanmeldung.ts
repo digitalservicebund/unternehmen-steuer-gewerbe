@@ -7,6 +7,7 @@ import {
   VERTRAUENSNIVEAU,
   RECHTSFORM,
   STAATSANGEHOERIGKEIT,
+  STAATSANGEHOERIGKEIT_ICAO,
   HAMBURG_GEMEINDESCHLUESSEL,
   HAMBURG_STADTBEZIRK_PLZ,
 } from "./xGewerbeordnungCodes";
@@ -74,6 +75,11 @@ export function transformToGewerbeanmeldung(
     data.persönlicheDaten.adresse,
   );
 
+  const { staatsangehörigkeitIcao } = data.persönlicheDaten;
+  const staatsangehoerigkeitCode = staatsangehörigkeitIcao
+    ? STAATSANGEHOERIGKEIT_ICAO[staatsangehörigkeitIcao]
+    : STAATSANGEHOERIGKEIT[data.persönlicheDaten.staatsangehörigkeit];
+
   const gemeindeSchluessel = routingInfo.ags;
   const gewerbeamtKennung = `MELDID:${gemeindeSchluessel}`;
   const gewerbeamtName = routingInfo.gewerbeamt.name || "Gewerbeamt";
@@ -110,6 +116,7 @@ export function transformToGewerbeanmeldung(
       // We currently only support non-registered sole proprietorships (412000), which must
       // not carry a registered name (SCH-0205), so eingetragenerName stays undefined.
       eingetragenerName: undefined,
+      geschaeftsbezeichnung: data.unternehmensDaten.geschäftsbezeichnung,
       betriebsstaette: {
         artBetriebsstaette: "01",
         anschrift: betriebsAnschrift,
@@ -120,8 +127,8 @@ export function transformToGewerbeanmeldung(
         },
       },
       istNebenerwerb: data.unternehmensDaten.gewerbeart === "nebengewerbe",
-      anzahlVollzeitBeschaeftigte: 0,
-      anzahlTeilzeitBeschaeftigte: 0,
+      anzahlVollzeitBeschaeftigte: data.unternehmensDaten.anzahlVollzeitBeschaeftigte,
+      anzahlTeilzeitBeschaeftigte: data.unternehmensDaten.anzahlTeilzeitBeschaeftigte,
       // For later: this property has a cross-relation to artNiederlassung (which we don't have, right now)
       istReisegewerbe: false,
       beteiligungOeffentlicheHand: "0",
@@ -149,7 +156,7 @@ export function transformToGewerbeanmeldung(
           // XGewerbeordnung Schematron requires np:geschlecht to be present (SCH-EXISTS-xga-natuerlichePerson-np-geschlecht);
           // we no longer collect it, so always report "keine Angabe".
           geschlecht: "x",
-          staatsangehoerigkeit: STAATSANGEHOERIGKEIT[data.persönlicheDaten.staatsangehörigkeit],
+          staatsangehoerigkeit: staatsangehoerigkeitCode,
           anschrift: {
             strasse: personStrasseHausnummer.strasse,
             hausnummerVon: joinHausnummerUndZusatz(

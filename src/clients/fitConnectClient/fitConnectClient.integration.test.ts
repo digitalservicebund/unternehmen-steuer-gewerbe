@@ -10,6 +10,7 @@ vi.mock("../../helpers/fetchJson", () => ({
 }));
 
 import { getFitConnectClient } from "./fitConnectClient";
+import { HttpError } from "../../helpers/httpError";
 
 const OAUTH_TOKEN_RESPONSE = {
   access_token: "test-token",
@@ -68,7 +69,7 @@ describe("FitConnectClient with mocked FIT-Connect responses", () => {
       const client = getFitConnectClient();
       const result = await client.getSubmissionEvents("submission-id", "destination-id");
 
-      expect(result.eventLog).toEqual([expect.objectContaining({ type: "SUBMITTED" })]);
+      expect(result!.eventLog).toEqual([expect.objectContaining({ type: "SUBMITTED" })]);
     });
 
     it("matches an event token's key against destinationKeys as well as wellKnownJWKs", async () => {
@@ -81,7 +82,7 @@ describe("FitConnectClient with mocked FIT-Connect responses", () => {
       const client = getFitConnectClient();
       const result = await client.getSubmissionEvents("submission-id", "destination-id");
 
-      expect(result.eventLog).toEqual([expect.objectContaining({ type: "FORWARDED" })]);
+      expect(result!.eventLog).toEqual([expect.objectContaining({ type: "FORWARDED" })]);
     });
 
     it("returns null for an event token whose kid matches no known key", async () => {
@@ -93,7 +94,30 @@ describe("FitConnectClient with mocked FIT-Connect responses", () => {
       const client = getFitConnectClient();
       const result = await client.getSubmissionEvents("submission-id", "destination-id");
 
-      expect(result.eventLog).toEqual([null]);
+      expect(result!.eventLog).toEqual([null]);
+    });
+
+    it("returns undefined when the submission events endpoint responds 404", async () => {
+      mockFetchJson
+        .mockResolvedValueOnce(OAUTH_TOKEN_RESPONSE)
+        .mockRejectedValueOnce(new HttpError(404, "HTTP 404 Not Found"));
+
+      const client = getFitConnectClient();
+      const result = await client.getSubmissionEvents("submission-id", "destination-id");
+
+      expect(result).toBeUndefined();
+    });
+
+    it("rethrows a 503 from the submission events endpoint", async () => {
+      mockFetchJson
+        .mockResolvedValueOnce(OAUTH_TOKEN_RESPONSE)
+        .mockRejectedValueOnce(new HttpError(503, "HTTP 503 Service Unavailable"));
+
+      const client = getFitConnectClient();
+
+      await expect(client.getSubmissionEvents("submission-id", "destination-id")).rejects.toThrow(
+        "HTTP 503 Service Unavailable",
+      );
     });
   });
 });
