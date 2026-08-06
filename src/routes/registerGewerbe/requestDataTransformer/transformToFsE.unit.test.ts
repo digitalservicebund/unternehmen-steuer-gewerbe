@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { defaultFinanzamtId, transformToEUnFsE } from "./transformToFsE";
 import { registerGewerbeSampleRequestAllFieldsFilled } from "../testHelpers";
 import { ElsterFsEEUn } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
+import { formatDatumDE } from "../../../helpers/formFieldTransformations";
 
 describe("transformToEUnFsE", () => {
   it("maps output fields from request data", () => {
@@ -27,7 +28,7 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.allgAngaben?.artTaet?.gewerbeArt).toBe("Vertrieb von Vertriebsmustern");
     expect(result.eUn?.betrieb?.betrBeginn?.betriebsbeginn).toBe("17.04.2026");
     expect(result.eUn?.betrieb?.gruendungsangaben?.gruendungsForm?.uebertrStichtag).toBe(
-      "18.05.2026",
+      "17.04.2026",
     );
     expect(result.eUn?.umsatzsteuer?.sollIstVersteuerung?.auswahlSollIstVerst).toBe("1");
     expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toBe("1"); // 1 means "zahllast", 2 means "überschuss"
@@ -47,6 +48,18 @@ describe("transformToEUnFsE", () => {
     const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
 
     expect(result.eUn?.allgAngaben?.inhaber?.natPers?.persIdNr).toBe("06646829576");
+  });
+
+  it("maps anmeldedatumFinanzamt to both betriebsbeginn and uebertrStichtag", () => {
+    const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+    const expectedDate = formatDatumDE(
+      registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten.anmeldedatumFinanzamt,
+    );
+
+    expect(result.eUn?.betrieb?.betrBeginn?.betriebsbeginn).toBe(expectedDate);
+    expect(result.eUn?.betrieb?.gruendungsangaben?.gruendungsForm?.uebertrStichtag).toBe(
+      expectedDate,
+    );
   });
 
   it("leaves persIdNr empty when steuerId is not given", () => {
