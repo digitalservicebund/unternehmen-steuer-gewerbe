@@ -142,13 +142,14 @@ const UnternehmensDatenSchema = z
       example: false,
       description: "Soll mit dem FsE auch eine UmsatzsteuerId mitbeantragt werden?",
     }),
-    gewinnGründungsjahr: z.number().int().min(0).default(1).openapi({
+    gewinnGründungsjahr: z.number().int().openapi({
       example: 25000,
-      description: "Voraussichtlicher Gewinn (in Euro) im Jahr der Betriebseröffnung.",
+      description:
+        "Voraussichtlicher Gewinn (in Euro) im Jahr der Betriebseröffnung. Negativ bei Verlust.",
     }),
-    gewinnFolgejahr: z.number().int().min(0).default(1).openapi({
+    gewinnFolgejahr: z.number().int().openapi({
       example: 26000,
-      description: "Voraussichtlicher Gewinn (in Euro) im Folgejahr.",
+      description: "Voraussichtlicher Gewinn (in Euro) im Folgejahr. Negativ bei Verlust.",
     }),
     sollIstVersteuerung: z.enum(SOLL_IST_VERSTEUERUNG_KEYS).openapi({
       example: "istVersteuerung",

@@ -31,6 +31,8 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten.sollIstVersteuerung"],
       ["unternehmensDaten.umsatzGruendungsjahr"],
       ["unternehmensDaten.umsatzFolgejahr"],
+      ["unternehmensDaten.gewinnGründungsjahr"],
+      ["unternehmensDaten.gewinnFolgejahr"],
       ["unternehmensDaten.umsatzsteuerIdMitbeantragen"],
     ])("fails when %s is missing", (fieldPath) => {
       const request = validRequest() as Record<string, unknown>;
@@ -98,8 +100,6 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten", "kleinunternehmerRegelung", false],
       ["unternehmensDaten", "anzahlVollzeitBeschaeftigte", 0],
       ["unternehmensDaten", "anzahlTeilzeitBeschaeftigte", 0],
-      ["unternehmensDaten", "gewinnGründungsjahr", 1],
-      ["unternehmensDaten", "gewinnFolgejahr", 1],
       ["unternehmensDaten", "zahllastUeberschussAuswahl", "zahllast"],
       ["unternehmensDaten", "zahllastUeberschussBetrag", 0],
     ])("defaults %s.%s to %j when omitted", (section, field, defaultValue) => {
@@ -228,8 +228,6 @@ describe("RegisterGewerbeRequestSchema", () => {
     it.each([
       ["umsatzGruendungsjahr"],
       ["umsatzFolgejahr"],
-      ["gewinnGründungsjahr"],
-      ["gewinnFolgejahr"],
       ["zahllastUeberschussBetrag"],
       ["anzahlVollzeitBeschaeftigte"],
       ["anzahlTeilzeitBeschaeftigte"],
@@ -241,6 +239,18 @@ describe("RegisterGewerbeRequestSchema", () => {
 
       expect(result.success).toBe(false);
     });
+
+    it.each([["gewinnGründungsjahr"], ["gewinnFolgejahr"]])(
+      "accepts a negative value for %s",
+      (field) => {
+        const request = validRequest();
+        (request.unternehmensDaten as Record<string, unknown>)[field] = -1;
+
+        const result = RegisterGewerbeRequestSchema.safeParse(request);
+
+        expect(result.success).toBe(true);
+      },
+    );
 
     it.each([
       ["umsatzGruendungsjahr"],
