@@ -147,10 +147,9 @@ const UnternehmensDatenSchema = z
       example: 26000,
       description: "Voraussichtlicher Gewinn (in Euro) im Folgejahr.",
     }),
-    sollIstVersteuerung: z.enum(SOLL_IST_VERSTEUERUNG_KEYS).default("sollVersteuerung").openapi({
+    sollIstVersteuerung: z.enum(SOLL_IST_VERSTEUERUNG_KEYS).openapi({
       example: "istVersteuerung",
-      description:
-        "Art der Umsatzbesteuerung gemäß § 16 bzw. § 20 UStG. Standard ist Sollversteuerung (nach vereinbarten Entgelten).",
+      description: "Art der Umsatzbesteuerung gemäß § 16 bzw. § 20 UStG.",
     }),
     istVersteuerungGrund: z.enum(IST_VERSTEUERUNG_GRUND_KEYS).optional().openapi({
       example: "unterschreitungUmsatzgrenze",

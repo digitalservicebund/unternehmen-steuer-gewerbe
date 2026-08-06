@@ -28,6 +28,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten.gründungsdatum"],
       ["unternehmensDaten.gewerbeart"],
       ["unternehmensDaten.gewinnErmittlung"],
+      ["unternehmensDaten.sollIstVersteuerung"],
       ["unternehmensDaten.umsatzGruendungsjahr"],
       ["unternehmensDaten.umsatzFolgejahr"],
       ["unternehmensDaten.umsatzsteuerIdMitbeantragen"],
@@ -99,17 +100,11 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten", "anzahlTeilzeitBeschaeftigte", 0],
       ["unternehmensDaten", "gewinnGründungsjahr", 1],
       ["unternehmensDaten", "gewinnFolgejahr", 1],
-      ["unternehmensDaten", "sollIstVersteuerung", "sollVersteuerung"],
       ["unternehmensDaten", "zahllastUeberschussAuswahl", "zahllast"],
       ["unternehmensDaten", "zahllastUeberschussBetrag", 0],
     ])("defaults %s.%s to %j when omitted", (section, field, defaultValue) => {
       const request = validRequest() as Record<string, unknown>;
       delete (request[section] as Record<string, unknown>)[field];
-      // sollIstVersteuerung's default is "sollVersteuerung", which requires
-      // istVersteuerungGrund to be absent for the cross-field refine to pass.
-      if (field === "sollIstVersteuerung") {
-        delete (request[section] as Record<string, unknown>).istVersteuerungGrund;
-      }
 
       const result = RegisterGewerbeRequestSchema.safeParse(request);
 
