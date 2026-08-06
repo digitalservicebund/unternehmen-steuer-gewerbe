@@ -105,7 +105,7 @@ export function transformToGewerbeanmeldung(
       betriebsAnschrift.postleitzahl,
     ),
     uuid: randomUUID(),
-    gueltigAb: data.unternehmensDaten.tätigkeitsbeginn,
+    gueltigAb: data.unternehmensDaten.anmeldedatumGewerbeamt,
     datumMeldung: new Date().toISOString().split("T")[0]!,
     grundAnmeldungSchluessel: "01", // 01 = Neugründung. See https://www.xrepository.de/api/xrepository/urn:xoev-de:xgewerbeordnung:codeliste:grundfueranmeldung_3:technischerBestandteilGenericode
     bisherigeUnfallversicherung: undefined, // Not used as long as we only support 'grundAnmeldungSchluessel: "01"' (Neugründung)

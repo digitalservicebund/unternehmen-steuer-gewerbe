@@ -24,8 +24,8 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["persönlicheDaten.vertrauensniveau"],
       ["unternehmensDaten.tätigkeitsbeschreibung"],
       ["unternehmensDaten.tätigkeitsbereich"],
-      ["unternehmensDaten.tätigkeitsbeginn"],
-      ["unternehmensDaten.gründungsdatum"],
+      ["unternehmensDaten.anmeldedatumFinanzamt"],
+      ["unternehmensDaten.anmeldedatumGewerbeamt"],
       ["unternehmensDaten.gewerbeart"],
       ["unternehmensDaten.gewinnErmittlung"],
       ["unternehmensDaten.sollIstVersteuerung"],
@@ -212,8 +212,8 @@ describe("RegisterGewerbeRequestSchema", () => {
 
     it.each([
       ["persönlicheDaten", "geburtsdatum"],
-      ["unternehmensDaten", "tätigkeitsbeginn"],
-      ["unternehmensDaten", "gründungsdatum"],
+      ["unternehmensDaten", "anmeldedatumFinanzamt"],
+      ["unternehmensDaten", "anmeldedatumGewerbeamt"],
     ])("rejects a malformed date for %s.%s", (section, field) => {
       const request = validRequest() as Record<string, unknown>;
       (request[section] as Record<string, unknown>)[field] = "17-04-2026";
