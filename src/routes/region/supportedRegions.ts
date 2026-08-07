@@ -11,7 +11,7 @@ const SUPPORTED_REGIONS = {
   dresden: [rangeOfPLZs("01067", "01328"), "01465"],
   fulda: [rangeOfPLZs("36037", "36043")],
   münchen: [rangeOfPLZs("80331", "81929")],
-  husum: ["25813"],
+  nordfriesland: [rangeOfPLZs("25811", "25999")],
   düsseldorf: [rangeOfPLZs("40210", "40629")],
   goslar: ["38640", "38642", "38644", "38690"],
   hamburg: [rangeOfPLZs("20095", "21149"), rangeOfPLZs("22041", "22769"), "27499"],
