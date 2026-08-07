@@ -10,6 +10,7 @@ const SUPPORTED_REGIONS = {
   dresden: [rangeOfPLZs("01067", "01328"), "01465"],
   fulda: [rangeOfPLZs("36037", "36043")],
   münchen: [rangeOfPLZs("80331", "81929")],
+  husum: ["25813"],
   hamburg: [rangeOfPLZs("20095", "21149"), rangeOfPLZs("22041", "22769"), "27499"],
   mannheim: [rangeOfPLZs("68159", "68309")],
 } as const satisfies Record<string, ReadonlyArray<string | PLZRange>>;
