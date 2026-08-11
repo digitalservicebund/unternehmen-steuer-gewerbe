@@ -119,6 +119,20 @@ describe("transformToGewerbeanmeldung", () => {
     expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe("137");
   });
 
+  it("uses anmeldedatumGewerbeamt (not anmeldedatumFinanzamt) for gueltigAb", () => {
+    const result = transformToGewerbeanmeldung(
+      registerGewerbeSampleRequestAllFieldsFilled,
+      testRoutingInfo,
+    );
+
+    expect(result.gueltigAb).toBe(
+      registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten.anmeldedatumGewerbeamt,
+    );
+    expect(result.gueltigAb).not.toBe(
+      registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten.anmeldedatumFinanzamt,
+    );
+  });
+
   it("uses adresseAbweichend as betriebsstaette anschrift when provided", () => {
     const result = transformToGewerbeanmeldung(
       {
@@ -141,6 +155,53 @@ describe("transformToGewerbeanmeldung", () => {
       postleitzahl: "23936",
       ort: "Testorf-Steinfort",
     });
+  });
+
+  it("maps geschäftsbezeichnung to gewerbebetrieb.geschaeftsbezeichnung", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          geschäftsbezeichnung: "Musterhandel Schmidt",
+        },
+      },
+      testRoutingInfo,
+    );
+
+    expect(result.gewerbebetrieb!.geschaeftsbezeichnung).toBe("Musterhandel Schmidt");
+  });
+
+  it("omits gewerbebetrieb.geschaeftsbezeichnung when geschäftsbezeichnung is not given", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          geschäftsbezeichnung: undefined,
+        },
+      },
+      testRoutingInfo,
+    );
+
+    expect(result.gewerbebetrieb!.geschaeftsbezeichnung).toBeUndefined();
+  });
+
+  it("maps anzahlVollzeitBeschaeftigte and anzahlTeilzeitBeschaeftigte to gewerbebetrieb", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          anzahlVollzeitBeschaeftigte: 3,
+          anzahlTeilzeitBeschaeftigte: 4,
+        },
+      },
+      testRoutingInfo,
+    );
+
+    expect(result.gewerbebetrieb!.anzahlVollzeitBeschaeftigte).toBe(3);
+    expect(result.gewerbebetrieb!.anzahlTeilzeitBeschaeftigte).toBe(4);
   });
 
   it("uses routingInfo.ags as gemeindeSchluessel", () => {

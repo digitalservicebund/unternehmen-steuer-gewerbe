@@ -22,9 +22,11 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
   unternehmensDaten: {
     tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
     tätigkeitsbereich: "handwerk",
-    tätigkeitsbeginn: "2026-04-17",
-    gründungsdatum: "2026-05-18",
+    anmeldedatumFinanzamt: "2026-04-17",
+    anmeldedatumGewerbeamt: "2026-05-18",
     gewerbeart: "hauptgewerbe",
+    anzahlVollzeitBeschaeftigte: 2,
+    anzahlTeilzeitBeschaeftigte: 1,
     gewinnErmittlung: "einnahmenüberschussrechnung",
     kleinunternehmerRegelung: false,
     umsatzGruendungsjahr: 1,
@@ -40,6 +42,7 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
       postleitzahl: "96450",
       ort: "Coburg",
     },
+    geschäftsbezeichnung: "Musterhandel",
     umsatzsteuerIdMitbeantragen: true,
   },
 };

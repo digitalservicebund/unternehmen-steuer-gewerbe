@@ -94,16 +94,34 @@ const UnternehmensDatenSchema = z
         ort: "Fulda",
       },
     }),
+    geschäftsbezeichnung: z.string().max(120).optional().openapi({
+      example: "Musterhandel",
+      description:
+        "Bezeichnung des Unternehmens, falls abweichend vom Namen des Gewerbetreibenden.",
+    }),
     tätigkeitsbeschreibung: z.string().openapi({ example: "Vertrieb von Vertriebsmustern" }),
     tätigkeitsbereich: z
       .enum(["industrie", "handwerk", "handel", "sonstiges"])
       .openapi({ example: "handwerk" }),
-    tätigkeitsbeginn: z.iso.date().openapi({ example: "2026-04-17" }),
-    gründungsdatum: z.iso.date().openapi({
+    anmeldedatumFinanzamt: z.iso.date().openapi({
       example: "2026-04-17",
-      description: "Founding date of the business.",
+      description: "Date reported to the Finanzamt as the start of business activity.",
+    }),
+    anmeldedatumGewerbeamt: z.iso.date().openapi({
+      example: "2026-04-17",
+      description: "Date reported to the Gewerbeamt as the business's founding date.",
     }),
     gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
+    anzahlVollzeitBeschaeftigte: z.number().int().min(0).default(0).openapi({
+      example: 0,
+      description:
+        "Anzahl der Vollzeitbeschäftigten (inklusive Ehe- oder Lebenspartner, Aushilfen, jedoch stets ohne den Inhaber selbst), die zum Zeitpunkt der Gewerbemeldung in der Betriebsstätte tätig sind.",
+    }),
+    anzahlTeilzeitBeschaeftigte: z.number().int().min(0).default(0).openapi({
+      example: 0,
+      description:
+        "Anzahl der Teilzeitbeschäftigten (inklusive Ehe- oder Lebenspartner, Aushilfen, jedoch stets ohne den Inhaber selbst), die zum Zeitpunkt der Gewerbemeldung in der Betriebsstätte tätig sind.",
+    }),
     gewinnErmittlung: z.enum(GEWINN_ERMITTLUNG_KEYS).openapi({
       example: "einnahmenüberschussrechnung",
     }),
@@ -123,18 +141,18 @@ const UnternehmensDatenSchema = z
       example: false,
       description: "Soll mit dem FsE auch eine UmsatzsteuerId mitbeantragt werden?",
     }),
-    gewinnGründungsjahr: z.number().int().min(0).default(1).openapi({
+    gewinnGründungsjahr: z.number().int().openapi({
       example: 25000,
-      description: "Voraussichtlicher Gewinn (in Euro) im Jahr der Betriebseröffnung.",
-    }),
-    gewinnFolgejahr: z.number().int().min(0).default(1).openapi({
-      example: 26000,
-      description: "Voraussichtlicher Gewinn (in Euro) im Folgejahr.",
-    }),
-    sollIstVersteuerung: z.enum(SOLL_IST_VERSTEUERUNG_KEYS).default("sollVersteuerung").openapi({
-      example: "istVersteuerung",
       description:
-        "Art der Umsatzbesteuerung gemäß § 16 bzw. § 20 UStG. Standard ist Sollversteuerung (nach vereinbarten Entgelten).",
+        "Voraussichtlicher Gewinn (in Euro) im Jahr der Betriebseröffnung. Negativ bei Verlust.",
+    }),
+    gewinnFolgejahr: z.number().int().openapi({
+      example: 26000,
+      description: "Voraussichtlicher Gewinn (in Euro) im Folgejahr. Negativ bei Verlust.",
+    }),
+    sollIstVersteuerung: z.enum(SOLL_IST_VERSTEUERUNG_KEYS).openapi({
+      example: "istVersteuerung",
+      description: "Art der Umsatzbesteuerung gemäß § 16 bzw. § 20 UStG.",
     }),
     istVersteuerungGrund: z.enum(IST_VERSTEUERUNG_GRUND_KEYS).optional().openapi({
       example: "unterschreitungUmsatzgrenze",
@@ -143,20 +161,17 @@ const UnternehmensDatenSchema = z
     }),
     zahllastUeberschussAuswahl: z.enum(ZAHLLAST_UEBERSCHUSS_KEYS).default("zahllast").openapi({
       example: "zahllast",
-      description:
-        "Deprecated. Use 'umsatzsteuerImErstenJahr instead. (Ob voraussichtlich eine Zahllast oder ein Überschuss erwartet wird.)",
-      deprecated: true,
+      description: "Ob voraussichtlich eine Zahllast oder ein Überschuss erwartet wird.",
     }),
     zahllastUeberschussBetrag: z.number().int().min(0).default(0).openapi({
       example: 0,
-      description:
-        "Deprecated. Use 'umsatzsteuerImErstenJahr instead. (Voraussichtliche Zahllast oder Überschuss in Euro.)",
-      deprecated: true,
+      description: "Voraussichtliche Zahllast oder Überschuss in Euro.",
     }),
     umsatzsteuerImErstenJahr: z.int().optional().openapi({
       example: 100,
       description:
-        "Voraussichtliche Umsatzsteuer im ersten Jahr. (Größer als 0 => Nutzer hat 'Zahllast' => muss was bezahlen; kleiner oder gleich 0 => 'Überschuss' => Rückzahlung vom / Guthaben beim Finanzamt.)",
+        "Deprecated. Use 'zahllastUeberschussAuswahl'/'zahllastUeberschussBetrag' instead. (Voraussichtliche Umsatzsteuer im ersten Jahr. Größer als 0 => Nutzer hat 'Zahllast' => muss was bezahlen; kleiner oder gleich 0 => 'Überschuss' => Rückzahlung vom / Guthaben beim Finanzamt.)",
+      deprecated: true,
     }),
   })
   .refine(

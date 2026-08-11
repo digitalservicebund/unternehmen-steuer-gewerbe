@@ -11,6 +11,7 @@ import {
   GEWINN_ERMITTLUNG,
   SOLL_IST_VERSTEUERUNG,
   IST_VERSTEUERUNG_GRUND,
+  ZAHLLAST_UEBERSCHUSS,
 } from "./fsECodes";
 
 function getKleinunternehmerRegelung(data: RegisterGewerbeRequest) {
@@ -19,15 +20,16 @@ function getKleinunternehmerRegelung(data: RegisterGewerbeRequest) {
     : { kleinUnternUStVerzicht: true };
 }
 
-function getUnternehmensAnschrift(data: RegisterGewerbeRequest) {
-  const { adresseAbweichend } = data.unternehmensDaten;
+function getUnternehmen(data: RegisterGewerbeRequest) {
+  const { adresseAbweichend, geschäftsbezeichnung } = data.unternehmensDaten;
   if (adresseAbweichend === undefined) {
-    return { entsprichtWohnanschrift: true };
+    return { entsprichtWohnanschrift: true, abwFirmenname: geschäftsbezeichnung };
   }
   const { strasse, hausnummer, hausnummerBis, hausnummerZusatz } = splitStrasseHausnummer(
     adresseAbweichend.strasseUndHausnummer,
   );
   return {
+    abwFirmenname: geschäftsbezeichnung,
     adrkette: {
       strAdr: {
         str: strasse,
@@ -61,17 +63,13 @@ function getIstVersteuerungGrund({
   return { [IST_VERSTEUERUNG_GRUND[istVersteuerungGrund]]: true };
 }
 
-function getZahllastUeberschuss(data: RegisterGewerbeRequest) {
+function getZahllastUeberschuss({
+  zahllastUeberschussAuswahl,
+  zahllastUeberschussBetrag,
+}: RegisterGewerbeRequest["unternehmensDaten"]) {
   return {
-    auswahl:
-      data.unternehmensDaten.umsatzsteuerImErstenJahr !== undefined &&
-      data.unternehmensDaten.umsatzsteuerImErstenJahr < 0
-        ? "2" // überschuss (tax office ows the user)
-        : "1", // zahllast (user needs to pay)
-    betrag:
-      data.unternehmensDaten.umsatzsteuerImErstenJahr === undefined
-        ? 0
-        : Math.abs(data.unternehmensDaten.umsatzsteuerImErstenJahr),
+    auswahl: ZAHLLAST_UEBERSCHUSS[zahllastUeberschussAuswahl],
+    betrag: zahllastUeberschussBetrag,
   };
 }
 
@@ -269,14 +267,14 @@ export function transformToEUnFsE(
         // },
       },
       betrieb: {
-        unternehmen: getUnternehmensAnschrift(data),
+        unternehmen: getUnternehmen(data),
         betrBeginn: {
-          betriebsbeginn: formatDatumDE(data.unternehmensDaten.tätigkeitsbeginn),
+          betriebsbeginn: formatDatumDE(data.unternehmensDaten.anmeldedatumFinanzamt),
         },
         gruendungsangaben: {
           gruendungsForm: {
             gruendungsArt: "1",
-            uebertrStichtag: formatDatumDE(data.unternehmensDaten.gründungsdatum),
+            uebertrStichtag: formatDatumDE(data.unternehmensDaten.anmeldedatumFinanzamt),
           },
         },
       },
@@ -301,7 +299,7 @@ export function transformToEUnFsE(
           auswahlSollIstVerst: SOLL_IST_VERSTEUERUNG[data.unternehmensDaten.sollIstVersteuerung],
           ...getIstVersteuerungGrund(data.unternehmensDaten),
         },
-        zahllastUeberschuss: getZahllastUeberschuss(data),
+        zahllastUeberschuss: getZahllastUeberschuss(data.unternehmensDaten),
         uStIdNr: getUstIdNr(data),
       },
     },

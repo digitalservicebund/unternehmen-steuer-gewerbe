@@ -24,12 +24,15 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["persönlicheDaten.vertrauensniveau"],
       ["unternehmensDaten.tätigkeitsbeschreibung"],
       ["unternehmensDaten.tätigkeitsbereich"],
-      ["unternehmensDaten.tätigkeitsbeginn"],
-      ["unternehmensDaten.gründungsdatum"],
+      ["unternehmensDaten.anmeldedatumFinanzamt"],
+      ["unternehmensDaten.anmeldedatumGewerbeamt"],
       ["unternehmensDaten.gewerbeart"],
       ["unternehmensDaten.gewinnErmittlung"],
+      ["unternehmensDaten.sollIstVersteuerung"],
       ["unternehmensDaten.umsatzGruendungsjahr"],
       ["unternehmensDaten.umsatzFolgejahr"],
+      ["unternehmensDaten.gewinnGründungsjahr"],
+      ["unternehmensDaten.gewinnFolgejahr"],
       ["unternehmensDaten.umsatzsteuerIdMitbeantragen"],
       ["persönlicheDaten.steuerId"],
     ])("fails when %s is missing", (fieldPath) => {
@@ -95,19 +98,13 @@ describe("RegisterGewerbeRequestSchema", () => {
     it.each([
       ["persönlicheDaten", "staatsangehörigkeit", "deutsch"],
       ["unternehmensDaten", "kleinunternehmerRegelung", false],
-      ["unternehmensDaten", "gewinnGründungsjahr", 1],
-      ["unternehmensDaten", "gewinnFolgejahr", 1],
-      ["unternehmensDaten", "sollIstVersteuerung", "sollVersteuerung"],
+      ["unternehmensDaten", "anzahlVollzeitBeschaeftigte", 0],
+      ["unternehmensDaten", "anzahlTeilzeitBeschaeftigte", 0],
       ["unternehmensDaten", "zahllastUeberschussAuswahl", "zahllast"],
       ["unternehmensDaten", "zahllastUeberschussBetrag", 0],
     ])("defaults %s.%s to %j when omitted", (section, field, defaultValue) => {
       const request = validRequest() as Record<string, unknown>;
       delete (request[section] as Record<string, unknown>)[field];
-      // sollIstVersteuerung's default is "sollVersteuerung", which requires
-      // istVersteuerungGrund to be absent for the cross-field refine to pass.
-      if (field === "sollIstVersteuerung") {
-        delete (request[section] as Record<string, unknown>).istVersteuerungGrund;
-      }
 
       const result = RegisterGewerbeRequestSchema.safeParse(request);
 
@@ -215,8 +212,8 @@ describe("RegisterGewerbeRequestSchema", () => {
 
     it.each([
       ["persönlicheDaten", "geburtsdatum"],
-      ["unternehmensDaten", "tätigkeitsbeginn"],
-      ["unternehmensDaten", "gründungsdatum"],
+      ["unternehmensDaten", "anmeldedatumFinanzamt"],
+      ["unternehmensDaten", "anmeldedatumGewerbeamt"],
     ])("rejects a malformed date for %s.%s", (section, field) => {
       const request = validRequest() as Record<string, unknown>;
       (request[section] as Record<string, unknown>)[field] = "17-04-2026";
@@ -231,9 +228,9 @@ describe("RegisterGewerbeRequestSchema", () => {
     it.each([
       ["umsatzGruendungsjahr"],
       ["umsatzFolgejahr"],
-      ["gewinnGründungsjahr"],
-      ["gewinnFolgejahr"],
       ["zahllastUeberschussBetrag"],
+      ["anzahlVollzeitBeschaeftigte"],
+      ["anzahlTeilzeitBeschaeftigte"],
     ])("rejects a negative value for %s", (field) => {
       const request = validRequest();
       (request.unternehmensDaten as Record<string, unknown>)[field] = -1;
@@ -243,12 +240,26 @@ describe("RegisterGewerbeRequestSchema", () => {
       expect(result.success).toBe(false);
     });
 
+    it.each([["gewinnGründungsjahr"], ["gewinnFolgejahr"]])(
+      "accepts a negative value for %s",
+      (field) => {
+        const request = validRequest();
+        (request.unternehmensDaten as Record<string, unknown>)[field] = -1;
+
+        const result = RegisterGewerbeRequestSchema.safeParse(request);
+
+        expect(result.success).toBe(true);
+      },
+    );
+
     it.each([
       ["umsatzGruendungsjahr"],
       ["umsatzFolgejahr"],
       ["gewinnGründungsjahr"],
       ["gewinnFolgejahr"],
       ["zahllastUeberschussBetrag"],
+      ["anzahlVollzeitBeschaeftigte"],
+      ["anzahlTeilzeitBeschaeftigte"],
     ])("rejects a non-integer value for %s", (field) => {
       const request = validRequest();
       (request.unternehmensDaten as Record<string, unknown>)[field] = 1.5;
