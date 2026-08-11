@@ -20,7 +20,7 @@ import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTra
 import { getGewerbeRoutingInfo, type GewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
 import { getOsciClient } from "../../clients/osciClient/osciClient";
 import { generatePdfReceipt } from "./registerGewerbePdfGenerator";
-import { splitStrasseHausnummer } from "../../helpers/formFieldTransformations";
+import { getBetriebsAdresse } from "../../helpers/formFieldTransformations";
 import {
   createOfficeDetailsFromFinanzamt,
   createOfficeDetailsFromGewerbeamt,
@@ -163,18 +163,19 @@ export const EricErrorFachlicheAblehnung = 610001002;
 
 async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeResponseItem> {
   try {
-    const address = data.unternehmensDaten.adresseAbweichend ?? data.persönlicheDaten.adresse;
-
-    const { strasse, hausnummer, hausnummerBis } = splitStrasseHausnummer(
-      address.strasseUndHausnummer,
-    );
+    const { adresse, adresseAbweichend } = data.unternehmensDaten;
+    const betriebsAdresse = getBetriebsAdresse({
+      adresse,
+      adresseAbweichend,
+      wohnadresse: data.persönlicheDaten.adresse,
+    });
 
     const finanzamtIds = getFinanzamtId({
-      postleitzahl: address.postleitzahl,
-      ort: address.ort,
-      strassenName: strasse,
-      hausnummerVon: hausnummer,
-      hausnummerBis: hausnummerBis,
+      postleitzahl: betriebsAdresse.postleitzahl,
+      ort: betriebsAdresse.ort,
+      strassenName: betriebsAdresse.strasse,
+      hausnummerVon: betriebsAdresse.hausnummer,
+      hausnummerBis: betriebsAdresse.hausnummerBis,
     });
 
     const finanzamtId = getFirstAssumingItsTheBestMatch(finanzamtIds);

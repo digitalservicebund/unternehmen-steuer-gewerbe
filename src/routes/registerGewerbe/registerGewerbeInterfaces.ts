@@ -1,5 +1,6 @@
 import { z } from "@hono/zod-openapi";
 import { OfficeDetailsSchema } from "../region/regionInterfaces";
+import { type Adresse, type BetriebsAdresse } from "../../helpers/formFieldTransformations";
 import {
   UNFALLVERSICHERUNGSTRAEGER,
   UNFALLVERSICHERUNGSTRAEGER_KEYS,
@@ -29,7 +30,20 @@ const AdresseSchema = z.object({
     .regex(/^\d{5}$/)
     .openapi({ example: "36037", description: "5-digit German postal code" }),
   ort: z.string().openapi({ example: "Fulda" }),
-});
+}) satisfies z.ZodType<Adresse>;
+
+const BetriebsAdresseSchema = z.object({
+  strasse: z.string().min(1).openapi({ example: "Musterstraße" }),
+  hausnummer: z.string().min(1).openapi({
+    example: "2a",
+    description: 'House number; a range can be given as "8-14" or "8/14"',
+  }),
+  postleitzahl: z
+    .string()
+    .regex(/^\d{5}$/)
+    .openapi({ example: "36037", description: "5-digit German postal code" }),
+  ort: z.string().openapi({ example: "Fulda" }),
+}) satisfies z.ZodType<BetriebsAdresse>;
 
 const PersönlicheDatenSchema = z.object({
   vorname: z.string().openapi({ example: "Erika" }),
@@ -88,12 +102,25 @@ const PersönlicheDatenSchema = z.object({
 
 const UnternehmensDatenSchema = z
   .object({
+    adresse: BetriebsAdresseSchema.optional().openapi({
+      example: {
+        strasse: "Musterstraße",
+        hausnummer: "2",
+        postleitzahl: "36037",
+        ort: "Fulda",
+      },
+      description:
+        "Address of the business, if it differs from the private address. Takes precedence over the deprecated `adresseAbweichend`.",
+    }),
     adresseAbweichend: AdresseSchema.optional().openapi({
+      deprecated: true,
       example: {
         strasseUndHausnummer: "Musterstraße 2",
         postleitzahl: "36037",
         ort: "Fulda",
       },
+      description:
+        "Deprecated: use `adresse` instead, which takes street and house number as separate fields. Still read while `adresse` is optional.",
     }),
     geschäftsbezeichnung: z.string().max(120).optional().openapi({
       example: "Musterhandel",
