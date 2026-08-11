@@ -18,6 +18,7 @@ describe("splitStrasseHausnummer", () => {
     ["straße des 17 juni 1 2/5 b", "straße des 17 juni", "1", undefined, " 2/5 b"],
     ["straße des 17. juni 1-3", "straße des 17. juni", "1", "3", undefined],
     ["Teststr. 4 - 44", "Teststr.", "4", "44", undefined],
+    ["Domstraße 1C-1E", "Domstraße", "1", "1E", "C"],
   ])("splits '%s' correctly", (input, strasse, hausnummer, hausnummerBis, hausnummerZusatz) => {
     expect(splitStrasseHausnummer(input)).toEqual({
       strasse,
@@ -43,6 +44,7 @@ describe("splitHausnummer", () => {
     ["42a", "42", undefined, "a"],
     ["42 a", "42", undefined, "a"],
     ["8a-14b", "8", "14b", "a"],
+    ["1C-1E", "1", "1E", "C"],
     ["8-14-16", "8", "14-16", undefined],
     ["a", "a", undefined, undefined],
   ])("splits '%s' correctly", (input, hausnummer, hausnummerBis, hausnummerZusatz) => {

@@ -19,7 +19,7 @@ export function splitStrasseHausnummer(strasseUndHausnummer: string): SplitStras
   const upToSixNumbers = String.raw`\d{1,6}`;
   const zusatzPattern = String.raw`(?:\s+${upToSixNumbers})?(?:/${upToSixNumbers})?(?:\s*[a-z])?`;
   const addressPattern = new RegExp(
-    String.raw`^(?<strasse>.{1,100}?)\s+(?<hausnummer>${upToSixNumbers})(?<hausnummerZusatz>${zusatzPattern})(?:\s*-\s*(?<hausnummerBis>${upToSixNumbers}))?$`,
+    String.raw`^(?<strasse>.{1,100}?)\s+(?<hausnummer>${upToSixNumbers})(?<hausnummerZusatz>${zusatzPattern})(?:\s*-\s*(?<hausnummerBis>${upToSixNumbers}(?:\s*[a-z])?))?$`,
     "i",
   );
 

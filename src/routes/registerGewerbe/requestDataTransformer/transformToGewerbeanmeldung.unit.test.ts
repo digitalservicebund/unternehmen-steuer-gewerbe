@@ -208,6 +208,32 @@ describe("transformToGewerbeanmeldung", () => {
     });
   });
 
+  it("maps the hausnummer 1C-1E to hausnummerVon 1C and hausnummerBis 1E", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          adresse: {
+            strasse: "Domstraße",
+            hausnummer: "1C-1E",
+            postleitzahl: "36037",
+            ort: "Fulda",
+          },
+        },
+      },
+      testRoutingInfo,
+    );
+
+    expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
+      strasse: "Domstraße",
+      hausnummerVon: "1C",
+      hausnummerBis: "1E",
+      postleitzahl: "36037",
+      ort: "Fulda",
+    });
+  });
+
   it("appends the hausnummer Zusatz to hausnummerVon for 42a", () => {
     const result = transformToGewerbeanmeldung(
       {
