@@ -50,7 +50,7 @@ export function splitHausnummer(hausnummer: string): SplitHausnummer {
   const rangeMatch = /^(?<von>[^-/]*)(?:[-/](?<bis>.*))?$/.exec(hausnummer);
   const von = rangeMatch?.groups?.von?.trim() ?? "";
   const bis = rangeMatch?.groups?.bis?.trim();
-  const vonMatch = /^(?<nummer>\d+)(?<zusatz>.*)$/.exec(von);
+  const vonMatch = /^(?<nummer>\d+)(?<zusatz>\D.*)?$/.exec(von);
 
   return {
     hausnummer: (vonMatch?.groups?.nummer ?? von) || undefined,
