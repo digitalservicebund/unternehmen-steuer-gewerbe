@@ -34,6 +34,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten.gewinnGründungsjahr"],
       ["unternehmensDaten.gewinnFolgejahr"],
       ["unternehmensDaten.umsatzsteuerIdMitbeantragen"],
+      ["persönlicheDaten.steuerId"],
     ])("fails when %s is missing", (fieldPath) => {
       const request = validRequest() as Record<string, unknown>;
       const [section, field] = fieldPath.split(".") as [string, string];
@@ -63,7 +64,6 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["persönlicheDaten.geburtsort"],
       ["persönlicheDaten.geburtsland"],
       ["persönlicheDaten.staatsangehörigkeitIcao"],
-      ["persönlicheDaten.steuerId"],
       ["persönlicheDaten.steuernummer"],
       ["unternehmensDaten.adresseAbweichend"],
       ["unternehmensDaten.umsatzsteuerImErstenJahr"],

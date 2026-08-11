@@ -308,5 +308,17 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       });
       expect(response.status).toEqual(HttpStatusCode.BadRequest);
     });
+
+    it("Returns 400 BAD REQUEST when steuerId is missing", async () => {
+      const { steuerId: _steuerId, ...persönlicheDatenOhneSteuerId } =
+        registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten;
+
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        persönlicheDaten: persönlicheDatenOhneSteuerId,
+      } as unknown as typeof registerGewerbeSampleRequestAllFieldsFilled);
+
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+    });
   });
 });
