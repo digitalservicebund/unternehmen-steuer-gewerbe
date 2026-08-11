@@ -167,7 +167,7 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
     const betriebsAdresse = getBetriebsAdresse({
       adresse,
       adresseAbweichend,
-      wohnadresse: data.persönlicheDaten.adresse,
+      persönlicheAdresse: data.persönlicheDaten.adresse,
     });
 
     const finanzamtIds = getFinanzamtId({

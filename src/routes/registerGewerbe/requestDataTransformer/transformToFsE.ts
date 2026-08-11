@@ -26,7 +26,7 @@ function getUnternehmen(data: RegisterGewerbeRequest) {
   const betriebsAdresse = getBetriebsAdresse({
     adresse,
     adresseAbweichend,
-    wohnadresse: data.persönlicheDaten.adresse,
+    persönlicheAdresse: data.persönlicheDaten.adresse,
   });
   return {
     abwFirmenname: geschäftsbezeichnung,

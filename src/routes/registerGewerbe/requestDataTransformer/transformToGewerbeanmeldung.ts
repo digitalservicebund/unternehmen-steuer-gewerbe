@@ -31,7 +31,7 @@ function createBetriebsAnschrift(data: RegisterGewerbeRequest): Anschrift {
     getBetriebsAdresse({
       adresse,
       adresseAbweichend,
-      wohnadresse: data.persönlicheDaten.adresse,
+      persönlicheAdresse: data.persönlicheDaten.adresse,
     });
   return {
     strasse,

@@ -65,7 +65,7 @@ export async function getGewerbeRoutingInfo(
   const betriebsAdresse = getBetriebsAdresse({
     adresse,
     adresseAbweichend,
-    wohnadresse: data.persönlicheDaten.adresse,
+    persönlicheAdresse: data.persönlicheDaten.adresse,
   });
 
   const locations = await getLocationsDetails({

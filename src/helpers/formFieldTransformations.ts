@@ -99,21 +99,21 @@ interface BetriebsAdresseInput {
   adresse?: BetriebsAdresse;
   /** Deprecated, only read while `adresse` is optional */
   adresseAbweichend?: Adresse;
-  wohnadresse: Adresse;
+  persönlicheAdresse: Adresse;
 }
 
 /**
  * Resolves the address of the business: `adresse` wins, then the deprecated `adresseAbweichend`,
- * then the Wohnadresse.
+ * then the persönliche Adresse.
  */
 export function getBetriebsAdresse({
   adresse,
   adresseAbweichend,
-  wohnadresse,
+  persönlicheAdresse,
 }: BetriebsAdresseInput): SplitAdresse {
   if (adresse === undefined) {
     // TODO: stop reading adresseAbweichend once the deprecated field is removed
-    const kombinierteAdresse = adresseAbweichend ?? wohnadresse;
+    const kombinierteAdresse = adresseAbweichend ?? persönlicheAdresse;
     return {
       ...splitStrasseHausnummer(kombinierteAdresse.strasseUndHausnummer),
       postleitzahl: kombinierteAdresse.postleitzahl,
