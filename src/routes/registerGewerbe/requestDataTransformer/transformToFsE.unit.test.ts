@@ -192,24 +192,19 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.betrieb?.unternehmen?.abwFirmenname).toBeUndefined();
   });
 
-  it("maps the Wohnadresse to Unternehmen-Anschrift when neither adresse nor adresseAbweichend is set", () => {
+  it("sets entsprichtWohnanschrift: true when neither adresse nor adresseAbweichend is set", () => {
     const { adresseAbweichend: _, ...unternehmensDatenOhneAbweichung } =
       registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten;
     const result = transformToEUnFsE({
       ...registerGewerbeSampleRequestAllFieldsFilled,
       unternehmensDaten: unternehmensDatenOhneAbweichung,
     });
-    expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
-      str: "Musterstraße",
-      hausNr: "1",
-      adressErg: "a",
-      plz: "03046",
-      ort: "Cottbus",
-    });
+    expect(result.eUn?.betrieb?.unternehmen?.entsprichtWohnanschrift).toBe(true);
   });
 
   it("maps adresseAbweichend to Unternehmen-Anschrift (ERiC Anschrift_angegeben)", () => {
     const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+    expect(result.eUn?.betrieb?.unternehmen?.entsprichtWohnanschrift).toBeUndefined();
     expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
       str: "Musterstraße",
       hausNr: "2",

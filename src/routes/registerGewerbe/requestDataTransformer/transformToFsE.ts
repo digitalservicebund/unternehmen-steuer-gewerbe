@@ -23,6 +23,9 @@ function getKleinunternehmerRegelung(data: RegisterGewerbeRequest) {
 
 function getUnternehmen(data: RegisterGewerbeRequest) {
   const { adresse, adresseAbweichend, geschäftsbezeichnung } = data.unternehmensDaten;
+  if (adresse === undefined && adresseAbweichend === undefined) {
+    return { entsprichtWohnanschrift: true, abwFirmenname: geschäftsbezeichnung };
+  }
   const betriebsAdresse = getBetriebsAdresse({
     adresse,
     adresseAbweichend,
