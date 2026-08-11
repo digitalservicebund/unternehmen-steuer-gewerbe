@@ -59,11 +59,9 @@ function formatBoolean(value: boolean | undefined): string | undefined {
 
 function formatAnschrift(anschrift: Anschrift | undefined): string | undefined {
   if (!anschrift) return undefined;
-  const hausnummer = [anschrift.hausnummerVon, anschrift.hausnummerBis]
-    .filter((part) => part)
-    .join("-");
-  const strasse = [anschrift.strasse, hausnummer].filter((part) => part).join(" ");
-  const ort = [anschrift.postleitzahl, anschrift.ort].filter((part) => part).join(" ");
+  const hausnummer = [anschrift.hausnummerVon, anschrift.hausnummerBis].filter(Boolean).join("-");
+  const strasse = [anschrift.strasse, hausnummer].filter(Boolean).join(" ");
+  const ort = [anschrift.postleitzahl, anschrift.ort].filter(Boolean).join(" ");
   const parts = [strasse, ort].filter((part) => part.length > 0);
   return parts.length === 0 ? undefined : parts.join(", ");
 }
@@ -72,7 +70,7 @@ function formatGeburtsortUndLand(
   ort: string | undefined,
   staat: string | undefined,
 ): string | undefined {
-  const parts = [ort, staat].filter((part) => part);
+  const parts = [ort, staat].filter(Boolean);
   return parts.length === 0 ? undefined : parts.join(", ");
 }
 
