@@ -1,5 +1,6 @@
 import {
   formatDatumDE,
+  getBetriebsAdresse,
   splitStrasseHausnummer,
   splitTelefonnummer,
 } from "../../../helpers/formFieldTransformations";
@@ -21,23 +22,22 @@ function getKleinunternehmerRegelung(data: RegisterGewerbeRequest) {
 }
 
 function getUnternehmen(data: RegisterGewerbeRequest) {
-  const { adresseAbweichend, geschäftsbezeichnung } = data.unternehmensDaten;
-  if (adresseAbweichend === undefined) {
-    return { entsprichtWohnanschrift: true, abwFirmenname: geschäftsbezeichnung };
-  }
-  const { strasse, hausnummer, hausnummerBis, hausnummerZusatz } = splitStrasseHausnummer(
-    adresseAbweichend.strasseUndHausnummer,
-  );
+  const { adresse, adresseAbweichend, geschäftsbezeichnung } = data.unternehmensDaten;
+  const betriebsAdresse = getBetriebsAdresse({
+    adresse,
+    adresseAbweichend,
+    wohnadresse: data.persönlicheDaten.adresse,
+  });
   return {
     abwFirmenname: geschäftsbezeichnung,
     adrkette: {
       strAdr: {
-        str: strasse,
-        hausNr: hausnummer,
-        hausNrZu: hausnummerBis,
-        adressErg: hausnummerZusatz?.trim(),
-        plz: adresseAbweichend.postleitzahl,
-        ort: adresseAbweichend.ort,
+        str: betriebsAdresse.strasse,
+        hausNr: betriebsAdresse.hausnummer,
+        hausNrZu: betriebsAdresse.hausnummerBis,
+        adressErg: betriebsAdresse.hausnummerZusatz?.trim(),
+        plz: betriebsAdresse.postleitzahl,
+        ort: betriebsAdresse.ort,
       },
     },
   };

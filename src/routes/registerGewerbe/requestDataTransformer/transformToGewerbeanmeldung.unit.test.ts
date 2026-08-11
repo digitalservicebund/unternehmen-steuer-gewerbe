@@ -157,6 +157,107 @@ describe("transformToGewerbeanmeldung", () => {
     });
   });
 
+  it("uses adresse as betriebsstaette anschrift when provided", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          adresse: {
+            strasse: "Betriebsweg",
+            hausnummer: "42",
+            postleitzahl: "23936",
+            ort: "Testorf-Steinfort",
+          },
+        },
+      },
+      testRoutingInfo,
+    );
+
+    expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
+      strasse: "Betriebsweg",
+      hausnummerVon: "42",
+      postleitzahl: "23936",
+      ort: "Testorf-Steinfort",
+    });
+  });
+
+  it("maps the hausnummer 8-14 to hausnummerVon 8 and hausnummerBis 14", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          adresse: {
+            strasse: "Prinzessinnenstraße",
+            hausnummer: "8-14",
+            postleitzahl: "10969",
+            ort: "Berlin",
+          },
+        },
+      },
+      testRoutingInfo,
+    );
+
+    expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
+      strasse: "Prinzessinnenstraße",
+      hausnummerVon: "8",
+      hausnummerBis: "14",
+      postleitzahl: "10969",
+      ort: "Berlin",
+    });
+  });
+
+  it("appends the hausnummer Zusatz to hausnummerVon for 42a", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          adresse: {
+            strasse: "Betriebsweg",
+            hausnummer: "42a",
+            postleitzahl: "23936",
+            ort: "Testorf-Steinfort",
+          },
+        },
+      },
+      testRoutingInfo,
+    );
+
+    expect(result.gewerbebetrieb!.betriebsstaette!.anschrift!.hausnummerVon).toBe("42a");
+  });
+
+  it("prefers adresse over adresseAbweichend", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          adresse: {
+            strasse: "Betriebsweg",
+            hausnummer: "42",
+            postleitzahl: "23936",
+            ort: "Testorf-Steinfort",
+          },
+          adresseAbweichend: {
+            strasseUndHausnummer: "Musterstraße 2 a",
+            postleitzahl: "96450",
+            ort: "Coburg",
+          },
+        },
+      },
+      testRoutingInfo,
+    );
+
+    expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
+      strasse: "Betriebsweg",
+      hausnummerVon: "42",
+      postleitzahl: "23936",
+      ort: "Testorf-Steinfort",
+    });
+  });
+
   it("maps geschäftsbezeichnung to gewerbebetrieb.geschaeftsbezeichnung", () => {
     const result = transformToGewerbeanmeldung(
       {
@@ -221,6 +322,26 @@ describe("transformToGewerbeanmeldung", () => {
           ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
           adresseAbweichend: {
             strasseUndHausnummer: "Reeperbahn 1",
+            postleitzahl: "22767",
+            ort: "Hamburg",
+          },
+        },
+      },
+      testRoutingInfoHamburg,
+    );
+
+    expect(result.gemeindeschluesselErgaenzung).toBe("02100000");
+  });
+
+  it("derives the Hamburg gemeindeschluesselErgaenzung 02100000 from adresse.postleitzahl 22767", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          adresse: {
+            strasse: "Reeperbahn",
+            hausnummer: "1",
             postleitzahl: "22767",
             ort: "Hamburg",
           },

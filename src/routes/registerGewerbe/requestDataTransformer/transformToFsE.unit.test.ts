@@ -192,25 +192,100 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.betrieb?.unternehmen?.abwFirmenname).toBeUndefined();
   });
 
-  it("sets entsprichtWohnanschrift: true when adresseAbweichend is not set", () => {
+  it("maps the Wohnadresse to Unternehmen-Anschrift when neither adresse nor adresseAbweichend is set", () => {
     const { adresseAbweichend: _, ...unternehmensDatenOhneAbweichung } =
       registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten;
     const result = transformToEUnFsE({
       ...registerGewerbeSampleRequestAllFieldsFilled,
       unternehmensDaten: unternehmensDatenOhneAbweichung,
     });
-    expect(result.eUn?.betrieb?.unternehmen?.entsprichtWohnanschrift).toBe(true);
+    expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
+      str: "Musterstraße",
+      hausNr: "1",
+      adressErg: "a",
+      plz: "03046",
+      ort: "Cottbus",
+    });
   });
 
   it("maps adresseAbweichend to Unternehmen-Anschrift (ERiC Anschrift_angegeben)", () => {
     const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
-    expect(result.eUn?.betrieb?.unternehmen?.entsprichtWohnanschrift).toBeUndefined();
     expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
       str: "Musterstraße",
       hausNr: "2",
       adressErg: "a",
       plz: "96450",
       ort: "Coburg",
+    });
+  });
+
+  it("maps adresse to Unternehmen-Anschrift", () => {
+    const result = transformToEUnFsE({
+      ...registerGewerbeSampleRequestAllFieldsFilled,
+      unternehmensDaten: {
+        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+        adresse: {
+          strasse: "Betriebsweg",
+          hausnummer: "42a",
+          postleitzahl: "23936",
+          ort: "Testorf-Steinfort",
+        },
+      },
+    });
+    expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
+      str: "Betriebsweg",
+      hausNr: "42",
+      adressErg: "a",
+      plz: "23936",
+      ort: "Testorf-Steinfort",
+    });
+  });
+
+  it("maps the hausnummer 8-14 to hausNrZu 14", () => {
+    const result = transformToEUnFsE({
+      ...registerGewerbeSampleRequestAllFieldsFilled,
+      unternehmensDaten: {
+        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+        adresse: {
+          strasse: "Prinzessinnenstraße",
+          hausnummer: "8-14",
+          postleitzahl: "10969",
+          ort: "Berlin",
+        },
+      },
+    });
+    expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
+      str: "Prinzessinnenstraße",
+      hausNr: "8",
+      hausNrZu: "14",
+      plz: "10969",
+      ort: "Berlin",
+    });
+  });
+
+  it("prefers adresse over adresseAbweichend", () => {
+    const result = transformToEUnFsE({
+      ...registerGewerbeSampleRequestAllFieldsFilled,
+      unternehmensDaten: {
+        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+        adresse: {
+          strasse: "Betriebsweg",
+          hausnummer: "42",
+          postleitzahl: "23936",
+          ort: "Testorf-Steinfort",
+        },
+        adresseAbweichend: {
+          strasseUndHausnummer: "Musterstraße 2 a",
+          postleitzahl: "96450",
+          ort: "Coburg",
+        },
+      },
+    });
+    expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
+      str: "Betriebsweg",
+      hausNr: "42",
+      plz: "23936",
+      ort: "Testorf-Steinfort",
     });
   });
 
