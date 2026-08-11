@@ -6,3 +6,10 @@ declare module "saxonjs-he" {
   export function getResource(options: any): Promise<any>;
   // You can add more as you go, but this stops the error
 }
+
+// pdfkit 0.19 writes the table cell Scope attribute; @types/pdfkit 0.17 does not know the option yet
+declare namespace PDFKit.Mixins {
+  interface StructureElementOptions {
+    scope?: "Row" | "Column" | "Both";
+  }
+}

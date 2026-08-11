@@ -110,11 +110,11 @@ async function submitGewerbeanmeldung(
     };
   }
 
+  const gewerbeanmeldung = transformToGewerbeanmeldung(data, routingInfo);
+
   let gewerbeanmeldungXml: string;
   try {
-    gewerbeanmeldungXml = await createGewerbeanmeldungXml(
-      transformToGewerbeanmeldung(data, routingInfo),
-    );
+    gewerbeanmeldungXml = await createGewerbeanmeldungXml(gewerbeanmeldung);
   } catch (error) {
     console.error("Gewerbeanmeldung XML validation failed", error);
     return {
@@ -124,7 +124,7 @@ async function submitGewerbeanmeldung(
     };
   }
 
-  const gewerbeanmeldungPdfReceipt = await generatePdfReceipt(gewerbeanmeldungXml);
+  const gewerbeanmeldungPdfReceipt = await generatePdfReceipt(gewerbeanmeldung, routingInfo);
 
   const gewerbeamtDetails = createOfficeDetailsFromGewerbeamt(routingInfo.gewerbeamt);
   const { fitConnectDestinationInformation } = routingInfo;

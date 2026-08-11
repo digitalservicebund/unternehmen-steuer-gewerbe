@@ -1,74 +1,403 @@
-// Disclaimer:
-// This is considered throw-away code until we have proper specs
-// Also: The PDF is far from "official". It's our home-made translation of the XGewerbeordnung-Anmeldung XML into something human-readable.
+import { type CreateGewerbeanmeldungXmlData } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
+import { type GewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
+import {
+  BOTTOM_MARGIN,
+  createReceiptDocument,
+  FONT_BOLD,
+  FONT_REGULAR,
+  renderDocumentToBuffer,
+} from "./pdfDocument";
+import {
+  buildReceipt,
+  RECEIPT_NOTICE_TEXT,
+  RECEIPT_NOTICE_TITLE,
+  RECEIPT_SUBLINE,
+  RECEIPT_TITLE,
+  type Receipt,
+  type ReceiptRow,
+  type ReceiptSection,
+} from "./receiptFields";
+import {
+  COLORS,
+  CONTENT_TOP_FOLLOWING_PAGES,
+  CONTENT_WIDTH,
+  EMPTY_VALUE,
+  FONT_SIZES,
+  FOOTER,
+  HEADER,
+  LINE_GAP,
+  NOTICE,
+  PAGE_HEIGHT,
+  PAGE_MARGIN,
+  ROW,
+  ROW_VALUE_WIDTH,
+  SECTION,
+  TITLE,
+} from "./pdfTheme";
 
-import { XMLParser } from "fast-xml-parser";
-import PDFDocument from "pdfkit";
+const CONTENT_BOTTOM = PAGE_HEIGHT - BOTTOM_MARGIN;
+const MIN_ROWS_WITH_HEADING = 3;
 
-interface EnteredField {
-  leafName: string;
-  wert: string;
-  xmlPfad: string;
-}
+export async function generatePdfReceipt(
+  anmeldung: CreateGewerbeanmeldungXmlData,
+  routingInfo: GewerbeRoutingInfo,
+): Promise<string> {
+  const receipt = buildReceipt(anmeldung, routingInfo);
+  const document = await createReceiptDocument(RECEIPT_TITLE);
 
-const parser = new XMLParser({ ignoreAttributes: true, parseTagValue: false });
+  const pdf = await renderDocumentToBuffer(document, () => {
+    const documentStruct = document.struct("Document");
+    document.addStructure(documentStruct);
 
-export async function generatePdfReceipt(xml: string): Promise<string> {
-  const pdf = await renderFieldsToPdf(extractEnteredFields(xml));
+    renderHeader(document, documentStruct, receipt);
+    renderNotice(document, documentStruct);
+    renderTitle(document, documentStruct);
+    receipt.sections.forEach((section) => renderSection(document, documentStruct, section));
+    renderFooters(document, receipt);
+
+    documentStruct.end();
+  });
+
   return pdf.toString("base64");
 }
 
-function extractEnteredFields(xml: string): EnteredField[] {
-  return collectLeaves(parser.parse(xml), []);
+function renderHeader(
+  document: PDFKit.PDFDocument,
+  documentStruct: PDFKit.PDFStructureElement,
+  receipt: Receipt,
+): void {
+  const headerStruct = document.struct("Sect");
+
+  const cells: {
+    label: string;
+    value: string;
+    x: number;
+    width: number;
+    align: "left" | "right";
+  }[] = [
+    {
+      label: "Name der ausstellenden Behörde",
+      value: receipt.behoerdenName,
+      x: PAGE_MARGIN,
+      width: HEADER.columnWidth,
+      align: "left",
+    },
+    {
+      label: "Gemeindekennzahl",
+      value: receipt.gemeindekennzahl,
+      x: PAGE_MARGIN + HEADER.gemeindekennzahlOffset,
+      width: HEADER.columnWidth,
+      align: "left",
+    },
+    {
+      label: "Übermittelt durch",
+      value: receipt.submittedBy,
+      x: PAGE_MARGIN + CONTENT_WIDTH - HEADER.uebermitteltColumnWidth,
+      width: HEADER.uebermitteltColumnWidth,
+      align: "right",
+    },
+  ];
+
+  const valueTop = HEADER.valueBaseline - FONT_SIZES.metaValue;
+  const headerBottom = cells.reduce<number>((bottom, cell) => {
+    const height = document
+      .font(FONT_BOLD)
+      .fontSize(FONT_SIZES.metaValue)
+      .heightOfString(cell.value, { width: cell.width });
+    return Math.max(bottom, valueTop + height + 4);
+  }, HEADER.ruleFromTop);
+
+  cells.forEach((cell) => {
+    const cellStruct = document.struct("P", {}, () => {
+      document
+        .font(FONT_REGULAR)
+        .fontSize(FONT_SIZES.metaLabel)
+        .fillColor(COLORS.label)
+        .text(cell.label, cell.x, HEADER.labelBaseline - FONT_SIZES.metaLabel, {
+          width: cell.width,
+          align: cell.align,
+        });
+
+      document
+        .font(FONT_BOLD)
+        .fontSize(FONT_SIZES.metaValue)
+        .fillColor(COLORS.text)
+        .text(cell.value, cell.x, HEADER.valueBaseline - FONT_SIZES.metaValue, {
+          width: cell.width,
+          align: cell.align,
+        });
+    });
+    headerStruct.add(cellStruct);
+  });
+
+  headerStruct.end();
+  documentStruct.add(headerStruct);
+
+  document.markContent("Artifact", { type: "Layout" });
+  document
+    .moveTo(PAGE_MARGIN, headerBottom)
+    .lineTo(PAGE_MARGIN + CONTENT_WIDTH, headerBottom)
+    .lineWidth(FOOTER.ruleWidth)
+    .strokeColor(COLORS.rule)
+    .stroke();
+  document.endMarkedContent();
+
+  document.y = Math.max(NOTICE.top, headerBottom + 13);
 }
 
-function collectLeaves(node: unknown, pfad: string[]): EnteredField[] {
-  if (Array.isArray(node)) {
-    return node.flatMap((eintrag) => collectLeaves(eintrag, pfad));
-  }
-  if (node !== null && typeof node === "object") {
-    return Object.entries(node).flatMap(([tag, wert]) =>
-      collectLeaves(wert, [...pfad, localName(tag)]),
-    );
-  }
-  const wert = String(node).trim();
-  return wert === "" ? [] : [{ leafName: pfad.at(-1) ?? "", wert, xmlPfad: pfad.join(" > ") }];
+function renderNotice(
+  document: PDFKit.PDFDocument,
+  documentStruct: PDFKit.PDFStructureElement,
+): void {
+  const top = document.y;
+  const textX = PAGE_MARGIN + NOTICE.accentBarWidth + NOTICE.paddingHorizontal;
+  const textWidth = CONTENT_WIDTH - 2 * NOTICE.paddingHorizontal - NOTICE.accentBarWidth;
+
+  const titleHeight = document
+    .font(FONT_BOLD)
+    .fontSize(FONT_SIZES.body)
+    .heightOfString(RECEIPT_NOTICE_TITLE, { width: textWidth });
+  const textHeight = document
+    .font(FONT_REGULAR)
+    .fontSize(FONT_SIZES.body)
+    .heightOfString(RECEIPT_NOTICE_TEXT, { width: textWidth });
+  const boxHeight = NOTICE.paddingVertical * 2 + titleHeight + textHeight + 6;
+
+  document.markContent("Artifact", { type: "Layout" });
+  document.rect(PAGE_MARGIN, top, CONTENT_WIDTH, boxHeight).fill(COLORS.noticeBackground);
+  document.rect(PAGE_MARGIN, top, NOTICE.accentBarWidth, boxHeight).fill(COLORS.accent);
+  document.endMarkedContent();
+
+  const noticeStruct = document.struct("Sect");
+  noticeStruct.add(
+    document.struct("P", {}, () => {
+      document
+        .font(FONT_BOLD)
+        .fontSize(FONT_SIZES.body)
+        .fillColor(COLORS.text)
+        .text(RECEIPT_NOTICE_TITLE, textX, top + NOTICE.paddingVertical, { width: textWidth });
+    }),
+  );
+  noticeStruct.add(
+    document.struct("P", {}, () => {
+      document
+        .font(FONT_REGULAR)
+        .fontSize(FONT_SIZES.body)
+        .fillColor(COLORS.text)
+        .text(RECEIPT_NOTICE_TEXT, textX, document.y + 6, { width: textWidth });
+    }),
+  );
+  noticeStruct.end();
+  documentStruct.add(noticeStruct);
+
+  document.y = top + boxHeight + NOTICE.spaceAfter;
 }
 
-function localName(tag: string): string {
-  const lastColon = tag.lastIndexOf(":");
-  return lastColon === -1 ? tag : tag.slice(lastColon + 1);
+function renderTitle(
+  document: PDFKit.PDFDocument,
+  documentStruct: PDFKit.PDFStructureElement,
+): void {
+  const titleStruct = document.struct("H1", {}, () => {
+    document
+      .font(FONT_BOLD)
+      .fontSize(FONT_SIZES.title)
+      .fillColor(COLORS.text)
+      .text(RECEIPT_TITLE, PAGE_MARGIN, document.y, { width: CONTENT_WIDTH });
+  });
+  titleStruct.end();
+  documentStruct.add(titleStruct);
+
+  const sublineStruct = document.struct("P", {}, () => {
+    document
+      .font(FONT_REGULAR)
+      .fontSize(FONT_SIZES.body)
+      .fillColor(COLORS.label)
+      .text(RECEIPT_SUBLINE, PAGE_MARGIN, document.y + TITLE.sublineSpace, {
+        width: CONTENT_WIDTH,
+      });
+  });
+  sublineStruct.end();
+  documentStruct.add(sublineStruct);
+
+  document.y += TITLE.spaceAfter;
 }
 
-function renderFieldsToPdf(fields: EnteredField[]): Promise<Buffer> {
-  const doc = new PDFDocument({ margin: 50 });
-  const chunks: Buffer[] = [];
-  doc.on("data", (chunk) => chunks.push(chunk));
+function renderSection(
+  document: PDFKit.PDFDocument,
+  documentStruct: PDFKit.PDFStructureElement,
+  section: ReceiptSection,
+): void {
+  const sectionStruct = document.struct("Sect");
+  documentStruct.add(sectionStruct);
 
-  doc.fontSize(16).text("Gewerbeanmeldung – erfasste Daten", { underline: true });
-  doc.moveDown();
-  doc
-    .fontSize(10)
-    .text(
-      "Disclaimer: This PDF is a simple representation of the data sent as XGewerbeordnung. " +
-        'It\'s by no means an "official" receipt by any Gewerbeamt. ' +
-        "Also, it has not been styled, yet.",
-    );
-  doc.moveDown();
-  doc.fontSize(10);
+  const headingHeight =
+    FONT_SIZES.sectionHeading + SECTION.underlineOffset + SECTION.spaceAfterHeading;
+  const sectionHeight = section.rows.reduce(
+    (height, row) => height + rowHeight(document, row),
+    headingHeight,
+  );
+  const keptTogetherHeight =
+    sectionHeight <= CONTENT_BOTTOM - CONTENT_TOP_FOLLOWING_PAGES
+      ? sectionHeight
+      : section.rows
+          .slice(0, MIN_ROWS_WITH_HEADING)
+          .reduce((height, row) => height + rowHeight(document, row), headingHeight);
 
-  // Three columns: leafName | value | (path)
-  // Page is 595pt wide, 50pt margins → 495pt usable starting at x=50
-  const COL = { name: 50, value: 170, path: 340 };
-  const COL_W = { name: 115, value: 165, path: 595 - 50 - 340 };
-
-  for (const { leafName, wert, xmlPfad } of fields) {
-    const y = doc.y;
-    doc.text(leafName, COL.name, y, { width: COL_W.name, lineBreak: false });
-    doc.text(wert, COL.value, y, { width: COL_W.value, lineBreak: false });
-    doc.text(`(${xmlPfad})`, COL.path, y, { width: COL_W.path });
+  if (document.y + SECTION.spaceBefore + keptTogetherHeight > CONTENT_BOTTOM) {
+    addPage(document);
+  } else {
+    document.y += SECTION.spaceBefore;
   }
-  doc.end();
 
-  return new Promise((resolve) => doc.on("end", () => resolve(Buffer.concat(chunks))));
+  renderSectionHeading(document, sectionStruct, section.title);
+
+  const tableStruct = document.struct("Table");
+  sectionStruct.add(tableStruct);
+  section.rows.forEach((row) => renderRow(document, tableStruct, row, section.title));
+  tableStruct.end();
+
+  sectionStruct.end();
+}
+
+function headingText(document: PDFKit.PDFDocument, title: string): void {
+  document
+    .font(FONT_BOLD)
+    .fontSize(FONT_SIZES.sectionHeading)
+    .fillColor(COLORS.accent)
+    .text(title, PAGE_MARGIN, document.y, { width: CONTENT_WIDTH });
+}
+
+function headingUnderline(document: PDFKit.PDFDocument): void {
+  const underlineY = document.y + SECTION.underlineOffset - FONT_SIZES.sectionHeading;
+  document
+    .moveTo(PAGE_MARGIN, underlineY)
+    .lineTo(PAGE_MARGIN + CONTENT_WIDTH, underlineY)
+    .lineWidth(SECTION.underlineWidth)
+    .strokeColor(COLORS.accent)
+    .stroke();
+
+  document.y = underlineY + SECTION.spaceAfterHeading;
+}
+
+function renderSectionHeading(
+  document: PDFKit.PDFDocument,
+  sectionStruct: PDFKit.PDFStructureElement,
+  title: string,
+): void {
+  sectionStruct.add(document.struct("H2", {}, () => headingText(document, title)));
+
+  document.markContent("Artifact", { type: "Layout" });
+  headingUnderline(document);
+  document.endMarkedContent();
+}
+
+function rowHeight(document: PDFKit.PDFDocument, row: ReceiptRow): number {
+  const labelHeight = document
+    .font(FONT_REGULAR)
+    .fontSize(FONT_SIZES.body)
+    .heightOfString(row.label, { width: ROW.labelWidth, lineGap: LINE_GAP });
+  const valueHeight = document
+    .font(FONT_BOLD)
+    .fontSize(FONT_SIZES.body)
+    .heightOfString(row.value ?? EMPTY_VALUE, { width: ROW_VALUE_WIDTH, lineGap: LINE_GAP });
+  return Math.max(labelHeight, valueHeight) + ROW.gap;
+}
+
+function renderRow(
+  document: PDFKit.PDFDocument,
+  tableStruct: PDFKit.PDFStructureElement,
+  row: ReceiptRow,
+  sectionTitle: string,
+): void {
+  const height = rowHeight(document, row);
+  if (document.y + height > CONTENT_BOTTOM) {
+    addPage(document);
+    renderContinuedHeading(document, sectionTitle);
+  }
+
+  const top = document.y;
+  const pagesBefore = document.bufferedPageRange().count;
+
+  // PDF/UA-1 7.5-1: without Scope the TD has no resolvable header.
+  const labelCell = document.struct("TH", { scope: "Row" }, () => {
+    document.font(FONT_REGULAR).fillColor(COLORS.label);
+    if (row.gewaNumber !== undefined) {
+      document.fontSize(FONT_SIZES.gewaNumber).text(row.gewaNumber, PAGE_MARGIN, top + 1.5, {
+        width: ROW.gewaNumberWidth,
+        align: "right",
+        lineBreak: false,
+      });
+    }
+    document.fontSize(FONT_SIZES.body).text(row.label, PAGE_MARGIN + ROW.labelOffset, top, {
+      width: ROW.labelWidth,
+      lineGap: LINE_GAP,
+    });
+  });
+
+  const valueCell = document.struct("TD", {}, () => {
+    document
+      .font(FONT_BOLD)
+      .fontSize(FONT_SIZES.body)
+      .fillColor(row.value === undefined ? COLORS.label : COLORS.text)
+      .text(row.value ?? EMPTY_VALUE, PAGE_MARGIN + ROW.valueOffset, top, {
+        width: ROW_VALUE_WIDTH,
+        lineGap: LINE_GAP,
+      });
+  });
+
+  tableStruct.add(document.struct("TR", {}, [labelCell, valueCell]));
+
+  const valueSpilledOverPage = document.bufferedPageRange().count !== pagesBefore;
+  document.y = valueSpilledOverPage ? document.y + ROW.gap : top + height;
+}
+
+function renderContinuedHeading(document: PDFKit.PDFDocument, sectionTitle: string): void {
+  // The section is tagged once, so the repeat stays an artifact.
+  document.markContent("Artifact", { type: "Pagination" });
+  headingText(document, `${sectionTitle} (Fortsetzung)`);
+  headingUnderline(document);
+  document.endMarkedContent();
+}
+
+function addPage(document: PDFKit.PDFDocument): void {
+  document.addPage();
+  document.y = CONTENT_TOP_FOLLOWING_PAGES;
+}
+
+function renderFooters(document: PDFKit.PDFDocument, receipt: Receipt): void {
+  const { count } = document.bufferedPageRange();
+
+  for (let pageIndex = 0; pageIndex < count; pageIndex++) {
+    document.switchToPage(pageIndex);
+    document.page.margins.bottom = 0;
+
+    const ruleY = PAGE_HEIGHT - FOOTER.ruleFromBottom;
+    const textY = PAGE_HEIGHT - FOOTER.baselineFromBottom - FONT_SIZES.footer;
+
+    document.markContent("Artifact", { type: "Pagination" });
+    document
+      .moveTo(PAGE_MARGIN, ruleY)
+      .lineTo(PAGE_MARGIN + CONTENT_WIDTH, ruleY)
+      .lineWidth(FOOTER.ruleWidth)
+      .strokeColor(COLORS.rule)
+      .stroke();
+
+    document.font(FONT_REGULAR).fontSize(FONT_SIZES.footer).fillColor(COLORS.label);
+    document.text(`Erstellt: ${receipt.createdAt}`, PAGE_MARGIN, textY, {
+      width: CONTENT_WIDTH,
+      align: "left",
+      lineBreak: false,
+    });
+    document.text(`Seite ${pageIndex + 1} von ${count}`, PAGE_MARGIN, textY, {
+      width: CONTENT_WIDTH,
+      align: "center",
+      lineBreak: false,
+    });
+    document.text(`ID: ${receipt.anzeigeId}`, PAGE_MARGIN, textY, {
+      width: CONTENT_WIDTH,
+      align: "right",
+      lineBreak: false,
+    });
+    document.endMarkedContent();
+  }
 }
