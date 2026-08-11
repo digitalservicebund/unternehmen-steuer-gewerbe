@@ -36,6 +36,29 @@ export function splitStrasseHausnummer(strasseUndHausnummer: string): SplitStras
   };
 }
 
+interface SplitHausnummer {
+  hausnummer?: string;
+  hausnummerBis?: string;
+  hausnummerZusatz?: string;
+}
+
+/**
+ * Splits a house number into von and bis at "-" or "/" ("8-14", "8/14") and separates a trailing
+ * Zusatz ("42a"). Only the von part is broken down, the bis part is passed through as given.
+ */
+export function splitHausnummer(hausnummer: string): SplitHausnummer {
+  const rangeMatch = /^(?<von>[^-/]*)(?:[-/](?<bis>.*))?$/.exec(hausnummer);
+  const von = rangeMatch?.groups?.von?.trim() ?? "";
+  const bis = rangeMatch?.groups?.bis?.trim();
+  const vonMatch = /^(?<nummer>\d+)(?<zusatz>.*)$/.exec(von);
+
+  return {
+    hausnummer: (vonMatch?.groups?.nummer ?? von) || undefined,
+    hausnummerBis: bis || undefined,
+    hausnummerZusatz: vonMatch?.groups?.zusatz?.trim() || undefined,
+  };
+}
+
 /** Joins street and house number into "Straße 123", omitting missing parts */
 export function joinStrasseUndHausnummer(
   strasse?: string,
@@ -45,6 +68,65 @@ export function joinStrasseUndHausnummer(
     (part) => part !== undefined && part.trim() !== "",
   );
   return presentParts.length === 0 ? undefined : presentParts.join(" ");
+}
+
+/** Address with street and house number in one string */
+export interface Adresse {
+  strasseUndHausnummer: string;
+  postleitzahl: string;
+  ort: string;
+}
+
+/** Address with street and house number as separate fields */
+export interface BetriebsAdresse {
+  strasse: string;
+  hausnummer: string;
+  postleitzahl: string;
+  ort: string;
+}
+
+/** Resolved business address, house number already split into von, bis and Zusatz */
+export interface SplitAdresse {
+  strasse?: string;
+  hausnummer?: string;
+  hausnummerBis?: string;
+  hausnummerZusatz?: string;
+  postleitzahl: string;
+  ort: string;
+}
+
+interface BetriebsAdresseInput {
+  adresse?: BetriebsAdresse;
+  /** Deprecated, only read while `adresse` is optional */
+  adresseAbweichend?: Adresse;
+  wohnadresse: Adresse;
+}
+
+/**
+ * Resolves the address of the business: `adresse` wins, then the deprecated `adresseAbweichend`,
+ * then the Wohnadresse.
+ */
+export function getBetriebsAdresse({
+  adresse,
+  adresseAbweichend,
+  wohnadresse,
+}: BetriebsAdresseInput): SplitAdresse {
+  if (adresse === undefined) {
+    // TODO: stop reading adresseAbweichend once the deprecated field is removed
+    const kombinierteAdresse = adresseAbweichend ?? wohnadresse;
+    return {
+      ...splitStrasseHausnummer(kombinierteAdresse.strasseUndHausnummer),
+      postleitzahl: kombinierteAdresse.postleitzahl,
+      ort: kombinierteAdresse.ort,
+    };
+  }
+
+  return {
+    strasse: adresse.strasse,
+    ...splitHausnummer(adresse.hausnummer),
+    postleitzahl: adresse.postleitzahl,
+    ort: adresse.ort,
+  };
 }
 
 export function splitTelefonnummer(telefonnummer: string) {

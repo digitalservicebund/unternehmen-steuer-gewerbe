@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   joinStrasseUndHausnummer,
   formatDatumDE,
+  splitHausnummer,
   splitStrasseHausnummer,
   splitTelefonnummer,
 } from "./formFieldTransformations";
@@ -30,6 +31,22 @@ describe("splitStrasseHausnummer", () => {
     expect(() => splitStrasseHausnummer("Musterstraße")).toThrow(
       "The given address format is not supported",
     );
+  });
+});
+
+describe("splitHausnummer", () => {
+  it.each([
+    ["8", "8", undefined, undefined],
+    ["8-14", "8", "14", undefined],
+    ["8 - 14", "8", "14", undefined],
+    ["8/14", "8", "14", undefined],
+    ["42a", "42", undefined, "a"],
+    ["42 a", "42", undefined, "a"],
+    ["8a-14b", "8", "14b", "a"],
+    ["8-14-16", "8", "14-16", undefined],
+    ["a", "a", undefined, undefined],
+  ])("splits '%s' correctly", (input, hausnummer, hausnummerBis, hausnummerZusatz) => {
+    expect(splitHausnummer(input)).toEqual({ hausnummer, hausnummerBis, hausnummerZusatz });
   });
 });
 
