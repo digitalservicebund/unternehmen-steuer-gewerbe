@@ -15,10 +15,7 @@ import { Anschrift } from "../../../xmlBuilders/xGewerbeordnung/buildingBlocks/a
 
 // xGewerbeordnung has no separate field for the Hausnummer-Zusatz, so it is appended to
 // hausnummerVon directly (e.g. "21a")
-function joinHausnummerUndZusatz(
-  hausnummer: string | undefined,
-  zusatz: string | undefined,
-): string {
+function joinHausnummerUndZusatz(hausnummer?: string, zusatz?: string): string {
   return `${hausnummer ?? ""}${zusatz ?? ""}`;
 }
 
@@ -43,10 +40,7 @@ function getBetriebsAnschriftWithFallbackToPersönlicheDaten(
  * Resolves the Gemeindeschlüssel-Ergänzung Code for Hamburg.
  * Returns undefined for non-Hamburg municipalities
  */
-function getGemeindeschluesselErgaenzung(
-  gemeindeSchluessel: string,
-  betriebsPlz: string | undefined,
-) {
+function getGemeindeschluesselErgaenzung(gemeindeSchluessel: string, betriebsPlz?: string) {
   if (betriebsPlz === undefined || gemeindeSchluessel !== HAMBURG_GEMEINDESCHLUESSEL) {
     return undefined;
   }
