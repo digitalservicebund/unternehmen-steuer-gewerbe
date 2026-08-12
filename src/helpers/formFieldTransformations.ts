@@ -80,15 +80,15 @@ export interface Adresse {
 }
 
 /** Address with street and house number as separate fields */
-export interface BetriebsAdresse {
+export interface AdresseMitHausnummer {
   strasse: string;
   hausnummer: string;
   postleitzahl: string;
   ort: string;
 }
 
-/** Resolved business address, house number already split into von, bis and Zusatz */
-export interface SplitAdresse {
+/** Resolved address of the business, house number already split into von, bis and Zusatz */
+export interface BetriebsAdresse {
   strasse?: string;
   hausnummer?: string;
   hausnummerBis?: string;
@@ -98,7 +98,7 @@ export interface SplitAdresse {
 }
 
 interface BetriebsAdresseInput {
-  adresse?: BetriebsAdresse;
+  adresse?: AdresseMitHausnummer;
   /** Deprecated, only read while `adresse` is optional */
   adresseAbweichend?: Adresse;
   persönlicheAdresse: Adresse;
@@ -112,7 +112,7 @@ export function getBetriebsAdresse({
   adresse,
   adresseAbweichend,
   persönlicheAdresse,
-}: BetriebsAdresseInput): SplitAdresse {
+}: BetriebsAdresseInput): BetriebsAdresse {
   if (adresse === undefined) {
     // TODO: stop reading adresseAbweichend once the deprecated field is removed
     const kombinierteAdresse = adresseAbweichend ?? persönlicheAdresse;

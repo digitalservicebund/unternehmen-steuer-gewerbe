@@ -1,6 +1,6 @@
 import { z } from "@hono/zod-openapi";
 import { OfficeDetailsSchema } from "../region/regionInterfaces";
-import { type Adresse, type BetriebsAdresse } from "../../helpers/formFieldTransformations";
+import { type Adresse, type AdresseMitHausnummer } from "../../helpers/formFieldTransformations";
 import {
   UNFALLVERSICHERUNGSTRAEGER,
   UNFALLVERSICHERUNGSTRAEGER_KEYS,
@@ -32,7 +32,7 @@ const AdresseSchema = z.object({
   ort: z.string().openapi({ example: "Fulda" }),
 }) satisfies z.ZodType<Adresse>;
 
-const BetriebsAdresseSchema = z.object({
+const AdresseMitHausnummerSchema = z.object({
   strasse: z.string().min(1).openapi({ example: "Musterstraße" }),
   hausnummer: z.string().min(1).openapi({
     example: "2a",
@@ -43,7 +43,7 @@ const BetriebsAdresseSchema = z.object({
     .regex(/^\d{5}$/)
     .openapi({ example: "36037", description: "5-digit German postal code" }),
   ort: z.string().openapi({ example: "Fulda" }),
-}) satisfies z.ZodType<BetriebsAdresse>;
+}) satisfies z.ZodType<AdresseMitHausnummer>;
 
 const PersönlicheDatenSchema = z.object({
   vorname: z.string().openapi({ example: "Erika" }),
@@ -102,7 +102,7 @@ const PersönlicheDatenSchema = z.object({
 
 const UnternehmensDatenSchema = z
   .object({
-    adresse: BetriebsAdresseSchema.optional().openapi({
+    adresse: AdresseMitHausnummerSchema.optional().openapi({
       example: {
         strasse: "Musterstraße",
         hausnummer: "2",
