@@ -17,7 +17,9 @@ interface SplitStrasseHausnummer {
 
 export function splitStrasseHausnummer(strasseUndHausnummer: string): SplitStrasseHausnummer {
   const upToSixNumbers = String.raw`\d{1,6}`;
-  const zusatzPattern = String.raw`(?:\s+${upToSixNumbers})?(?:/${upToSixNumbers})?(?:\s*[a-z])?`;
+  // Zusatz allows whitespace around the slash, up to three letters after it and a trailing dot.
+  // The letters are capped because XGewerbe puts Hausnummer + Zusatz into hausnummerVon (max 10).
+  const zusatzPattern = String.raw`(?:\s+${upToSixNumbers})?(?:\s*/\s*(?:${upToSixNumbers}|[a-z]{1,3}))?(?:\s*[a-z]\.?)?`;
   const addressPattern = new RegExp(
     String.raw`^(?<strasse>.{1,100}?)\s+(?<hausnummer>${upToSixNumbers})(?<hausnummerZusatz>${zusatzPattern})(?:\s*-\s*(?<hausnummerBis>${upToSixNumbers}(?:\s*[a-z])?))?$`,
     "i",

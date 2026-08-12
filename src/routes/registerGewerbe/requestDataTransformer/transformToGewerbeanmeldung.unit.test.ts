@@ -251,7 +251,12 @@ describe("transformToGewerbeanmeldung", () => {
       testRoutingInfo,
     );
 
-    expect(result.gewerbebetrieb!.betriebsstaette!.anschrift!.hausnummerVon).toBe("42a");
+    expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
+      strasse: "Betriebsweg",
+      hausnummerVon: "42a",
+      postleitzahl: "23936",
+      ort: "Testorf-Steinfort",
+    });
   });
 
   it("prefers adresse over adresseAbweichend", () => {

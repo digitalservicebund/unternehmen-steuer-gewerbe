@@ -15,6 +15,17 @@ import {
   ZAHLLAST_UEBERSCHUSS,
 } from "./fsECodes";
 
+// FsE only allows digits in HausNr, so everything after the leading number — Zusatz, separator and
+// a bis-Hausnummer — has to go into HausNrZu (e.g. "1C-1E" => hausNr "1", hausNrZu "C-1E")
+function createHausNrZu(
+  hausnummerZusatz: string | undefined,
+  hausnummerBis: string | undefined,
+): string | undefined {
+  const bis = hausnummerBis === undefined ? "" : `-${hausnummerBis}`;
+  const hausNrZu = `${hausnummerZusatz?.trim() ?? ""}${bis}`;
+  return hausNrZu === "" ? undefined : hausNrZu;
+}
+
 function getKleinunternehmerRegelung(data: RegisterGewerbeRequest) {
   return data.unternehmensDaten.kleinunternehmerRegelung
     ? { kleinUnternUSt: true }
@@ -37,8 +48,7 @@ function getUnternehmen(data: RegisterGewerbeRequest) {
       strAdr: {
         str: betriebsAdresse.strasse,
         hausNr: betriebsAdresse.hausnummer,
-        hausNrZu: betriebsAdresse.hausnummerBis,
-        adressErg: betriebsAdresse.hausnummerZusatz?.trim(),
+        hausNrZu: createHausNrZu(betriebsAdresse.hausnummerZusatz, betriebsAdresse.hausnummerBis),
         plz: betriebsAdresse.postleitzahl,
         ort: betriebsAdresse.ort,
       },
@@ -145,8 +155,10 @@ export function transformToEUnFsE(
               strAdr: {
                 str: persönlicheStrasseHausnummer.strasse,
                 hausNr: persönlicheStrasseHausnummer.hausnummer,
-                hausNrZu: persönlicheStrasseHausnummer.hausnummerBis,
-                adressErg: persönlicheStrasseHausnummer.hausnummerZusatz?.trim(),
+                hausNrZu: createHausNrZu(
+                  persönlicheStrasseHausnummer.hausnummerZusatz,
+                  persönlicheStrasseHausnummer.hausnummerBis,
+                ),
                 plz: data.persönlicheDaten.adresse.postleitzahl,
                 ort: data.persönlicheDaten.adresse.ort,
               },

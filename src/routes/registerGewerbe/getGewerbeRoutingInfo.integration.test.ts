@@ -122,6 +122,30 @@ describe("getGewerbeRoutingInfo", () => {
       });
     });
 
+    // A Hausnummer-Zusatz makes the PVOG full-text search pick a different municipality for
+    // ambiguous PLZ (e.g. "25842 Dorfstraße 1C" resolves to Hohenhorn instead of Langenhorn)
+    it("passes only the leading digits of the hausnummer 1C-1E to the location lookup", async () => {
+      await getGewerbeRoutingInfo({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          adresse: {
+            strasse: "Dorfstraße",
+            hausnummer: "1C-1E",
+            postleitzahl: "25842",
+            ort: "Langenhorn",
+          },
+        },
+      });
+
+      expect(mockGetLocationsDetails).toHaveBeenCalledWith({
+        plz: "25842",
+        ort: "Langenhorn",
+        strasse: "Dorfstraße",
+        hausnummer: "1",
+      });
+    });
+
     it("prefers adresse over adresseAbweichend for the location lookup", async () => {
       await getGewerbeRoutingInfo({
         ...registerGewerbeSampleRequestAllFieldsFilled,

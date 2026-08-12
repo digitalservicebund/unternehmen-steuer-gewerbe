@@ -16,7 +16,7 @@ describe("transformToEUnFsE", () => {
     expect(natPers?.adrkette?.strAdr).toMatchObject({
       str: "Musterstraße",
       hausNr: "1",
-      adressErg: "a",
+      hausNrZu: "a",
       plz: "03046",
       ort: "Cottbus",
     });
@@ -208,7 +208,7 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
       str: "Musterstraße",
       hausNr: "2",
-      adressErg: "a",
+      hausNrZu: "a",
       plz: "96450",
       ort: "Coburg",
     });
@@ -230,13 +230,13 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
       str: "Betriebsweg",
       hausNr: "42",
-      adressErg: "a",
+      hausNrZu: "a",
       plz: "23936",
       ort: "Testorf-Steinfort",
     });
   });
 
-  it("maps the hausnummer 8-14 to hausNrZu 14", () => {
+  it("maps the hausnummer 8-14 to hausNrZu -14", () => {
     const result = transformToEUnFsE({
       ...registerGewerbeSampleRequestAllFieldsFilled,
       unternehmensDaten: {
@@ -252,9 +252,31 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
       str: "Prinzessinnenstraße",
       hausNr: "8",
-      hausNrZu: "14",
+      hausNrZu: "-14",
       plz: "10969",
       ort: "Berlin",
+    });
+  });
+
+  it("maps the hausnummer 1C-1E to hausNrZu C-1E", () => {
+    const result = transformToEUnFsE({
+      ...registerGewerbeSampleRequestAllFieldsFilled,
+      unternehmensDaten: {
+        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+        adresse: {
+          strasse: "Domstraße",
+          hausnummer: "1C-1E",
+          postleitzahl: "36037",
+          ort: "Fulda",
+        },
+      },
+    });
+    expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
+      str: "Domstraße",
+      hausNr: "1",
+      hausNrZu: "C-1E",
+      plz: "36037",
+      ort: "Fulda",
     });
   });
 

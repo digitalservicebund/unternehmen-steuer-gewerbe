@@ -19,12 +19,23 @@ describe("splitStrasseHausnummer", () => {
     ["straße des 17. juni 1-3", "straße des 17. juni", "1", "3", undefined],
     ["Teststr. 4 - 44", "Teststr.", "4", "44", undefined],
     ["Domstraße 1C-1E", "Domstraße", "1", "1E", "C"],
+    ["Musterstraße 1/a", "Musterstraße", "1", undefined, "/a"],
+    ["Hauptstr. 1 a.", "Hauptstr.", "1", undefined, " a."],
   ])("splits '%s' correctly", (input, strasse, hausnummer, hausnummerBis, hausnummerZusatz) => {
     expect(splitStrasseHausnummer(input)).toEqual({
       strasse,
       hausnummer,
       hausnummerBis,
       hausnummerZusatz,
+    });
+  });
+
+  it("splits 'Musterstraße 1 / 2' into strasse Musterstraße and hausnummer 1", () => {
+    expect(splitStrasseHausnummer("Musterstraße 1 / 2")).toEqual({
+      strasse: "Musterstraße",
+      hausnummer: "1",
+      hausnummerBis: undefined,
+      hausnummerZusatz: " / 2",
     });
   });
 
@@ -47,9 +58,12 @@ describe("splitHausnummer", () => {
     ["1C-1E", "1", "1E", "C"],
     ["8-14-16", "8", "14-16", undefined],
     ["a", "a", undefined, undefined],
-  ])("splits '%s' correctly", (input, hausnummer, hausnummerBis, hausnummerZusatz) => {
-    expect(splitHausnummer(input)).toEqual({ hausnummer, hausnummerBis, hausnummerZusatz });
-  });
+  ])(
+    "splits '%s' into von, bis and Zusatz",
+    (input, hausnummer, hausnummerBis, hausnummerZusatz) => {
+      expect(splitHausnummer(input)).toEqual({ hausnummer, hausnummerBis, hausnummerZusatz });
+    },
+  );
 });
 
 describe("joinStrasseUndHausnummer", () => {
