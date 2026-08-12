@@ -57,7 +57,7 @@ describe("transformToEUnFsE", () => {
     );
   });
 
-  describe("gewerbeArt", () => {
+  describe("gewerbeArt (tätigkeitsbeschreibung)", () => {
     it("falls back to tätigkeitsbeschreibung when tätigkeitsbeschreibungKurz is missing", () => {
       const request = {
         ...registerGewerbeSampleRequestAllFieldsFilled,
