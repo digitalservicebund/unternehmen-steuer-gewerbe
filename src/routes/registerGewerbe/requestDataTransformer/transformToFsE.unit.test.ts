@@ -57,6 +57,38 @@ describe("transformToEUnFsE", () => {
     );
   });
 
+  describe("gewerbeArt", () => {
+    it("falls back to tätigkeitsbeschreibung when tätigkeitsbeschreibungKurz is missing", () => {
+      const request = {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
+          tätigkeitsbeschreibungKurz: undefined,
+        },
+      };
+
+      const result = transformToEUnFsE(request);
+
+      expect(result.eUn?.allgAngaben?.artTaet?.gewerbeArt).toBe("Vertrieb von Vertriebsmustern");
+    });
+
+    it("truncates the tätigkeitsbeschreibung fallback to 200 characters", () => {
+      const request = {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          tätigkeitsbeschreibung: "a".repeat(250),
+          tätigkeitsbeschreibungKurz: undefined,
+        },
+      };
+
+      const result = transformToEUnFsE(request);
+
+      expect(result.eUn?.allgAngaben?.artTaet?.gewerbeArt).toBe("a".repeat(200));
+    });
+  });
+
   describe("finanzamtId", () => {
     it("uses default testfinanzamt (instead of the given 0000) if ERIC_ENABLE_CUSTOM_FINANZAMT_IDS is not set", () => {
       vi.stubEnv("ERIC_ENABLE_CUSTOM_FINANZAMT_IDS", "");

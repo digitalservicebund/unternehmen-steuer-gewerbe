@@ -35,7 +35,6 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["persönlicheDaten.religion"],
       ["persönlicheDaten.vertrauensniveau"],
       ["unternehmensDaten.tätigkeitsbeschreibung"],
-      ["unternehmensDaten.tätigkeitsbeschreibungKurz"],
       ["unternehmensDaten.tätigkeitsbereich"],
       ["unternehmensDaten.anmeldedatumFinanzamt"],
       ["unternehmensDaten.anmeldedatumGewerbeamt"],
@@ -79,6 +78,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["persönlicheDaten.staatsangehörigkeitIcao"],
       ["persönlicheDaten.steuernummer"],
       ["unternehmensDaten.adresseAbweichend"],
+      ["unternehmensDaten.tätigkeitsbeschreibungKurz"],
       ["unternehmensDaten.umsatzsteuerImErstenJahr"],
     ])("succeeds and stays absent when %s is missing", (fieldPath) => {
       const request = validRequest() as Record<string, unknown>;
