@@ -213,7 +213,7 @@ export function transformToEUnFsE(
           },
         },
         artTaet: {
-          gewerbeArt: data.unternehmensDaten.tätigkeitsbeschreibung,
+          gewerbeArt: data.unternehmensDaten.tätigkeitsbeschreibungKurz,
         },
         // bankKonto: {
         //   iban: undefined,
