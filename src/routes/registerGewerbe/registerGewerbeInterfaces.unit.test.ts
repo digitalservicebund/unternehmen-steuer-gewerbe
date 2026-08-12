@@ -12,6 +12,18 @@ describe("RegisterGewerbeRequestSchema", () => {
     expect(result.success).toBe(true);
   });
 
+  it("parses unternehmensDaten.adresse with a separate strasse and hausnummer", () => {
+    const request = validRequest();
+    request.unternehmensDaten.adresse = {
+      strasse: "Prinzessinnenstraße",
+      hausnummer: "8-14",
+      postleitzahl: "10969",
+      ort: "Berlin",
+    };
+
+    expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(true);
+  });
+
   describe("required fields", () => {
     it.each([
       ["persönlicheDaten.vorname"],
@@ -172,6 +184,30 @@ describe("RegisterGewerbeRequestSchema", () => {
     it("accepts a valid strasseUndHausnummer and rejects one without a digit", () => {
       const invalid = validRequest();
       invalid.persönlicheDaten.adresse.strasseUndHausnummer = "Musterstraße";
+
+      expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
+    });
+
+    it("rejects an empty hausnummer in unternehmensDaten.adresse", () => {
+      const invalid = validRequest();
+      invalid.unternehmensDaten.adresse = {
+        strasse: "Prinzessinnenstraße",
+        hausnummer: "",
+        postleitzahl: "10969",
+        ort: "Berlin",
+      };
+
+      expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
+    });
+
+    it("rejects an empty strasse in unternehmensDaten.adresse", () => {
+      const invalid = validRequest();
+      invalid.unternehmensDaten.adresse = {
+        strasse: "",
+        hausnummer: "8",
+        postleitzahl: "10969",
+        ort: "Berlin",
+      };
 
       expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
     });

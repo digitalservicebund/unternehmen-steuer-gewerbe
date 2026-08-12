@@ -2,7 +2,10 @@ import { randomUUID } from "node:crypto";
 import { type CreateGewerbeanmeldungXmlData } from "../../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { type GewerbeRoutingInfo } from "../getGewerbeRoutingInfo";
-import { splitStrasseHausnummer } from "../../../helpers/formFieldTransformations";
+import {
+  getBetriebsAdresse,
+  splitStrasseHausnummer,
+} from "../../../helpers/formFieldTransformations";
 import {
   VERTRAUENSNIVEAU,
   RECHTSFORM,
@@ -19,20 +22,20 @@ function joinHausnummerUndZusatz(hausnummer?: string, zusatz?: string): string {
   return `${hausnummer ?? ""}${zusatz ?? ""}`;
 }
 
-function getBetriebsAnschriftWithFallbackToPersönlicheDaten(
-  adresseAbweichend: RegisterGewerbeRequest["unternehmensDaten"]["adresseAbweichend"],
-  privateAdresse: RegisterGewerbeRequest["persönlicheDaten"]["adresse"],
-): Anschrift {
-  const betriebsAdresse = adresseAbweichend ?? privateAdresse;
-  const { strasse, hausnummer, hausnummerBis, hausnummerZusatz } = splitStrasseHausnummer(
-    betriebsAdresse.strasseUndHausnummer,
-  );
+function createBetriebsAnschrift(data: RegisterGewerbeRequest): Anschrift {
+  const { adresse, adresseAbweichend } = data.unternehmensDaten;
+  const { strasse, hausnummer, hausnummerBis, hausnummerZusatz, postleitzahl, ort } =
+    getBetriebsAdresse({
+      adresse,
+      adresseAbweichend,
+      persönlicheAdresse: data.persönlicheDaten.adresse,
+    });
   return {
     strasse,
     hausnummerVon: joinHausnummerUndZusatz(hausnummer, hausnummerZusatz),
     hausnummerBis,
-    postleitzahl: betriebsAdresse.postleitzahl,
-    ort: betriebsAdresse.ort,
+    postleitzahl,
+    ort,
   };
 }
 
@@ -64,10 +67,7 @@ export function transformToGewerbeanmeldung(
     data.persönlicheDaten.adresse.strasseUndHausnummer,
   );
 
-  const betriebsAnschrift = getBetriebsAnschriftWithFallbackToPersönlicheDaten(
-    data.unternehmensDaten.adresseAbweichend,
-    data.persönlicheDaten.adresse,
-  );
+  const betriebsAnschrift = createBetriebsAnschrift(data);
 
   const { staatsangehörigkeitIcao } = data.persönlicheDaten;
   const staatsangehoerigkeitCode = staatsangehörigkeitIcao

@@ -47,6 +47,28 @@ describe("Route /api/v1/register-gewerbe — Finanzamt officeDetails (real looku
     });
   });
 
+  it("returns Finanzamt details for adresse in unternehmensDaten (Prinzessinnenstraße 8-14, 10969 Berlin)", async () => {
+    const data = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+    data.unternehmensDaten.adresse = {
+      strasse: "Prinzessinnenstraße",
+      hausnummer: "8-14",
+      postleitzahl: "10969",
+      ort: "Berlin",
+    };
+
+    const response = await postFsEOnly(data);
+    const json = await response.json();
+
+    expect(response.status).toEqual(HttpStatusCode.Ok);
+    expect(json.fseÜbermittlung.officeDetails).toEqual({
+      name: "Finanzamt Friedrichshain-Kreuzberg",
+      strasseUndHausnummer: "Mehringdamm 22",
+      postleitzahl: "10961",
+      ort: "Berlin",
+      telefon: "030 9024-14 0",
+    });
+  });
+
   it("returns Finanzamt details for persönlicheDaten address (Musterstraße 1, 03046 Cottbus)", async () => {
     const data = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
     data.unternehmensDaten.adresseAbweichend = undefined;
