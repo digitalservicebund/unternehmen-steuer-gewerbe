@@ -6,6 +6,9 @@ import {
   VERTRAUENSNIVEAU_KEYS,
   STAATSANGEHOERIGKEIT_KEYS,
   STAATSANGEHOERIGKEIT_ICAO_KEYS,
+  RECHTSFORM_KEYS,
+  GRUNDANMELDUNGSSCHLUESSEL_KEYS,
+  ART_BETRIEBSSTAETTE_KEYS,
 } from "./requestDataTransformer/xGewerbeordnungCodes";
 import {
   RELIGIONSSCHLUESSEL_KEYS,
@@ -36,8 +39,8 @@ const PersönlicheDatenSchema = z.object({
   nachname: z.string().openapi({ example: "Mustermann" }),
   geburtsname: z.string().openapi({ example: "Muster" }).optional(),
   geburtsdatum: z.iso.date().openapi({ example: "1988-09-10" }),
-  geburtsort: z.string().openapi({ example: "Musterstadt" }).optional(),
-  geburtsland: z.string().openapi({ example: "Deutschland" }).optional(),
+  geburtsort: z.string().openapi({ example: "Musterstadt" }),
+  geburtsland: z.string().openapi({ example: "Deutschland" }),
   staatsangehörigkeitIcao: z.enum(STAATSANGEHOERIGKEIT_ICAO_KEYS).optional().openapi({
     example: "D",
     description:
@@ -83,6 +86,11 @@ const PersönlicheDatenSchema = z.object({
     example: "substantiell",
     description: "Vertrauensniveau des verwendeten Identifizierungsmittels gemäß eIDAS-Verordnung",
   }),
+  geschlecht: z.enum(["x", "d", "w", "m"]).openapi({
+    example: "x",
+    description:
+      "Geschlecht der Person. 'x' = keine Angabe (Pflichtfeld gemäß SCH-EXISTS in xGewerbeordnung).",
+  }),
 });
 
 const UnternehmensDatenSchema = z
@@ -112,6 +120,28 @@ const UnternehmensDatenSchema = z
       description: "Date reported to the Gewerbeamt as the business's founding date.",
     }),
     gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
+    istReisegewerbe: z.boolean().openapi({
+      example: false,
+      description: "Handelt es sich um ein Reisegewerbe?",
+    }),
+    rechtsform: z.enum(RECHTSFORM_KEYS).openapi({
+      example: "nichtEingetragenesEinzelunternehmen",
+      description: "Rechtsform des Unternehmens.",
+    }),
+    grundAnmeldungSchluessel: z.enum(GRUNDANMELDUNGSSCHLUESSEL_KEYS).openapi({
+      example: "neugründung",
+      description:
+        "Grund für die Gewerbeanmeldung. Entspricht dem Codelisten-Schlüssel gemäß urn:xoev-de:xgewerbeordnung:codeliste:grundfueranmeldung_3.",
+    }),
+    artBetriebsstaette: z.enum(ART_BETRIEBSSTAETTE_KEYS).openapi({
+      example: "hauptniederlassung",
+      description: "Art der Betriebsstätte (SCH-0256: nur 01/02/03 ab 2024-05-01).",
+    }),
+    beteiligungOeffentlicheHand: z.enum(["0", "1", "2"]).openapi({
+      example: "0",
+      description:
+        "Beteiligung der öffentlichen Hand: '0' = keine, '1' = vorhanden, '2' = unbekannt.",
+    }),
     anzahlVollzeitBeschaeftigte: z.number().int().min(0).default(0).openapi({
       example: 0,
       description:

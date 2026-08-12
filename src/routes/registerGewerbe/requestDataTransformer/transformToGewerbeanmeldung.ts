@@ -10,6 +10,8 @@ import {
   STAATSANGEHOERIGKEIT_ICAO,
   HAMBURG_GEMEINDESCHLUESSEL,
   HAMBURG_STADTBEZIRK_PLZ,
+  GRUNDANMELDUNGSSCHLUESSEL,
+  ART_BETRIEBSSTAETTE,
 } from "./xGewerbeordnungCodes";
 import { Anschrift } from "../../../xmlBuilders/xGewerbeordnung/buildingBlocks/anschrift";
 
@@ -107,18 +109,18 @@ export function transformToGewerbeanmeldung(
     uuid: randomUUID(),
     gueltigAb: data.unternehmensDaten.anmeldedatumGewerbeamt,
     datumMeldung: new Date().toISOString().split("T")[0]!,
-    grundAnmeldungSchluessel: "01", // 01 = Neugründung. See https://www.xrepository.de/api/xrepository/urn:xoev-de:xgewerbeordnung:codeliste:grundfueranmeldung_3:technischerBestandteilGenericode
+    grundAnmeldungSchluessel:
+      GRUNDANMELDUNGSSCHLUESSEL[data.unternehmensDaten.grundAnmeldungSchluessel],
     bisherigeUnfallversicherung: undefined, // Not used as long as we only support 'grundAnmeldungSchluessel: "01"' (Neugründung)
     gewerbebetrieb: {
       gewerbebetriebID: randomUUID(),
       gemeindeMeldungNr: "2024 0001",
-      rechtsformcode: RECHTSFORM.nichtEingetragenesEinzelunternehmen,
-      // We currently only support non-registered sole proprietorships (412000), which must
-      // not carry a registered name (SCH-0205), so eingetragenerName stays undefined.
+      rechtsformcode: RECHTSFORM[data.unternehmensDaten.rechtsform],
+      // SCH-0205: eingetragenerName must not be set for nichtEingetragenesEinzelunternehmen
       eingetragenerName: undefined,
       geschaeftsbezeichnung: data.unternehmensDaten.geschäftsbezeichnung,
       betriebsstaette: {
-        artBetriebsstaette: "01",
+        artBetriebsstaette: ART_BETRIEBSSTAETTE[data.unternehmensDaten.artBetriebsstaette],
         anschrift: betriebsAnschrift,
       },
       taetigkeitenGesamt: {
@@ -130,8 +132,8 @@ export function transformToGewerbeanmeldung(
       anzahlVollzeitBeschaeftigte: data.unternehmensDaten.anzahlVollzeitBeschaeftigte,
       anzahlTeilzeitBeschaeftigte: data.unternehmensDaten.anzahlTeilzeitBeschaeftigte,
       // For later: this property has a cross-relation to artNiederlassung (which we don't have, right now)
-      istReisegewerbe: false,
-      beteiligungOeffentlicheHand: "0",
+      istReisegewerbe: data.unternehmensDaten.istReisegewerbe,
+      beteiligungOeffentlicheHand: data.unternehmensDaten.beteiligungOeffentlicheHand,
       betriebArt: {
         industrie: data.unternehmensDaten.tätigkeitsbereich === "industrie",
         handwerk: data.unternehmensDaten.tätigkeitsbereich === "handwerk",
@@ -150,12 +152,10 @@ export function transformToGewerbeanmeldung(
           },
           geburt: {
             geburtsdatum: data.persönlicheDaten.geburtsdatum,
-            ort: data.persönlicheDaten.geburtsort ?? "keine Angabe",
-            staat: data.persönlicheDaten.geburtsland ?? "keine Angabe",
+            ort: data.persönlicheDaten.geburtsort,
+            staat: data.persönlicheDaten.geburtsland,
           },
-          // XGewerbeordnung Schematron requires np:geschlecht to be present (SCH-EXISTS-xga-natuerlichePerson-np-geschlecht);
-          // we no longer collect it, so always report "keine Angabe".
-          geschlecht: "x",
+          geschlecht: data.persönlicheDaten.geschlecht,
           staatsangehoerigkeit: staatsangehoerigkeitCode,
           anschrift: {
             strasse: personStrasseHausnummer.strasse,

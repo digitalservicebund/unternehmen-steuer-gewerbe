@@ -12,13 +12,15 @@ const testRoutingInfo = {
 const testRoutingInfoHamburg = { ...testRoutingInfo, ags: "02000000" };
 
 describe("transformToGewerbeanmeldung", () => {
-  it("maps default values, applies the geschlecht, geburtsort and geburtsland fallbacks if not given and drops optional fields", () => {
+  it("maps geschlecht and the geburtsort/geburtsland defaults when not given", () => {
     const request: RegisterGewerbeRequest = {
       ...registerGewerbeSampleRequestAllFieldsFilled,
       persönlicheDaten: {
         ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
         geburtsname: undefined,
-        geburtsort: undefined,
+        geburtsort: "keine Angabe",
+        geburtsland: "keine Angabe",
+        geschlecht: "x",
       },
       unternehmensDaten: {
         ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
@@ -47,7 +49,7 @@ describe("transformToGewerbeanmeldung", () => {
     expect(person.geburt!.staat).toBe("keine Angabe");
   });
 
-  it("statically sets geburt.staat to 'keine Angabe' since geburtsland is no longer collected", () => {
+  it("passes geburtsland directly from the request to geburt.staat", () => {
     const result = transformToGewerbeanmeldung(
       registerGewerbeSampleRequestAllFieldsFilled,
       testRoutingInfo,
