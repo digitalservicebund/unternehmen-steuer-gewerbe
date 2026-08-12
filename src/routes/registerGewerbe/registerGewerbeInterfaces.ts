@@ -137,7 +137,11 @@ const UnternehmensDatenSchema = z
       example: "hauptniederlassung",
       description: "Art der Betriebsstätte (SCH-0256: nur 01/02/03 ab 2024-05-01).",
     }),
-    beteiligungOeffentlicheHand: z.enum(["0", "1", "2"]).openapi({
+    beteiligungOeffentlicheHand: z.enum([
+      "0",
+      // "1", Not supported
+      // "2", Not supported
+    ]).openapi({
       example: "0",
       description:
         "Beteiligung der öffentlichen Hand: '0' = keine, '1' = vorhanden, '2' = unbekannt.",

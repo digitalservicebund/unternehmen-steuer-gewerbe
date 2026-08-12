@@ -254,8 +254,8 @@ export const GRUNDANMELDUNGSSCHLUESSEL_KEYS = Object.keys(GRUNDANMELDUNGSSCHLUES
 // Valid values from SCH-0256 (only 01/02/03 allowed from 2024-05-01)
 export const ART_BETRIEBSSTAETTE = {
   hauptniederlassung: "01",
-  zweigniederlassung: "02",
-  unselbststaendigeZweigniederlassung: "03",
+  // zweigniederlassung: "02", Not supported
+  // unselbststaendigeZweigniederlassung: "03", Not supported
 } as const;
 type ArtBetriebsstaette = keyof typeof ART_BETRIEBSSTAETTE;
 export const ART_BETRIEBSSTAETTE_KEYS = Object.keys(ART_BETRIEBSSTAETTE) as [
