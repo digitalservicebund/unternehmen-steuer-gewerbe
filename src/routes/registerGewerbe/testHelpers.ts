@@ -75,20 +75,35 @@ export function gewerbeanmeldungFixture(): CreateGewerbeanmeldungXmlData {
           ort: "Musterstadt",
         },
       },
-      taetigkeitenGesamt: { schwerpunkt: { taetigkeitSchwerpunkt: "Mustertätigkeit" } },
+      taetigkeitenGesamt: {
+        schwerpunkt: { taetigkeitSchwerpunkt: "Mustertätigkeit" },
+      },
       istNebenerwerb: false,
       anzahlVollzeitBeschaeftigte: 1,
       anzahlTeilzeitBeschaeftigte: 0,
       istReisegewerbe: false,
       beteiligungOeffentlicheHand: "0",
-      betriebArt: { industrie: false, handwerk: false, handel: true, sonstiges: false },
+      betriebArt: {
+        industrie: false,
+        handwerk: false,
+        handel: true,
+        sonstiges: false,
+      },
     },
     referenzierteSubjekte: {
       natuerlichePerson: [
         {
           id: personId,
-          name: { familienname: "Mustermann", vornamen: "Max", geburtsname: "Musterfrau" },
-          geburt: { geburtsdatum: "1980-01-12", ort: "Musterstadt", staat: "Deutschland" },
+          name: {
+            familienname: "Mustermann",
+            vornamen: "Max",
+            geburtsname: "Musterfrau",
+          },
+          geburt: {
+            geburtsdatum: "1980-01-12",
+            ort: "Musterstadt",
+            staat: "Deutschland",
+          },
           geschlecht: "x",
           staatsangehoerigkeit: "000",
           anschrift: {
@@ -97,7 +112,10 @@ export function gewerbeanmeldungFixture(): CreateGewerbeanmeldungXmlData {
             postleitzahl: "12345",
             ort: "Musterstadt",
           },
-          kommunikation: { telefon: "+49 123 456789", email: "max@mustermann.de" },
+          kommunikation: {
+            telefon: "+49 123 456789",
+            email: "max@mustermann.de",
+          },
         },
       ],
     },
@@ -109,6 +127,8 @@ export function gewerbeRoutingInfoFixture(): GewerbeRoutingInfo {
     ags: "11000000",
     ars: "110000000000",
     gewerbeamt: { name: "Ordnungsamt Musterstadt" },
-    fitConnectDestinationInformation: { destinationId: "d0d0c0de-0000-4000-8000-000000000000" },
+    fitConnectDestinationInformation: {
+      destinationId: "d0d0c0de-0000-4000-8000-000000000000",
+    },
   };
 }

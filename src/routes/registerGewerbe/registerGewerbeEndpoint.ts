@@ -65,7 +65,10 @@ async function submitViaFitConnect({
     data: gewerbeanmeldungXml,
   });
 
-  return { submissionId: response.submissionId, fitConnectDestinationId: destinationId };
+  return {
+    submissionId: response.submissionId,
+    fitConnectDestinationId: destinationId,
+  };
 }
 
 interface SubmitViaOsciOptions {
@@ -132,7 +135,10 @@ async function submitGewerbeanmeldung(
   try {
     let transportResult: GewerbeanmeldungTransportResult;
     if (fitConnectDestinationInformation === null) {
-      transportResult = await submitViaOsci({ ags: routingInfo.ags, gewerbeanmeldungXml });
+      transportResult = await submitViaOsci({
+        ags: routingInfo.ags,
+        gewerbeanmeldungXml,
+      });
     } else {
       transportResult = await submitViaFitConnect({
         destinationId: fitConnectDestinationInformation.destinationId,

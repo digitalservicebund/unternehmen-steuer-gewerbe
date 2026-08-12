@@ -5,7 +5,7 @@ import {
   createReceiptDocument,
   FONT_BOLD,
   FONT_REGULAR,
-  renderDocumentToBuffer,
+  buildDocumentBuffer,
 } from "./pdfDocument";
 import {
   buildReceipt,
@@ -45,7 +45,7 @@ export async function generatePdfReceipt(
   const receipt = buildReceipt(anmeldung, routingInfo);
   const document = await createReceiptDocument(RECEIPT_TITLE);
 
-  const pdf = await renderDocumentToBuffer(document, () => {
+  const pdf = await buildDocumentBuffer(document, () => {
     const documentStruct = document.struct("Document");
     document.addStructure(documentStruct);
 
@@ -175,7 +175,9 @@ function renderNotice(
         .font(FONT_BOLD)
         .fontSize(FONT_SIZES.body)
         .fillColor(COLORS.text)
-        .text(RECEIPT_NOTICE_TITLE, textX, top + NOTICE.paddingVertical, { width: textWidth });
+        .text(RECEIPT_NOTICE_TITLE, textX, top + NOTICE.paddingVertical, {
+          width: textWidth,
+        });
     }),
   );
   noticeStruct.add(
@@ -299,7 +301,10 @@ function rowHeight(document: PDFKit.PDFDocument, row: ReceiptRow): number {
   const valueHeight = document
     .font(FONT_BOLD)
     .fontSize(FONT_SIZES.body)
-    .heightOfString(row.value ?? EMPTY_VALUE, { width: ROW_VALUE_WIDTH, lineGap: LINE_GAP });
+    .heightOfString(row.value ?? EMPTY_VALUE, {
+      width: ROW_VALUE_WIDTH,
+      lineGap: LINE_GAP,
+    });
   return Math.max(labelHeight, valueHeight) + ROW.gap;
 }
 

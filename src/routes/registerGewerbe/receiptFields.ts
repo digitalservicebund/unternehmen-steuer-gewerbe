@@ -40,7 +40,7 @@ export interface Receipt {
   sections: ReceiptSection[];
 }
 
-function formatDate(value: string | undefined): string | undefined {
+function formatDate(value?: string): string | undefined {
   if (!value) return undefined;
   const date = new Date(value.length === 10 ? `${value}T00:00:00Z` : value);
   if (Number.isNaN(date.getTime())) return undefined;
@@ -52,29 +52,26 @@ function formatDate(value: string | undefined): string | undefined {
   }).format(date);
 }
 
-function formatBoolean(value: boolean | undefined): string | undefined {
+function formatBoolean(value?: boolean): string | undefined {
   if (value === undefined) return undefined;
   return value ? "Ja" : "Nein";
 }
 
-function formatAnschrift(anschrift: Anschrift | undefined): string | undefined {
-  if (!anschrift) return undefined;
-  const hausnummer = [anschrift.hausnummerVon, anschrift.hausnummerBis].filter(Boolean).join("-");
-  const strasse = [anschrift.strasse, hausnummer].filter(Boolean).join(" ");
-  const ort = [anschrift.postleitzahl, anschrift.ort].filter(Boolean).join(" ");
-  const parts = [strasse, ort].filter((part) => part.length > 0);
-  return parts.length === 0 ? undefined : parts.join(", ");
+function formatAnschrift(anschrift?: Anschrift): string | undefined {
+  if (!anschrift?.strasse || !anschrift.hausnummerVon || !anschrift.postleitzahl || !anschrift.ort)
+    return undefined;
+  const hausnummer = anschrift.hausnummerBis
+    ? `${anschrift.hausnummerVon}-${anschrift.hausnummerBis}`
+    : anschrift.hausnummerVon;
+  return `${anschrift.strasse} ${hausnummer}, ${anschrift.postleitzahl} ${anschrift.ort}`;
 }
 
-function formatGeburtsortUndLand(
-  ort: string | undefined,
-  staat: string | undefined,
-): string | undefined {
-  const parts = [ort, staat].filter(Boolean);
-  return parts.length === 0 ? undefined : parts.join(", ");
+function formatGeburtsortUndLand(ort?: string, staat?: string): string | undefined {
+  if (!ort || !staat) return undefined;
+  return `${ort}, ${staat}`;
 }
 
-function formatBetriebArt(betriebArt: BetriebArt | undefined): string | undefined {
+function formatBetriebArt(betriebArt?: BetriebArt): string | undefined {
   if (!betriebArt) return undefined;
   const arten = [
     betriebArt.industrie ? "Industrie" : undefined,
@@ -85,15 +82,12 @@ function formatBetriebArt(betriebArt: BetriebArt | undefined): string | undefine
   return arten.length === 0 ? undefined : arten.join(", ");
 }
 
-function formatBeschaeftigte(
-  vollzeit: number | undefined,
-  teilzeit: number | undefined,
-): string | undefined {
+function formatBeschaeftigte(vollzeit?: number, teilzeit?: number): string | undefined {
   if (vollzeit === undefined && teilzeit === undefined) return undefined;
   return `${vollzeit ?? 0} / ${teilzeit ?? 0}`;
 }
 
-function labelFor(labels: Record<string, string>, code: string | undefined): string | undefined {
+function labelFor(labels: Record<string, string>, code?: string): string | undefined {
   return code === undefined ? undefined : labels[code];
 }
 
@@ -161,8 +155,16 @@ export function buildReceipt(
           label: "Anschrift der Wohnung",
           value: formatAnschrift(person?.anschrift),
         },
-        { gewaNumber: "11", label: "Telefonnummer", value: person?.kommunikation?.telefon },
-        { gewaNumber: "11", label: "E-Mail-Adresse", value: person?.kommunikation?.email },
+        {
+          gewaNumber: "11",
+          label: "Telefonnummer",
+          value: person?.kommunikation?.telefon,
+        },
+        {
+          gewaNumber: "11",
+          label: "E-Mail-Adresse",
+          value: person?.kommunikation?.email,
+        },
       ],
     },
     {
@@ -227,7 +229,10 @@ export function buildReceipt(
           label: "Liegt ein Aufenthaltstitel vor?",
           value: person?.aufenthaltstitel === undefined ? undefined : "Ja",
         },
-        { gewaNumber: "31", label: "Auflage oder Beschränkung der Erwerbstätigkeit" },
+        {
+          gewaNumber: "31",
+          label: "Auflage oder Beschränkung der Erwerbstätigkeit",
+        },
       ],
     },
     {
@@ -255,10 +260,19 @@ export function buildReceipt(
             gewerbebetrieb?.beteiligungOeffentlicheHand,
           ),
         },
-        { gewaNumber: "14", label: "Vertretungsberechtigte Person / Betriebsleiter" },
-        { gewaNumber: "16", label: "Hauptniederlassung (bei Zweigniederlassung)" },
+        {
+          gewaNumber: "14",
+          label: "Vertretungsberechtigte Person / Betriebsleiter",
+        },
+        {
+          gewaNumber: "16",
+          label: "Hauptniederlassung (bei Zweigniederlassung)",
+        },
         { gewaNumber: "17", label: "Frühere Betriebsstätte" },
-        { gewaNumber: "26", label: "Früherer Gewerbetreibender oder Firmenname" },
+        {
+          gewaNumber: "26",
+          label: "Früherer Gewerbetreibender oder Firmenname",
+        },
         {
           gewaNumber: "27",
           label: "Bisheriger Unfallversicherungsträger",

@@ -47,12 +47,6 @@ export async function createReceiptDocument(title: string): Promise<PDFKit.PDFDo
     },
     fontLayoutCache: true,
     subset: "PDF/UA" as PDFKit.Mixins.PDFSubsets,
-    permissions: {
-      annotating: true,
-      printing: "highResolution",
-      fillingForms: true,
-      contentAccessibility: true,
-    },
   });
 
   const fonts = await getFonts();
@@ -68,7 +62,7 @@ export async function createReceiptDocument(title: string): Promise<PDFKit.PDFDo
   return document;
 }
 
-export function renderDocumentToBuffer(
+export function buildDocumentBuffer(
   document: PDFKit.PDFDocument,
   build: () => void,
 ): Promise<Buffer> {
