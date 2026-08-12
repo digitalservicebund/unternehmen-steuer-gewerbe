@@ -26,7 +26,7 @@ describe("transformToEUnFsE", () => {
       natVorw: "234",
       rufNr: "121314",
     });
-    expect(result.eUn?.allgAngaben?.artTaet?.gewerbeArt).toBe("Vertrieb von Vertriebsmustern");
+    expect(result.eUn?.allgAngaben?.artTaet?.gewerbeArt).toBe("Vertrieb von Mustern");
     expect(result.eUn?.betrieb?.betrBeginn?.betriebsbeginn).toBe("17.04.2026");
     expect(result.eUn?.betrieb?.gruendungsangaben?.gruendungsForm?.uebertrStichtag).toBe(
       "17.04.2026",
@@ -55,6 +55,38 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.betrieb?.gruendungsangaben?.gruendungsForm?.uebertrStichtag).toBe(
       expectedDate,
     );
+  });
+
+  describe("gewerbeArt (tätigkeitsbeschreibung)", () => {
+    it("falls back to tätigkeitsbeschreibung when tätigkeitsbeschreibungKurz is missing", () => {
+      const request = {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
+          tätigkeitsbeschreibungKurz: undefined,
+        },
+      };
+
+      const result = transformToEUnFsE(request);
+
+      expect(result.eUn?.allgAngaben?.artTaet?.gewerbeArt).toBe("Vertrieb von Vertriebsmustern");
+    });
+
+    it("truncates the tätigkeitsbeschreibung fallback to 200 characters", () => {
+      const request = {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          tätigkeitsbeschreibung: "a".repeat(250),
+          tätigkeitsbeschreibungKurz: undefined,
+        },
+      };
+
+      const result = transformToEUnFsE(request);
+
+      expect(result.eUn?.allgAngaben?.artTaet?.gewerbeArt).toBe("a".repeat(200));
+    });
   });
 
   describe("finanzamtId", () => {

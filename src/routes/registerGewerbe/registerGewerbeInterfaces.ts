@@ -126,7 +126,12 @@ const UnternehmensDatenSchema = z
       description:
         "Bezeichnung des Unternehmens, falls abweichend vom Namen des Gewerbetreibenden.",
     }),
-    tätigkeitsbeschreibung: z.string().openapi({ example: "Vertrieb von Vertriebsmustern" }),
+    tätigkeitsbeschreibung: z.string().min(1).openapi({ example: "Vertrieb von Vertriebsmustern" }),
+    tätigkeitsbeschreibungKurz: z.string().min(1).max(200).optional().openapi({
+      example: "Vertrieb von Mustern",
+      description:
+        "Kurzfassung der Tätigkeitsbeschreibung für den FsE (max. 200 Zeichen). Fehlt sie, wird `tätigkeitsbeschreibung` auf 200 Zeichen gekürzt.",
+    }),
     tätigkeitsbereich: z
       .enum(["industrie", "handwerk", "handel", "sonstiges"])
       .openapi({ example: "handwerk" }),

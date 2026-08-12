@@ -78,6 +78,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["persönlicheDaten.staatsangehörigkeitIcao"],
       ["persönlicheDaten.steuernummer"],
       ["unternehmensDaten.adresseAbweichend"],
+      ["unternehmensDaten.tätigkeitsbeschreibungKurz"],
       ["unternehmensDaten.umsatzsteuerImErstenJahr"],
     ])("succeeds and stays absent when %s is missing", (fieldPath) => {
       const request = validRequest() as Record<string, unknown>;
@@ -299,6 +300,29 @@ describe("RegisterGewerbeRequestSchema", () => {
     ])("rejects a non-integer value for %s", (field) => {
       const request = validRequest();
       (request.unternehmensDaten as Record<string, unknown>)[field] = 1.5;
+
+      const result = RegisterGewerbeRequestSchema.safeParse(request);
+
+      expect(result.success).toBe(false);
+    });
+  });
+
+  describe("string length bounds", () => {
+    it.each([["tätigkeitsbeschreibung"], ["tätigkeitsbeschreibungKurz"]])(
+      "rejects an empty string for %s",
+      (field) => {
+        const request = validRequest();
+        (request.unternehmensDaten as Record<string, unknown>)[field] = "";
+
+        const result = RegisterGewerbeRequestSchema.safeParse(request);
+
+        expect(result.success).toBe(false);
+      },
+    );
+
+    it("rejects a tätigkeitsbeschreibungKurz longer than 200 characters", () => {
+      const request = validRequest();
+      request.unternehmensDaten.tätigkeitsbeschreibungKurz = "a".repeat(201);
 
       const result = RegisterGewerbeRequestSchema.safeParse(request);
 

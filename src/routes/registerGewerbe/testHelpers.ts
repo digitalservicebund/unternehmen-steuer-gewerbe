@@ -23,6 +23,7 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
   },
   unternehmensDaten: {
     tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
+    tätigkeitsbeschreibungKurz: "Vertrieb von Mustern",
     tätigkeitsbereich: "handwerk",
     anmeldedatumFinanzamt: "2026-04-17",
     anmeldedatumGewerbeamt: "2026-05-18",

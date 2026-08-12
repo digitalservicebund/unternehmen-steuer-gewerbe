@@ -213,7 +213,10 @@ export function transformToEUnFsE(
           },
         },
         artTaet: {
-          gewerbeArt: data.unternehmensDaten.tätigkeitsbeschreibung,
+          // FsE GewerbeArt allows at most 200 characters
+          gewerbeArt:
+            data.unternehmensDaten.tätigkeitsbeschreibungKurz ??
+            data.unternehmensDaten.tätigkeitsbeschreibung.slice(0, 200),
         },
         // bankKonto: {
         //   iban: undefined,
