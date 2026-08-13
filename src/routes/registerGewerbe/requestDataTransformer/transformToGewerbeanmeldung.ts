@@ -106,7 +106,9 @@ export function transformToGewerbeanmeldung(
     gueltigAb: data.unternehmensDaten.anmeldedatumGewerbeamt,
     datumMeldung: new Date().toISOString().split("T")[0]!,
     grundAnmeldungSchluessel: GRUNDANMELDUNGSSCHLUESSEL[data.unternehmensDaten.gründungsart],
-    bisherigeUnfallversicherung: undefined, // Not used as long as we only support 'gründungsart: "neugründung"'
+    // SCH-0007: may only stay empty while gründungsart is "neugründung" and artBetriebsstaette is
+    // "hauptniederlassung" (or istReisegewerbe is true) — opening any of those makes it mandatory.
+    bisherigeUnfallversicherung: undefined,
     gewerbebetrieb: {
       gewerbebetriebID: randomUUID(),
       gemeindeMeldungNr: "2024 0001",
@@ -126,7 +128,6 @@ export function transformToGewerbeanmeldung(
       istNebenerwerb: data.unternehmensDaten.gewerbeart === "nebengewerbe",
       anzahlVollzeitBeschaeftigte: data.unternehmensDaten.anzahlVollzeitBeschaeftigte,
       anzahlTeilzeitBeschaeftigte: data.unternehmensDaten.anzahlTeilzeitBeschaeftigte,
-      // For later: this property has a cross-relation to artNiederlassung (which we don't have, right now)
       istReisegewerbe: data.unternehmensDaten.istReisegewerbe,
       beteiligungOeffentlicheHand:
         BETEILIGUNG_OEFFENTLICHE_HAND[data.unternehmensDaten.beteiligungOeffentlicheHand],
@@ -148,8 +149,8 @@ export function transformToGewerbeanmeldung(
           },
           geburt: {
             geburtsdatum: data.persönlicheDaten.geburtsdatum,
-            ort: data.persönlicheDaten.geburtsort,
-            staat: data.persönlicheDaten.geburtsland,
+            ort: data.persönlicheDaten.geburtsort ?? "keine Angabe",
+            staat: data.persönlicheDaten.geburtsland ?? "keine Angabe",
           },
           geschlecht: GESCHLECHT[data.persönlicheDaten.geschlecht],
           staatsangehoerigkeit: staatsangehoerigkeitCode,

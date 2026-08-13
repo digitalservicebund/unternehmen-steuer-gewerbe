@@ -29,9 +29,6 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["persönlicheDaten.vorname"],
       ["persönlicheDaten.nachname"],
       ["persönlicheDaten.geburtsdatum"],
-      ["persönlicheDaten.geburtsort"],
-      ["persönlicheDaten.geburtsland"],
-      ["persönlicheDaten.geschlecht"],
       ["persönlicheDaten.adresse"],
       ["persönlicheDaten.telefon"],
       ["persönlicheDaten.email"],
@@ -76,6 +73,8 @@ describe("RegisterGewerbeRequestSchema", () => {
   describe("optional fields", () => {
     it.each([
       ["persönlicheDaten.geburtsname"],
+      ["persönlicheDaten.geburtsort"],
+      ["persönlicheDaten.geburtsland"],
       ["persönlicheDaten.staatsangehörigkeitIcao"],
       ["persönlicheDaten.steuernummer"],
       ["unternehmensDaten.adresseAbweichend"],
@@ -111,6 +110,7 @@ describe("RegisterGewerbeRequestSchema", () => {
   describe("defaults", () => {
     it.each([
       ["persönlicheDaten", "staatsangehörigkeit", "deutsch"],
+      ["persönlicheDaten", "geschlecht", "keineAngabe"],
       ["unternehmensDaten", "kleinunternehmerRegelung", false],
       ["unternehmensDaten", "anzahlVollzeitBeschaeftigte", 0],
       ["unternehmensDaten", "anzahlTeilzeitBeschaeftigte", 0],

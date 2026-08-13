@@ -102,6 +102,24 @@ describe("transformToGewerbeanmeldung", () => {
     expect(actual(result)).toBe(expected);
   });
 
+  it("falls back to 'keine Angabe' for geburt.ort and geburt.staat when geburtsort and geburtsland are not given", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        persönlicheDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
+          geburtsort: undefined,
+          geburtsland: undefined,
+        },
+      },
+      testRoutingInfo,
+    );
+    const { geburt } = result.referenzierteSubjekte!.natuerlichePerson![0]!;
+
+    expect(geburt!.ort).toBe("keine Angabe");
+    expect(geburt!.staat).toBe("keine Angabe");
+  });
+
   it.each([
     { geschlecht: "weiblich", expected: "w" },
     { geschlecht: "keineAngabe", expected: "x" },

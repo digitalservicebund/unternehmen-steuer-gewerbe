@@ -51,8 +51,8 @@ const PersönlicheDatenSchema = z.object({
   nachname: z.string().openapi({ example: "Mustermann" }),
   geburtsname: z.string().openapi({ example: "Muster" }).optional(),
   geburtsdatum: z.iso.date().openapi({ example: "1988-09-10" }),
-  geburtsort: z.string().openapi({ example: "Musterstadt" }),
-  geburtsland: z.string().openapi({ example: "Deutschland" }),
+  geburtsort: z.string().openapi({ example: "Musterstadt" }).optional(),
+  geburtsland: z.string().openapi({ example: "Deutschland" }).optional(),
   staatsangehörigkeitIcao: z.enum(STAATSANGEHOERIGKEIT_ICAO_KEYS).optional().openapi({
     example: "D",
     description:
@@ -98,10 +98,10 @@ const PersönlicheDatenSchema = z.object({
     example: "substantiell",
     description: "Vertrauensniveau des verwendeten Identifizierungsmittels gemäß eIDAS-Verordnung",
   }),
-  geschlecht: z.enum(GESCHLECHT_KEYS).openapi({
+  geschlecht: z.enum(GESCHLECHT_KEYS).default("keineAngabe").openapi({
     example: "keineAngabe",
     description:
-      "Geschlecht der Person gemäß urn:xoev-de:xinneres:codeliste:geschlecht_1 (Pflichtfeld gemäß SCH-EXISTS in xGewerbeordnung).",
+      "Geschlecht der Person gemäß urn:xoev-de:xinneres:codeliste:geschlecht_1. Pflichtangabe in der xGewerbeordnung (SCH-EXISTS), Standardwert ist 'keineAngabe'.",
   }),
 });
 
@@ -268,7 +268,7 @@ const unfallversicherungstraegerCodesDescription = Object.entries(UNFALLVERSICHE
   .map(([name, code]) => `- \`${name}\` (${code})`)
   .join("\n");
 
-// Not used as long as we only support 'gründungsart: "neugründung"'
+// Not used while SCH-0007 requires bisherigeUnfallversicherung to stay empty (see transform)
 const _BisherigeUnfallversicherungSchema = z
   .object({
     traeger: z.enum(UNFALLVERSICHERUNGSTRAEGER_KEYS).openapi({
