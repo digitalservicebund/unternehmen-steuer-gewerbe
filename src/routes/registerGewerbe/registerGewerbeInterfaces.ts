@@ -6,9 +6,7 @@ import {
   VERTRAUENSNIVEAU_KEYS,
   STAATSANGEHOERIGKEIT_KEYS,
   STAATSANGEHOERIGKEIT_ICAO_KEYS,
-  RECHTSFORM_KEYS,
-  GRUNDANMELDUNGSSCHLUESSEL_KEYS,
-  ART_BETRIEBSSTAETTE_KEYS,
+  GESCHLECHT_KEYS,
 } from "./requestDataTransformer/xGewerbeordnungCodes";
 import {
   RELIGIONSSCHLUESSEL_KEYS,
@@ -86,10 +84,10 @@ const PersönlicheDatenSchema = z.object({
     example: "substantiell",
     description: "Vertrauensniveau des verwendeten Identifizierungsmittels gemäß eIDAS-Verordnung",
   }),
-  geschlecht: z.enum(["x", "d", "w", "m"]).openapi({
-    example: "x",
+  geschlecht: z.enum(GESCHLECHT_KEYS).openapi({
+    example: "keineAngabe",
     description:
-      "Geschlecht der Person. 'x' = keine Angabe (Pflichtfeld gemäß SCH-EXISTS in xGewerbeordnung).",
+      "Geschlecht der Person gemäß urn:xoev-de:xinneres:codeliste:geschlecht_1 (Pflichtfeld gemäß SCH-EXISTS in xGewerbeordnung).",
   }),
 });
 
@@ -120,31 +118,34 @@ const UnternehmensDatenSchema = z
       description: "Date reported to the Gewerbeamt as the business's founding date.",
     }),
     gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
-    istReisegewerbe: z.boolean().openapi({
+    istReisegewerbe: z.literal(false).openapi({
       example: false,
-      description: "Handelt es sich um ein Reisegewerbe?",
+      description: "Handelt es sich um ein Reisegewerbe? Aktuell wird nur 'false' unterstützt.",
     }),
-    rechtsform: z.enum(RECHTSFORM_KEYS).openapi({
+    rechtsform: z.literal("nichtEingetragenesEinzelunternehmen").openapi({
       example: "nichtEingetragenesEinzelunternehmen",
-      description: "Rechtsform des Unternehmens.",
+      description:
+        "Rechtsform des Unternehmens. Aktuell wird nur 'nichtEingetragenesEinzelunternehmen' unterstützt.",
     }),
-    grundAnmeldungSchluessel: z.enum(GRUNDANMELDUNGSSCHLUESSEL_KEYS).openapi({
+    gründungsart: z.literal("neugründung").openapi({
       example: "neugründung",
       description:
-        "Grund für die Gewerbeanmeldung. Entspricht dem Codelisten-Schlüssel gemäß urn:xoev-de:xgewerbeordnung:codeliste:grundfueranmeldung_3.",
+        "Anlass der Gründung: Grund der Gewerbeanmeldung (xGewerbeordnung) und Gründungsform (FsE). Aktuell wird nur 'neugründung' unterstützt.",
     }),
-    artBetriebsstaette: z.enum(ART_BETRIEBSSTAETTE_KEYS).openapi({
+    artBetriebsstaette: z.literal("hauptniederlassung").openapi({
       example: "hauptniederlassung",
-      description: "Art der Betriebsstätte (SCH-0256: nur 01/02/03 ab 2024-05-01).",
-    }),
-    beteiligungOeffentlicheHand: z.enum([
-      "0",
-      // "1", Not supported
-      // "2", Not supported
-    ]).openapi({
-      example: "0",
       description:
-        "Beteiligung der öffentlichen Hand: '0' = keine, '1' = vorhanden, '2' = unbekannt.",
+        "Art der Betriebsstätte gemäß urn:xoev-de:xunternehmen:codeliste:artniederlassung_1. Aktuell wird nur 'hauptniederlassung' unterstützt.",
+    }),
+    beteiligungOeffentlicheHand: z.literal("nein").openapi({
+      example: "nein",
+      description:
+        "Liegt eine Beteiligung der öffentlichen Hand vor? Aktuell wird nur 'nein' unterstützt.",
+    }),
+    fragebogenTyp: z.literal("aufnahmeTätigkeit").openapi({
+      example: "aufnahmeTätigkeit",
+      description:
+        "Typ des Fragebogens zur steuerlichen Erfassung. Aktuell wird nur 'aufnahmeTätigkeit' unterstützt.",
     }),
     anzahlVollzeitBeschaeftigte: z.number().int().min(0).default(0).openapi({
       example: 0,
@@ -236,7 +237,7 @@ const unfallversicherungstraegerCodesDescription = Object.entries(UNFALLVERSICHE
   .map(([name, code]) => `- \`${name}\` (${code})`)
   .join("\n");
 
-// Not used as long as we only support 'grundAnmeldungSchluessel: "01"' ("Neugründung")
+// Not used as long as we only support 'gründungsart: "neugründung"'
 const _BisherigeUnfallversicherungSchema = z
   .object({
     traeger: z.enum(UNFALLVERSICHERUNGSTRAEGER_KEYS).openapi({

@@ -12,6 +12,8 @@ import {
   HAMBURG_STADTBEZIRK_PLZ,
   GRUNDANMELDUNGSSCHLUESSEL,
   ART_BETRIEBSSTAETTE,
+  BETEILIGUNG_OEFFENTLICHE_HAND,
+  GESCHLECHT,
 } from "./xGewerbeordnungCodes";
 import { Anschrift } from "../../../xmlBuilders/xGewerbeordnung/buildingBlocks/anschrift";
 
@@ -109,9 +111,8 @@ export function transformToGewerbeanmeldung(
     uuid: randomUUID(),
     gueltigAb: data.unternehmensDaten.anmeldedatumGewerbeamt,
     datumMeldung: new Date().toISOString().split("T")[0]!,
-    grundAnmeldungSchluessel:
-      GRUNDANMELDUNGSSCHLUESSEL[data.unternehmensDaten.grundAnmeldungSchluessel],
-    bisherigeUnfallversicherung: undefined, // Not used as long as we only support 'grundAnmeldungSchluessel: "01"' (Neugründung)
+    grundAnmeldungSchluessel: GRUNDANMELDUNGSSCHLUESSEL[data.unternehmensDaten.gründungsart],
+    bisherigeUnfallversicherung: undefined, // Not used as long as we only support 'gründungsart: "neugründung"'
     gewerbebetrieb: {
       gewerbebetriebID: randomUUID(),
       gemeindeMeldungNr: "2024 0001",
@@ -133,7 +134,8 @@ export function transformToGewerbeanmeldung(
       anzahlTeilzeitBeschaeftigte: data.unternehmensDaten.anzahlTeilzeitBeschaeftigte,
       // For later: this property has a cross-relation to artNiederlassung (which we don't have, right now)
       istReisegewerbe: data.unternehmensDaten.istReisegewerbe,
-      beteiligungOeffentlicheHand: data.unternehmensDaten.beteiligungOeffentlicheHand,
+      beteiligungOeffentlicheHand:
+        BETEILIGUNG_OEFFENTLICHE_HAND[data.unternehmensDaten.beteiligungOeffentlicheHand],
       betriebArt: {
         industrie: data.unternehmensDaten.tätigkeitsbereich === "industrie",
         handwerk: data.unternehmensDaten.tätigkeitsbereich === "handwerk",
@@ -155,7 +157,7 @@ export function transformToGewerbeanmeldung(
             ort: data.persönlicheDaten.geburtsort,
             staat: data.persönlicheDaten.geburtsland,
           },
-          geschlecht: data.persönlicheDaten.geschlecht,
+          geschlecht: GESCHLECHT[data.persönlicheDaten.geschlecht],
           staatsangehoerigkeit: staatsangehoerigkeitCode,
           anschrift: {
             strasse: personStrasseHausnummer.strasse,

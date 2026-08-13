@@ -194,7 +194,7 @@ export const RECHTSFORM = {
   eingetragenesEinzelunternehmen: "411000",
   eingetragenesEinzelunternehmenSitzInland: "411100",
   eingetragenesEinzelunternehmenSitzAusland: "411200",
-  nichtEingetragenesEinzelunternehmen: "412000", // currently the only supported value
+  nichtEingetragenesEinzelunternehmen: "412000",
   nichtEingetragenesEinzelunternehmenSitzInland: "412100",
   nichtEingetragenesEinzelunternehmenSitzAusland: "412200",
   sonstigeWirtschaftlicheTaetigkeitNatuerlichePerson: "420000",
@@ -238,30 +238,41 @@ export const RECHTSFORM = {
   sonstigeAuslaendischeRechtsformAuffangtatbestandSteuer: "698100",
 } as const;
 
-export type RechtsformKey = keyof typeof RECHTSFORM;
-export const RECHTSFORM_KEYS = Object.keys(RECHTSFORM) as [RechtsformKey, ...RechtsformKey[]];
-
 // https://www.xrepository.de/api/xrepository/urn:xoev-de:xgewerbeordnung:codeliste:grundfueranmeldung_3
 export const GRUNDANMELDUNGSSCHLUESSEL = {
   neugründung: "01",
+  verlegungAusAnderemMeldebezirk: "02",
+  übergangNachUmwandlungsgesetz: "03",
+  wechselDerRechtsform: "04",
+  gesellschaftereintritt: "05",
+  übernahme: "06",
 } as const;
-type Grundanmeldungsschluessel = keyof typeof GRUNDANMELDUNGSSCHLUESSEL;
-export const GRUNDANMELDUNGSSCHLUESSEL_KEYS = Object.keys(GRUNDANMELDUNGSSCHLUESSEL) as [
-  Grundanmeldungsschluessel,
-  ...Grundanmeldungsschluessel[],
-];
 
-// Valid values from SCH-0256 (only 01/02/03 allowed from 2024-05-01)
+// https://www.xrepository.de/api/xrepository/urn:xoev-de:xunternehmen:codeliste:artniederlassung_1
+// SCH-0256 only allows 01, 02 and 03 from 2024-05-01 on.
 export const ART_BETRIEBSSTAETTE = {
   hauptniederlassung: "01",
-  // zweigniederlassung: "02", Not supported
-  // unselbststaendigeZweigniederlassung: "03", Not supported
+  zweigniederlassung: "02",
+  unselbstaendigeZweigstelle: "03",
+  betriebsstaetteUnspezifisch: "04",
 } as const;
-type ArtBetriebsstaette = keyof typeof ART_BETRIEBSSTAETTE;
-export const ART_BETRIEBSSTAETTE_KEYS = Object.keys(ART_BETRIEBSSTAETTE) as [
-  ArtBetriebsstaette,
-  ...ArtBetriebsstaette[],
-];
+
+// https://www.xrepository.de/api/xrepository/urn:xoev-de:xgewerbeordnung:codeliste:beteiligungoeffentlichehand_1
+export const BETEILIGUNG_OEFFENTLICHE_HAND = {
+  nein: "0",
+  ja: "1",
+  nichtBekannt: "2",
+} as const;
+
+// https://www.xrepository.de/api/xrepository/urn:xoev-de:xinneres:codeliste:geschlecht_1
+export const GESCHLECHT = {
+  männlich: "m",
+  weiblich: "w",
+  divers: "d",
+  keineAngabe: "x",
+} as const;
+type Geschlecht = keyof typeof GESCHLECHT;
+export const GESCHLECHT_KEYS = Object.keys(GESCHLECHT) as [Geschlecht, ...Geschlecht[]];
 
 // https://www.xrepository.de/details/urn:de:bund:destatis:bevoelkerungsstatistik:schluessel:staatsangehoerigkeit_2024-08-01
 export const STAATSANGEHOERIGKEIT = {

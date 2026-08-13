@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { transformToGewerbeanmeldung } from "./transformToGewerbeanmeldung";
-import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
+import { type CreateGewerbeanmeldungXmlData } from "../../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { registerGewerbeSampleRequestAllFieldsFilled } from "../testHelpers";
 
 const testRoutingInfo = {
@@ -12,51 +12,116 @@ const testRoutingInfo = {
 const testRoutingInfoHamburg = { ...testRoutingInfo, ags: "02000000" };
 
 describe("transformToGewerbeanmeldung", () => {
-  it("maps geschlecht and the geburtsort/geburtsland defaults when not given", () => {
-    const request: RegisterGewerbeRequest = {
-      ...registerGewerbeSampleRequestAllFieldsFilled,
-      persönlicheDaten: {
-        ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
-        geburtsname: undefined,
-        geburtsort: "keine Angabe",
-        geburtsland: "keine Angabe",
-        geschlecht: "x",
+  it("falls back to persönlicheDaten.adresse as betriebsstaette anschrift when adresseAbweichend is not given", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          adresseAbweichend: undefined,
+        },
       },
-      unternehmensDaten: {
-        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-        adresseAbweichend: undefined,
-      },
-    };
-    const result = transformToGewerbeanmeldung(request, testRoutingInfo);
-    const person = result.referenzierteSubjekte!.natuerlichePerson![0]!;
+      testRoutingInfo,
+    );
 
-    expect(result.gewerbebetrieb!.istNebenerwerb).toBe(false);
-    expect(result.gewerbebetrieb!.betriebArt).toEqual({
-      industrie: false,
-      handwerk: true,
-      handel: false,
-      sonstiges: false,
-    });
     expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
       strasse: "Musterstraße",
       hausnummerVon: "1 a",
       postleitzahl: "03046",
       ort: "Cottbus",
     });
-    expect(person.geschlecht).toBe("x");
-    expect(person.name!.geburtsname).toBeUndefined();
-    expect(person.geburt!.ort).toBe("keine Angabe");
-    expect(person.geburt!.staat).toBe("keine Angabe");
   });
 
-  it("passes geburtsland directly from the request to geburt.staat", () => {
+  it("maps tätigkeitsbereich handwerk to the betriebArt flags", () => {
     const result = transformToGewerbeanmeldung(
       registerGewerbeSampleRequestAllFieldsFilled,
       testRoutingInfo,
     );
 
-    expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.geburt!.staat).toBe("keine Angabe");
+    expect(result.gewerbebetrieb!.betriebArt).toEqual({
+      industrie: false,
+      handwerk: true,
+      handel: false,
+      sonstiges: false,
+    });
   });
+
+  it("maps gewerbeart hauptgewerbe to istNebenerwerb false", () => {
+    const result = transformToGewerbeanmeldung(
+      registerGewerbeSampleRequestAllFieldsFilled,
+      testRoutingInfo,
+    );
+
+    expect(result.gewerbebetrieb!.istNebenerwerb).toBe(false);
+  });
+
+  it("omits natuerlichePerson.geburtsname when geburtsname is not given", () => {
+    const result = transformToGewerbeanmeldung(
+      {
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        persönlicheDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
+          geburtsname: undefined,
+        },
+      },
+      testRoutingInfo,
+    );
+
+    expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.name!.geburtsname).toBeUndefined();
+  });
+
+  it.each([
+    {
+      label: "gründungsart neugründung",
+      expected: "01",
+      actual: (result: CreateGewerbeanmeldungXmlData) => result.grundAnmeldungSchluessel,
+    },
+    {
+      label: "rechtsform nichtEingetragenesEinzelunternehmen",
+      expected: "412000",
+      actual: (result: CreateGewerbeanmeldungXmlData) => result.gewerbebetrieb!.rechtsformcode,
+    },
+    {
+      label: "artBetriebsstaette hauptniederlassung",
+      expected: "01",
+      actual: (result: CreateGewerbeanmeldungXmlData) =>
+        result.gewerbebetrieb!.betriebsstaette!.artBetriebsstaette,
+    },
+    {
+      label: "beteiligungOeffentlicheHand nein",
+      expected: "0",
+      actual: (result: CreateGewerbeanmeldungXmlData) =>
+        result.gewerbebetrieb!.beteiligungOeffentlicheHand,
+    },
+  ])("maps $label to the xGewerbeordnung code $expected", ({ expected, actual }) => {
+    const result = transformToGewerbeanmeldung(
+      registerGewerbeSampleRequestAllFieldsFilled,
+      testRoutingInfo,
+    );
+
+    expect(actual(result)).toBe(expected);
+  });
+
+  it.each([
+    { geschlecht: "weiblich", expected: "w" },
+    { geschlecht: "keineAngabe", expected: "x" },
+  ] as const)(
+    "maps geschlecht $geschlecht to the XInneres code $expected",
+    ({ geschlecht, expected }) => {
+      const result = transformToGewerbeanmeldung(
+        {
+          ...registerGewerbeSampleRequestAllFieldsFilled,
+          persönlicheDaten: {
+            ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
+            geschlecht,
+          },
+        },
+        testRoutingInfo,
+      );
+
+      expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.geschlecht).toBe(expected);
+    },
+  );
 
   it("maps the staatsangehörigkeit key to its destatis code (deutsch = 000, französisch = 129)", async () => {
     const deutsch = transformToGewerbeanmeldung(

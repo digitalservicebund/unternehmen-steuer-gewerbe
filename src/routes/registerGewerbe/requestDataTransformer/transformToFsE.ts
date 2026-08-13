@@ -12,6 +12,8 @@ import {
   SOLL_IST_VERSTEUERUNG,
   IST_VERSTEUERUNG_GRUND,
   ZAHLLAST_UEBERSCHUSS,
+  FRAGEBOGEN_TYP,
+  GRUENDUNGSART,
 } from "./fsECodes";
 
 function getKleinunternehmerRegelung(data: RegisterGewerbeRequest) {
@@ -122,7 +124,7 @@ export function transformToEUnFsE(
       },
     },
     eUn: {
-      fragebogenTyp: "AUFNTAET",
+      fragebogenTyp: FRAGEBOGEN_TYP[data.unternehmensDaten.fragebogenTyp],
       ordnungskriterium: {
         ordNrArt: data.persönlicheDaten.steuernummer ? "S" : "O",
       },
@@ -273,7 +275,7 @@ export function transformToEUnFsE(
         },
         gruendungsangaben: {
           gruendungsForm: {
-            gruendungsArt: "1",
+            gruendungsArt: GRUENDUNGSART[data.unternehmensDaten.gründungsart],
             uebertrStichtag: formatDatumDE(data.unternehmensDaten.anmeldedatumFinanzamt),
           },
         },
