@@ -75,7 +75,7 @@ describe("getGewerbeamt raw PVOG endpoints", () => {
   it("returns the Stadt Husum for ARS 010540056056, not the Einheitlicher Ansprechpartner Schleswig-Holstein", async () => {
     const gewerbeamt = await getGewerbeamt("010540056056");
 
-    expect(gewerbeamt!.name).toBe("Stadt Husum - Der Bürgermeister - Ordnungsamt - Gewerbewesen");
+    expect(gewerbeamt!.name).toBe("Stadt Husum - Der Bürgermeister - Gewerbewesen");
   });
 
   it("returns the Stadt Goslar for ARS 031530017017, not the Einheitlicher Ansprechpartner Landkreis Goslar", async () => {
