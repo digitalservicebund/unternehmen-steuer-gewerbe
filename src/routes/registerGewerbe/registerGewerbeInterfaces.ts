@@ -98,10 +98,10 @@ const PersönlicheDatenSchema = z.object({
     example: "substantiell",
     description: "Vertrauensniveau des verwendeten Identifizierungsmittels gemäß eIDAS-Verordnung",
   }),
-  geschlecht: z.enum(GESCHLECHT_KEYS).default("keineAngabe").openapi({
+  geschlecht: z.enum(GESCHLECHT_KEYS).openapi({
     example: "keineAngabe",
     description:
-      "Geschlecht der Person gemäß urn:xoev-de:xinneres:codeliste:geschlecht_1. Pflichtangabe in der xGewerbeordnung (SCH-EXISTS), Standardwert ist 'keineAngabe'.",
+      "Geschlecht der Person gemäß urn:xoev-de:xinneres:codeliste:geschlecht_1 (Pflichtangabe in der xGewerbeordnung, SCH-EXISTS).",
   }),
 });
 
@@ -150,33 +150,29 @@ const UnternehmensDatenSchema = z
       description: "Date reported to the Gewerbeamt as the business's founding date.",
     }),
     gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
-    istReisegewerbe: z.literal(false).default(false).openapi({
+    istReisegewerbe: z.literal(false).openapi({
       example: false,
-      description:
-        "Handelt es sich um ein Reisegewerbe? Aktuell wird nur 'false' unterstützt, Standardwert ist 'false'.",
+      description: "Handelt es sich um ein Reisegewerbe? Aktuell wird nur 'false' unterstützt.",
     }),
-    rechtsform: z
-      .literal("nichtEingetragenesEinzelunternehmen")
-      .default("nichtEingetragenesEinzelunternehmen")
-      .openapi({
-        example: "nichtEingetragenesEinzelunternehmen",
-        description:
-          "Rechtsform des Unternehmens. Aktuell wird nur 'nichtEingetragenesEinzelunternehmen' unterstützt, Standardwert ist 'nichtEingetragenesEinzelunternehmen'.",
-      }),
-    gründungsart: z.literal("neugründung").default("neugründung").openapi({
+    rechtsform: z.literal("nichtEingetragenesEinzelunternehmen").openapi({
+      example: "nichtEingetragenesEinzelunternehmen",
+      description:
+        "Rechtsform des Unternehmens. Aktuell wird nur 'nichtEingetragenesEinzelunternehmen' unterstützt.",
+    }),
+    gründungsart: z.literal("neugründung").openapi({
       example: "neugründung",
       description:
-        "Anlass der Gründung: Grund der Gewerbeanmeldung (xGewerbeordnung) und Gründungsform (FsE). Aktuell wird nur 'neugründung' unterstützt, Standardwert ist 'neugründung'.",
+        "Anlass der Gründung: Grund der Gewerbeanmeldung (xGewerbeordnung) und Gründungsform (FsE). Aktuell wird nur 'neugründung' unterstützt.",
     }),
-    artBetriebsstaette: z.literal("hauptniederlassung").default("hauptniederlassung").openapi({
+    artBetriebsstaette: z.literal("hauptniederlassung").openapi({
       example: "hauptniederlassung",
       description:
-        "Art der Betriebsstätte gemäß urn:xoev-de:xunternehmen:codeliste:artniederlassung_1. Aktuell wird nur 'hauptniederlassung' unterstützt, Standardwert ist 'hauptniederlassung'.",
+        "Art der Betriebsstätte gemäß urn:xoev-de:xunternehmen:codeliste:artniederlassung_1. Aktuell wird nur 'hauptniederlassung' unterstützt.",
     }),
-    beteiligungOeffentlicheHand: z.literal("nein").default("nein").openapi({
+    beteiligungOeffentlicheHand: z.literal("nein").openapi({
       example: "nein",
       description:
-        "Liegt eine Beteiligung der öffentlichen Hand vor? Aktuell wird nur 'nein' unterstützt, Standardwert ist 'nein'.",
+        "Liegt eine Beteiligung der öffentlichen Hand vor? Aktuell wird nur 'nein' unterstützt.",
     }),
     anzahlVollzeitBeschaeftigte: z.number().int().min(0).default(0).openapi({
       example: 0,

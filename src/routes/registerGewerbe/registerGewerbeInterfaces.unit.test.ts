@@ -29,6 +29,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["persönlicheDaten.vorname"],
       ["persönlicheDaten.nachname"],
       ["persönlicheDaten.geburtsdatum"],
+      ["persönlicheDaten.geschlecht"],
       ["persönlicheDaten.adresse"],
       ["persönlicheDaten.telefon"],
       ["persönlicheDaten.email"],
@@ -39,6 +40,11 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten.anmeldedatumFinanzamt"],
       ["unternehmensDaten.anmeldedatumGewerbeamt"],
       ["unternehmensDaten.gewerbeart"],
+      ["unternehmensDaten.istReisegewerbe"],
+      ["unternehmensDaten.rechtsform"],
+      ["unternehmensDaten.gründungsart"],
+      ["unternehmensDaten.artBetriebsstaette"],
+      ["unternehmensDaten.beteiligungOeffentlicheHand"],
       ["unternehmensDaten.gewinnErmittlung"],
       ["unternehmensDaten.sollIstVersteuerung"],
       ["unternehmensDaten.umsatzGruendungsjahr"],
@@ -110,17 +116,11 @@ describe("RegisterGewerbeRequestSchema", () => {
   describe("defaults", () => {
     it.each([
       ["persönlicheDaten", "staatsangehörigkeit", "deutsch"],
-      ["persönlicheDaten", "geschlecht", "keineAngabe"],
       ["unternehmensDaten", "kleinunternehmerRegelung", false],
       ["unternehmensDaten", "anzahlVollzeitBeschaeftigte", 0],
       ["unternehmensDaten", "anzahlTeilzeitBeschaeftigte", 0],
       ["unternehmensDaten", "zahllastUeberschussAuswahl", "zahllast"],
       ["unternehmensDaten", "zahllastUeberschussBetrag", 0],
-      ["unternehmensDaten", "istReisegewerbe", false],
-      ["unternehmensDaten", "rechtsform", "nichtEingetragenesEinzelunternehmen"],
-      ["unternehmensDaten", "gründungsart", "neugründung"],
-      ["unternehmensDaten", "artBetriebsstaette", "hauptniederlassung"],
-      ["unternehmensDaten", "beteiligungOeffentlicheHand", "nein"],
     ])("defaults %s.%s to %j when omitted", (section, field, defaultValue) => {
       const request = validRequest() as Record<string, unknown>;
       delete (request[section] as Record<string, unknown>)[field];
