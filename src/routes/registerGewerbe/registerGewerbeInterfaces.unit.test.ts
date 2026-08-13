@@ -30,12 +30,6 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten.anmeldedatumFinanzamt"],
       ["unternehmensDaten.anmeldedatumGewerbeamt"],
       ["unternehmensDaten.gewerbeart"],
-      ["unternehmensDaten.istReisegewerbe"],
-      ["unternehmensDaten.rechtsform"],
-      ["unternehmensDaten.gründungsart"],
-      ["unternehmensDaten.artBetriebsstaette"],
-      ["unternehmensDaten.beteiligungOeffentlicheHand"],
-      ["unternehmensDaten.fragebogenTyp"],
       ["unternehmensDaten.gewinnErmittlung"],
       ["unternehmensDaten.sollIstVersteuerung"],
       ["unternehmensDaten.umsatzGruendungsjahr"],
@@ -109,6 +103,11 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten", "anzahlTeilzeitBeschaeftigte", 0],
       ["unternehmensDaten", "zahllastUeberschussAuswahl", "zahllast"],
       ["unternehmensDaten", "zahllastUeberschussBetrag", 0],
+      ["unternehmensDaten", "istReisegewerbe", false],
+      ["unternehmensDaten", "rechtsform", "nichtEingetragenesEinzelunternehmen"],
+      ["unternehmensDaten", "gründungsart", "neugründung"],
+      ["unternehmensDaten", "artBetriebsstaette", "hauptniederlassung"],
+      ["unternehmensDaten", "beteiligungOeffentlicheHand", "nein"],
     ])("defaults %s.%s to %j when omitted", (section, field, defaultValue) => {
       const request = validRequest() as Record<string, unknown>;
       delete (request[section] as Record<string, unknown>)[field];
@@ -158,7 +157,6 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten", "gewinnErmittlung"],
       ["unternehmensDaten", "sollIstVersteuerung"],
       ["unternehmensDaten", "zahllastUeberschussAuswahl"],
-      ["unternehmensDaten", "fragebogenTyp"],
       ["unternehmensDaten", "gründungsart"],
     ])("rejects an unknown value for %s.%s", (section, field) => {
       const request = validRequest() as Record<string, unknown>;

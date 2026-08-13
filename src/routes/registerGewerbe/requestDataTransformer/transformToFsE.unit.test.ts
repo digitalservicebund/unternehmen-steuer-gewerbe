@@ -45,12 +45,6 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.umsatzsteuer?.uStIdNr?.uStIdAntrag?.merkerAntragUStId).toBe(true);
   });
 
-  it("maps fragebogenTyp to eUn.fragebogenTyp (aufnahmeTätigkeit = AUFNTAET)", () => {
-    const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
-
-    expect(result.eUn?.fragebogenTyp).toBe("AUFNTAET");
-  });
-
   it("maps gründungsart to gruendungsForm.gruendungsArt (neugründung = 1)", () => {
     const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
 

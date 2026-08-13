@@ -32,7 +32,6 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
     gründungsart: "neugründung",
     artBetriebsstaette: "hauptniederlassung",
     beteiligungOeffentlicheHand: "nein",
-    fragebogenTyp: "aufnahmeTätigkeit",
     anzahlVollzeitBeschaeftigte: 2,
     anzahlTeilzeitBeschaeftigte: 1,
     gewinnErmittlung: "einnahmenüberschussrechnung",

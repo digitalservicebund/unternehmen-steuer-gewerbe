@@ -12,7 +12,6 @@ import {
   SOLL_IST_VERSTEUERUNG,
   IST_VERSTEUERUNG_GRUND,
   ZAHLLAST_UEBERSCHUSS,
-  FRAGEBOGEN_TYP,
   GRUENDUNGSART,
 } from "./fsECodes";
 
@@ -124,7 +123,7 @@ export function transformToEUnFsE(
       },
     },
     eUn: {
-      fragebogenTyp: FRAGEBOGEN_TYP[data.unternehmensDaten.fragebogenTyp],
+      fragebogenTyp: "AUFNTAET",
       ordnungskriterium: {
         ordNrArt: data.persönlicheDaten.steuernummer ? "S" : "O",
       },
