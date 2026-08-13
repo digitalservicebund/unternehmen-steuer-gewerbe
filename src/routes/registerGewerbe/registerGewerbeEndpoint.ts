@@ -20,7 +20,7 @@ import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTra
 import { getGewerbeRoutingInfo, type GewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
 import { getOsciClient } from "../../clients/osciClient/osciClient";
 import { generatePdfReceipt } from "./registerGewerbePdfGenerator";
-import { splitStrasseHausnummer } from "../../helpers/formFieldTransformations";
+import { getBetriebsAdresse } from "../../helpers/formFieldTransformations";
 import {
   createOfficeDetailsFromFinanzamt,
   createOfficeDetailsFromGewerbeamt,
@@ -65,7 +65,10 @@ async function submitViaFitConnect({
     data: gewerbeanmeldungXml,
   });
 
-  return { submissionId: response.submissionId, fitConnectDestinationId: destinationId };
+  return {
+    submissionId: response.submissionId,
+    fitConnectDestinationId: destinationId,
+  };
 }
 
 interface SubmitViaOsciOptions {
@@ -110,11 +113,11 @@ async function submitGewerbeanmeldung(
     };
   }
 
+  const gewerbeanmeldung = transformToGewerbeanmeldung(data, routingInfo);
+
   let gewerbeanmeldungXml: string;
   try {
-    gewerbeanmeldungXml = await createGewerbeanmeldungXml(
-      transformToGewerbeanmeldung(data, routingInfo),
-    );
+    gewerbeanmeldungXml = await createGewerbeanmeldungXml(gewerbeanmeldung);
   } catch (error) {
     console.error("Gewerbeanmeldung XML validation failed", error);
     return {
@@ -124,7 +127,7 @@ async function submitGewerbeanmeldung(
     };
   }
 
-  const gewerbeanmeldungPdfReceipt = await generatePdfReceipt(gewerbeanmeldungXml);
+  const gewerbeanmeldungPdfReceipt = await generatePdfReceipt(gewerbeanmeldung, routingInfo);
 
   const gewerbeamtDetails = createOfficeDetailsFromGewerbeamt(routingInfo.gewerbeamt);
   const { fitConnectDestinationInformation } = routingInfo;
@@ -132,7 +135,10 @@ async function submitGewerbeanmeldung(
   try {
     let transportResult: GewerbeanmeldungTransportResult;
     if (fitConnectDestinationInformation === null) {
-      transportResult = await submitViaOsci({ ags: routingInfo.ags, gewerbeanmeldungXml });
+      transportResult = await submitViaOsci({
+        ags: routingInfo.ags,
+        gewerbeanmeldungXml,
+      });
     } else {
       transportResult = await submitViaFitConnect({
         destinationId: fitConnectDestinationInformation.destinationId,
@@ -163,18 +169,19 @@ export const EricErrorFachlicheAblehnung = 610001002;
 
 async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeResponseItem> {
   try {
-    const address = data.unternehmensDaten.adresseAbweichend ?? data.persönlicheDaten.adresse;
-
-    const { strasse, hausnummer, hausnummerBis } = splitStrasseHausnummer(
-      address.strasseUndHausnummer,
-    );
+    const { adresse, adresseAbweichend } = data.unternehmensDaten;
+    const betriebsAdresse = getBetriebsAdresse({
+      adresse,
+      adresseAbweichend,
+      persönlicheAdresse: data.persönlicheDaten.adresse,
+    });
 
     const finanzamtIds = getFinanzamtId({
-      postleitzahl: address.postleitzahl,
-      ort: address.ort,
-      strassenName: strasse,
-      hausnummerVon: hausnummer,
-      hausnummerBis: hausnummerBis,
+      postleitzahl: betriebsAdresse.postleitzahl,
+      ort: betriebsAdresse.ort,
+      strassenName: betriebsAdresse.strasse,
+      hausnummerVon: betriebsAdresse.hausnummer,
+      hausnummerBis: betriebsAdresse.hausnummerBis,
     });
 
     const finanzamtId = getFirstAssumingItsTheBestMatch(finanzamtIds);

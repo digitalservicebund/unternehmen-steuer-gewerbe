@@ -3,6 +3,7 @@ import path from "node:path";
 // no types exist for saxon-js; we have defined a placeholder in /src/declarations.d.ts, so the compiler does not complain
 import SaxonJS from "saxonjs-he";
 import { validateXML, XMLValidationResult } from "xmllint-wasm";
+import { getResourcesDir } from "./resourcesDir";
 
 interface XmlValidationResult {
   isValid: boolean;
@@ -18,15 +19,6 @@ interface SaxonTransformResult {
   resultDocuments: Record<string, string | Document>;
   /** The internal compiled stylesheet object */
   stylesheetInternal: object;
-}
-
-// In ts-node, resolved relative to this source file (src/helpers/ -> src/resources/).
-// In Docker, overridden via RESOURCES_DIR env var pointing to /app/resources.
-function getResourcesDir(): string {
-  return (
-    process.env["RESOURCES_DIR"] ??
-    path.resolve(new URL(".", import.meta.url).pathname, "../resources")
-  );
 }
 
 let cachedXsdFiles:

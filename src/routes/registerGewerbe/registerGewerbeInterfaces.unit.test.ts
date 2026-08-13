@@ -12,6 +12,18 @@ describe("RegisterGewerbeRequestSchema", () => {
     expect(result.success).toBe(true);
   });
 
+  it("parses unternehmensDaten.adresse with a separate strasse and hausnummer", () => {
+    const request = validRequest();
+    request.unternehmensDaten.adresse = {
+      strasse: "Prinzessinnenstraße",
+      hausnummer: "8-14",
+      postleitzahl: "10969",
+      ort: "Berlin",
+    };
+
+    expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(true);
+  });
+
   describe("required fields", () => {
     it.each([
       ["persönlicheDaten.vorname"],
@@ -67,6 +79,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["persönlicheDaten.staatsangehörigkeitIcao"],
       ["persönlicheDaten.steuernummer"],
       ["unternehmensDaten.adresseAbweichend"],
+      ["unternehmensDaten.tätigkeitsbeschreibungKurz"],
       ["unternehmensDaten.umsatzsteuerImErstenJahr"],
     ])("succeeds and stays absent when %s is missing", (fieldPath) => {
       const request = validRequest() as Record<string, unknown>;
@@ -200,6 +213,30 @@ describe("RegisterGewerbeRequestSchema", () => {
       expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
     });
 
+    it("rejects an empty hausnummer in unternehmensDaten.adresse", () => {
+      const invalid = validRequest();
+      invalid.unternehmensDaten.adresse = {
+        strasse: "Prinzessinnenstraße",
+        hausnummer: "",
+        postleitzahl: "10969",
+        ort: "Berlin",
+      };
+
+      expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
+    });
+
+    it("rejects an empty strasse in unternehmensDaten.adresse", () => {
+      const invalid = validRequest();
+      invalid.unternehmensDaten.adresse = {
+        strasse: "",
+        hausnummer: "8",
+        postleitzahl: "10969",
+        ort: "Berlin",
+      };
+
+      expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
+    });
+
     it("accepts a valid telefon and rejects a malformed one", () => {
       const invalid = validRequest();
       invalid.persönlicheDaten.telefon = "0234 121314";
@@ -287,6 +324,29 @@ describe("RegisterGewerbeRequestSchema", () => {
     ])("rejects a non-integer value for %s", (field) => {
       const request = validRequest();
       (request.unternehmensDaten as Record<string, unknown>)[field] = 1.5;
+
+      const result = RegisterGewerbeRequestSchema.safeParse(request);
+
+      expect(result.success).toBe(false);
+    });
+  });
+
+  describe("string length bounds", () => {
+    it.each([["tätigkeitsbeschreibung"], ["tätigkeitsbeschreibungKurz"]])(
+      "rejects an empty string for %s",
+      (field) => {
+        const request = validRequest();
+        (request.unternehmensDaten as Record<string, unknown>)[field] = "";
+
+        const result = RegisterGewerbeRequestSchema.safeParse(request);
+
+        expect(result.success).toBe(false);
+      },
+    );
+
+    it("rejects a tätigkeitsbeschreibungKurz longer than 200 characters", () => {
+      const request = validRequest();
+      request.unternehmensDaten.tätigkeitsbeschreibungKurz = "a".repeat(201);
 
       const result = RegisterGewerbeRequestSchema.safeParse(request);
 

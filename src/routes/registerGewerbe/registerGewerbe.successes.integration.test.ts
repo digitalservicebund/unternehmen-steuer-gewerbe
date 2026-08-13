@@ -142,6 +142,44 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
     });
   });
 
+  describe("Betriebsstätten-Anschrift in the submitted xGewerbeanmeldung", () => {
+    it("splits the hausnummer range 1C-1E into hausnummerVon and hausnummerBis", async () => {
+      mockSubmitData.mockClear();
+
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          adresse: {
+            strasse: "Domstraße",
+            hausnummer: "1C-1E",
+            postleitzahl: "36037",
+            ort: "Fulda",
+          },
+        },
+      });
+
+      // a 200 also means the generated XML passed XSD and Schematron validation
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+
+      const submittedXml = mockSubmitData.mock.calls[0]![0].data;
+      const xGewO = parser.parse(submittedXml)["xga:ext.gewerbemeldung.0400"];
+      const anschrift =
+        xGewO["xga:satz"]["xga:anmeldung"]["xga:gewerbebetrieb"]["xga:betriebsstaette"][
+          "bk:anschrift"
+        ]["bk:strassenanschriftInland"];
+
+      expect(anschrift).toEqual({
+        "adr:strasse": "Domstraße",
+        "bk:hausnummerVon": "1C",
+        "bk:hausnummerBis": "1E",
+        // the XML parser turns the numeric PLZ into a number
+        "adr:postleitzahl": 36037,
+        "adr:ort": "Fulda",
+      });
+    });
+  });
+
   describe("gemeindeschluesselErgaenzung for Hamburg", () => {
     it("includes the Hamburg Stadtbezirk gemeindeschluesselErgaenzung derived from the betriebsstaette PLZ", async () => {
       mockSubmitData.mockClear();

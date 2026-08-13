@@ -1,5 +1,6 @@
 import {
   formatDatumDE,
+  getBetriebsAdresse,
   splitStrasseHausnummer,
   splitTelefonnummer,
 } from "../../../helpers/formFieldTransformations";
@@ -15,6 +16,17 @@ import {
   GRUENDUNGSART,
 } from "./fsECodes";
 
+// FsE only allows digits in HausNr, so everything after the leading number — Zusatz, separator and
+// a bis-Hausnummer — has to go into HausNrZu (e.g. "1C-1E" => hausNr "1", hausNrZu "C-1E")
+function createHausNrZu(
+  hausnummerZusatz: string | undefined,
+  hausnummerBis: string | undefined,
+): string | undefined {
+  const bis = hausnummerBis === undefined ? "" : `-${hausnummerBis}`;
+  const hausNrZu = `${hausnummerZusatz?.trim() ?? ""}${bis}`;
+  return hausNrZu === "" ? undefined : hausNrZu;
+}
+
 function getKleinunternehmerRegelung(data: RegisterGewerbeRequest) {
   return data.unternehmensDaten.kleinunternehmerRegelung
     ? { kleinUnternUSt: true }
@@ -22,23 +34,24 @@ function getKleinunternehmerRegelung(data: RegisterGewerbeRequest) {
 }
 
 function getUnternehmen(data: RegisterGewerbeRequest) {
-  const { adresseAbweichend, geschäftsbezeichnung } = data.unternehmensDaten;
-  if (adresseAbweichend === undefined) {
+  const { adresse, adresseAbweichend, geschäftsbezeichnung } = data.unternehmensDaten;
+  if (adresse === undefined && adresseAbweichend === undefined) {
     return { entsprichtWohnanschrift: true, abwFirmenname: geschäftsbezeichnung };
   }
-  const { strasse, hausnummer, hausnummerBis, hausnummerZusatz } = splitStrasseHausnummer(
-    adresseAbweichend.strasseUndHausnummer,
-  );
+  const betriebsAdresse = getBetriebsAdresse({
+    adresse,
+    adresseAbweichend,
+    persönlicheAdresse: data.persönlicheDaten.adresse,
+  });
   return {
     abwFirmenname: geschäftsbezeichnung,
     adrkette: {
       strAdr: {
-        str: strasse,
-        hausNr: hausnummer,
-        hausNrZu: hausnummerBis,
-        adressErg: hausnummerZusatz?.trim(),
-        plz: adresseAbweichend.postleitzahl,
-        ort: adresseAbweichend.ort,
+        str: betriebsAdresse.strasse,
+        hausNr: betriebsAdresse.hausnummer,
+        hausNrZu: createHausNrZu(betriebsAdresse.hausnummerZusatz, betriebsAdresse.hausnummerBis),
+        plz: betriebsAdresse.postleitzahl,
+        ort: betriebsAdresse.ort,
       },
     },
   };
@@ -143,8 +156,10 @@ export function transformToEUnFsE(
               strAdr: {
                 str: persönlicheStrasseHausnummer.strasse,
                 hausNr: persönlicheStrasseHausnummer.hausnummer,
-                hausNrZu: persönlicheStrasseHausnummer.hausnummerBis,
-                adressErg: persönlicheStrasseHausnummer.hausnummerZusatz?.trim(),
+                hausNrZu: createHausNrZu(
+                  persönlicheStrasseHausnummer.hausnummerZusatz,
+                  persönlicheStrasseHausnummer.hausnummerBis,
+                ),
                 plz: data.persönlicheDaten.adresse.postleitzahl,
                 ort: data.persönlicheDaten.adresse.ort,
               },
@@ -199,7 +214,10 @@ export function transformToEUnFsE(
           },
         },
         artTaet: {
-          gewerbeArt: data.unternehmensDaten.tätigkeitsbeschreibung,
+          // FsE GewerbeArt allows at most 200 characters
+          gewerbeArt:
+            data.unternehmensDaten.tätigkeitsbeschreibungKurz ??
+            data.unternehmensDaten.tätigkeitsbeschreibung.slice(0, 200),
         },
         // bankKonto: {
         //   iban: undefined,

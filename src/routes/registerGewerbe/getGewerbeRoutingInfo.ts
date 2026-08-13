@@ -1,7 +1,7 @@
 import { getGewerbeamt, getLocationsDetails, type Gewerbeamt } from "../../clients/pvogClient";
 import { verifyDestinationSignature } from "../../clients/fitConnectClient/destinationSignature";
 import { getFitConnectClient } from "../../clients/fitConnectClient/fitConnectClient";
-import { splitStrasseHausnummer } from "../../helpers/formFieldTransformations";
+import { getBetriebsAdresse } from "../../helpers/formFieldTransformations";
 import { getAGS } from "../../helpers/getAgs";
 import { getFirstAssumingItsTheBestMatch } from "../../helpers/getFirstAssumingItsTheBestMatch";
 import { getEnvironmentVariable } from "../../secretsAndEnvironmentVariables";
@@ -61,14 +61,18 @@ async function getFitConnectDestinationInformation(
 export async function getGewerbeRoutingInfo(
   data: RegisterGewerbeRequest,
 ): Promise<GewerbeRoutingInfo | undefined> {
-  const address = data.unternehmensDaten.adresseAbweichend ?? data.persönlicheDaten.adresse;
-  const { strasse, hausnummer } = splitStrasseHausnummer(address.strasseUndHausnummer);
+  const { adresse, adresseAbweichend } = data.unternehmensDaten;
+  const betriebsAdresse = getBetriebsAdresse({
+    adresse,
+    adresseAbweichend,
+    persönlicheAdresse: data.persönlicheDaten.adresse,
+  });
 
   const locations = await getLocationsDetails({
-    plz: address.postleitzahl,
-    ort: address.ort,
-    strasse,
-    hausnummer,
+    plz: betriebsAdresse.postleitzahl,
+    ort: betriebsAdresse.ort,
+    strasse: betriebsAdresse.strasse,
+    hausnummer: betriebsAdresse.hausnummer,
   });
   const bestMatchingLocation = getFirstAssumingItsTheBestMatch(locations);
   if (bestMatchingLocation === undefined) {

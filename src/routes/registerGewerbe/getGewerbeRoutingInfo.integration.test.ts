@@ -58,7 +58,7 @@ import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
 
 describe("getGewerbeRoutingInfo", () => {
   describe("AGS (Amtlicher Gemeindeschlüssel)", () => {
-    it("uses persönlicheDaten.adresse.postleitzahl when no adresseAbweichend", async () => {
+    it("uses persönlicheDaten.adresse.postleitzahl when neither adresse nor adresseAbweichend is set", async () => {
       await getGewerbeRoutingInfo({
         ...registerGewerbeSampleRequestAllFieldsFilled,
         persönlicheDaten: {
@@ -96,6 +96,79 @@ describe("getGewerbeRoutingInfo", () => {
         plz: "25842",
         ort: "Lütjenholm",
         strasse: "Dorfstraße",
+        hausnummer: "1",
+      });
+    });
+
+    it("passes adresse.strasse and adresse.hausnummer to the location lookup", async () => {
+      await getGewerbeRoutingInfo({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          adresse: {
+            strasse: "Marktstraße",
+            hausnummer: "1",
+            postleitzahl: "25813",
+            ort: "Husum",
+          },
+        },
+      });
+
+      expect(mockGetLocationsDetails).toHaveBeenCalledWith({
+        plz: "25813",
+        ort: "Husum",
+        strasse: "Marktstraße",
+        hausnummer: "1",
+      });
+    });
+
+    // A Hausnummer-Zusatz makes the PVOG full-text search pick a different municipality for
+    // ambiguous PLZ (e.g. "25842 Dorfstraße 1C" resolves to Hohenhorn instead of Langenhorn)
+    it("passes only the leading digits of the hausnummer 1C-1E to the location lookup", async () => {
+      await getGewerbeRoutingInfo({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          adresse: {
+            strasse: "Dorfstraße",
+            hausnummer: "1C-1E",
+            postleitzahl: "25842",
+            ort: "Langenhorn",
+          },
+        },
+      });
+
+      expect(mockGetLocationsDetails).toHaveBeenCalledWith({
+        plz: "25842",
+        ort: "Langenhorn",
+        strasse: "Dorfstraße",
+        hausnummer: "1",
+      });
+    });
+
+    it("prefers adresse over adresseAbweichend for the location lookup", async () => {
+      await getGewerbeRoutingInfo({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          adresse: {
+            strasse: "Marktstraße",
+            hausnummer: "1",
+            postleitzahl: "25813",
+            ort: "Husum",
+          },
+          adresseAbweichend: {
+            strasseUndHausnummer: "Dorfstraße 1",
+            postleitzahl: "25842",
+            ort: "Lütjenholm",
+          },
+        },
+      });
+
+      expect(mockGetLocationsDetails).toHaveBeenCalledWith({
+        plz: "25813",
+        ort: "Husum",
+        strasse: "Marktstraße",
         hausnummer: "1",
       });
     });
