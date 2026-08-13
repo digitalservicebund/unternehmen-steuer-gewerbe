@@ -113,7 +113,7 @@ describe("getGewerbeamt with mocked PVOG responses", () => {
         },
         {
           id: "L1.OE.GEWERBEAMT",
-          title: "Stadt Husum - Der Bürgermeister - Ordnungsamt - Gewerbewesen",
+          title: "Stadt Husum - Der Bürgermeister - Gewerbewesen",
           role: { code: "02", name: "Zuständige Stelle" },
         },
       ],
