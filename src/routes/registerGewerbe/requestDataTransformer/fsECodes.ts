@@ -32,8 +32,8 @@ export const RELIGIONSSCHLUESSEL_KEYS = Object.keys(RELIGIONSSCHLUESSEL) as [
 
 export const GEWINN_ERMITTLUNG = {
   einnahmenüberschussrechnung: "01",
-  betriebsvermögensvergleich: "02",
-  gewinnermittlungDurchschnittssätze: "03",
+  betriebsvermögensvergleich: "02", // Bilanz mit Gewinn- und Verlustrechnung
+  gewinnermittlungDurchschnittssätze: "03", // nur bei Land- und Forstwirtschaft
   sonstige: "04",
 } as const;
 
