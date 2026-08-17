@@ -156,6 +156,8 @@ const UnternehmensDatenSchema = z
     }),
     gewinnErmittlung: z.enum(GEWINN_ERMITTLUNG_KEYS).openapi({
       example: "einnahmenüberschussrechnung",
+      description:
+        "Method of profit calculation. Enumeration:\n- einnahmenüberschussrechnung\n- betriebsvermögensvergleich (Bilanz mit Gewinn- und Verlustrechnung)\n- gewinnermittlungDurchschnittssätze (nur bei Land- und Forstwirtschaft)]\n- sonstige (z. B. § 5a EStG)]",
     }),
     kleinunternehmerRegelung: z.boolean().default(false).openapi({
       example: false,
