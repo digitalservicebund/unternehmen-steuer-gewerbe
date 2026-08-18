@@ -238,7 +238,7 @@ export const RECHTSFORM = {
   sonstigeAuslaendischeRechtsformAuffangtatbestandSteuer: "698100",
 } as const;
 
-// https://www.xrepository.de/api/xrepository/urn:xoev-de:xgewerbeordnung:codeliste:grundfueranmeldung_3
+// https://www.xrepository.de/details/urn:xoev-de:xgewerbeordnung:codeliste:grundfueranmeldung_3
 export const GRUNDANMELDUNGSSCHLUESSEL = {
   neugründung: "01",
   verlegungAusAnderemMeldebezirk: "02",
@@ -248,7 +248,7 @@ export const GRUNDANMELDUNGSSCHLUESSEL = {
   übernahme: "06",
 } as const;
 
-// https://www.xrepository.de/api/xrepository/urn:xoev-de:xunternehmen:codeliste:artniederlassung_1
+// https://www.xrepository.de/details/urn:xoev-de:xunternehmen:codeliste:artniederlassung_1
 // SCH-0256 only allows 01, 02 and 03 from 2024-05-01 on.
 export const ART_BETRIEBSSTAETTE = {
   hauptniederlassung: "01",
@@ -257,14 +257,14 @@ export const ART_BETRIEBSSTAETTE = {
   betriebsstaetteUnspezifisch: "04",
 } as const;
 
-// https://www.xrepository.de/api/xrepository/urn:xoev-de:xgewerbeordnung:codeliste:beteiligungoeffentlichehand_1
+// https://www.xrepository.de/details/urn:xoev-de:xgewerbeordnung:codeliste:beteiligungoeffentlichehand_1
 export const BETEILIGUNG_OEFFENTLICHE_HAND = {
   nein: "0",
   ja: "1",
   nichtBekannt: "2",
 } as const;
 
-// https://www.xrepository.de/api/xrepository/urn:xoev-de:xinneres:codeliste:geschlecht_1
+// https://www.xrepository.de/details/urn:xoev-de:xinneres:codeliste:geschlecht_1
 export const GESCHLECHT = {
   männlich: "m",
   weiblich: "w",
