@@ -127,6 +127,28 @@ const UnternehmensDatenSchema = z
       description:
         "Deprecated: use `adresse` instead, which takes street and house number as separate fields. Still read while `adresse` is optional.",
     }),
+    bankKonto: z
+      .object({
+        personensteuerkonto: z.object({
+          iban: z.string(),
+          bic: z.string().optional(),
+          kontoinhaber: z.string(),
+          kontoinhaberName: z.string().optional(),
+        }),
+        betriebssteuerkonto: z
+          .object({
+            iban: z.string(),
+            bic: z.string().optional(),
+            kontoinhaber: z.string(),
+            kontoinhaberName: z.string().optional(),
+          })
+          .optional(),
+      })
+      .optional()
+      .openapi({
+        description:
+          "Bank accounts collected for private and optional business taxes.",
+      }),
     geschäftsbezeichnung: z.string().max(120).optional().openapi({
       example: "Musterhandel",
       description:

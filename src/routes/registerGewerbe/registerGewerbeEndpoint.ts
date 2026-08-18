@@ -267,6 +267,10 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
       const { only } = c.req.valid("query");
       const data = c.req.valid("json");
 
+      console.log("Received bank account details", data.unternehmensDaten.bankKonto);
+      // TODO: Map bankKonto into FsE once ERiC bank-account fields are finalized.
+      // TODO: Remove temporary bank-account logging after transport is implemented.
+
       // Sequential, not concurrent: each of these can hold a worker-thread heap
       // (gewerbeanmeldung) or block the event loop (fsE); running them one at a time
       // keeps the peak memory of a single request from stacking both at once.
