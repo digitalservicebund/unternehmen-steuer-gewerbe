@@ -179,6 +179,21 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
         expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
       },
     );
+
+    it("Returns the TransferTicket as fseÜbermittlung submissionId when sendFsE reports failure", async () => {
+      vi.mocked(mockSendFsE).mockReturnValueOnce({
+        success: false,
+        info: "ERiC rejected submission",
+        serverResponse:
+          '<Elster xmlns="http://www.elster.de/elsterxml/schema/v11"><TransferHeader version="11"><TransferTicket>eh23053phmwjw2411dsn98z8picgyoue</TransferTicket></TransferHeader></Elster>',
+      });
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+      expect(response.status).toEqual(HttpStatusCode.MultiStatus);
+      expect(json.fseÜbermittlung.success).toBe(false);
+      expect(json.fseÜbermittlung.submissionId).toBe("eh23053phmwjw2411dsn98z8picgyoue");
+    });
   });
 
   describe("in case of error", () => {

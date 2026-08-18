@@ -9,6 +9,7 @@ import {
 } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 import { getEnvironmentVariable } from "../../secretsAndEnvironmentVariables";
 import pLimit from "p-limit";
+import { XMLParser } from "fast-xml-parser";
 import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import {
   ErrorTypeSchema,
@@ -167,6 +168,26 @@ async function submitGewerbeanmeldung(
 // Sending fails because of semantic errors
 export const EricErrorFachlicheAblehnung = 610001002;
 
+// parseTagValue: false keeps an all-digit TransferTicket a string.
+const elsterServerResponseParser = new XMLParser({ parseTagValue: false });
+
+interface ElsterTransferHeader {
+  TransferTicket?: string;
+}
+
+interface ElsterServerResponse {
+  Elster?: { TransferHeader?: ElsterTransferHeader };
+}
+
+// ELSTER identifies the submission by the TransferTicket in the TransferHeader of its response.
+function getTransferTicket(serverResponse: string | undefined): string | undefined {
+  if (serverResponse === undefined) {
+    return undefined;
+  }
+  const parsed = elsterServerResponseParser.parse(serverResponse) as ElsterServerResponse;
+  return parsed.Elster?.TransferHeader?.TransferTicket;
+}
+
 async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeResponseItem> {
   try {
     const { adresse, adresseAbweichend } = data.unternehmensDaten;
@@ -219,13 +240,15 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
           : ErrorTypeSchema.enum.upstream_error;
       return {
         success: false,
+        // ELSTER also tickets rejected submissions.
+        submissionId: getTransferTicket(result.serverResponse),
         errorType: type,
         info: result.info,
       };
     }
     return {
       success: true,
-      submissionId: "implementation missing",
+      submissionId: getTransferTicket(result.serverResponse),
       info: result.info,
       pdfReceiptBase64: result.pdf?.toString("base64"),
       officeDetails,
