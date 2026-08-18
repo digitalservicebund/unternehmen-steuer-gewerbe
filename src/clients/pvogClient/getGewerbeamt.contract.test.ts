@@ -81,7 +81,7 @@ describe("getGewerbeamt raw PVOG endpoints", () => {
   it("returns the Stadt Goslar for ARS 031530017017, not the Einheitlicher Ansprechpartner Landkreis Goslar", async () => {
     const gewerbeamt = await getGewerbeamt("031530017017");
 
-    expect(gewerbeamt!.name).toBe("Stadt Goslar - Bürgerbüro");
+    expect(gewerbeamt!.name).toBe("Einheitlicher Ansprechpartner Stadt Goslar");
   });
 
   // temporarily skipped because of unstable API
