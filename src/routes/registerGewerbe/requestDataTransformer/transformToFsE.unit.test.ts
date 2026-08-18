@@ -356,7 +356,7 @@ describe("transformToEUnFsE", () => {
       ]);
     });
 
-    it("puts a foreign IBAN (identified by a given bic) into ibanAusland instead of iban", () => {
+    it("puts a foreign IBAN (identified by a non-DE country code) into ibanAusland instead of iban", () => {
       const result = transformToEUnFsE({
         ...registerGewerbeSampleRequestAllFieldsFilled,
         unternehmensDaten: {
