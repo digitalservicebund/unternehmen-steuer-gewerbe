@@ -31,6 +31,21 @@ export interface Gewerbeamt {
   onlineServices?: OnlineServiceLink[];
 }
 
+// Dresden's Gewerbeamt is registered in the PVOG for the Gewerbeab- and -ummeldung only, so there is
+// no service description for the Gewerbeanmeldung to look it up with. Remove once Sachsen fixed that.
+const ARS_DRESDEN = "146120000000";
+const HARDCODED_GEWERBEAMT_DRESDEN: Gewerbeamt = {
+  name: "Abteilung Gewerbeangelegenheiten",
+  adresse: {
+    strasse: "Augsburger Straße",
+    hausnummer: "3",
+    postleitzahl: "01309",
+    ort: "Dresden",
+  },
+  telefon: "+49 351 4885811",
+  email: "gewerbeangelegenheiten@dresden.de",
+};
+
 interface ServiceDescription {
   id: string;
   ars: string[];
@@ -223,6 +238,10 @@ export async function fetchOrganisationUnitDetail(
 }
 
 export async function getGewerbeamt(ars: string): Promise<Gewerbeamt | undefined> {
+  if (ars === ARS_DRESDEN) {
+    return HARDCODED_GEWERBEAMT_DRESDEN;
+  }
+
   const serviceDescriptions = await fetchServiceDescriptions(ars);
   const serviceDescription = findServiceDescriptionWithMostPreciseArs(
     serviceDescriptions.content,

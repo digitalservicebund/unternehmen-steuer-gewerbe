@@ -84,16 +84,16 @@ describe("getGewerbeamt raw PVOG endpoints", () => {
     expect(gewerbeamt!.name).toBe("Einheitlicher Ansprechpartner Stadt Goslar");
   });
 
-  // temporarily skipped because of unstable API
-  it.skip("returns an empty onlineServices list for Fraureuth (ARS 146120000000), which has no online services", async () => {
-    const gewerbeamt = await getGewerbeamt("146120000000");
-
-    expect(gewerbeamt!.name).toBe("Gewerbeamt");
-    expect(gewerbeamt!.onlineServices).toEqual([]);
-  });
-
   it("returns no service description for the non-existent ARS 000000000000", async () => {
     const result = await fetchServiceDescriptionsByArs("000000000000");
+
+    expect(result.content).toEqual([]);
+  });
+
+  // Turns red once Sachsen registers Dresden for the Gewerbeanmeldung, which is when the hardcoded
+  // fallback in getGewerbeamt can be removed
+  it("returns no service description for Dresden (ARS 146120000000)", async () => {
+    const result = await fetchServiceDescriptionsByArs("146120000000");
 
     expect(result.content).toEqual([]);
   });

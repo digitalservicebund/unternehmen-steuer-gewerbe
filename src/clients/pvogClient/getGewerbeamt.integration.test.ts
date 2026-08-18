@@ -184,6 +184,34 @@ describe("getGewerbeamt with mocked PVOG responses", () => {
     );
   });
 
+  // the mocked PVOG would answer with a different Gewerbeamt, so this also covers that Dresden
+  // short-circuits before the lookup
+  it("returns the hardcoded Gewerbeamt for Dresden (ARS 146120000000)", async () => {
+    mockPvogApi({});
+
+    const gewerbeamt = await getGewerbeamt("146120000000");
+
+    expect(gewerbeamt).toEqual({
+      name: "Abteilung Gewerbeangelegenheiten",
+      adresse: {
+        strasse: "Augsburger Straße",
+        hausnummer: "3",
+        postleitzahl: "01309",
+        ort: "Dresden",
+      },
+      telefon: "+49 351 4885811",
+      email: "gewerbeangelegenheiten@dresden.de",
+    });
+  });
+
+  it("returns undefined for an ARS without a service description", async () => {
+    mockPvogApi({ serviceDescriptions: { content: [] } });
+
+    const gewerbeamt = await getGewerbeamt("064120000000");
+
+    expect(gewerbeamt).toBeUndefined();
+  });
+
   it("prefers the Hausanschrift over other addresses", async () => {
     mockPvogApi({
       organisationUnitDetail: {
