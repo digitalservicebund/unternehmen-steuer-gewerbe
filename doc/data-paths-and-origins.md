@@ -1,4 +1,4 @@
-# registerGewerbe — Data Paths as of 2026-08-13
+# registerGewerbe — Data Paths as of 2026-08-18
 
 Where data comes from and how it affects XGewerbe (`transformToGewerbeanmeldung`) and FsE (`transformToEUnFsE`).
 
