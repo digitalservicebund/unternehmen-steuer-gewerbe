@@ -46,6 +46,42 @@ const AdresseMitHausnummerSchema = z.object({
   ort: z.string().openapi({ example: "Fulda" }),
 }) satisfies z.ZodType<AdresseMitHausnummer>;
 
+const BankKontoSchema = z.object({
+  iban: z.string(),
+  bic: z.string().optional(),
+  kontoinhaber: z.string(),
+  kontoinhaberName: z.string().optional(),
+  steuerart: z.enum(["personensteuern", "betriebssteuern", "alleSteuerarten"]),
+});
+
+const OnlinehandelSchema = z.object({
+  eigenerWebshop: z.boolean(),
+  adresseEigenerWebshop: z.string().optional(),
+  onlineMarktplaetze: z.boolean(),
+  onlineMarktplatz: z
+    .array(
+      z.object({
+        nameMarktplatz: z.string(),
+        nameAccount: z.string(),
+      }),
+    )
+    .max(99)
+    .optional(),
+});
+
+const InfluencerSchema = z.object({
+  influencerUmsatz: z.boolean(),
+  plattform: z
+    .array(
+      z.object({
+        namePlattform: z.string(),
+        nameAccount: z.string(),
+      }),
+    )
+    .max(99)
+    .optional(),
+});
+
 const PersönlicheDatenSchema = z.object({
   vorname: z.string().openapi({ example: "Erika" }),
   nachname: z.string().openapi({ example: "Mustermann" }),
@@ -127,6 +163,11 @@ const UnternehmensDatenSchema = z
       description:
         "Deprecated: use `adresse` instead, which takes street and house number as separate fields. Still read while `adresse` is optional.",
     }),
+    bankKonto: z.array(BankKontoSchema).max(2).optional().openapi({
+      description: "Bank accounts and their tax-area assignment.",
+    }),
+    onlinehandel: OnlinehandelSchema.optional(),
+    influencer: InfluencerSchema.optional(),
     geschäftsbezeichnung: z.string().max(120).optional().openapi({
       example: "Musterhandel",
       description:
