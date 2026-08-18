@@ -70,6 +70,19 @@ const BankKontoKontoinhaberNameSchema = z.string().min(1).max(128).openapi({
   description: 'Name of the account holder; only meaningful when kontoinhaber is "anderePerson".',
 });
 
+// A domestic IBAN starts with the "DE" country code (ISO 13616); anything else is foreign.
+const BankKontoSchema = z
+  .object({
+    iban: BankKontoIbanSchema,
+    bic: BankKontoBicSchema.optional(),
+    kontoinhaber: z.enum(ROLLE_KONTOINHABER_KEYS),
+    kontoinhaberName: BankKontoKontoinhaberNameSchema.optional(),
+  })
+  .refine((konto) => konto.iban.slice(0, 2).toUpperCase() === "DE" || konto.bic !== undefined, {
+    error: "bic is required for a foreign IBAN (one that doesn't start with 'DE').",
+    path: ["bic"],
+  });
+
 const PersönlicheDatenSchema = z.object({
   vorname: z.string().openapi({ example: "Erika" }),
   nachname: z.string().openapi({ example: "Mustermann" }),
@@ -153,20 +166,8 @@ const UnternehmensDatenSchema = z
     }),
     bankKonto: z
       .object({
-        personensteuerkonto: z.object({
-          iban: BankKontoIbanSchema,
-          bic: BankKontoBicSchema.optional(),
-          kontoinhaber: z.enum(ROLLE_KONTOINHABER_KEYS),
-          kontoinhaberName: BankKontoKontoinhaberNameSchema.optional(),
-        }),
-        betriebssteuerkonto: z
-          .object({
-            iban: BankKontoIbanSchema,
-            bic: BankKontoBicSchema.optional(),
-            kontoinhaber: z.enum(ROLLE_KONTOINHABER_KEYS),
-            kontoinhaberName: BankKontoKontoinhaberNameSchema.optional(),
-          })
-          .optional(),
+        personensteuerkonto: BankKontoSchema,
+        betriebssteuerkonto: BankKontoSchema.optional(),
       })
       .optional()
       .openapi({

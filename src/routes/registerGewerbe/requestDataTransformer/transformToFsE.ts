@@ -93,12 +93,13 @@ type BankKontoEingabe = NonNullable<
   RegisterGewerbeRequest["unternehmensDaten"]["bankKonto"]
 >["personensteuerkonto"];
 
-// FsE only has an "Iban" field for domestic accounts; foreign accounts go in "IbanAusland"
-// alongside their Bic (see FsE_EUn XSD: "BIC zur ausländischen IBAN"). We only collect a Bic
-// for foreign accounts, so its presence is what distinguishes the two.
+// In FsE, domestic accounts go into "Iban"; foreign ones go into "IbanAusland" and also need
+// a Bic (see FsE_EUn XSD: "BIC zur ausländischen IBAN"). Domestic IBANs start with the "DE"
+// country code (ISO 13616); anything else is foreign.
 function createBankKonto(konto: BankKontoEingabe, steuerart: string) {
+  const istInland = konto.iban.slice(0, 2).toUpperCase() === "DE";
   return {
-    ...(konto.bic ? { ibanAusland: konto.iban, bic: konto.bic } : { iban: konto.iban }),
+    ...(istInland ? { iban: konto.iban } : { ibanAusland: konto.iban, bic: konto.bic }),
     steuerart,
     kontoinhaber: {
       rolleKontoinhaber: ROLLE_KONTOINHABER[konto.kontoinhaber],
