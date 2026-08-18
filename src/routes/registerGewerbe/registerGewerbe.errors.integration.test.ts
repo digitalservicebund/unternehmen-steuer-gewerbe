@@ -58,7 +58,10 @@ import {
 import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import * as pdfGenerator from "./registerGewerbePdfGenerator";
 
-import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
+import {
+  elsterServerResponseFixture,
+  registerGewerbeSampleRequestAllFieldsFilled,
+} from "./testHelpers";
 import { ErrorTypeSchema } from "./registerGewerbeInterfaces";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
 
@@ -179,6 +182,20 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
         expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
       },
     );
+
+    it("Returns the TransferTicket as fseÜbermittlung submissionId when sendFsE reports failure", async () => {
+      vi.mocked(mockSendFsE).mockReturnValueOnce({
+        success: false,
+        info: "ERiC rejected submission",
+        serverResponse: elsterServerResponseFixture("t6wq2rjkxa90fbn4hs7cvmzl3dpuy8ge"),
+      });
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+      expect(response.status).toEqual(HttpStatusCode.MultiStatus);
+      expect(json.fseÜbermittlung.success).toBe(false);
+      expect(json.fseÜbermittlung.submissionId).toBe("t6wq2rjkxa90fbn4hs7cvmzl3dpuy8ge");
+    });
   });
 
   describe("in case of error", () => {
