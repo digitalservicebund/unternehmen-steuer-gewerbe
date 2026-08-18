@@ -53,7 +53,10 @@ vi.mock("./getGewerbeRoutingInfo", () => ({
 import app from "../../app";
 
 import { sendFsE as mockSendFsE } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
-import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
+import {
+  elsterServerResponseFixture,
+  registerGewerbeSampleRequestAllFieldsFilled,
+} from "./testHelpers";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
@@ -275,13 +278,10 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
   });
 
   describe("fseÜbermittlung submissionId", () => {
-    const elsterServerResponse =
-      '<?xml version="1.0" encoding="UTF-8"?><Elster xmlns="http://www.elster.de/elsterxml/schema/v11"><TransferHeader version="11"><Verfahren>ElsterFSE</Verfahren><DatenArt>EUn</DatenArt><Vorgang>send-Auth</Vorgang><TransferTicket>eh23053phmwjw2411dsn98z8picgyoue</TransferTicket><Testmerker>700000004</Testmerker><Empfaenger id="L"><Ziel>BY</Ziel></Empfaenger><HerstellerID>49420</HerstellerID><EingangsDatum>20260818093231</EingangsDatum><RC><Rueckgabe><Code>0</Code><Text>Daten wurden erfolgreich angenommen.</Text></Rueckgabe><Stack><Code></Code><Text></Text></Stack></RC><VersionClient>ERiC Beispiele</VersionClient></TransferHeader><DatenTeil></DatenTeil></Elster>';
-
     it("returns the TransferTicket from the ELSTER server response as submissionId", async () => {
       vi.mocked(mockSendFsE).mockReturnValueOnce({
         success: true,
-        serverResponse: elsterServerResponse,
+        serverResponse: elsterServerResponseFixture("eh23053phmwjw2411dsn98z8picgyoue"),
       });
 
       const response = await postRegisterGewerbe();

@@ -232,7 +232,7 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
           : ErrorTypeSchema.enum.upstream_error;
       return {
         success: false,
-        // ELSTER also tickets rejected submissions.
+        // ELSTER creates transfer tickets for rejected submissions
         submissionId: getTransferTicket(result.serverResponse),
         errorType: type,
         info: result.info,
