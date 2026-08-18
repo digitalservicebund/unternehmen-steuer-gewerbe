@@ -13,6 +13,7 @@ import {
   SOLL_IST_VERSTEUERUNG,
   IST_VERSTEUERUNG_GRUND,
   ZAHLLAST_UEBERSCHUSS,
+  GRUENDUNGSART,
 } from "./fsECodes";
 
 // FsE only allows digits in HausNr, so everything after the leading number — Zusatz, separator and
@@ -291,7 +292,7 @@ export function transformToEUnFsE(
         },
         gruendungsangaben: {
           gruendungsForm: {
-            gruendungsArt: "1",
+            gruendungsArt: GRUENDUNGSART[data.unternehmensDaten.gründungsart],
             uebertrStichtag: formatDatumDE(data.unternehmensDaten.anmeldedatumFinanzamt),
           },
         },

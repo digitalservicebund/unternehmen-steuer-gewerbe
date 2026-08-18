@@ -7,6 +7,7 @@ import {
   VERTRAUENSNIVEAU_KEYS,
   STAATSANGEHOERIGKEIT_KEYS,
   STAATSANGEHOERIGKEIT_ICAO_KEYS,
+  GESCHLECHT_KEYS,
 } from "./requestDataTransformer/xGewerbeordnungCodes";
 import {
   RELIGIONSSCHLUESSEL_KEYS,
@@ -97,6 +98,11 @@ const PersönlicheDatenSchema = z.object({
     example: "substantiell",
     description: "Vertrauensniveau des verwendeten Identifizierungsmittels gemäß eIDAS-Verordnung",
   }),
+  geschlecht: z.enum(GESCHLECHT_KEYS).openapi({
+    example: "keineAngabe",
+    description:
+      "Geschlecht der Person gemäß urn:xoev-de:xinneres:codeliste:geschlecht_1 (Pflichtangabe in der xGewerbeordnung, SCH-EXISTS).",
+  }),
 });
 
 const UnternehmensDatenSchema = z
@@ -144,6 +150,30 @@ const UnternehmensDatenSchema = z
       description: "Date reported to the Gewerbeamt as the business's founding date.",
     }),
     gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
+    istReisegewerbe: z.literal(false).openapi({
+      example: false,
+      description: "Handelt es sich um ein Reisegewerbe? Aktuell wird nur 'false' unterstützt.",
+    }),
+    rechtsform: z.literal("nichtEingetragenesEinzelunternehmen").openapi({
+      example: "nichtEingetragenesEinzelunternehmen",
+      description:
+        "Rechtsform des Unternehmens. Aktuell wird nur 'nichtEingetragenesEinzelunternehmen' unterstützt.",
+    }),
+    gründungsart: z.literal("neugründung").openapi({
+      example: "neugründung",
+      description:
+        "Anlass der Gründung: Grund der Gewerbeanmeldung (xGewerbeordnung) und Gründungsform (FsE). Aktuell wird nur 'neugründung' unterstützt.",
+    }),
+    artBetriebsstaette: z.literal("hauptniederlassung").openapi({
+      example: "hauptniederlassung",
+      description:
+        "Art der Betriebsstätte gemäß urn:xoev-de:xunternehmen:codeliste:artniederlassung_1. Aktuell wird nur 'hauptniederlassung' unterstützt.",
+    }),
+    beteiligungOeffentlicheHand: z.literal("nein").openapi({
+      example: "nein",
+      description:
+        "Liegt eine Beteiligung der öffentlichen Hand vor? Aktuell wird nur 'nein' unterstützt.",
+    }),
     anzahlVollzeitBeschaeftigte: z.number().int().min(0).default(0).openapi({
       example: 0,
       description:
@@ -236,7 +266,7 @@ const unfallversicherungstraegerCodesDescription = Object.entries(UNFALLVERSICHE
   .map(([name, code]) => `- \`${name}\` (${code})`)
   .join("\n");
 
-// Not used as long as we only support 'grundAnmeldungSchluessel: "01"' ("Neugründung")
+// Not used while SCH-0007 requires bisherigeUnfallversicherung to stay empty (see transform)
 const _BisherigeUnfallversicherungSchema = z
   .object({
     traeger: z.enum(UNFALLVERSICHERUNGSTRAEGER_KEYS).openapi({

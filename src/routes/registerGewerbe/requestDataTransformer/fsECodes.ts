@@ -76,3 +76,10 @@ export const ZAHLLAST_UEBERSCHUSS_KEYS = Object.keys(ZAHLLAST_UEBERSCHUSS) as [
   ZahllastUeberschuss,
   ...ZahllastUeberschuss[],
 ];
+
+// Gründungsform of the business; further codes exist in the ELSTER data set description
+// but are not supported (see Neugründung-only scope). Keys mirror GRUNDANMELDUNGSSCHLUESSEL,
+// both are mapped from the same request field.
+export const GRUENDUNGSART = {
+  neugründung: "1",
+} as const;

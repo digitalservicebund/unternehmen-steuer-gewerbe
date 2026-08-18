@@ -238,6 +238,42 @@ export const RECHTSFORM = {
   sonstigeAuslaendischeRechtsformAuffangtatbestandSteuer: "698100",
 } as const;
 
+// https://www.xrepository.de/details/urn:xoev-de:xgewerbeordnung:codeliste:grundfueranmeldung_3
+export const GRUNDANMELDUNGSSCHLUESSEL = {
+  neugründung: "01",
+  verlegungAusAnderemMeldebezirk: "02",
+  übergangNachUmwandlungsgesetz: "03",
+  wechselDerRechtsform: "04",
+  gesellschaftereintritt: "05",
+  übernahme: "06",
+} as const;
+
+// https://www.xrepository.de/details/urn:xoev-de:xunternehmen:codeliste:artniederlassung_1
+// SCH-0256 only allows 01, 02 and 03 from 2024-05-01 on.
+export const ART_BETRIEBSSTAETTE = {
+  hauptniederlassung: "01",
+  zweigniederlassung: "02",
+  unselbstaendigeZweigstelle: "03",
+  betriebsstaetteUnspezifisch: "04",
+} as const;
+
+// https://www.xrepository.de/details/urn:xoev-de:xgewerbeordnung:codeliste:beteiligungoeffentlichehand_1
+export const BETEILIGUNG_OEFFENTLICHE_HAND = {
+  nein: "0",
+  ja: "1",
+  nichtBekannt: "2",
+} as const;
+
+// https://www.xrepository.de/details/urn:xoev-de:xinneres:codeliste:geschlecht_1
+export const GESCHLECHT = {
+  männlich: "m",
+  weiblich: "w",
+  divers: "d",
+  keineAngabe: "x",
+} as const;
+type Geschlecht = keyof typeof GESCHLECHT;
+export const GESCHLECHT_KEYS = Object.keys(GESCHLECHT) as [Geschlecht, ...Geschlecht[]];
+
 // https://www.xrepository.de/details/urn:de:bund:destatis:bevoelkerungsstatistik:schluessel:staatsangehoerigkeit_2024-08-01
 export const STAATSANGEHOERIGKEIT = {
   afghanisch: "423",

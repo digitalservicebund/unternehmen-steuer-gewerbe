@@ -29,6 +29,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["persönlicheDaten.vorname"],
       ["persönlicheDaten.nachname"],
       ["persönlicheDaten.geburtsdatum"],
+      ["persönlicheDaten.geschlecht"],
       ["persönlicheDaten.adresse"],
       ["persönlicheDaten.telefon"],
       ["persönlicheDaten.email"],
@@ -39,6 +40,11 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten.anmeldedatumFinanzamt"],
       ["unternehmensDaten.anmeldedatumGewerbeamt"],
       ["unternehmensDaten.gewerbeart"],
+      ["unternehmensDaten.istReisegewerbe"],
+      ["unternehmensDaten.rechtsform"],
+      ["unternehmensDaten.gründungsart"],
+      ["unternehmensDaten.artBetriebsstaette"],
+      ["unternehmensDaten.beteiligungOeffentlicheHand"],
       ["unternehmensDaten.gewinnErmittlung"],
       ["unternehmensDaten.sollIstVersteuerung"],
       ["unternehmensDaten.umsatzGruendungsjahr"],
@@ -138,6 +144,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["persönlicheDaten", "religion", "nichtKirchensteuerpflichtig"],
       ["persönlicheDaten", "vertrauensniveau", "substantiell"],
       ["persönlicheDaten", "staatsangehörigkeitIcao", "AUT"],
+      ["persönlicheDaten", "geschlecht", "weiblich"],
       ["unternehmensDaten", "tätigkeitsbereich", "handwerk"],
       ["unternehmensDaten", "gewerbeart", "hauptgewerbe"],
       ["unternehmensDaten", "gewinnErmittlung", "einnahmenüberschussrechnung"],
@@ -157,14 +164,31 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["persönlicheDaten", "religion"],
       ["persönlicheDaten", "vertrauensniveau"],
       ["persönlicheDaten", "staatsangehörigkeitIcao"],
+      ["persönlicheDaten", "geschlecht"],
       ["unternehmensDaten", "tätigkeitsbereich"],
       ["unternehmensDaten", "gewerbeart"],
       ["unternehmensDaten", "gewinnErmittlung"],
       ["unternehmensDaten", "sollIstVersteuerung"],
       ["unternehmensDaten", "zahllastUeberschussAuswahl"],
+      ["unternehmensDaten", "gründungsart"],
     ])("rejects an unknown value for %s.%s", (section, field) => {
       const request = validRequest() as Record<string, unknown>;
       (request[section] as Record<string, unknown>)[field] = "not-a-real-value";
+
+      const result = RegisterGewerbeRequestSchema.safeParse(request);
+
+      expect(result.success).toBe(false);
+    });
+
+    it.each([
+      ["unternehmensDaten", "istReisegewerbe", true],
+      ["unternehmensDaten", "rechtsform", "eingetragenesEinzelunternehmen"],
+      ["unternehmensDaten", "gründungsart", "übernahme"],
+      ["unternehmensDaten", "artBetriebsstaette", "zweigniederlassung"],
+      ["unternehmensDaten", "beteiligungOeffentlicheHand", "ja"],
+    ])("rejects the currently unsupported %s.%s value %j", (section, field, unsupportedValue) => {
+      const request = validRequest() as Record<string, unknown>;
+      (request[section] as Record<string, unknown>)[field] = unsupportedValue;
 
       const result = RegisterGewerbeRequestSchema.safeParse(request);
 

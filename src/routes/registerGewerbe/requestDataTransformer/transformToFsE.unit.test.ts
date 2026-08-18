@@ -45,6 +45,12 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.umsatzsteuer?.uStIdNr?.uStIdAntrag?.merkerAntragUStId).toBe(true);
   });
 
+  it("maps gründungsart to gruendungsForm.gruendungsArt (neugründung = 1)", () => {
+    const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+
+    expect(result.eUn?.betrieb?.gruendungsangaben?.gruendungsForm?.gruendungsArt).toBe("1");
+  });
+
   it("maps anmeldedatumFinanzamt to both betriebsbeginn and uebertrStichtag", () => {
     const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
     const expectedDate = formatDatumDE(
