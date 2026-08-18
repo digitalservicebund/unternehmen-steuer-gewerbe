@@ -14,6 +14,8 @@ import {
   IST_VERSTEUERUNG_GRUND,
   ZAHLLAST_UEBERSCHUSS,
   GRUENDUNGSART,
+  ROLLE_KONTOINHABER,
+  BANKKONTO_STEUERART,
 } from "./fsECodes";
 
 // FsE only allows digits in HausNr, so everything after the leading number — Zusatz, separator and
@@ -85,6 +87,34 @@ function getZahllastUeberschuss({
     auswahl: ZAHLLAST_UEBERSCHUSS[zahllastUeberschussAuswahl],
     betrag: zahllastUeberschussBetrag,
   };
+}
+
+type BankKontoEingabe = NonNullable<
+  RegisterGewerbeRequest["unternehmensDaten"]["bankKonto"]
+>["personensteuerkonto"];
+
+// FsE only has an "Iban" field for domestic accounts; foreign accounts go in "IbanAusland"
+// alongside their Bic (see FsE_EUn XSD: "BIC zur ausländischen IBAN"). We only collect a Bic
+// for foreign accounts, so its presence is what distinguishes the two.
+function createBankKonto(konto: BankKontoEingabe, steuerart: string) {
+  return {
+    ...(konto.bic ? { ibanAusland: konto.iban, bic: konto.bic } : { iban: konto.iban }),
+    steuerart,
+    kontoinhaber: {
+      rolleKontoinhaber: ROLLE_KONTOINHABER[konto.kontoinhaber],
+      abwKontoinhaber: konto.kontoinhaberName,
+    },
+  };
+}
+
+function getBankKonto({ unternehmensDaten: { bankKonto } }: RegisterGewerbeRequest) {
+  if (bankKonto === undefined) return undefined;
+  return [
+    createBankKonto(bankKonto.personensteuerkonto, BANKKONTO_STEUERART.personensteuern),
+    ...(bankKonto.betriebssteuerkonto
+      ? [createBankKonto(bankKonto.betriebssteuerkonto, BANKKONTO_STEUERART.betriebssteuern)]
+      : []),
+  ];
 }
 
 function ensureEricHerstellerId() {
@@ -219,13 +249,7 @@ export function transformToEUnFsE(
             data.unternehmensDaten.tätigkeitsbeschreibungKurz ??
             data.unternehmensDaten.tätigkeitsbeschreibung.slice(0, 200),
         },
-        // bankKonto: {
-        //   iban: undefined,
-        //   steuerart: undefined,
-        //   kontoinhaber: {
-        //     rolleKontoinhaber: undefined
-        //   },
-        // },
+        bankKonto: getBankKonto(data),
         // steuerberater: {
         //   natPers: {
         //     anredeId: undefined,

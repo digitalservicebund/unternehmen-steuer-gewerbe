@@ -15,6 +15,7 @@ import {
   SOLL_IST_VERSTEUERUNG_KEYS,
   IST_VERSTEUERUNG_GRUND_KEYS,
   ZAHLLAST_UEBERSCHUSS_KEYS,
+  ROLLE_KONTOINHABER_KEYS,
 } from "./requestDataTransformer/fsECodes";
 
 const AdresseSchema = z.object({
@@ -132,14 +133,14 @@ const UnternehmensDatenSchema = z
         personensteuerkonto: z.object({
           iban: z.string(),
           bic: z.string().optional(),
-          kontoinhaber: z.string(),
+          kontoinhaber: z.enum(ROLLE_KONTOINHABER_KEYS),
           kontoinhaberName: z.string().optional(),
         }),
         betriebssteuerkonto: z
           .object({
             iban: z.string(),
             bic: z.string().optional(),
-            kontoinhaber: z.string(),
+            kontoinhaber: z.enum(ROLLE_KONTOINHABER_KEYS),
             kontoinhaberName: z.string().optional(),
           })
           .optional(),

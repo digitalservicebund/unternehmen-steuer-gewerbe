@@ -83,3 +83,22 @@ export const ZAHLLAST_UEBERSCHUSS_KEYS = Object.keys(ZAHLLAST_UEBERSCHUSS) as [
 export const GRUENDUNGSART = {
   neugründung: "1",
 } as const;
+
+export const ROLLE_KONTOINHABER = {
+  steuerpflichtigePerson: "01",
+  ehePartner: "02",
+  gemeinsamMitEhePartner: "03",
+  anderePerson: "99",
+} as const;
+
+type RolleKontoinhaber = keyof typeof ROLLE_KONTOINHABER;
+export const ROLLE_KONTOINHABER_KEYS = Object.keys(ROLLE_KONTOINHABER) as [
+  RolleKontoinhaber,
+  ...RolleKontoinhaber[],
+];
+
+// Which taxes a BankKonto entry applies to; fixed per account slot, not user-selected.
+export const BANKKONTO_STEUERART = {
+  personensteuern: "1",
+  betriebssteuern: "2",
+} as const;
