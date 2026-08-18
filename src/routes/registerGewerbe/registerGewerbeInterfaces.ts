@@ -47,6 +47,29 @@ const AdresseMitHausnummerSchema = z.object({
   ort: z.string().openapi({ example: "Fulda" }),
 }) satisfies z.ZodType<AdresseMitHausnummer>;
 
+// FsE_EUn XSD: String_MinL5_MaxL34_Musterm188614856_SType, used for both Iban and IbanAusland
+const BankKontoIbanSchema = z
+  .string()
+  .min(5)
+  .max(34)
+  .regex(/^[A-Za-z]{2}\d{2}[\dA-Za-z]{1,30}$/)
+  .openapi({ example: "DE02120300000000202051", description: "IBAN" });
+
+// FsE_EUn XSD: BICBaseSType
+const BankKontoBicSchema = z
+  .string()
+  .regex(/^[A-Za-z]{6}[\dA-Za-z]{2}([\dA-Za-z]{3})?$/)
+  .openapi({
+    example: "BYLADEM1SWU",
+    description: "BIC; only required for a foreign IBAN.",
+  });
+
+// FsE_EUn XSD: String_MinL1_MaxL128_SType
+const BankKontoKontoinhaberNameSchema = z.string().min(1).max(128).openapi({
+  example: "Max Mustermann",
+  description: 'Name of the account holder; only meaningful when kontoinhaber is "anderePerson".',
+});
+
 const PersönlicheDatenSchema = z.object({
   vorname: z.string().openapi({ example: "Erika" }),
   nachname: z.string().openapi({ example: "Mustermann" }),
@@ -131,23 +154,23 @@ const UnternehmensDatenSchema = z
     bankKonto: z
       .object({
         personensteuerkonto: z.object({
-          iban: z.string(),
-          bic: z.string().optional(),
+          iban: BankKontoIbanSchema,
+          bic: BankKontoBicSchema.optional(),
           kontoinhaber: z.enum(ROLLE_KONTOINHABER_KEYS),
-          kontoinhaberName: z.string().optional(),
+          kontoinhaberName: BankKontoKontoinhaberNameSchema.optional(),
         }),
         betriebssteuerkonto: z
           .object({
-            iban: z.string(),
-            bic: z.string().optional(),
+            iban: BankKontoIbanSchema,
+            bic: BankKontoBicSchema.optional(),
             kontoinhaber: z.enum(ROLLE_KONTOINHABER_KEYS),
-            kontoinhaberName: z.string().optional(),
+            kontoinhaberName: BankKontoKontoinhaberNameSchema.optional(),
           })
           .optional(),
       })
       .optional()
       .openapi({
-        description: "Bank accounts collected for private and optional business taxes.",
+        description: "Bank accounts for private and optional business taxes.",
       }),
     geschäftsbezeichnung: z.string().max(120).optional().openapi({
       example: "Musterhandel",
