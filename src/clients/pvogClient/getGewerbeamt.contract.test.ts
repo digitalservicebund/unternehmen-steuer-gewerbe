@@ -90,8 +90,8 @@ describe("getGewerbeamt raw PVOG endpoints", () => {
     expect(result.content).toEqual([]);
   });
 
-  // Turns red once Sachsen registers Dresden for the Gewerbeanmeldung, which is when the hardcoded
-  // fallback in getGewerbeamt can be removed
+  // Turns red once the Gewerbeanmeldung is registered for Dresden, at which point
+  // the hardcoded fallback in getGewerbeamt can be removed.
   it("returns no service description for Dresden (ARS 146120000000)", async () => {
     const result = await fetchServiceDescriptionsByArs("146120000000");
 

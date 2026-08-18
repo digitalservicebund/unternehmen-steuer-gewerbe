@@ -184,9 +184,9 @@ describe("getGewerbeamt with mocked PVOG responses", () => {
     );
   });
 
-  // the mocked PVOG would answer with a different Gewerbeamt, so this also covers that Dresden
-  // short-circuits before the lookup
   it("returns the hardcoded Gewerbeamt for Dresden (ARS 146120000000)", async () => {
+    // the mocked PVOG would answer with none or a different Gewerbeamt, so this also
+    // covers that Dresden short-cut before the lookup
     mockPvogApi({});
 
     const gewerbeamt = await getGewerbeamt("146120000000");
