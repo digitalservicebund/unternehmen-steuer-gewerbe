@@ -146,8 +146,7 @@ const UnternehmensDatenSchema = z
       })
       .optional()
       .openapi({
-        description:
-          "Bank accounts collected for private and optional business taxes.",
+        description: "Bank accounts collected for private and optional business taxes.",
       }),
     geschäftsbezeichnung: z.string().max(120).optional().openapi({
       example: "Musterhandel",

@@ -338,6 +338,79 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.umsatzsteuer?.kleinunternehmerRegelung?.kleinUnternUSt).toBeUndefined();
   });
 
+  describe("bankKonto", () => {
+    it("maps personensteuerkonto and betriebssteuerkonto to BankKonto entries with matching Steuerart", () => {
+      const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+
+      expect(result.eUn?.allgAngaben?.bankKonto).toEqual([
+        {
+          iban: "DE02120300000000202051",
+          steuerart: "1", // 1 means "Personensteuern", 2 means "Betriebssteuern"
+          kontoinhaber: { rolleKontoinhaber: "01", abwKontoinhaber: undefined }, // 01 means "die steuerpflichtige Person"
+        },
+        {
+          iban: "DE02500105170137075030",
+          steuerart: "2", // 1 means "Personensteuern", 2 means "Betriebssteuern"
+          kontoinhaber: { rolleKontoinhaber: "99", abwKontoinhaber: "Max Mustermann" }, // 99 means "eine andere Person"
+        },
+      ]);
+    });
+
+    it("puts a foreign IBAN (identified by a given bic) into ibanAusland instead of iban", () => {
+      const result = transformToEUnFsE({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          bankKonto: {
+            personensteuerkonto: {
+              iban: "FR7630006000011234567890189",
+              bic: "AGRIFRPP",
+              kontoinhaber: "steuerpflichtigePerson",
+            },
+          },
+        },
+      });
+
+      expect(result.eUn?.allgAngaben?.bankKonto).toEqual([
+        {
+          ibanAusland: "FR7630006000011234567890189",
+          bic: "AGRIFRPP",
+          steuerart: "1", // 1 means "Personensteuern", 2 means "Betriebssteuern"
+          kontoinhaber: { rolleKontoinhaber: "01", abwKontoinhaber: undefined }, // 01 means "die steuerpflichtige Person"
+        },
+      ]);
+    });
+
+    it("omits betriebssteuerkonto's entry when not given", () => {
+      const result = transformToEUnFsE({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          bankKonto: {
+            personensteuerkonto: {
+              iban: "DE02120300000000202051",
+              kontoinhaber: "steuerpflichtigePerson",
+            },
+          },
+        },
+      });
+
+      expect(result.eUn?.allgAngaben?.bankKonto).toHaveLength(1);
+    });
+
+    it("is undefined when no bankKonto is given", () => {
+      const result = transformToEUnFsE({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          bankKonto: undefined,
+        },
+      });
+
+      expect(result.eUn?.allgAngaben?.bankKonto).toBeUndefined();
+    });
+  });
+
   it("sets kleinUnternUSt=true when kleinunternehmerRegelung is true, kleinUnternUStVerzicht is undefined", () => {
     const result = transformToEUnFsE({
       ...registerGewerbeSampleRequestAllFieldsFilled,
