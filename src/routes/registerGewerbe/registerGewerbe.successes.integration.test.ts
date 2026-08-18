@@ -52,7 +52,11 @@ vi.mock("./getGewerbeRoutingInfo", () => ({
 
 import app from "../../app";
 
-import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
+import { sendFsE as mockSendFsE } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
+import {
+  elsterServerResponseFixture,
+  registerGewerbeSampleRequestAllFieldsFilled,
+} from "./testHelpers";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
@@ -270,6 +274,32 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(json.gewerbeanmeldung.submissionId).toBe("mock-osci-message-id");
       expect(json.gewerbeanmeldung.ars).toBe("084210000000");
       expect(json.gewerbeanmeldung.fitConnectDestinationId).toBeUndefined();
+    });
+  });
+
+  describe("fseÜbermittlung submissionId", () => {
+    it("returns the TransferTicket from the ELSTER server response as submissionId", async () => {
+      vi.mocked(mockSendFsE).mockReturnValueOnce({
+        success: true,
+        serverResponse: elsterServerResponseFixture("eh23053phmwjw2411dsn98z8picgyoue"),
+      });
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+      expect(json.fseÜbermittlung.submissionId).toBe("eh23053phmwjw2411dsn98z8picgyoue");
+    });
+
+    it("returns no submissionId when sendFsE returns no serverResponse", async () => {
+      vi.mocked(mockSendFsE).mockReturnValueOnce({ success: true });
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+      expect(json.fseÜbermittlung.success).toBe(true);
+      expect(json.fseÜbermittlung.submissionId).toBeUndefined();
     });
   });
 

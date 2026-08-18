@@ -151,3 +151,8 @@ export function gewerbeRoutingInfoFixture(): GewerbeRoutingInfo {
     },
   };
 }
+
+// Real ELSTER response to an accepted FsE submission, as sendFsE returns it in serverResponse.
+export function elsterServerResponseFixture(transferTicket: string): string {
+  return `<?xml version="1.0" encoding="UTF-8"?><Elster xmlns="http://www.elster.de/elsterxml/schema/v11"><TransferHeader version="11"><Verfahren>ElsterFSE</Verfahren><DatenArt>EUn</DatenArt><Vorgang>send-Auth</Vorgang><TransferTicket>${transferTicket}</TransferTicket><Testmerker>700000004</Testmerker><Empfaenger id="L"><Ziel>BY</Ziel></Empfaenger><HerstellerID>49420</HerstellerID><DatenLieferant>MIAGCSqGSIb3DQEHBqCAMIACAQAwgAYJKoZIhvcNAQcBMB0GCWCGSAFlAwQBKgQQynn9UxNP1Sepu7kWZYxH3qCABDDPnpKJga5nvxnAuWCw4+6MePG3bcMCAujtJxff68Le0SfDx8HaZmEEeSPIZwdeEjMAAAAAAAAAAAAA</DatenLieferant><EingangsDatum>20260818093231</EingangsDatum><Datei><Verschluesselung>CMSEncryptedData</Verschluesselung><Kompression>GZIP</Kompression><TransportSchluessel>MIAGCSqGSIb3DQEHBqCAMIACAQAwgAYJKoZIhvcNAQcBMB0GCWCGSAFlAwQBKgQQcF/bHO5PyLsAyhCxSlP/hKCABCAGrVRcQ0ImOQWCqgPVWTtmue+VRDON/gBZgIhPdzBhBwAAAAAAAAAAAAA=</TransportSchluessel></Datei><RC><Rueckgabe><Code>0</Code><Text>Daten wurden erfolgreich angenommen.</Text></Rueckgabe><Stack><Code></Code><Text></Text></Stack></RC><VersionClient>ERiC Beispiele</VersionClient></TransferHeader><DatenTeil></DatenTeil></Elster>`;
+}
