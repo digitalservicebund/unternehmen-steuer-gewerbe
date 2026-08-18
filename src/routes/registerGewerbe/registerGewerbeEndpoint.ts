@@ -171,20 +171,12 @@ export const EricErrorFachlicheAblehnung = 610001002;
 // parseTagValue: false keeps an all-digit TransferTicket a string.
 const elsterServerResponseParser = new XMLParser({ parseTagValue: false });
 
-interface ElsterTransferHeader {
-  TransferTicket?: string;
-}
-
-interface ElsterServerResponse {
-  Elster?: { TransferHeader?: ElsterTransferHeader };
-}
-
 // ELSTER identifies the submission by the TransferTicket in the TransferHeader of its response.
 function getTransferTicket(serverResponse: string | undefined): string | undefined {
   if (serverResponse === undefined) {
     return undefined;
   }
-  const parsed = elsterServerResponseParser.parse(serverResponse) as ElsterServerResponse;
+  const parsed = elsterServerResponseParser.parse(serverResponse);
   return parsed.Elster?.TransferHeader?.TransferTicket;
 }
 
