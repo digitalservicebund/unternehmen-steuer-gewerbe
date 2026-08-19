@@ -195,7 +195,7 @@ const UnternehmensDatenSchema = z
     onlinehandel: OnlinehandelSchema.optional().openapi({
       example: {
         eigenerWebshop: true,
-        adresseEigenerWebshop: "http://amazon.de/TheSimpleShop",
+        adresseEigenerWebshop: "https://amazon.de/TheSimpleShop",
         onlineMarktplaetze: true,
         onlineMarktplatz: [
           {
