@@ -85,9 +85,9 @@ export const GRUENDUNGSART = {
 } as const;
 
 export const ROLLE_KONTOINHABER = {
-  steuerpflichtigePerson: "01",
-  ehePartner: "02",
-  gemeinsamMitEhePartner: "03",
+  steuerpflichtigePerson: "1",
+  ehePartner: "2",
+  gemeinsamMitEhePartner: "3",
   anderePerson: "99",
 } as const;
 

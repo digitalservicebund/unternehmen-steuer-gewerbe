@@ -346,7 +346,7 @@ describe("transformToEUnFsE", () => {
         {
           iban: "DE02120300000000202051",
           steuerart: "1", // 1 means "Personensteuern", 2 means "Betriebssteuern"
-          kontoinhaber: { rolleKontoinhaber: "01", abwKontoinhaber: undefined }, // 01 means "die steuerpflichtige Person"
+          kontoinhaber: { rolleKontoinhaber: "1", abwKontoinhaber: undefined }, // 1 means "die steuerpflichtige Person"
         },
         {
           iban: "DE02500105170137075030",
@@ -376,7 +376,7 @@ describe("transformToEUnFsE", () => {
           ibanAusland: "FR7630006000011234567890189",
           bic: "AGRIFRPP",
           steuerart: "1", // 1 means "Personensteuern", 2 means "Betriebssteuern"
-          kontoinhaber: { rolleKontoinhaber: "01", abwKontoinhaber: undefined }, // 01 means "die steuerpflichtige Person"
+          kontoinhaber: { rolleKontoinhaber: "1", abwKontoinhaber: undefined }, // 1 means "die steuerpflichtige Person"
         },
       ]);
     });
