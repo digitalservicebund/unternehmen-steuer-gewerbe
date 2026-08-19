@@ -281,10 +281,6 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
     try {
       const { only } = c.req.valid("query");
       const data = c.req.valid("json");
-      console.log("register-gewerbe onlinehandel/influencer payload", {
-        onlinehandel: data.unternehmensDaten.onlinehandel,
-        influencer: data.unternehmensDaten.influencer,
-      });
 
       // Sequential, not concurrent: each of these can hold a worker-thread heap
       // (gewerbeanmeldung) or block the event loop (fsE); running them one at a time
