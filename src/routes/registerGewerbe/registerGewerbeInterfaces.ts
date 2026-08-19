@@ -49,13 +49,13 @@ const AdresseMitHausnummerSchema = z.object({
 
 const OnlinehandelSchema = z.object({
   eigenerWebshop: z.boolean(),
-  adresseEigenerWebshop: z.string().optional(),
+  adresseEigenerWebshop: z.string().min(1).max(128).optional(),
   onlineMarktplaetze: z.boolean(),
   onlineMarktplatz: z
     .array(
       z.object({
-        nameMarktplatz: z.string(),
-        nameAccount: z.string(),
+        nameMarktplatz: z.string().min(1).max(100),
+        nameAccount: z.string().min(1).max(100),
       }),
     )
     .max(99)
@@ -67,8 +67,8 @@ const InfluencerSchema = z.object({
   plattform: z
     .array(
       z.object({
-        namePlattform: z.string(),
-        nameAccount: z.string(),
+        namePlattform: z.string().min(1).max(100),
+        nameAccount: z.string().min(1).max(100),
       }),
     )
     .max(99)
