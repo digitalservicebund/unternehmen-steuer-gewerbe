@@ -395,4 +395,36 @@ describe("RegisterGewerbeRequestSchema", () => {
       expect(result.success).toBe(true);
     });
   });
+
+  describe("bankKonto iban / bic cross-field rule", () => {
+    it("fails when personensteuerkonto's iban is foreign and bic is missing", () => {
+      const request = validRequest();
+      request.unternehmensDaten.bankKonto!.personensteuerkonto.iban = "FR7630006000011234567890189";
+      delete request.unternehmensDaten.bankKonto!.personensteuerkonto.bic;
+
+      const result = RegisterGewerbeRequestSchema.safeParse(request);
+
+      expect(result.success).toBe(false);
+    });
+
+    it("succeeds when personensteuerkonto's iban is foreign and bic is set", () => {
+      const request = validRequest();
+      request.unternehmensDaten.bankKonto!.personensteuerkonto.iban = "FR7630006000011234567890189";
+      request.unternehmensDaten.bankKonto!.personensteuerkonto.bic = "AGRIFRPP";
+
+      const result = RegisterGewerbeRequestSchema.safeParse(request);
+
+      expect(result.success).toBe(true);
+    });
+
+    it("succeeds when personensteuerkonto's iban is domestic and bic is absent", () => {
+      const request = validRequest();
+      request.unternehmensDaten.bankKonto!.personensteuerkonto.iban = "DE02120300000000202051";
+      delete request.unternehmensDaten.bankKonto!.personensteuerkonto.bic;
+
+      const result = RegisterGewerbeRequestSchema.safeParse(request);
+
+      expect(result.success).toBe(true);
+    });
+  });
 });

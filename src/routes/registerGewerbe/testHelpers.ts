@@ -54,6 +54,17 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
     },
     geschäftsbezeichnung: "Musterhandel",
     umsatzsteuerIdMitbeantragen: true,
+    bankKonto: {
+      personensteuerkonto: {
+        iban: "DE02120300000000202051",
+        kontoinhaber: "steuerpflichtigePerson",
+      },
+      betriebssteuerkonto: {
+        iban: "DE02500105170137075030",
+        kontoinhaber: "anderePerson",
+        kontoinhaberName: "Max Mustermann",
+      },
+    },
   },
 };
 
