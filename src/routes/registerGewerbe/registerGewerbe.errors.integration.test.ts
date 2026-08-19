@@ -337,5 +337,23 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
 
       expect(response.status).toEqual(HttpStatusCode.BadRequest);
     });
+
+    it("Returns 400 BAD REQUEST when iban is foreign and bic is missing", async () => {
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          bankKonto: {
+            ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten.bankKonto,
+            personensteuerkonto: {
+              iban: "FR1420041010050500013M02606",
+              kontoinhaber: "steuerpflichtigePerson",
+            },
+          },
+        },
+      });
+
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+    });
   });
 });
