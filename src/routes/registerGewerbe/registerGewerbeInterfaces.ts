@@ -192,8 +192,30 @@ const UnternehmensDatenSchema = z
       description:
         "Deprecated: use `adresse` instead, which takes street and house number as separate fields. Still read while `adresse` is optional.",
     }),
-    onlinehandel: OnlinehandelSchema.optional(),
-    influencer: InfluencerSchema.optional(),
+    onlinehandel: OnlinehandelSchema.optional().openapi({
+      example: {
+        eigenerWebshop: true,
+        adresseEigenerWebshop: "http://amazon.de/TheSimpleShop",
+        onlineMarktplaetze: true,
+        onlineMarktplatz: [
+          {
+            nameMarktplatz: "Amazon",
+            nameAccount: "TheSimpleShop",
+          },
+        ],
+      },
+    }),
+    influencer: InfluencerSchema.optional().openapi({
+      example: {
+        influencerUmsatz: true,
+        plattform: [
+          {
+            namePlattform: "Instagram",
+            nameAccount: "TheSimpleVid",
+          },
+        ],
+      },
+    }),
     bankKonto: z
       .object({
         personensteuerkonto: BankKontoSchema.openapi({
