@@ -22,28 +22,28 @@ const AdresseSchema = z.object({
     .string()
     .regex(/^\D.*\d/)
     .openapi({
-      example: "Musterstraße 1",
+      example: "Münzgasse 2",
       description:
         "Street name followed by street number; must start with letters and contain a digit",
     }),
   postleitzahl: z
     .string()
     .regex(/^\d{5}$/)
-    .openapi({ example: "36037", description: "5-digit German postal code" }),
-  ort: z.string().openapi({ example: "Fulda" }),
+    .openapi({ example: "01067", description: "5-digit German postal code" }),
+  ort: z.string().openapi({ example: "Dresden" }),
 }) satisfies z.ZodType<Adresse>;
 
 const AdresseMitHausnummerSchema = z.object({
-  strasse: z.string().min(1).openapi({ example: "Musterstraße" }),
+  strasse: z.string().min(1).openapi({ example: "Münzgasse" }),
   hausnummer: z.string().min(1).openapi({
-    example: "2a",
+    example: "2",
     description: 'House number; a range can be given as "8-14" or "8/14"',
   }),
   postleitzahl: z
     .string()
     .regex(/^\d{5}$/)
-    .openapi({ example: "36037", description: "5-digit German postal code" }),
-  ort: z.string().openapi({ example: "Fulda" }),
+    .openapi({ example: "01067", description: "5-digit German postal code" }),
+  ort: z.string().openapi({ example: "Dresden" }),
 }) satisfies z.ZodType<AdresseMitHausnummer>;
 
 const PersönlicheDatenSchema = z.object({
@@ -109,10 +109,10 @@ const UnternehmensDatenSchema = z
   .object({
     adresse: AdresseMitHausnummerSchema.optional().openapi({
       example: {
-        strasse: "Musterstraße",
+        strasse: "Münzgasse",
         hausnummer: "2",
-        postleitzahl: "36037",
-        ort: "Fulda",
+        postleitzahl: "01067",
+        ort: "Dresden",
       },
       description:
         "Address of the business, if it differs from the private address. Takes precedence over the deprecated `adresseAbweichend`.",
@@ -120,9 +120,9 @@ const UnternehmensDatenSchema = z
     adresseAbweichend: AdresseSchema.optional().openapi({
       deprecated: true,
       example: {
-        strasseUndHausnummer: "Musterstraße 2",
-        postleitzahl: "36037",
-        ort: "Fulda",
+        strasseUndHausnummer: "Münzgasse 2",
+        postleitzahl: "01067",
+        ort: "Dresden",
       },
       description:
         "Deprecated: use `adresse` instead, which takes street and house number as separate fields. Still read while `adresse` is optional.",
