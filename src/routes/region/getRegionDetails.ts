@@ -15,7 +15,8 @@ import {
 } from "../../helpers/createOfficeDetails";
 import { getFirstAssumingItsTheBestMatch } from "../../helpers/getFirstAssumingItsTheBestMatch";
 
-interface RegionOfficesDetails {
+interface RegionDetails {
+  arsList: string[];
   finanzaemter: OfficeDetails[];
   gewerbeaemter: OfficeDetails[];
 }
@@ -62,22 +63,26 @@ function limitToBestMatch<T>(matches: T[]): T[] {
 }
 
 /**
- * Get the responsible Finanzämter and Gewerbeämter for a given PLZ, ort, street and house number.
- * Unless getAllOffices is set, each list contains only the best match — the same office the XML
- * submission would use.
+ * Get the ARS of every Kommune the given PLZ, ort, street and house number resolve to, plus the
+ * responsible Finanzämter and Gewerbeämter.
+ * Unless getAllOffices is set, each office list contains only the best match — the same office the
+ * XML submission would use. `arsList` always contains every resolved Kommune, so that callers can
+ * tell an ambiguous address from an unambiguous one.
  * Best-effort: a failing upstream lookup results in an empty array
  */
-export async function getRegionOfficesDetails(
+export async function getRegionDetails(
   locationQuery: LocationQuery,
   getAllOffices: boolean,
-): Promise<RegionOfficesDetails> {
+): Promise<RegionDetails> {
   const allFinanzamtIds = getAllFinanzamtIds(locationQuery);
   const allLocations = await getAllLocations(locationQuery);
+
+  const arsList = allLocations.map((location) => location.ars);
 
   const selectedFinanzamtIds = getAllOffices ? allFinanzamtIds : limitToBestMatch(allFinanzamtIds);
   const selectedLocations = getAllOffices ? allLocations : limitToBestMatch(allLocations);
 
   const finanzaemter = createFinanzaemterOfficeDetails(selectedFinanzamtIds);
   const gewerbeaemter = await createGewerbeaemterOfficeDetails(selectedLocations);
-  return { finanzaemter, gewerbeaemter };
+  return { arsList, finanzaemter, gewerbeaemter };
 }

@@ -1,5 +1,5 @@
 import { HonoAppType } from "../../honoApp";
-import { getRegionOfficesDetails } from "./getRegionOfficesDetails";
+import { getRegionDetails } from "./getRegionDetails";
 import { regionRoute } from "./regionRoute";
 import { isSupportedRegion } from "./supportedRegions";
 
@@ -8,11 +8,14 @@ export function addRegionEndpoint(app: HonoAppType): HonoAppType {
     const plz = c.req.valid("param").plz;
     const { ort, strasse, hausnummer, getAllOffices } = c.req.valid("query");
 
-    const supported = isSupportedRegion(Number(plz));
-    const { finanzaemter, gewerbeaemter } = await getRegionOfficesDetails(
+    const { arsList, finanzaemter, gewerbeaemter } = await getRegionDetails(
       { plz, ort, strasse, hausnummer },
       getAllOffices,
     );
+
+    // Only claim support when the address resolves to exactly one Kommune: an ambiguous PLZ can
+    // span a neighbouring, unsupported Kommune and we cannot tell which one it belongs to
+    const supported = arsList.length === 1 && isSupportedRegion(arsList[0]!);
 
     return c.json({ supported, finanzaemter, gewerbeaemter }, 200);
   });

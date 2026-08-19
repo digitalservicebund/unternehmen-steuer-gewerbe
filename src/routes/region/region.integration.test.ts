@@ -59,6 +59,16 @@ async function requestRegion36037ForAllMatches() {
   return { response, body };
 }
 
+async function requestRegionResolvingTo(plz: string, arsValues: string[]) {
+  mockGetLocationsDetails.mockResolvedValue(
+    arsValues.map((ars) => ({ ars, name: "Kommune", plz })),
+  );
+
+  const response = await app.request(`/api/v1/region/${plz}`);
+  const body = (await response.json()) as RegionResponseBody;
+  return { response, body };
+}
+
 describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
   beforeEach(() => {
     vi.resetAllMocks();
@@ -168,20 +178,72 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
     });
   });
 
-  it("returns supported:true for a PLZ within a supported region (36037, Fulda)", async () => {
-    const { body } = await requestRegionForPostleitzahl36037();
+  describe("determining whether the resolved Kommune is supported", () => {
+    it("returns supported:true for Fulda 066310009009", async () => {
+      const { body } = await requestRegionResolvingTo("36037", ["066310009009"]);
 
-    expect(body.supported).toBe(true);
-  });
+      expect(body.supported).toBe(true);
+    });
 
-  it("returns supported:false for a PLZ outside every supported region, while still returning matches", async () => {
-    const response = await app.request("/api/v1/region/89073");
-    const body = (await response.json()) as RegionResponseBody;
+    it("returns supported:false for Künzell 066310017017, which shares PLZ 36043 with Fulda", async () => {
+      const { body } = await requestRegionResolvingTo("36043", ["066310017017"]);
 
-    expect(response.status).toEqual(HttpStatusCode.Ok);
-    expect(body.supported).toBe(false);
-    expect(body.gewerbeaemter).toHaveLength(1);
-    expect(body.finanzaemter).toHaveLength(1);
+      expect(body.supported).toBe(false);
+    });
+
+    it("returns supported:false when PLZ 36043 resolves to both Fulda and Künzell", async () => {
+      const { body } = await requestRegionResolvingTo("36043", ["066310009009", "066310017017"]);
+
+      expect(body.supported).toBe(false);
+    });
+
+    it("returns supported:false when PLZ 25813 resolves to Husum, Schwesing, Simonsberg and Südermarsch", async () => {
+      const { body } = await requestRegionResolvingTo("25813", [
+        "010540056056",
+        "010545453118",
+        "010545492120",
+        "010545492132",
+      ]);
+
+      expect(body.supported).toBe(false);
+    });
+
+    it("returns supported:true for Husum 010540056056", async () => {
+      const { body } = await requestRegionResolvingTo("25813", ["010540056056"]);
+
+      expect(body.supported).toBe(true);
+    });
+
+    it("returns supported:false for Schwesing 010545453118, which shares PLZ 25813 with Husum", async () => {
+      const { body } = await requestRegionResolvingTo("25813", ["010545453118"]);
+
+      expect(body.supported).toBe(false);
+    });
+
+    it("returns supported:true for Hamburg 020000000000", async () => {
+      const { body } = await requestRegionResolvingTo("20095", ["020000000000"]);
+
+      expect(body.supported).toBe(true);
+    });
+
+    it("returns supported:false for Helgoland 010560025025", async () => {
+      const { body } = await requestRegionResolvingTo("27499", ["010560025025"]);
+
+      expect(body.supported).toBe(false);
+    });
+
+    it("returns supported:false for Ulm 084210000000", async () => {
+      const { body } = await requestRegionResolvingTo("89073", ["084210000000"]);
+
+      expect(body.supported).toBe(false);
+    });
+
+    it("returns the responsible Gewerbeamt and Finanzamt for an unsupported Kommune", async () => {
+      const { body } = await requestRegionResolvingTo("89073", ["084210000000"]);
+
+      expect(body.gewerbeaemter).toHaveLength(1);
+      expect(body.finanzaemter).toHaveLength(1);
+    });
   });
 
   it("returns supported:false and empty arrays when neither lookup finds a match", async () => {
