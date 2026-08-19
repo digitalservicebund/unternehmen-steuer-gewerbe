@@ -166,6 +166,47 @@ describe("transformToEUnFsE", () => {
 
       expect(result.eUn?.umsatzsteuer?.uStIdNr).toBeUndefined();
     });
+
+    it("maps onlinehandel and influencer", () => {
+      const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+
+      expect(result.eUn?.umsatzsteuer?.onlinehandel).toEqual({
+        eigenerWebshop: true,
+        adresseEigenerWebshop: "https://example.org",
+        onlineMarktplaetze: true,
+        onlineMarktplatz: [{ nameMarktplatz: "Amazon", nameAccount: "example-shop" }],
+      });
+      expect(result.eUn?.umsatzsteuer?.influencer).toEqual({
+        influencerUmsatz: true,
+        plattform: [{ namePlattform: "Instagram", nameAccount: "example" }],
+      });
+    });
+
+    it("omits eigenerWebshop/onlineMarktplaetze/influencerUmsatz when false (JaTrueBaseSType only allows 'true')", () => {
+      const data = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+      data.unternehmensDaten.onlinehandel = {
+        eigenerWebshop: false,
+        onlineMarktplaetze: false,
+      };
+      data.unternehmensDaten.influencer = { influencerUmsatz: false };
+
+      const result = transformToEUnFsE(data);
+
+      expect(result.eUn?.umsatzsteuer?.onlinehandel?.eigenerWebshop).toBeUndefined();
+      expect(result.eUn?.umsatzsteuer?.onlinehandel?.onlineMarktplaetze).toBeUndefined();
+      expect(result.eUn?.umsatzsteuer?.influencer?.influencerUmsatz).toBeUndefined();
+    });
+
+    it("omits onlinehandel and influencer entirely when not given", () => {
+      const data = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+      data.unternehmensDaten.onlinehandel = undefined;
+      data.unternehmensDaten.influencer = undefined;
+
+      const result = transformToEUnFsE(data);
+
+      expect(result.eUn?.umsatzsteuer?.onlinehandel).toBeUndefined();
+      expect(result.eUn?.umsatzsteuer?.influencer).toBeUndefined();
+    });
   });
 
   it.each([
