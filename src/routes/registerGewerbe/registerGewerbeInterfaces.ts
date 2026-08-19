@@ -166,8 +166,24 @@ const UnternehmensDatenSchema = z
     }),
     bankKonto: z
       .object({
-        personensteuerkonto: BankKontoSchema,
-        betriebssteuerkonto: BankKontoSchema.optional(),
+        personensteuerkonto: BankKontoSchema.openapi({
+          example: {
+            iban: "DE02120300000000202051",
+            bic: "BYLADEM1SWU",
+            kontoinhaber: "steuerpflichtigePerson",
+          },
+          description:
+            "Rule: 'kontoinhaber: steuerpflichtigePerson' must not go with using 'kontoinhaberName'",
+        }),
+        betriebssteuerkonto: BankKontoSchema.optional().openapi({
+          example: {
+            iban: "DE02120300000000202051",
+            bic: "BYLADEM1SWU",
+            kontoinhaber: "anderePerson",
+            kontoinhaberName: "Friedo Müller",
+          },
+          description: "Rule: 'kontoinhaber: anderePerson' requires 'kontoinhaberName'",
+        }),
       })
       .optional()
       .openapi({
