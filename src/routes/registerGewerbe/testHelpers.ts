@@ -54,25 +54,26 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
     },
     geschäftsbezeichnung: "Musterhandel",
     umsatzsteuerIdMitbeantragen: true,
-    bankKonto: [
-      {
-        iban: "DE12345678901234567890",
-        bic: "GENODEF1S01",
-        kontoinhaber: "selbst",
-        steuerart: "personensteuern",
-      },
-    ],
     onlinehandel: {
       eigenerWebshop: true,
       adresseEigenerWebshop: "https://example.org",
       onlineMarktplaetze: true,
-      onlineMarktplatz: [
-        { nameMarktplatz: "Amazon", nameAccount: "example-shop" },
-      ],
+      onlineMarktplatz: [{ nameMarktplatz: "Amazon", nameAccount: "example-shop" }],
     },
     influencer: {
       influencerUmsatz: true,
       plattform: [{ namePlattform: "Instagram", nameAccount: "example" }],
+    },
+    bankKonto: {
+      personensteuerkonto: {
+        iban: "DE02120300000000202051",
+        kontoinhaber: "steuerpflichtigePerson",
+      },
+      betriebssteuerkonto: {
+        iban: "DE02500105170137075030",
+        kontoinhaber: "anderePerson",
+        kontoinhaberName: "Max Mustermann",
+      },
     },
   },
 };

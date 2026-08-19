@@ -15,6 +15,7 @@ import {
   SOLL_IST_VERSTEUERUNG_KEYS,
   IST_VERSTEUERUNG_GRUND_KEYS,
   ZAHLLAST_UEBERSCHUSS_KEYS,
+  ROLLE_KONTOINHABER_KEYS,
 } from "./requestDataTransformer/fsECodes";
 
 const AdresseSchema = z.object({
@@ -22,37 +23,29 @@ const AdresseSchema = z.object({
     .string()
     .regex(/^\D.*\d/)
     .openapi({
-      example: "Musterstraße 1",
+      example: "Münzgasse 2",
       description:
         "Street name followed by street number; must start with letters and contain a digit",
     }),
   postleitzahl: z
     .string()
     .regex(/^\d{5}$/)
-    .openapi({ example: "36037", description: "5-digit German postal code" }),
-  ort: z.string().openapi({ example: "Fulda" }),
+    .openapi({ example: "01067", description: "5-digit German postal code" }),
+  ort: z.string().openapi({ example: "Dresden" }),
 }) satisfies z.ZodType<Adresse>;
 
 const AdresseMitHausnummerSchema = z.object({
-  strasse: z.string().min(1).openapi({ example: "Musterstraße" }),
+  strasse: z.string().min(1).openapi({ example: "Münzgasse" }),
   hausnummer: z.string().min(1).openapi({
-    example: "2a",
+    example: "2",
     description: 'House number; a range can be given as "8-14" or "8/14"',
   }),
   postleitzahl: z
     .string()
     .regex(/^\d{5}$/)
-    .openapi({ example: "36037", description: "5-digit German postal code" }),
-  ort: z.string().openapi({ example: "Fulda" }),
+    .openapi({ example: "01067", description: "5-digit German postal code" }),
+  ort: z.string().openapi({ example: "Dresden" }),
 }) satisfies z.ZodType<AdresseMitHausnummer>;
-
-const BankKontoSchema = z.object({
-  iban: z.string(),
-  bic: z.string().optional(),
-  kontoinhaber: z.string(),
-  kontoinhaberName: z.string().optional(),
-  steuerart: z.enum(["personensteuern", "betriebssteuern", "alleSteuerarten"]),
-});
 
 const OnlinehandelSchema = z.object({
   eigenerWebshop: z.boolean(),
@@ -81,6 +74,42 @@ const InfluencerSchema = z.object({
     .max(99)
     .optional(),
 });
+
+// FsE_EUn XSD: String_MinL5_MaxL34_Musterm188614856_SType, used for both Iban and IbanAusland
+const BankKontoIbanSchema = z
+  .string()
+  .min(5)
+  .max(34)
+  .regex(/^[A-Za-z]{2}\d{2}[\dA-Za-z]{1,30}$/)
+  .openapi({ example: "DE02120300000000202051", description: "IBAN" });
+
+// FsE_EUn XSD: BICBaseSType
+const BankKontoBicSchema = z
+  .string()
+  .regex(/^[A-Za-z]{6}[\dA-Za-z]{2}([\dA-Za-z]{3})?$/)
+  .openapi({
+    example: "BYLADEM1SWU",
+    description: "BIC; only required for a foreign IBAN.",
+  });
+
+// FsE_EUn XSD: String_MinL1_MaxL128_SType
+const BankKontoKontoinhaberNameSchema = z.string().min(1).max(128).openapi({
+  example: "Max Mustermann",
+  description: 'Name of the account holder; only meaningful when kontoinhaber is "anderePerson".',
+});
+
+// A domestic IBAN starts with the "DE" country code (ISO 13616); anything else is foreign.
+const BankKontoSchema = z
+  .object({
+    iban: BankKontoIbanSchema,
+    bic: BankKontoBicSchema.optional(),
+    kontoinhaber: z.enum(ROLLE_KONTOINHABER_KEYS),
+    kontoinhaberName: BankKontoKontoinhaberNameSchema.optional(),
+  })
+  .refine((konto) => konto.iban.slice(0, 2).toUpperCase() === "DE" || konto.bic !== undefined, {
+    error: "bic is required for a foreign IBAN (one that doesn't start with 'DE').",
+    path: ["bic"],
+  });
 
 const PersönlicheDatenSchema = z.object({
   vorname: z.string().openapi({ example: "Erika" }),
@@ -145,10 +174,10 @@ const UnternehmensDatenSchema = z
   .object({
     adresse: AdresseMitHausnummerSchema.optional().openapi({
       example: {
-        strasse: "Musterstraße",
+        strasse: "Münzgasse",
         hausnummer: "2",
-        postleitzahl: "36037",
-        ort: "Fulda",
+        postleitzahl: "01067",
+        ort: "Dresden",
       },
       description:
         "Address of the business, if it differs from the private address. Takes precedence over the deprecated `adresseAbweichend`.",
@@ -156,18 +185,40 @@ const UnternehmensDatenSchema = z
     adresseAbweichend: AdresseSchema.optional().openapi({
       deprecated: true,
       example: {
-        strasseUndHausnummer: "Musterstraße 2",
-        postleitzahl: "36037",
-        ort: "Fulda",
+        strasseUndHausnummer: "Münzgasse 2",
+        postleitzahl: "01067",
+        ort: "Dresden",
       },
       description:
         "Deprecated: use `adresse` instead, which takes street and house number as separate fields. Still read while `adresse` is optional.",
     }),
-    bankKonto: z.array(BankKontoSchema).max(2).optional().openapi({
-      description: "Bank accounts and their tax-area assignment.",
-    }),
     onlinehandel: OnlinehandelSchema.optional(),
     influencer: InfluencerSchema.optional(),
+    bankKonto: z
+      .object({
+        personensteuerkonto: BankKontoSchema.openapi({
+          example: {
+            iban: "DE02120300000000202051",
+            bic: "BYLADEM1SWU",
+            kontoinhaber: "steuerpflichtigePerson",
+          },
+          description:
+            "Rule: 'kontoinhaber: steuerpflichtigePerson' must not go with using 'kontoinhaberName'",
+        }),
+        betriebssteuerkonto: BankKontoSchema.optional().openapi({
+          example: {
+            iban: "DE02120300000000202051",
+            bic: "BYLADEM1SWU",
+            kontoinhaber: "anderePerson",
+            kontoinhaberName: "Friedo Müller",
+          },
+          description: "Rule: 'kontoinhaber: anderePerson' requires 'kontoinhaberName'",
+        }),
+      })
+      .optional()
+      .openapi({
+        description: "Bank accounts for private and optional business taxes.",
+      }),
     geschäftsbezeichnung: z.string().max(120).optional().openapi({
       example: "Musterhandel",
       description:
