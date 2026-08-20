@@ -21,10 +21,11 @@ describe("transformToEUnFsE", () => {
       plz: "03046",
       ort: "Cottbus",
     });
+    // +1 415 5552671
     expect(result.eUn?.allgAngaben?.komm?.tel?.[0]).toEqual({
-      intVorw: "+49",
-      natVorw: "234",
-      rufNr: "121314",
+      intVorw: "+1",
+      natVorw: "415",
+      rufNr: "5552671",
     });
     expect(result.eUn?.allgAngaben?.artTaet?.gewerbeArt).toBe("Vertrieb von Mustern");
     expect(result.eUn?.betrieb?.betrBeginn?.betriebsbeginn).toBe("17.04.2026");
