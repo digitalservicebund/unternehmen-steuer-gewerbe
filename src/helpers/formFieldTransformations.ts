@@ -1,3 +1,5 @@
+import { parsePhoneNumberFromString } from "libphonenumber-js";
+
 /** Converts an ISO date "YYYY-MM-DD" to German format "DD.MM.YYYY" */
 export function formatDatumDE(isoDate: string): string {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate);
@@ -131,22 +133,28 @@ export function getBetriebsAdresse({
   };
 }
 
+/** Splits an E.164 phone number (e.g. "+491701234567") into international prefix, area/national code and local number */
 export function splitTelefonnummer(telefonnummer: string) {
-  const match =
-    /^(?<intVorw>\+\d{1,5})\s(?<natVorw>\d{1,5})\s(?<rufNr>\d{1,13})(?:-(?<durchwahl>\d{1,5}))?$/.exec(
-      telefonnummer,
-    );
+  const phoneNumber = parsePhoneNumberFromString(telefonnummer);
 
-  if (!match?.groups) {
+  if (!phoneNumber) {
     throw new Error("The given Phone number format is not supported");
   }
 
-  const { intVorw, natVorw, rufNr, durchwahl } = match.groups;
+  const [intVorw, natVorw, ...rest] = phoneNumber.formatInternational().split(" ");
 
   return {
-    intVorw: intVorw?.trimEnd(),
-    natVorw: natVorw?.trimEnd(),
-    rufNr: rufNr?.trimEnd(),
-    durchwahl: durchwahl?.trimEnd(),
+    intVorw,
+    natVorw,
+    rufNr: rest.join(""),
   };
+}
+
+/**
+ * Formats an E.164 phone number as DIN 5008 ("+[Ländervorwahl] [Lokale Vorwahl] [Rufnummer]"),
+ * which xGewerbeordnung's kom:telefon requires (Schematron rule SCH-0193).
+ */
+export function formatTelefonnummerDIN5008(telefonnummer: string): string {
+  const { intVorw, natVorw, rufNr } = splitTelefonnummer(telefonnummer);
+  return `${intVorw} ${natVorw} ${rufNr}`;
 }

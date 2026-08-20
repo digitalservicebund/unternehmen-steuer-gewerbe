@@ -17,7 +17,7 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
       postleitzahl: "03046",
       ort: "Cottbus",
     },
-    telefon: "+49 234 121314",
+    telefon: "+14155552671",
     email: "e.mustermann@example.org",
     steuerId: "06646829576",
     religion: "nichtKirchensteuerpflichtig",

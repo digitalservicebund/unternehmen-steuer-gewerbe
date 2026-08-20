@@ -88,22 +88,20 @@ describe("formatDatumDE", () => {
 });
 
 describe("splitTelefonnummer", () => {
-  it("splits the phonenumber +49 30 123456-123 corretly", () => {
-    const parts = splitTelefonnummer("+49 30 123456-123");
+  it("splits the E.164 number +4930123456 into intVorw (+49), natVorw (30) and rufNr (123456)", () => {
+    const parts = splitTelefonnummer("+4930123456");
 
     expect(parts.intVorw).toBe("+49");
     expect(parts.natVorw).toBe("30");
     expect(parts.rufNr).toBe("123456");
-    expect(parts.durchwahl).toBe("123");
   });
 
-  it("splits the number for a phone number +49 30 123456 without a durchwahl", () => {
-    const parts = splitTelefonnummer("+49 30 123456");
+  it("splits the E.164 number +14155552671 into intVorw (+1), natVorw (415) and rufNr (5552671", () => {
+    const parts = splitTelefonnummer("+14155552671");
 
-    expect(parts.intVorw).toBe("+49");
-    expect(parts.natVorw).toBe("30");
-    expect(parts.rufNr).toBe("123456");
-    expect(parts.durchwahl).toBeUndefined();
+    expect(parts.intVorw).toBe("+1");
+    expect(parts.natVorw).toBe("415");
+    expect(parts.rufNr).toBe("5552671");
   });
 
   it("throws an Error for an unsupported phone number 030 123455", () => {

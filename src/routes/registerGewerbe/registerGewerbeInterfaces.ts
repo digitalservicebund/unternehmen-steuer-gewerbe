@@ -1,4 +1,5 @@
 import { z } from "@hono/zod-openapi";
+import { isValidPhoneNumber } from "libphonenumber-js";
 import { OfficeDetailsSchema } from "../region/regionInterfaces";
 import { type Adresse, type AdresseMitHausnummer } from "../../helpers/formFieldTransformations";
 import {
@@ -104,11 +105,14 @@ const PersönlicheDatenSchema = z.object({
   adresse: AdresseSchema,
   telefon: z
     .string()
-    .regex(/^\+\d{1,5}\s\d{1,5}\s\d{1,13}(-\d{1,5})?$/)
+    .regex(/^\+[1-9]\d{1,14}$/)
+    .refine((value) => isValidPhoneNumber(value), {
+      message: "Phone number must be a valid number in E.164 format",
+    })
     .openapi({
-      example: "+49 234 121314",
+      example: "+491701234567",
       description:
-        "Phone numbers are encoded according to the DIN 5008 standard as follows: +[Country code] (up to 5 digits) [Area code] (up to 5 digits) [Phone number] (up to 13 digits) [-Extension] (optional, up to 5 digits).",
+        "Phone number in E.164 format: +[Country code][Subscriber number], no spaces or separators.",
     }),
   email: z.email().openapi({ example: "e.mustermann@example.org" }),
   steuerId: z

@@ -237,11 +237,32 @@ describe("RegisterGewerbeRequestSchema", () => {
       expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
     });
 
-    it("accepts a valid telefon and rejects a malformed one", () => {
-      const invalid = validRequest();
-      invalid.persönlicheDaten.telefon = "0234 121314";
+    describe("telefon (E.164)", () => {
+      it.each([["+14155552671"], ["+491701234567"], ["+4930183948"]])(
+        "accepts a valid E.164 number %s",
+        (value) => {
+          const request = validRequest();
+          request.persönlicheDaten.telefon = value;
 
-      expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
+          expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(true);
+        },
+      );
+
+      it.each([
+        ["+49 234 121314"], // old DIN 5008 formatting (spaces) is no longer accepted
+        ["0234 121314"], // missing leading +
+        ["+49-234-121314"], // dashes are not allowed
+        ["+4917012345678901"], // exceeds the 15-digit E.164 max
+        ["not-a-number"],
+        // format looks plausible but is not a real, dialable German number -
+        // this is the case a bare regex can't catch and libphonenumber-js can
+        ["+4900000000000"],
+      ])("rejects malformed or invalid value %s", (value) => {
+        const request = validRequest();
+        request.persönlicheDaten.telefon = value;
+
+        expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(false);
+      });
     });
 
     it("rejects a malformed email", () => {
