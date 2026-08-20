@@ -3,6 +3,7 @@ import { type CreateGewerbeanmeldungXmlData } from "../../../xmlBuilders/xGewerb
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { type GewerbeRoutingInfo } from "../getGewerbeRoutingInfo";
 import {
+  formatTelefonnummerDIN5008,
   getBetriebsAdresse,
   splitStrasseHausnummer,
 } from "../../../helpers/formFieldTransformations";
@@ -165,7 +166,7 @@ export function transformToGewerbeanmeldung(
             ort: data.persönlicheDaten.adresse.ort,
           },
           kommunikation: {
-            telefon: data.persönlicheDaten.telefon,
+            telefon: formatTelefonnummerDIN5008(data.persönlicheDaten.telefon),
             email: data.persönlicheDaten.email,
           },
         },
