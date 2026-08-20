@@ -72,7 +72,10 @@ export const OfficeDetailsSchema = z
 
 export const RegionResponseSchema = z
   .object({
-    supported: z.boolean(),
+    supported: z.boolean().openapi({
+      description:
+        "True only when the address resolves to exactly one Kommune and that Kommune is supported. A PLZ spanning several Kommunen is reported as unsupported — narrow it down with ort, strasse and hausnummer.",
+    }),
     finanzaemter: z.array(OfficeDetailsSchema),
     gewerbeaemter: z.array(OfficeDetailsSchema),
   })

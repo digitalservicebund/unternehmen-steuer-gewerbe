@@ -16,9 +16,9 @@ export const regionRoute = createRoute({
         },
       },
       description:
-        "Lookup successful (the PLZ may still be unsupported by Schneller Gründen). Returns the " +
-        "responsible Finanzämter and Gewerbeämter for the given location; arrays may be empty if " +
-        "it was not possible to find a Finanz- and/or Gewerbeamt for the given location.",
+        "Lookup successful (the Kommune may still be unsupported by Schneller Gründen). Returns " +
+        "the responsible Finanzämter and Gewerbeämter for the given location; arrays may be empty " +
+        "if it was not possible to find a Finanz- and/or Gewerbeamt for the given location.",
     },
     400: {
       description: "Invalid PLZ format — must be a 5-digit number",
@@ -26,5 +26,5 @@ export const regionRoute = createRoute({
   },
   tags: ["Active Development"],
   summary:
-    "Get whether a region with the given PLZ is currently supported by our application, plus the responsible Finanzämter and Gewerbeämter",
+    "Get whether the Kommune for the given address is unambiguously supported by our application, plus the responsible Finanzämter and Gewerbeämter",
 });
