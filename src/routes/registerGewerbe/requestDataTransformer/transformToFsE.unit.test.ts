@@ -21,7 +21,6 @@ describe("transformToEUnFsE", () => {
       plz: "03046",
       ort: "Cottbus",
     });
-    // +1 415 5552671
     expect(result.eUn?.allgAngaben?.komm?.tel?.[0]).toEqual({
       intVorw: "+1",
       natVorw: "415",
