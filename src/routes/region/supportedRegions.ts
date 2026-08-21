@@ -18,3 +18,6 @@ const ALL_SUPPORTED_ARS: ReadonlyArray<string> = Object.values(SUPPORTED_REGIONS
 export function isSupportedRegion(ars: string): boolean {
   return ALL_SUPPORTED_ARS.includes(ars);
 }
+
+// Kommunen where Schneller Gründen is available, shown to the frontend so it can list them.
+export const SUPPORTED_KOMMUNEN: readonly string[] = ["Dresden"];
