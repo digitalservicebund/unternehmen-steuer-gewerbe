@@ -89,6 +89,28 @@ function getZahllastUeberschuss({
   };
 }
 
+// FsE_EUn XSD: EigenerWebshop/OnlineMarktplaetze are JaTrueBaseSType (only "true" is a valid
+// value), so "false" must be omitted rather than transmitted.
+function getOnlinehandel({ onlinehandel }: RegisterGewerbeRequest["unternehmensDaten"]) {
+  if (onlinehandel === undefined) return undefined;
+  return {
+    eigenerWebshop: onlinehandel.eigenerWebshop ? true : undefined,
+    adresseEigenerWebshop: onlinehandel.adresseEigenerWebshop,
+    onlineMarktplaetze: onlinehandel.onlineMarktplaetze ? true : undefined,
+    onlineMarktplatz: onlinehandel.onlineMarktplatz,
+  };
+}
+
+// FsE_EUn XSD: InfluencerUmsatz is JaTrueBaseSType (only "true" is a valid value), so "false"
+// must be omitted rather than transmitted.
+function getInfluencer({ influencer }: RegisterGewerbeRequest["unternehmensDaten"]) {
+  if (influencer === undefined) return undefined;
+  return {
+    influencerUmsatz: influencer.influencerUmsatz ? true : undefined,
+    plattform: influencer.plattform,
+  };
+}
+
 type BankKontoEingabe = NonNullable<
   RegisterGewerbeRequest["unternehmensDaten"]["bankKonto"]
 >["personensteuerkonto"];
@@ -345,6 +367,8 @@ export function transformToEUnFsE(
         },
         zahllastUeberschuss: getZahllastUeberschuss(data.unternehmensDaten),
         uStIdNr: getUstIdNr(data),
+        onlinehandel: getOnlinehandel(data.unternehmensDaten),
+        influencer: getInfluencer(data.unternehmensDaten),
       },
     },
   };

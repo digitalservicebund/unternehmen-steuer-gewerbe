@@ -54,6 +54,16 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
     },
     geschäftsbezeichnung: "Musterhandel",
     umsatzsteuerIdMitbeantragen: true,
+    onlinehandel: {
+      eigenerWebshop: true,
+      adresseEigenerWebshop: "https://example.org",
+      onlineMarktplaetze: true,
+      onlineMarktplatz: [{ nameMarktplatz: "Amazon", nameAccount: "example-shop" }],
+    },
+    influencer: {
+      influencerUmsatz: true,
+      plattform: [{ namePlattform: "Instagram", nameAccount: "example" }],
+    },
     bankKonto: {
       personensteuerkonto: {
         iban: "DE02120300000000202051",

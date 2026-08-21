@@ -48,6 +48,34 @@ const AdresseMitHausnummerSchema = z.object({
   ort: z.string().openapi({ example: "Dresden" }),
 }) satisfies z.ZodType<AdresseMitHausnummer>;
 
+const OnlinehandelSchema = z.object({
+  eigenerWebshop: z.boolean(),
+  adresseEigenerWebshop: z.string().min(1).max(128).optional(),
+  onlineMarktplaetze: z.boolean(),
+  onlineMarktplatz: z
+    .array(
+      z.object({
+        nameMarktplatz: z.string().min(1).max(100),
+        nameAccount: z.string().min(1).max(100),
+      }),
+    )
+    .max(99)
+    .optional(),
+});
+
+const InfluencerSchema = z.object({
+  influencerUmsatz: z.boolean(),
+  plattform: z
+    .array(
+      z.object({
+        namePlattform: z.string().min(1).max(100),
+        nameAccount: z.string().min(1).max(100),
+      }),
+    )
+    .max(99)
+    .optional(),
+});
+
 // FsE_EUn XSD: String_MinL5_MaxL34_Musterm188614856_SType, used for both Iban and IbanAusland
 const BankKontoIbanSchema = z
   .string()
@@ -167,6 +195,30 @@ const UnternehmensDatenSchema = z
       },
       description:
         "Deprecated: use `adresse` instead, which takes street and house number as separate fields. Still read while `adresse` is optional.",
+    }),
+    onlinehandel: OnlinehandelSchema.optional().openapi({
+      example: {
+        eigenerWebshop: true,
+        adresseEigenerWebshop: "https://amazon.de/TheSimpleShop",
+        onlineMarktplaetze: true,
+        onlineMarktplatz: [
+          {
+            nameMarktplatz: "Amazon",
+            nameAccount: "TheSimpleShop",
+          },
+        ],
+      },
+    }),
+    influencer: InfluencerSchema.optional().openapi({
+      example: {
+        influencerUmsatz: true,
+        plattform: [
+          {
+            namePlattform: "Instagram",
+            nameAccount: "TheSimpleVid",
+          },
+        ],
+      },
     }),
     bankKonto: z
       .object({
