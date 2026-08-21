@@ -255,7 +255,7 @@ const UnternehmensDatenSchema = z
       description:
         "Method of profit calculation. Enumeration:\n- einnahmenüberschussrechnung\n- betriebsvermögensvergleich (Bilanz mit Gewinn- und Verlustrechnung)\n- gewinnermittlungDurchschnittssätze (nur bei Land- und Forstwirtschaft)]\n- sonstige (z. B. § 5a EStG)]",
     }),
-    kleinunternehmerRegelung: z.boolean().default(false).openapi({
+    kleinunternehmerRegelung: z.boolean().openapi({
       example: false,
       description: "Wird die Kleinunternehmer-Regelung (§ 19 UStG) in Anspruch genommen?",
     }),

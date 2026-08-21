@@ -46,6 +46,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten.artBetriebsstaette"],
       ["unternehmensDaten.beteiligungOeffentlicheHand"],
       ["unternehmensDaten.gewinnErmittlung"],
+      ["unternehmensDaten.kleinunternehmerRegelung"],
       ["unternehmensDaten.sollIstVersteuerung"],
       ["unternehmensDaten.umsatzGruendungsjahr"],
       ["unternehmensDaten.umsatzFolgejahr"],
@@ -116,7 +117,6 @@ describe("RegisterGewerbeRequestSchema", () => {
   describe("defaults", () => {
     it.each([
       ["persönlicheDaten", "staatsangehörigkeit", "deutsch"],
-      ["unternehmensDaten", "kleinunternehmerRegelung", false],
       ["unternehmensDaten", "anzahlVollzeitBeschaeftigte", 0],
       ["unternehmensDaten", "anzahlTeilzeitBeschaeftigte", 0],
       ["unternehmensDaten", "zahllastUeberschussAuswahl", "zahllast"],
