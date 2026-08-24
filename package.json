@@ -37,7 +37,7 @@
     "@digitalservicebund/unternehmen-steuer-gewerbe-privat": "7.1.0-351",
     "@hono/node-server": "^2.1.1",
     "@hono/swagger-ui": "^0.6.1",
-    "@hono/zod-openapi": "1.5.3",
+    "@hono/zod-openapi": "1.6.0",
     "dotenv": "^17.4.2",
     "fast-xml-parser": "^5.10.1",
     "hono": "^4.13.2",
