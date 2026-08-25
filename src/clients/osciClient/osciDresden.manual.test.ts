@@ -14,7 +14,7 @@ import { getOsciClient } from "./osciClient";
 // AKDB_BASE_URL, AKDB_USERNAME, AKDB_PASSWORD, AKDB_CERTIFICATE_BASE64 and
 // AKDB_CERTIFICATE_PASSPHRASE must point at production (https://apk.akdb.de/okkommozg).
 
-// Dr.-Külz-Ring 19, 01067 Dresden (Rathaus) => ARS 146120000000
+// Augsburger Straße 3, 01309 Dresden => ARS 146120000000
 const DRESDEN_ARS = "146120000000";
 const DRESDEN_AGS = "14612000";
 
