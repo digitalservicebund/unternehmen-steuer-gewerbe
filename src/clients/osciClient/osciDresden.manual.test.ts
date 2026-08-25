@@ -1,0 +1,133 @@
+import { describe, expect, it } from "vitest";
+import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
+import { getGewerbeRoutingInfo } from "../../routes/registerGewerbe/getGewerbeRoutingInfo";
+import { type RegisterGewerbeRequest } from "../../routes/registerGewerbe/registerGewerbeInterfaces";
+import { transformToGewerbeanmeldung } from "../../routes/registerGewerbe/requestDataTransformer/transformToGewerbeanmeldung";
+import { getOsciClient } from "./osciClient";
+
+// TEMPORARY manual test: sends a Gewerbeanmeldung to the real Gewerbeamt Dresden through
+// the AKDB production API. It runs the same chain as the endpoint (routing -> transform ->
+// XML builder incl. XSD/Schematron validation), so what arrives in Dresden is what production sends.
+// Delete this file, vitest.manual.config.ts and the test:manual script once the test send is done.
+//
+// Run with:
+// AKDB_BASE_URL, AKDB_USERNAME, AKDB_PASSWORD, AKDB_CERTIFICATE_BASE64 and
+// AKDB_CERTIFICATE_PASSPHRASE must point at production (https://apk.akdb.de/okkommozg).
+
+// Dr.-Külz-Ring 19, 01067 Dresden (Rathaus) => ARS 146120000000
+const DRESDEN_ARS = "146120000000";
+const DRESDEN_AGS = "14612000";
+
+const dresdenAdresse = {
+  strasse: "Dr.-Külz-Ring",
+  hausnummer: "19",
+  postleitzahl: "01067",
+  ort: "Dresden",
+};
+
+export const dresdenRequest: RegisterGewerbeRequest = {
+  persönlicheDaten: {
+    vorname: "Erika",
+    nachname: "Mustermann",
+    geburtsname: "DigitalService",
+    geburtsdatum: "1988-09-10",
+    geburtsort: "Musterstadt",
+    geburtsland: "Deutschland",
+    geschlecht: "keineAngabe",
+    staatsangehörigkeit: "deutsch",
+    adresse: {
+      strasseUndHausnummer: "Dr.-Külz-Ring 19",
+      postleitzahl: "01067",
+      ort: "Dresden",
+    },
+    telefon: "+49234121314",
+    email: "e.mustermann@example.org",
+    steuerId: "06646829576",
+    religion: "nichtKirchensteuerpflichtig",
+    vertrauensniveau: "substantiell",
+  },
+  unternehmensDaten: {
+    tätigkeitsbeschreibung: "Testeintrag Schneller Gründen",
+    tätigkeitsbereich: "handwerk",
+    anmeldedatumFinanzamt: "2026-08-25",
+    anmeldedatumGewerbeamt: "2026-08-25",
+    gewerbeart: "hauptgewerbe",
+    istReisegewerbe: false,
+    rechtsform: "nichtEingetragenesEinzelunternehmen",
+    gründungsart: "neugründung",
+    artBetriebsstaette: "hauptniederlassung",
+    beteiligungOeffentlicheHand: "nein",
+    anzahlVollzeitBeschaeftigte: 0,
+    anzahlTeilzeitBeschaeftigte: 0,
+    gewinnErmittlung: "einnahmenüberschussrechnung",
+    kleinunternehmerRegelung: false,
+    umsatzGruendungsjahr: 1,
+    umsatzFolgejahr: 1,
+    gewinnGründungsjahr: 1,
+    gewinnFolgejahr: 1,
+    sollIstVersteuerung: "sollVersteuerung",
+    zahllastUeberschussAuswahl: "zahllast",
+    zahllastUeberschussBetrag: 0,
+    umsatzsteuerIdMitbeantragen: true,
+    adresse: dresdenAdresse,
+  },
+};
+
+// the receiving Gewerbeamt should not see the same ids twice; the transform generates fresh
+// UUIDs and timestamps on every call
+async function createDresdenGewerbeanmeldung(logging = false) {
+  const routingInfo = await getGewerbeRoutingInfo(dresdenRequest);
+  if (routingInfo === undefined) {
+    throw new Error("No Gewerbeamt found for the Dresden test address");
+  }
+
+  const gewerbeanmeldung = transformToGewerbeanmeldung(dresdenRequest, routingInfo);
+
+  if (logging) {
+    console.log("*** Routing Info:");
+    console.log(JSON.stringify(routingInfo, null, 2));
+    console.log("************************");
+    console.log("*** Gewerbemeldung Data:");
+    console.log(JSON.stringify(gewerbeanmeldung, null, 2));
+    console.log("************************");
+  }
+
+  const message = await createGewerbeanmeldungXml(gewerbeanmeldung);
+
+  return { routingInfo, message };
+}
+
+describe("Gewerbemeldung to Dresden via OSCI", () => {
+  it("routes the Dresden address to the Stadt Dresden and builds a valid XML for it", async () => {
+    const { routingInfo, message } = await createDresdenGewerbeanmeldung();
+
+    expect(routingInfo.ars).toBe(DRESDEN_ARS);
+    expect(routingInfo.ags).toBe(DRESDEN_AGS);
+    expect(message).toContain(`<bn-beh:kennung>MELDID:${DRESDEN_AGS}</bn-beh:kennung>`);
+    expect(message).toContain(`<bn-beh:name>${routingInfo.gewerbeamt.name}</bn-beh:name>`);
+  });
+
+  it("resolves Dresden to the OSCI path, without a FIT-Connect destination", async () => {
+    const { routingInfo } = await createDresdenGewerbeanmeldung();
+
+    expect(routingInfo.fitConnectDestinationInformation).toBeNull();
+  });
+
+  it(`successfully sends Gewerbemeldung to Dresden (MELDID:${DRESDEN_AGS})`, async () => {
+    expect(process.env["AKDB_BASE_URL"]).toContain("apk.akdb.de");
+
+    const { routingInfo, message } = await createDresdenGewerbeanmeldung(true);
+    const targetId = `MELDID:${routingInfo.ags}`;
+
+    const sendResult = await getOsciClient().sendMessage({ targetId, message });
+
+    console.log("*** Send result:");
+    console.log(JSON.stringify(sendResult.metadata, undefined, 2));
+    console.log("****************");
+
+    expect(sendResult.metadata.reply.replyType).toBe("OK");
+
+    console.log("*** SubmissionID:", sendResult.metadata.source.sourceMessageId);
+    console.log("*** ARS:         ", routingInfo.ars);
+  });
+});
