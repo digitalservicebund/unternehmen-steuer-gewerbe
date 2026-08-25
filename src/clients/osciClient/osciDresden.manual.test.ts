@@ -19,9 +19,9 @@ const DRESDEN_ARS = "146120000000";
 const DRESDEN_AGS = "14612000";
 
 const dresdenAdresse = {
-  strasse: "Dr.-Külz-Ring",
-  hausnummer: "19",
-  postleitzahl: "01067",
+  strasse: "Augsburger Straße",
+  hausnummer: "3",
+  postleitzahl: "01309",
   ort: "Dresden",
 };
 
@@ -34,10 +34,11 @@ export const dresdenRequest: RegisterGewerbeRequest = {
     geburtsort: "Musterstadt",
     geburtsland: "Deutschland",
     geschlecht: "keineAngabe",
+    staatsangehörigkeitIcao: "D",
     staatsangehörigkeit: "deutsch",
     adresse: {
-      strasseUndHausnummer: "Dr.-Külz-Ring 19",
-      postleitzahl: "01067",
+      strasseUndHausnummer: "Augsburger Straße 3",
+      postleitzahl: "01309",
       ort: "Dresden",
     },
     telefon: "+49234121314",
@@ -47,6 +48,7 @@ export const dresdenRequest: RegisterGewerbeRequest = {
     vertrauensniveau: "substantiell",
   },
   unternehmensDaten: {
+    geschäftsbezeichnung: "Testbetrieb Schneller Gründen",
     tätigkeitsbeschreibung: "Testeintrag Schneller Gründen",
     tätigkeitsbereich: "handwerk",
     anmeldedatumFinanzamt: "2026-08-25",
@@ -99,7 +101,7 @@ async function createDresdenGewerbeanmeldung(logging = false) {
 
 describe("Gewerbemeldung to Dresden via OSCI", () => {
   it("routes the Dresden address to the Stadt Dresden and builds a valid XML for it", async () => {
-    const { routingInfo, message } = await createDresdenGewerbeanmeldung();
+    const { routingInfo, message } = await createDresdenGewerbeanmeldung(true);
 
     expect(routingInfo.ars).toBe(DRESDEN_ARS);
     expect(routingInfo.ags).toBe(DRESDEN_AGS);
@@ -108,12 +110,12 @@ describe("Gewerbemeldung to Dresden via OSCI", () => {
   });
 
   it("resolves Dresden to the OSCI path, without a FIT-Connect destination", async () => {
-    const { routingInfo } = await createDresdenGewerbeanmeldung();
+    const { routingInfo } = await createDresdenGewerbeanmeldung(true);
 
     expect(routingInfo.fitConnectDestinationInformation).toBeNull();
   });
 
-  it(`successfully sends Gewerbemeldung to Dresden (MELDID:${DRESDEN_AGS})`, async () => {
+  it.skip(`successfully sends Gewerbemeldung to Dresden (MELDID:${DRESDEN_AGS})`, async () => {
     expect(process.env["AKDB_BASE_URL"]).toContain("apk.akdb.de");
 
     const { routingInfo, message } = await createDresdenGewerbeanmeldung(true);
