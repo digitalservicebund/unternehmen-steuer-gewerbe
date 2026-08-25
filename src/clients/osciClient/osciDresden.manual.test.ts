@@ -75,8 +75,6 @@ export const dresdenRequest: RegisterGewerbeRequest = {
   },
 };
 
-// the receiving Gewerbeamt should not see the same ids twice; the transform generates fresh
-// UUIDs and timestamps on every call
 async function createDresdenGewerbeanmeldung(logging = false) {
   const routingInfo = await getGewerbeRoutingInfo(dresdenRequest);
   if (routingInfo === undefined) {
