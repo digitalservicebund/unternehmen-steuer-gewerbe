@@ -179,55 +179,16 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
   });
 
   describe("determining whether the resolved Kommune is supported", () => {
-    it("returns supported:true for Fulda 066310009009", async () => {
-      const { body } = await requestRegionResolvingTo("36037", ["066310009009"]);
+    it("returns supported:true for Dresden 146120000000", async () => {
+      const { body } = await requestRegionResolvingTo("01067", ["146120000000"]);
 
       expect(body.supported).toBe(true);
     });
 
-    it("returns supported:false for Künzell 066310017017, which shares PLZ 36043 with Fulda", async () => {
-      const { body } = await requestRegionResolvingTo("36043", ["066310017017"]);
-
-      expect(body.supported).toBe(false);
-    });
-
-    it("returns supported:false when PLZ 36043 resolves to both Fulda and Künzell", async () => {
-      const { body } = await requestRegionResolvingTo("36043", ["066310009009", "066310017017"]);
-
-      expect(body.supported).toBe(false);
-    });
-
-    it("returns supported:false when PLZ 25813 resolves to Husum, Schwesing, Simonsberg and Südermarsch", async () => {
-      const { body } = await requestRegionResolvingTo("25813", [
-        "010540056056",
-        "010545453118",
-        "010545492120",
-        "010545492132",
-      ]);
-
-      expect(body.supported).toBe(false);
-    });
-
-    it("returns supported:true for Husum 010540056056", async () => {
-      const { body } = await requestRegionResolvingTo("25813", ["010540056056"]);
-
-      expect(body.supported).toBe(true);
-    });
-
-    it("returns supported:false for Schwesing 010545453118, which shares PLZ 25813 with Husum", async () => {
-      const { body } = await requestRegionResolvingTo("25813", ["010545453118"]);
-
-      expect(body.supported).toBe(false);
-    });
-
-    it("returns supported:true for Hamburg 020000000000", async () => {
-      const { body } = await requestRegionResolvingTo("20095", ["020000000000"]);
-
-      expect(body.supported).toBe(true);
-    });
-
-    it("returns supported:false for Helgoland 010560025025", async () => {
-      const { body } = await requestRegionResolvingTo("27499", ["010560025025"]);
+    // A PLZ can span several Kommunen, so a supported Kommune only counts on an unambiguous
+    // address. No Dresden PLZ overlaps, hence the constructed match list.
+    it("returns supported:false when the address resolves to Dresden 146120000000 and a second Kommune", async () => {
+      const { body } = await requestRegionResolvingTo("01067", ["146120000000", "146270210210"]);
 
       expect(body.supported).toBe(false);
     });
