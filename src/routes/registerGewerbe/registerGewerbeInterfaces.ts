@@ -30,6 +30,18 @@ const ArsSchema = z
       "Amtlicher Regionalschlüssel (12 digits) of the municipality, if the caller already resolved it. Optional: when absent, it is looked up from the address.",
   });
 
+// ARS + Ortsteil(4) + Straße(5) from BKG. For Berlin, digits 13-14 are the Bezirk,
+// which SCH-0189 requires as gemeindeschluesselErgaenzung. Not evaluated yet.
+const SchluesselSchema = z
+  .string()
+  .regex(/^\d{21}$/)
+  .optional()
+  .openapi({
+    example: "110000000000010116936",
+    description:
+      "BKG schluessel (21 digits): Regionalschlüssel (12) + Ortsteil (4) + Straße (5), if the caller already resolved it.",
+  });
+
 const AdresseSchema = z.object({
   strasseUndHausnummer: z
     .string()
@@ -45,6 +57,7 @@ const AdresseSchema = z.object({
     .openapi({ example: "01067", description: "5-digit German postal code" }),
   ort: z.string().openapi({ example: "Dresden" }),
   ars: ArsSchema,
+  schluessel: SchluesselSchema,
 }) satisfies z.ZodType<Adresse>;
 
 const AdresseMitHausnummerSchema = z.object({
@@ -59,6 +72,7 @@ const AdresseMitHausnummerSchema = z.object({
     .openapi({ example: "01067", description: "5-digit German postal code" }),
   ort: z.string().openapi({ example: "Dresden" }),
   ars: ArsSchema,
+  schluessel: SchluesselSchema,
 }) satisfies z.ZodType<AdresseMitHausnummer>;
 
 const OnlinehandelSchema = z.object({

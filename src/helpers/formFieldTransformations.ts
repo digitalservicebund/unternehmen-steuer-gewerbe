@@ -81,6 +81,8 @@ export interface Adresse {
   ort: string;
   /** Amtlicher Regionalschlüssel, if the caller already resolved it */
   ars?: string;
+  /** BKG schluessel: ars + Ortsteil (4) + Straße (5), if the caller already resolved it */
+  schluessel?: string;
 }
 
 /** Address with street and house number as separate fields */
@@ -91,6 +93,8 @@ export interface AdresseMitHausnummer {
   ort: string;
   /** Amtlicher Regionalschlüssel, if the caller already resolved it */
   ars?: string;
+  /** BKG schluessel: ars + Ortsteil (4) + Straße (5), if the caller already resolved it */
+  schluessel?: string;
 }
 
 /** Resolved address of the business, house number already split into von, bis and Zusatz */

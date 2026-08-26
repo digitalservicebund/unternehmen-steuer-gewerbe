@@ -280,6 +280,38 @@ describe("RegisterGewerbeRequestSchema", () => {
       });
     });
 
+    describe("schluessel", () => {
+      it("accepts an address with a 21-digit schluessel", () => {
+        const request = validRequest();
+        request.unternehmensDaten.adresseAbweichend = {
+          strasseUndHausnummer: "Zimmerstraße 90",
+          postleitzahl: "10117",
+          ort: "Berlin",
+          ars: "110000000000",
+          schluessel: "110000000000010116936",
+        };
+
+        expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(true);
+      });
+
+      it.each([
+        ["the bare ARS", "110000000000"],
+        ["a non-numeric key", "11000000001011693A"],
+        ["an empty string", ""],
+      ])("rejects %s", (_case, schluessel) => {
+        const request = validRequest();
+        request.unternehmensDaten.adresse = {
+          strasse: "Zimmerstraße",
+          hausnummer: "90",
+          postleitzahl: "10117",
+          ort: "Berlin",
+          schluessel,
+        };
+
+        expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(false);
+      });
+    });
+
     describe("telefon (E.164)", () => {
       it.each([["+14155552671"], ["+491701234567"], ["+4930183948"]])(
         "accepts a valid E.164 number %s",
