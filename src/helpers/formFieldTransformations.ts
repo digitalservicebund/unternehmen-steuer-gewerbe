@@ -79,6 +79,8 @@ export interface Adresse {
   strasseUndHausnummer: string;
   postleitzahl: string;
   ort: string;
+  /** Amtlicher Regionalschlüssel, if the caller already resolved it */
+  ars?: string;
 }
 
 /** Address with street and house number as separate fields */
@@ -87,6 +89,8 @@ export interface AdresseMitHausnummer {
   hausnummer: string;
   postleitzahl: string;
   ort: string;
+  /** Amtlicher Regionalschlüssel, if the caller already resolved it */
+  ars?: string;
 }
 
 /** Resolved address of the business, house number already split into von, bis and Zusatz */

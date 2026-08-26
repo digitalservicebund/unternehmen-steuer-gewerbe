@@ -237,6 +237,49 @@ describe("RegisterGewerbeRequestSchema", () => {
       expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
     });
 
+    describe("ars", () => {
+      it("accepts an address with a 12-digit ARS", () => {
+        const request = validRequest();
+        request.unternehmensDaten.adresseAbweichend = {
+          strasseUndHausnummer: "Münzgasse 2",
+          postleitzahl: "01067",
+          ort: "Dresden",
+          ars: "146120000000",
+        };
+
+        expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(true);
+      });
+
+      it("accepts an address without an ARS", () => {
+        const request = validRequest();
+        request.unternehmensDaten.adresseAbweichend = {
+          strasseUndHausnummer: "Münzgasse 2",
+          postleitzahl: "01067",
+          ort: "Dresden",
+        };
+
+        expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(true);
+      });
+
+      it.each([
+        ["the 8-digit AGS", "14612000"],
+        ["a non-numeric key", "1461200000AB"],
+        ["an over-long key", "1461200000000"],
+        ["an empty string", ""],
+      ])("rejects %s", (_case, ars) => {
+        const request = validRequest();
+        request.unternehmensDaten.adresse = {
+          strasse: "Münzgasse",
+          hausnummer: "2",
+          postleitzahl: "01067",
+          ort: "Dresden",
+          ars,
+        };
+
+        expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(false);
+      });
+    });
+
     describe("telefon (E.164)", () => {
       it.each([["+14155552671"], ["+491701234567"], ["+4930183948"]])(
         "accepts a valid E.164 number %s",

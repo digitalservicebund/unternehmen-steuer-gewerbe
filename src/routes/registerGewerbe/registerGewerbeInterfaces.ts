@@ -19,6 +19,17 @@ import {
   ROLLE_KONTOINHABER_KEYS,
 } from "./requestDataTransformer/fsECodes";
 
+// Not used for routing yet — getGewerbeRoutingInfo still resolves the ARS itself.
+const ArsSchema = z
+  .string()
+  .regex(/^\d{12}$/)
+  .optional()
+  .openapi({
+    example: "146120000000",
+    description:
+      "Amtlicher Regionalschlüssel (12 digits) of the municipality, if the caller already resolved it. Optional: when absent, it is looked up from the address.",
+  });
+
 const AdresseSchema = z.object({
   strasseUndHausnummer: z
     .string()
@@ -33,6 +44,7 @@ const AdresseSchema = z.object({
     .regex(/^\d{5}$/)
     .openapi({ example: "01067", description: "5-digit German postal code" }),
   ort: z.string().openapi({ example: "Dresden" }),
+  ars: ArsSchema,
 }) satisfies z.ZodType<Adresse>;
 
 const AdresseMitHausnummerSchema = z.object({
@@ -46,6 +58,7 @@ const AdresseMitHausnummerSchema = z.object({
     .regex(/^\d{5}$/)
     .openapi({ example: "01067", description: "5-digit German postal code" }),
   ort: z.string().openapi({ example: "Dresden" }),
+  ars: ArsSchema,
 }) satisfies z.ZodType<AdresseMitHausnummer>;
 
 const OnlinehandelSchema = z.object({
