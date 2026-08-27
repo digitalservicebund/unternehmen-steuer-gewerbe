@@ -160,52 +160,63 @@ describe("createGewerbeanmeldungXml", () => {
       referenzierteSubjekte: { natuerlichePerson: [] },
     };
 
-    await expect(createGewerbeanmeldungXml(withoutPerson)).rejects.toThrow(
+    await expect(createGewerbeanmeldungXml(withoutPerson, "fitConnect")).rejects.toThrow(
       "Generated XGewerbeanmeldung is invalid.",
     );
   });
 
   it("does not crash with an empty input but fails only on XML validation", async () => {
-    await expect(createGewerbeanmeldungXml({})).rejects.toThrow(
+    await expect(createGewerbeanmeldungXml({}, "fitConnect")).rejects.toThrow(
       "Generated XGewerbeanmeldung is invalid.",
     );
   });
 
   it("does not crash when all nested objects are present but all fields are undefined", async () => {
     await expect(
-      createGewerbeanmeldungXml({
-        nachrichtenkopf: { leser: {}, autor: {} },
-        autor: {},
-        bisherigeUnfallversicherung: {},
-        gewerbebetrieb: {
-          eintragung: { registergericht: {} },
-          betriebsstaette: { anschrift: {}, kommunikation: {} },
-          taetigkeitenGesamt: {
-            schwerpunkt: {},
-            weitereTaetigkeiten: { taetigkeit: [{}] },
-          },
-          betriebArt: {},
-          handwerkskarte: {},
-        },
-        referenzierteSubjekte: {
-          natuerlichePerson: [
-            {
-              name: {},
-              geburt: {},
-              anschrift: {},
-              kommunikation: {},
-              aufenthaltstitel: {},
+      createGewerbeanmeldungXml(
+        {
+          nachrichtenkopf: { leser: {}, autor: {} },
+          autor: {},
+          bisherigeUnfallversicherung: {},
+          gewerbebetrieb: {
+            eintragung: { registergericht: {} },
+            betriebsstaette: { anschrift: {}, kommunikation: {} },
+            taetigkeitenGesamt: {
+              schwerpunkt: {},
+              weitereTaetigkeiten: { taetigkeit: [{}] },
             },
-          ],
+            betriebArt: {},
+            handwerkskarte: {},
+          },
+          referenzierteSubjekte: {
+            natuerlichePerson: [
+              {
+                name: {},
+                geburt: {},
+                anschrift: {},
+                kommunikation: {},
+                aufenthaltstitel: {},
+              },
+            ],
+          },
         },
-      }),
+        "fitConnect",
+      ),
     ).rejects.toThrow("Generated XGewerbeanmeldung is invalid.");
   });
 
   it("maps Gewerbeanmeldung data to the correct xGewerbeordnung 1.6 XML structure", async () => {
-    expect(normalizeXml(await createGewerbeanmeldungXml(gewerbeanmeldung))).toBe(
+    expect(normalizeXml(await createGewerbeanmeldungXml(gewerbeanmeldung, "fitConnect"))).toBe(
       normalizeXml(xgewo_1_6_valid_0400),
     );
+  });
+
+  it(`omits xsi:schemaLocation for transportMethod "osci"`, async () => {
+    const parsed = parser.parse(await createGewerbeanmeldungXml(gewerbeanmeldung, "osci"));
+    const root = parsed["xga:ext.gewerbemeldung.0400"];
+    expect(root["@_xmlns:xsi"]).toBeUndefined();
+    expect(root["@_xsi:schemaLocation"]).toBeUndefined();
+    expect(root["@_xmlns:xga"]).toBe("http://www.xgewerbeordnung.de/spezifikation/xga/1.6");
   });
 
   it("omits optional XML elements when data is not provided", async () => {
@@ -277,7 +288,7 @@ describe("createGewerbeanmeldungXml", () => {
         ],
       },
     };
-    const xml = await createGewerbeanmeldungXml(minimal);
+    const xml = await createGewerbeanmeldungXml(minimal, "fitConnect");
     expect(xml).toContain("<xga:ext.gewerbemeldung.0400");
     expect(xml).not.toContain("<bk:kommunikation>");
     expect(xml).not.toContain("<xga:handwerkskarte>");
@@ -290,10 +301,13 @@ describe("createGewerbeanmeldungXml", () => {
   });
 
   it("includes ansprechpartner.id when provided", async () => {
-    const xml = await createGewerbeanmeldungXml({
-      ...gewerbeanmeldung,
-      ansprechpartnerId: "np-1",
-    });
+    const xml = await createGewerbeanmeldungXml(
+      {
+        ...gewerbeanmeldung,
+        ansprechpartnerId: "np-1",
+      },
+      "fitConnect",
+    );
     expect(xml).toContain("<antr:ansprechpartner.id>np-1</antr:ansprechpartner.id>");
   });
 
@@ -314,7 +328,7 @@ describe("createGewerbeanmeldungXml", () => {
       },
     };
 
-    const generatedXml = await createGewerbeanmeldungXml(withSpecials);
+    const generatedXml = await createGewerbeanmeldungXml(withSpecials, "fitConnect");
 
     expect(generatedXml).not.toContain(`Müller & <Söhne> "GmbH" 'Co.'`);
     expect(generatedXml).toContain("Müller &amp; &lt;Söhne&gt; &quot;GmbH&quot; &apos;Co.&apos;");
@@ -330,7 +344,9 @@ describe("createGewerbeanmeldungXml", () => {
       },
     };
 
-    const parsed = parser.parse(await createGewerbeanmeldungXml(withGeschaeftsbezeichnung));
+    const parsed = parser.parse(
+      await createGewerbeanmeldungXml(withGeschaeftsbezeichnung, "fitConnect"),
+    );
     expect(
       parsed["xga:ext.gewerbemeldung.0400"]["xga:satz"]["xga:anmeldung"]["xga:gewerbebetrieb"][
         "wt:geschaeftsbezeichnung"
@@ -339,7 +355,7 @@ describe("createGewerbeanmeldungXml", () => {
   });
 
   it("omits wt:geschaeftsbezeichnung when not set on gewerbebetrieb", async () => {
-    const parsed = parser.parse(await createGewerbeanmeldungXml(gewerbeanmeldung));
+    const parsed = parser.parse(await createGewerbeanmeldungXml(gewerbeanmeldung, "fitConnect"));
     expect(
       parsed["xga:ext.gewerbemeldung.0400"]["xga:satz"]["xga:anmeldung"]["xga:gewerbebetrieb"][
         "wt:geschaeftsbezeichnung"
@@ -363,7 +379,7 @@ describe("createGewerbeanmeldungXml", () => {
       },
     };
 
-    const parsed = parser.parse(await createGewerbeanmeldungXml(withRange));
+    const parsed = parser.parse(await createGewerbeanmeldungXml(withRange, "fitConnect"));
     const anschrift =
       parsed["xga:ext.gewerbemeldung.0400"]["xga:satz"]["xga:anmeldung"]["xga:gewerbebetrieb"][
         "xga:betriebsstaette"
@@ -388,7 +404,7 @@ describe("createGewerbeanmeldungXml", () => {
       },
     };
 
-    const generatedXml = await createGewerbeanmeldungXml(withoutPhone);
+    const generatedXml = await createGewerbeanmeldungXml(withoutPhone, "fitConnect");
     const parsed = parser.parse(generatedXml);
     const kommunikation =
       parsed["xga:ext.gewerbemeldung.0400"]["xga:satz"]["xga:anmeldung"]["xga:gewerbebetrieb"][
@@ -416,7 +432,7 @@ describe("createGewerbeanmeldungXml", () => {
       },
     };
 
-    const parsed = parser.parse(await createGewerbeanmeldungXml(multiPerson));
+    const parsed = parser.parse(await createGewerbeanmeldungXml(multiPerson, "fitConnect"));
     const personen =
       parsed["xga:ext.gewerbemeldung.0400"]["xga:satz"]["xga:anmeldung"][
         "xga:referenzierteSubjekte"
@@ -435,7 +451,7 @@ describe("createGewerbeanmeldungXml", () => {
       bisherigeUnfallversicherung: { traeger: "08", unternehmensnummer: "123456789012345" },
     };
 
-    const xml = await createGewerbeanmeldungXml(withUnfallversicherung);
+    const xml = await createGewerbeanmeldungXml(withUnfallversicherung, "fitConnect");
     expect(xml).toContain("<bk:bisherigeUnfallversicherung>");
     expect(xml).toContain("<code>08</code>");
     expect(xml).toContain("<bk:unternehmensnummer>123456789012345</bk:unternehmensnummer>");
@@ -460,7 +476,7 @@ describe("createGewerbeanmeldungXml", () => {
       },
     };
 
-    const xml = await createGewerbeanmeldungXml(hamburg);
+    const xml = await createGewerbeanmeldungXml(hamburg, "fitConnect");
     expect(xml).toContain(
       '<xga:gemeindeschluesselErgaenzung listVersionID="1"><code>02100000</code></xga:gemeindeschluesselErgaenzung>',
     );
@@ -473,7 +489,7 @@ describe("createGewerbeanmeldungXml", () => {
       gemeindeSchluessel: "02000000",
     };
 
-    await expect(createGewerbeanmeldungXml(hamburgWithoutErgaenzung)).rejects.toThrow(
+    await expect(createGewerbeanmeldungXml(hamburgWithoutErgaenzung, "fitConnect")).rejects.toThrow(
       "Generated XGewerbeanmeldung is invalid.",
     );
   });
@@ -485,7 +501,10 @@ describe("createGewerbeanmeldungXml", () => {
       bisherigeUnfallversicherung: { traeger: "08" },
     };
 
-    const xml = await createGewerbeanmeldungXml(withUnfallversicherungButNoUnternehmensummer);
+    const xml = await createGewerbeanmeldungXml(
+      withUnfallversicherungButNoUnternehmensummer,
+      "fitConnect",
+    );
     expect(xml).toContain("<bk:bisherigeUnfallversicherung>");
     expect(xml).not.toContain("bk:unternehmensnummer");
   });

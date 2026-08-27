@@ -10,7 +10,10 @@ import {
 import { getEnvironmentVariable } from "../../secretsAndEnvironmentVariables";
 import pLimit from "p-limit";
 import { XMLParser } from "fast-xml-parser";
-import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
+import {
+  createGewerbeanmeldungXml,
+  type TransportMethod,
+} from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import {
   ErrorTypeSchema,
   type RegisterGewerbeRequest,
@@ -116,9 +119,13 @@ async function submitGewerbeanmeldung(
 
   const gewerbeanmeldung = transformToGewerbeanmeldung(data, routingInfo);
 
+  const { fitConnectDestinationInformation } = routingInfo;
+  const transportMethod: TransportMethod =
+    fitConnectDestinationInformation === null ? "osci" : "fitConnect";
+
   let gewerbeanmeldungXml: string;
   try {
-    gewerbeanmeldungXml = await createGewerbeanmeldungXml(gewerbeanmeldung);
+    gewerbeanmeldungXml = await createGewerbeanmeldungXml(gewerbeanmeldung, transportMethod);
   } catch (error) {
     console.error("Gewerbeanmeldung XML validation failed", error);
     return {
@@ -131,7 +138,6 @@ async function submitGewerbeanmeldung(
   const gewerbeanmeldungPdfReceipt = await generatePdfReceipt(gewerbeanmeldung, routingInfo);
 
   const gewerbeamtDetails = createOfficeDetailsFromGewerbeamt(routingInfo.gewerbeamt);
-  const { fitConnectDestinationInformation } = routingInfo;
 
   try {
     let transportResult: GewerbeanmeldungTransportResult;
