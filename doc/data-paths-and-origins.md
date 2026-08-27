@@ -98,7 +98,7 @@ Values set by the transformers themselves — no user input, no external call.
 
 | Path                                          | Current value                   | Note                                                                                                                                                      |
 | --------------------------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `gewerbebetrieb.gemeindeMeldungNr` (XGewerbe) | `"2024 0001"`                   | should be generated; hardcoded placeholder                                                                                                                |
+| `gewerbebetrieb.gemeindeMeldungNr` (XGewerbe) | `undefined`                     | not sent: the Gewerbeamt assigns it itself;                                                                                                               |
 | `gewerbebetrieb.eingetragenerName` (XGewerbe) | `undefined`                     | must stay empty for `nichtEingetragenesEinzelunternehmen` (constraint SCH-0205)                                                                           |
 | `bisherigeUnfallversicherung` (XGewerbe)      | `undefined`                     | SCH-0007: may only stay empty while `gründungsart` is `"neugründung"` and `artBetriebsstaette` is `"hauptniederlassung"` (or `istReisegewerbe` is `true`) |
 | `transferHeader.testmerker` (FsE)             | `"700000004"`                   | test mode; needs toggling for production                                                                                                                  |

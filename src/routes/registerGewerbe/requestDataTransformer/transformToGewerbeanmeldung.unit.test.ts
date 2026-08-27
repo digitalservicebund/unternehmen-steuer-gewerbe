@@ -404,6 +404,15 @@ describe("transformToGewerbeanmeldung", () => {
     expect(result.gewerbebetrieb!.geschaeftsbezeichnung).toBeUndefined();
   });
 
+  it("omits gewerbebetrieb.gemeindeMeldungNr", () => {
+    const result = transformToGewerbeanmeldung(
+      registerGewerbeSampleRequestAllFieldsFilled,
+      testRoutingInfo,
+    );
+
+    expect(result.gewerbebetrieb!.gemeindeMeldungNr).toBeUndefined();
+  });
+
   it("maps anzahlVollzeitBeschaeftigte and anzahlTeilzeitBeschaeftigte to gewerbebetrieb", () => {
     const result = transformToGewerbeanmeldung(
       {

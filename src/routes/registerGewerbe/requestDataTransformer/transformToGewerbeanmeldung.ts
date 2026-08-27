@@ -112,7 +112,8 @@ export function transformToGewerbeanmeldung(
     bisherigeUnfallversicherung: undefined,
     gewerbebetrieb: {
       gewerbebetriebID: randomUUID(),
-      gemeindeMeldungNr: "2024 0001",
+      // The Gewerbeamt assigns this number itself; not required for ext.0400 messages
+      gemeindeMeldungNr: undefined,
       rechtsformcode: RECHTSFORM[data.unternehmensDaten.rechtsform],
       // SCH-0205: eingetragenerName must not be set for nichtEingetragenesEinzelunternehmen
       eingetragenerName: undefined,
