@@ -193,6 +193,12 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
       expect(body.supported).toBe(false);
     });
 
+    it("returns supported:false for Fulda 066310009009", async () => {
+      const { body } = await requestRegionResolvingTo("36037", ["066310009009"]);
+
+      expect(body.supported).toBe(false);
+    });
+
     it("returns supported:false for Ulm 084210000000", async () => {
       const { body } = await requestRegionResolvingTo("89073", ["084210000000"]);
 
