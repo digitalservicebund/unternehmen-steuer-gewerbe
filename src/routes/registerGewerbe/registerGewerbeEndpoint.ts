@@ -20,7 +20,11 @@ import {
   type RegisterGewerbeResponseItem,
 } from "./registerGewerbeInterfaces";
 import { registerGewerbeRoute } from "./registerGewerbeRoute";
-import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTransformer";
+import {
+  transformToGewerbeanmeldung,
+  transformToEUnFsE,
+  PDF_RECEIPT_NACHWEISDOKUMENT,
+} from "./requestDataTransformer";
 import { getGewerbeRoutingInfo, type GewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
 import { getOsciClient } from "../../clients/osciClient/osciClient";
 import { generatePdfReceipt } from "./registerGewerbePdfGenerator";
@@ -78,15 +82,25 @@ async function submitViaFitConnect({
 interface SubmitViaOsciOptions {
   ags: string;
   gewerbeanmeldungXml: string;
+  pdfReceiptBase64: string;
 }
 
 async function submitViaOsci({
   ags,
   gewerbeanmeldungXml,
+  pdfReceiptBase64,
 }: SubmitViaOsciOptions): Promise<GewerbeanmeldungTransportResult> {
   const response = await getOsciClient().sendMessage({
     targetId: `MELDID:${ags}`,
     message: gewerbeanmeldungXml,
+    // the XML declares this file as bk:nachweisdokument.onlinedienst
+    attachments: [
+      {
+        fileName: PDF_RECEIPT_NACHWEISDOKUMENT.dateiname,
+        mimeType: PDF_RECEIPT_NACHWEISDOKUMENT.mimetype,
+        content: Buffer.from(pdfReceiptBase64, "base64"),
+      },
+    ],
   });
 
   return { submissionId: response.metadata.source.sourceMessageId };
@@ -145,6 +159,7 @@ async function submitGewerbeanmeldung(
       transportResult = await submitViaOsci({
         ags: routingInfo.ags,
         gewerbeanmeldungXml,
+        pdfReceiptBase64: gewerbeanmeldungPdfReceipt,
       });
     } else {
       transportResult = await submitViaFitConnect({

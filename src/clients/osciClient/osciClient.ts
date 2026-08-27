@@ -2,7 +2,7 @@
 // and an Agent from the npm package only works with the fetch and FormData from the undici package,
 // not with the versions bundled into node (see https://github.com/nodejs/undici/discussions/4200)
 import { Agent, fetch, FormData } from "undici";
-import { createMetadata, GEWERBEMELDUNG_EXT_SERVICE_ID } from "./metadata";
+import { createMetadata, GEWERBEMELDUNG_EXT_SERVICE_ID, type OsciAttachment } from "./metadata";
 import { getEnvironmentVariable, getSecret } from "../../secretsAndEnvironmentVariables";
 import { createHttpError } from "../../helpers/httpError";
 
@@ -21,6 +21,8 @@ interface TokenResponse {
 interface SendMessageOptions {
   targetId: string;
   message: string;
+  /** Anlagen zur Fachnachricht; jede muss in der Nachricht als bk:nachweisdokument deklariert sein. */
+  attachments?: OsciAttachment[];
 }
 
 interface SendMessageResponseTarget {
@@ -169,7 +171,8 @@ export function getOsciClient() {
 
   async function sendMessage(options: SendMessageOptions): Promise<SendMessageResponse> {
     const accessToken = await getAccessToken();
-    const metadata = createMetadata({ targetId: options.targetId });
+    const attachments = options.attachments ?? [];
+    const metadata = createMetadata({ targetId: options.targetId, attachments });
 
     const form = new FormData();
     form.append(
@@ -183,6 +186,14 @@ export function getOsciClient() {
       // the message part filename must match the contentReference in the metadata
       metadata.payload.request.message.contentReference.replace("form-data://message/", ""),
     );
+    for (const attachment of attachments) {
+      // the part name is what the contentReference in the metadata resolves against
+      form.append(
+        "attachments",
+        new Blob([attachment.content], { type: attachment.mimeType }),
+        attachment.fileName,
+      );
+    }
 
     const url = `${config.baseUrl}/restapi/v3.0/messages/zko/json/multipart`;
     const response = await fetch(url, {

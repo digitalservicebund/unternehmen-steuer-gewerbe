@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { type CreateGewerbeanmeldungXmlData } from "../../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { type GewerbeRoutingInfo } from "../getGewerbeRoutingInfo";
+import { type Nachweisdokument } from "../../../xmlBuilders/xGewerbeordnung/buildingBlocks/nachweisdokument";
 import {
   formatTelefonnummerDIN5008,
   getBetriebsAdresse,
@@ -20,6 +21,20 @@ import {
   GESCHLECHT,
 } from "./xGewerbeordnungCodes";
 import { Anschrift } from "../../../xmlBuilders/xGewerbeordnung/buildingBlocks/anschrift";
+
+const PDF_RECEIPT_FILE_NAME = "gewerbeanmeldung-beleg.pdf";
+
+/**
+ * Der PDF-Beleg, den der Online-Dienst selbst erzeugt und als Anlage mitsendet.
+ * ok.komm leitet die OSCI-Ref-ID der Anlage aus ihrem Dateinamen ab, und das Transportprofil
+ * verlangt Ref-ID == dokumentid — daher ist dokumentid der Dateiname.
+ */
+export const PDF_RECEIPT_NACHWEISDOKUMENT = {
+  dokumentid: PDF_RECEIPT_FILE_NAME,
+  dateiname: PDF_RECEIPT_FILE_NAME,
+  mimetype: "application/pdf",
+  kategorie: "Antrag im Original",
+} as const satisfies Nachweisdokument;
 
 // xGewerbeordnung has no separate field for the Hausnummer-Zusatz, so it is appended to
 // hausnummerVon directly (e.g. "21a")
@@ -83,6 +98,8 @@ export function transformToGewerbeanmeldung(
   const gewerbeamtKennung = `MELDID:${gemeindeSchluessel}`;
   const gewerbeamtName = routingInfo.gewerbeamt.name || "Gewerbeamt";
   const personId = randomUUID();
+  // only the OSCI transport carries the PDF receipt along (see submitViaOsci)
+  const isSentViaOsci = routingInfo.fitConnectDestinationInformation === null;
 
   return {
     nachrichtenkopf: {
@@ -95,6 +112,8 @@ export function transformToGewerbeanmeldung(
     anzeigerenderId: personId,
     handelndePersonId: personId,
     handelndePersonVertrauensniveauCode: VERTRAUENSNIVEAU[data.persönlicheDaten.vertrauensniveau],
+    // the message may only declare the Anlage where it is actually sent along
+    nachweisdokumentOnlinedienst: isSentViaOsci ? PDF_RECEIPT_NACHWEISDOKUMENT : undefined,
     satzErstellung: new Date().toISOString(),
     ereigniszeitpunkt: new Date().toISOString(),
     istStorno: false,
