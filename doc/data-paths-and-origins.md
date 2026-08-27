@@ -78,11 +78,14 @@ Values set by the transformers themselves — no user input, no external call.
 
 ### Protocol / application constants
 
-| XGewerbe path                   | Value                    | Reason                              |
-| ------------------------------- | ------------------------ | ----------------------------------- |
-| `nachrichtenkopf.autor.kennung` | `"ds:schnellergruenden"` | app identity                        |
-| `nachrichtenkopf.autor.name`    | `"Schneller Gründen"`    | app identity                        |
-| `istStorno`                     | `false`                  | app only supports new registrations |
+| XGewerbe path                                           | Value                          | Reason                                                                                                                                                                                      |
+| ------------------------------------------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nachrichtenkopf.autor.kennung`                         | `"ds:schnellergruenden"`       | app identity                                                                                                                                                                                |
+| `nachrichtenkopf.autor.name`                            | `"Schneller Gründen"`          | app identity                                                                                                                                                                                |
+| `istStorno`                                             | `false`                        | app only supports new registrations                                                                                                                                                         |
+| `nachweisdokumentOnlinedienst.dokumentid`, `.dateiname` | `"gewerbeanmeldung-beleg.pdf"` | the generated PDF receipt, sent as an OSCI attachment; `dokumentid` must equal the attachment's Ref-ID, which ok.komm derives from the multipart file name (`PDF_RECEIPT_NACHWEISDOKUMENT`) |
+| `nachweisdokumentOnlinedienst.mimetype`                 | `"application/pdf"`            | the receipt is a PDF                                                                                                                                                                        |
+| `nachweisdokumentOnlinedienst.kategorie`                | `"Antrag im Original"`         | category per XGewO example; only set on the OSCI path, since only there the file is sent along                                                                                              |
 
 | FsE path                                | Value                | Reason                                                  |
 | --------------------------------------- | -------------------- | ------------------------------------------------------- |
