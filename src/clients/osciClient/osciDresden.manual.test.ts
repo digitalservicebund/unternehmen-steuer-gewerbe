@@ -99,7 +99,7 @@ async function createDresdenGewerbeanmeldung(logging = false) {
 
 describe("Gewerbemeldung to Dresden via OSCI", () => {
   it("routes the Dresden address to the Stadt Dresden and builds a valid XML for it", async () => {
-    const { routingInfo, message } = await createDresdenGewerbeanmeldung(true);
+    const { routingInfo, message } = await createDresdenGewerbeanmeldung();
 
     expect(routingInfo.ars).toBe(DRESDEN_ARS);
     expect(routingInfo.ags).toBe(DRESDEN_AGS);
@@ -108,12 +108,12 @@ describe("Gewerbemeldung to Dresden via OSCI", () => {
   });
 
   it("resolves Dresden to the OSCI path, without a FIT-Connect destination", async () => {
-    const { routingInfo } = await createDresdenGewerbeanmeldung(true);
+    const { routingInfo } = await createDresdenGewerbeanmeldung();
 
     expect(routingInfo.fitConnectDestinationInformation).toBeNull();
   });
 
-  it.skip(`successfully sends Gewerbemeldung to Dresden (MELDID:${DRESDEN_AGS})`, async () => {
+  it(`successfully sends Gewerbemeldung to Dresden (MELDID:${DRESDEN_AGS})`, async () => {
     expect(process.env["AKDB_BASE_URL"]).toContain("apk.akdb.de");
 
     const { routingInfo, message } = await createDresdenGewerbeanmeldung(true);
