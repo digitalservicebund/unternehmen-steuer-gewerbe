@@ -311,6 +311,29 @@ describe("createGewerbeanmeldungXml", () => {
     expect(xml).toContain("<antr:ansprechpartner.id>np-1</antr:ansprechpartner.id>");
   });
 
+  it("includes nachweisdokument.onlinedienst when provided", async () => {
+    const xml = await createGewerbeanmeldungXml(
+      {
+        ...gewerbeanmeldung,
+        nachweisdokumentOnlinedienst: {
+          dokumentid: "gewerbeanmeldung-beleg.pdf",
+          dateiname: "gewerbeanmeldung-beleg.pdf",
+          mimetype: "application/pdf",
+          kategorie: "Antrag im Original",
+        },
+      },
+      "osci",
+    );
+
+    const satz = parser.parse(xml)["xga:ext.gewerbemeldung.0400"]["xga:satz"];
+    expect(satz["bk:nachweisdokument.onlinedienst"]).toEqual({
+      "bk:dokumentid": "gewerbeanmeldung-beleg.pdf",
+      "bk:dateiname": "gewerbeanmeldung-beleg.pdf",
+      "bk:mimetype": "application/pdf",
+      "bk:kategorie": "Antrag im Original",
+    });
+  });
+
   it(`escapes XML special characters (<, >, &, ', ") in text fields`, async () => {
     const withSpecials: DataForCreateGewerbeanmeldungXml = {
       ...gewerbeanmeldung,

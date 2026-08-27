@@ -506,4 +506,27 @@ describe("transformToGewerbeanmeldung", () => {
 
     expect(result.gemeindeschluesselErgaenzung).toBeUndefined();
   });
+
+  it("declares the PDF receipt as nachweisdokument.onlinedienst when there is no FIT-Connect destination", () => {
+    const result = transformToGewerbeanmeldung(registerGewerbeSampleRequestAllFieldsFilled, {
+      ...testRoutingInfo,
+      fitConnectDestinationInformation: null,
+    });
+
+    expect(result.nachweisdokumentOnlinedienst).toEqual({
+      dokumentid: "gewerbeanmeldung-beleg.pdf",
+      dateiname: "gewerbeanmeldung-beleg.pdf",
+      mimetype: "application/pdf",
+      kategorie: "Antrag im Original",
+    });
+  });
+
+  it("omits nachweisdokumentOnlinedienst when the Gewerbeanmeldung goes via FIT-Connect", () => {
+    const result = transformToGewerbeanmeldung(
+      registerGewerbeSampleRequestAllFieldsFilled,
+      testRoutingInfo,
+    );
+
+    expect(result.nachweisdokumentOnlinedienst).toBeUndefined();
+  });
 });
