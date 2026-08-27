@@ -11,6 +11,10 @@ import {
 } from "./buildingBlocks/g2gNachrichtenkopf";
 import { createGewerbebetrieb, type Gewerbebetrieb } from "./buildingBlocks/gewerbebetrieb";
 import {
+  createNachweisdokumentOnlinedienst,
+  type Nachweisdokument,
+} from "./buildingBlocks/nachweisdokument";
+import {
   createReferenzierteSubjekte,
   type ReferenzierteSubjekte,
 } from "./buildingBlocks/referenzierteSubjekte";
@@ -30,6 +34,8 @@ export interface CreateGewerbeanmeldungXmlData {
   handelndePersonVertrauensniveauCode?: string;
   /** ID-Querverweis auf das natuerlichePerson-Element des Ansprechpartners. */
   ansprechpartnerId?: string;
+  /** Vom Online-Dienst selbst erstelltes Nachweisdokument, das als Anlage mitübermittelt wird. */
+  nachweisdokumentOnlinedienst?: Nachweisdokument;
   /** Angabe des Zeitpunkts der Erstellung des XML-Datensatzes für die Übermittlung. */
   satzErstellung?: string;
   /** Der Zeitpunkt, zu welchem der die Übermittlung auslösende Verwaltungsvorgang (Aufnahme / Änderung / Korrektur eines Datensatzes) im gemeindlichen Gewerbeverzeichnis gespeichert wurde. */
@@ -117,6 +123,7 @@ export async function createGewerbeanmeldungXml(
         ${optionalTag("antr:handelndePerson.id", gewerbeanmeldung.handelndePersonId)}
         ${optionalWrappedTag("bk:handelndePerson.vertrauensniveauIdentifikation", "code", gewerbeanmeldung.handelndePersonVertrauensniveauCode, ' listVersionID="4"')}
         ${optionalTag("antr:ansprechpartner.id", gewerbeanmeldung.ansprechpartnerId)}
+        ${createNachweisdokumentOnlinedienst(gewerbeanmeldung.nachweisdokumentOnlinedienst)}
         <xga:anmeldung>
             ${createAutor(gewerbeanmeldung.autor)}
             ${optionalTag("xga:satzErstellung", gewerbeanmeldung.satzErstellung)}
