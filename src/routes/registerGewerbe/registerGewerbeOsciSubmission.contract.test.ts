@@ -39,8 +39,14 @@ describe("Route /api/v1/register-gewerbe (Gewerbeanmeldung via OSCI)", { timeout
   let json: z.infer<typeof RegisterGewerbeResponseSchema>;
 
   beforeAll(async () => {
-    vi.mocked(createMetadata).mockReturnValueOnce(
-      createMetadata({ targetId: AKDB_TEST_AUTHORITY_ID }),
+    const { createMetadata: unmockedCreateMetadata } = await vi.importActual<
+      typeof import("../../clients/osciClient/metadata")
+    >("../../clients/osciClient/metadata");
+
+    // keep what the real call produces (notably the Anlage references, which have to match the
+    // multipart parts the client appends) and only redirect the target
+    vi.mocked(createMetadata).mockImplementationOnce((options) =>
+      unmockedCreateMetadata({ ...options, targetId: AKDB_TEST_AUTHORITY_ID }),
     );
 
     response = await app.request("/api/v1/register-gewerbe?only=gewerbeanmeldung", {

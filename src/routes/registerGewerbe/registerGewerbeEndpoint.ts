@@ -10,14 +10,21 @@ import {
 import { getEnvironmentVariable } from "../../secretsAndEnvironmentVariables";
 import pLimit from "p-limit";
 import { XMLParser } from "fast-xml-parser";
-import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
+import {
+  createGewerbeanmeldungXml,
+  type TransportMethod,
+} from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import {
   ErrorTypeSchema,
   type RegisterGewerbeRequest,
   type RegisterGewerbeResponseItem,
 } from "./registerGewerbeInterfaces";
 import { registerGewerbeRoute } from "./registerGewerbeRoute";
-import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTransformer";
+import {
+  transformToGewerbeanmeldung,
+  transformToEUnFsE,
+  PDF_RECEIPT_NACHWEISDOKUMENT,
+} from "./requestDataTransformer";
 import { getGewerbeRoutingInfo, type GewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
 import { getOsciClient } from "../../clients/osciClient/osciClient";
 import { generatePdfReceipt } from "./registerGewerbePdfGenerator";
@@ -75,15 +82,25 @@ async function submitViaFitConnect({
 interface SubmitViaOsciOptions {
   ags: string;
   gewerbeanmeldungXml: string;
+  pdfReceiptBase64: string;
 }
 
 async function submitViaOsci({
   ags,
   gewerbeanmeldungXml,
+  pdfReceiptBase64,
 }: SubmitViaOsciOptions): Promise<GewerbeanmeldungTransportResult> {
   const response = await getOsciClient().sendMessage({
     targetId: `MELDID:${ags}`,
     message: gewerbeanmeldungXml,
+    // the XML declares this file as bk:nachweisdokument.onlinedienst
+    attachments: [
+      {
+        fileName: PDF_RECEIPT_NACHWEISDOKUMENT.dateiname,
+        mimeType: PDF_RECEIPT_NACHWEISDOKUMENT.mimetype,
+        content: Buffer.from(pdfReceiptBase64, "base64"),
+      },
+    ],
   });
 
   return { submissionId: response.metadata.source.sourceMessageId };
@@ -116,9 +133,13 @@ async function submitGewerbeanmeldung(
 
   const gewerbeanmeldung = transformToGewerbeanmeldung(data, routingInfo);
 
+  const { fitConnectDestinationInformation } = routingInfo;
+  const transportMethod: TransportMethod =
+    fitConnectDestinationInformation === null ? "osci" : "fitConnect";
+
   let gewerbeanmeldungXml: string;
   try {
-    gewerbeanmeldungXml = await createGewerbeanmeldungXml(gewerbeanmeldung);
+    gewerbeanmeldungXml = await createGewerbeanmeldungXml(gewerbeanmeldung, transportMethod);
   } catch (error) {
     console.error("Gewerbeanmeldung XML validation failed", error);
     return {
@@ -131,7 +152,6 @@ async function submitGewerbeanmeldung(
   const gewerbeanmeldungPdfReceipt = await generatePdfReceipt(gewerbeanmeldung, routingInfo);
 
   const gewerbeamtDetails = createOfficeDetailsFromGewerbeamt(routingInfo.gewerbeamt);
-  const { fitConnectDestinationInformation } = routingInfo;
 
   try {
     let transportResult: GewerbeanmeldungTransportResult;
@@ -139,6 +159,7 @@ async function submitGewerbeanmeldung(
       transportResult = await submitViaOsci({
         ags: routingInfo.ags,
         gewerbeanmeldungXml,
+        pdfReceiptBase64: gewerbeanmeldungPdfReceipt,
       });
     } else {
       transportResult = await submitViaFitConnect({

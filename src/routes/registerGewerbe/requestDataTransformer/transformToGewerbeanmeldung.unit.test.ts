@@ -404,6 +404,15 @@ describe("transformToGewerbeanmeldung", () => {
     expect(result.gewerbebetrieb!.geschaeftsbezeichnung).toBeUndefined();
   });
 
+  it("omits gewerbebetrieb.gemeindeMeldungNr", () => {
+    const result = transformToGewerbeanmeldung(
+      registerGewerbeSampleRequestAllFieldsFilled,
+      testRoutingInfo,
+    );
+
+    expect(result.gewerbebetrieb!.gemeindeMeldungNr).toBeUndefined();
+  });
+
   it("maps anzahlVollzeitBeschaeftigte and anzahlTeilzeitBeschaeftigte to gewerbebetrieb", () => {
     const result = transformToGewerbeanmeldung(
       {
@@ -496,5 +505,28 @@ describe("transformToGewerbeanmeldung", () => {
     );
 
     expect(result.gemeindeschluesselErgaenzung).toBeUndefined();
+  });
+
+  it("declares the PDF receipt as nachweisdokument.onlinedienst when there is no FIT-Connect destination", () => {
+    const result = transformToGewerbeanmeldung(registerGewerbeSampleRequestAllFieldsFilled, {
+      ...testRoutingInfo,
+      fitConnectDestinationInformation: null,
+    });
+
+    expect(result.nachweisdokumentOnlinedienst).toEqual({
+      dokumentid: "gewerbeanmeldung-beleg.pdf",
+      dateiname: "gewerbeanmeldung-beleg.pdf",
+      mimetype: "application/pdf",
+      kategorie: "Antrag im Original",
+    });
+  });
+
+  it("omits nachweisdokumentOnlinedienst when the Gewerbeanmeldung goes via FIT-Connect", () => {
+    const result = transformToGewerbeanmeldung(
+      registerGewerbeSampleRequestAllFieldsFilled,
+      testRoutingInfo,
+    );
+
+    expect(result.nachweisdokumentOnlinedienst).toBeUndefined();
   });
 });
