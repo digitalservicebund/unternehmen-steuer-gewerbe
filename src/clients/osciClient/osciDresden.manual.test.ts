@@ -27,7 +27,7 @@ const dresdenAdresse = {
 
 export const dresdenRequest: RegisterGewerbeRequest = {
   persönlicheDaten: {
-    vorname: "Erika",
+    vorname: "Fridolin",
     nachname: "Mustermann",
     geburtsname: "DigitalService",
     geburtsdatum: "1988-09-10",
@@ -51,8 +51,8 @@ export const dresdenRequest: RegisterGewerbeRequest = {
     geschäftsbezeichnung: "Testbetrieb Schneller Gründen",
     tätigkeitsbeschreibung: "Testeintrag Schneller Gründen",
     tätigkeitsbereich: "handwerk",
-    anmeldedatumFinanzamt: "2026-08-25",
-    anmeldedatumGewerbeamt: "2026-08-25",
+    anmeldedatumFinanzamt: "2026-08-28",
+    anmeldedatumGewerbeamt: "2026-08-28",
     gewerbeart: "hauptgewerbe",
     istReisegewerbe: false,
     rechtsform: "nichtEingetragenesEinzelunternehmen",
