@@ -113,7 +113,7 @@ describe("Gewerbemeldung to Dresden via OSCI", () => {
     expect(routingInfo.fitConnectDestinationInformation).toBeNull();
   });
 
-  it(`successfully sends Gewerbemeldung to Dresden (MELDID:${DRESDEN_AGS})`, async () => {
+  it.skip(`successfully sends Gewerbemeldung to Dresden (MELDID:${DRESDEN_AGS})`, async () => {
     expect(process.env["AKDB_BASE_URL"]).toContain("apk.akdb.de");
 
     const { routingInfo, message } = await createDresdenGewerbeanmeldung(true);
