@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { getGewerbeRoutingInfo } from "../../routes/registerGewerbe/getGewerbeRoutingInfo";
 import { type RegisterGewerbeRequest } from "../../routes/registerGewerbe/registerGewerbeInterfaces";
-import { transformToGewerbeanmeldung } from "../../routes/registerGewerbe/requestDataTransformer/transformToGewerbeanmeldung";
+import {
+  PDF_RECEIPT_NACHWEISDOKUMENT,
+  transformToGewerbeanmeldung,
+} from "../../routes/registerGewerbe/requestDataTransformer/transformToGewerbeanmeldung";
+import { generatePdfReceipt } from "../../routes/registerGewerbe/registerGewerbePdfGenerator";
 import { getOsciClient } from "./osciClient";
 
 // TEMPORARY manual test: sends a Gewerbeanmeldung to the real Gewerbeamt Dresden through
@@ -92,9 +96,9 @@ async function createDresdenGewerbeanmeldung(logging = false) {
     console.log("************************");
   }
 
-  const message = await createGewerbeanmeldungXml(gewerbeanmeldung);
+  const message = await createGewerbeanmeldungXml(gewerbeanmeldung, "osci");
 
-  return { routingInfo, message };
+  return { routingInfo, gewerbeanmeldung, message };
 }
 
 describe("Gewerbemeldung to Dresden via OSCI", () => {
@@ -116,10 +120,23 @@ describe("Gewerbemeldung to Dresden via OSCI", () => {
   it.skip(`successfully sends Gewerbemeldung to Dresden (MELDID:${DRESDEN_AGS})`, async () => {
     expect(process.env["AKDB_BASE_URL"]).toContain("apk.akdb.de");
 
-    const { routingInfo, message } = await createDresdenGewerbeanmeldung(true);
+    const { routingInfo, gewerbeanmeldung, message } = await createDresdenGewerbeanmeldung(true);
     const targetId = `MELDID:${routingInfo.ags}`;
 
-    const sendResult = await getOsciClient().sendMessage({ targetId, message });
+    const pdfReceiptBase64 = await generatePdfReceipt(gewerbeanmeldung, routingInfo);
+
+    const sendResult = await getOsciClient().sendMessage({
+      targetId,
+      message,
+      // the XML declares this file as bk:nachweisdokument.onlinedienst
+      attachments: [
+        {
+          fileName: PDF_RECEIPT_NACHWEISDOKUMENT.dateiname,
+          mimeType: PDF_RECEIPT_NACHWEISDOKUMENT.mimetype,
+          content: Buffer.from(pdfReceiptBase64, "base64"),
+        },
+      ],
+    });
 
     console.log("*** Send result:");
     console.log(JSON.stringify(sendResult.metadata, undefined, 2));
