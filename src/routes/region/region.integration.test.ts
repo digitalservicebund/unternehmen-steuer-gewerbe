@@ -208,8 +208,25 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
     it("returns supported:true for Am Ende 3 in 01277 Dresden", async () => {
       // PVOG resolves this address to two ARS: Dresden and, spuriously, Delligsen in Niedersachsen
       mockGetLocationsDetails.mockResolvedValue([
-        { ars: "146120000000", name: "Dresden", plz: "01277" },
-        { ars: "032550008008", name: "Delligsen", plz: "31073" },
+        {
+          ars: "146120000000",
+          arsFederalstate: "14",
+          name: "Dresden 'Gruna'",
+          gemeinde: "Stadt Dresden",
+          plz: "01277",
+          strasse: "Am Ende",
+          koordinaten: ["13.79163", "51.033696"],
+        },
+        {
+          ars: "032550008008",
+          arsFederalstate: "03",
+          name: "Delligsen 'Ammensen'",
+          gemeinde: "Delligsen, Flecken",
+          plz: "31073",
+          strasse: "Am Ende",
+          hausnummer: "3",
+          koordinaten: ["9.854299", "51.908625"],
+        },
       ]);
       mockGetGewerbeamt.mockImplementation(async (ars: string) => {
         if (ars === "146120000000") {
@@ -266,7 +283,7 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
       });
 
       const response = await app.request(
-        "/api/v1/region/01277?ort=Dresden&strasse=Am+Ende&hausnummer=3&getAllOffices=false",
+        "/api/v1/region/01277?ort=Dresden&strasse=Am+Ende&hausnummer=3&getAllOffices=true",
       );
       const body = (await response.json()) as RegionResponseBody;
 
