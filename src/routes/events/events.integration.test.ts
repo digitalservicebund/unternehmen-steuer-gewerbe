@@ -1,21 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 
-vi.mock("@digitalservicebund/unternehmen-steuer-gewerbe-privat", () => ({
-  validateFsE: vi.fn().mockReturnValue({ valid: true }),
-  createElsterFsEEUnXml: vi.fn().mockReturnValue("<xml/>"),
-  sendFsE: vi.fn().mockReturnValue({ success: true }),
-  getFinanzamtId: vi.fn().mockReturnValue(["mock-finanzamt-id"]),
-  getFinanzamtDetailsById: vi.fn().mockReturnValue({
-    name: "Finanzamt Mock",
-    hausanschrift: {
-      strasse: "Mockstraße",
-      hausnummer: "1",
-      postleitzahl: "00000",
-      ort: "Mockstadt",
-    },
-    telefonnummer: "0000 000-0",
-  }),
-}));
+import "../../testSupport/mockUnternehmenSteuerGewerbePrivat";
 
 const { mockGetSubmissionEvents, mockGetTransportReport } = vi.hoisted(() => ({
   mockGetSubmissionEvents: vi.fn(),
