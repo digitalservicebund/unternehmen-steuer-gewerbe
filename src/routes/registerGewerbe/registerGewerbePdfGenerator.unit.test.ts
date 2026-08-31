@@ -106,6 +106,16 @@ function structRoles(node: unknown): string[] {
   return [role, ...childRoles].filter((candidate) => candidate !== undefined);
 }
 
+async function allStructRoles(
+  pdf: Awaited<ReturnType<typeof getDocumentProxy>>,
+): Promise<string[]> {
+  const roles: string[] = [];
+  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+    roles.push(...structRoles(await (await pdf.getPage(pageNumber)).getStructTree()));
+  }
+  return roles;
+}
+
 describe("generatePdfReceipt", () => {
   it("returns a base64-encoded PDF", async () => {
     const base64 = await generatePdfReceipt(gewerbeanmeldungFixture(), gewerbeRoutingInfoFixture());
@@ -249,12 +259,7 @@ describe("generatePdfReceipt", () => {
   // PDF/UA-1 7.1-5: non-standard types would need a role map, which we do not write.
   it("uses only standard PDF 1.7 structure types", async () => {
     const pdf = await getDocumentProxy(await renderPdf());
-    const roles = new Set<string>();
-    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-      structRoles(await (await pdf.getPage(pageNumber)).getStructTree()).forEach((role) =>
-        roles.add(role),
-      );
-    }
+    const roles = new Set(await allStructRoles(pdf));
 
     expect([...roles].filter((role) => !STANDARD_STRUCTURE_TYPES.includes(role))).toEqual([]);
   });
@@ -267,12 +272,7 @@ describe("generatePdfReceipt", () => {
         .toString("latin1")
         .match(/\/Scope \/Row/g) ?? [];
     const pdf = await getDocumentProxy(bytes);
-    const headerCells: string[] = [];
-    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-      structRoles(await (await pdf.getPage(pageNumber)).getStructTree()).forEach((role) => {
-        if (role === "TH") headerCells.push(role);
-      });
-    }
+    const headerCells = (await allStructRoles(pdf)).filter((role) => role === "TH");
 
     expect(headerCells.length).toBeGreaterThan(0);
     expect(scopes).toHaveLength(headerCells.length);
