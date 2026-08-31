@@ -6,6 +6,18 @@ function validRequest() {
   return structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
 }
 
+function parseWithFieldDeleted(section: string, field: string) {
+  const request = validRequest() as Record<string, unknown>;
+  delete (request[section] as Record<string, unknown>)[field];
+  return RegisterGewerbeRequestSchema.safeParse(request);
+}
+
+function parseWithFieldSet(section: string, field: string, value: unknown) {
+  const request = validRequest() as Record<string, unknown>;
+  (request[section] as Record<string, unknown>)[field] = value;
+  return RegisterGewerbeRequestSchema.safeParse(request);
+}
+
 describe("RegisterGewerbeRequestSchema", () => {
   it("parses the fully-populated sample request", () => {
     const result = RegisterGewerbeRequestSchema.safeParse(validRequest());
@@ -55,13 +67,9 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten.umsatzsteuerIdMitbeantragen"],
       ["persönlicheDaten.steuerId"],
     ])("fails when %s is missing", (fieldPath) => {
-      const request = validRequest() as Record<string, unknown>;
       const [section, field] = fieldPath.split(".") as [string, string];
-      delete (request[section] as Record<string, unknown>)[field];
 
-      const result = RegisterGewerbeRequestSchema.safeParse(request);
-
-      expect(result.success).toBe(false);
+      expect(parseWithFieldDeleted(section, field).success).toBe(false);
     });
 
     it.each([["persönlicheDaten"], ["unternehmensDaten"]])(
@@ -88,11 +96,8 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten.tätigkeitsbeschreibungKurz"],
       ["unternehmensDaten.umsatzsteuerImErstenJahr"],
     ])("succeeds and stays absent when %s is missing", (fieldPath) => {
-      const request = validRequest() as Record<string, unknown>;
       const [section, field] = fieldPath.split(".") as [string, string];
-      delete (request[section] as Record<string, unknown>)[field];
-
-      const result = RegisterGewerbeRequestSchema.safeParse(request);
+      const result = parseWithFieldDeleted(section, field);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -122,10 +127,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten", "zahllastUeberschussAuswahl", "zahllast"],
       ["unternehmensDaten", "zahllastUeberschussBetrag", 0],
     ])("defaults %s.%s to %j when omitted", (section, field, defaultValue) => {
-      const request = validRequest() as Record<string, unknown>;
-      delete (request[section] as Record<string, unknown>)[field];
-
-      const result = RegisterGewerbeRequestSchema.safeParse(request);
+      const result = parseWithFieldDeleted(section, field);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -151,12 +153,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten", "sollIstVersteuerung", "sollVersteuerung"],
       ["unternehmensDaten", "zahllastUeberschussAuswahl", "zahllast"],
     ])("accepts a known valid value for %s.%s", (section, field, validValue) => {
-      const request = validRequest() as Record<string, unknown>;
-      (request[section] as Record<string, unknown>)[field] = validValue;
-
-      const result = RegisterGewerbeRequestSchema.safeParse(request);
-
-      expect(result.success).toBe(true);
+      expect(parseWithFieldSet(section, field, validValue).success).toBe(true);
     });
 
     it.each([
@@ -172,12 +169,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten", "zahllastUeberschussAuswahl"],
       ["unternehmensDaten", "gründungsart"],
     ])("rejects an unknown value for %s.%s", (section, field) => {
-      const request = validRequest() as Record<string, unknown>;
-      (request[section] as Record<string, unknown>)[field] = "not-a-real-value";
-
-      const result = RegisterGewerbeRequestSchema.safeParse(request);
-
-      expect(result.success).toBe(false);
+      expect(parseWithFieldSet(section, field, "not-a-real-value").success).toBe(false);
     });
 
     it.each([
@@ -187,12 +179,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten", "artBetriebsstaette", "zweigniederlassung"],
       ["unternehmensDaten", "beteiligungOeffentlicheHand", "ja"],
     ])("rejects the currently unsupported %s.%s value %j", (section, field, unsupportedValue) => {
-      const request = validRequest() as Record<string, unknown>;
-      (request[section] as Record<string, unknown>)[field] = unsupportedValue;
-
-      const result = RegisterGewerbeRequestSchema.safeParse(request);
-
-      expect(result.success).toBe(false);
+      expect(parseWithFieldSet(section, field, unsupportedValue).success).toBe(false);
     });
   });
 
@@ -213,26 +200,15 @@ describe("RegisterGewerbeRequestSchema", () => {
       expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
     });
 
-    it("rejects an empty hausnummer in unternehmensDaten.adresse", () => {
+    it.each([
+      [
+        "hausnummer",
+        { strasse: "Prinzessinnenstraße", hausnummer: "", postleitzahl: "10969", ort: "Berlin" },
+      ],
+      ["strasse", { strasse: "", hausnummer: "8", postleitzahl: "10969", ort: "Berlin" }],
+    ] as const)("rejects an empty %s in unternehmensDaten.adresse", (_field, adresse) => {
       const invalid = validRequest();
-      invalid.unternehmensDaten.adresse = {
-        strasse: "Prinzessinnenstraße",
-        hausnummer: "",
-        postleitzahl: "10969",
-        ort: "Berlin",
-      };
-
-      expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
-    });
-
-    it("rejects an empty strasse in unternehmensDaten.adresse", () => {
-      const invalid = validRequest();
-      invalid.unternehmensDaten.adresse = {
-        strasse: "",
-        hausnummer: "8",
-        postleitzahl: "10969",
-        ort: "Berlin",
-      };
+      invalid.unternehmensDaten.adresse = adresse;
 
       expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
     });
@@ -297,12 +273,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["unternehmensDaten", "anmeldedatumFinanzamt"],
       ["unternehmensDaten", "anmeldedatumGewerbeamt"],
     ])("rejects a malformed date for %s.%s", (section, field) => {
-      const request = validRequest() as Record<string, unknown>;
-      (request[section] as Record<string, unknown>)[field] = "17-04-2026";
-
-      const result = RegisterGewerbeRequestSchema.safeParse(request);
-
-      expect(result.success).toBe(false);
+      expect(parseWithFieldSet(section, field, "17-04-2026").success).toBe(false);
     });
   });
 
@@ -314,23 +285,13 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["anzahlVollzeitBeschaeftigte"],
       ["anzahlTeilzeitBeschaeftigte"],
     ])("rejects a negative value for %s", (field) => {
-      const request = validRequest();
-      (request.unternehmensDaten as Record<string, unknown>)[field] = -1;
-
-      const result = RegisterGewerbeRequestSchema.safeParse(request);
-
-      expect(result.success).toBe(false);
+      expect(parseWithFieldSet("unternehmensDaten", field, -1).success).toBe(false);
     });
 
     it.each([["gewinnGründungsjahr"], ["gewinnFolgejahr"]])(
       "accepts a negative value for %s",
       (field) => {
-        const request = validRequest();
-        (request.unternehmensDaten as Record<string, unknown>)[field] = -1;
-
-        const result = RegisterGewerbeRequestSchema.safeParse(request);
-
-        expect(result.success).toBe(true);
+        expect(parseWithFieldSet("unternehmensDaten", field, -1).success).toBe(true);
       },
     );
 
@@ -343,12 +304,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["anzahlVollzeitBeschaeftigte"],
       ["anzahlTeilzeitBeschaeftigte"],
     ])("rejects a non-integer value for %s", (field) => {
-      const request = validRequest();
-      (request.unternehmensDaten as Record<string, unknown>)[field] = 1.5;
-
-      const result = RegisterGewerbeRequestSchema.safeParse(request);
-
-      expect(result.success).toBe(false);
+      expect(parseWithFieldSet("unternehmensDaten", field, 1.5).success).toBe(false);
     });
   });
 
@@ -356,12 +312,7 @@ describe("RegisterGewerbeRequestSchema", () => {
     it.each([["tätigkeitsbeschreibung"], ["tätigkeitsbeschreibungKurz"]])(
       "rejects an empty string for %s",
       (field) => {
-        const request = validRequest();
-        (request.unternehmensDaten as Record<string, unknown>)[field] = "";
-
-        const result = RegisterGewerbeRequestSchema.safeParse(request);
-
-        expect(result.success).toBe(false);
+        expect(parseWithFieldSet("unternehmensDaten", field, "").success).toBe(false);
       },
     );
 
