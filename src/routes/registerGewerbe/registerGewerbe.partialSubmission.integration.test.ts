@@ -1,48 +1,10 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 
-// Note 1: mocking is "global" on file level, therefore we have separate files for tests that mock and those that don't.
-// Note 2: We need to mock here, such that the private library correctly initializes their internal libraries before the tests are run.
-vi.mock("@digitalservicebund/unternehmen-steuer-gewerbe-privat", () => ({
-  validateFsE: vi.fn().mockReturnValue({ valid: true }),
-  createElsterFsEEUnXml: vi.fn().mockReturnValue("<xml/>"),
-  sendFsE: vi.fn().mockReturnValue({ success: true }),
-  getFinanzamtId: vi.fn().mockReturnValue(["mock-finanzamt-id"]),
-  getFinanzamtDetailsById: vi.fn().mockReturnValue({
-    name: "Finanzamt Mock",
-    hausanschrift: {
-      strasse: "Mockstraße",
-      hausnummer: "1",
-      postleitzahl: "00000",
-      ort: "Mockstadt",
-    },
-    telefonnummer: "0000 000-0",
-  }),
-}));
-
-const { mockSubmitData, mockGetGewerbeRoutingInfo } = vi.hoisted(() => ({
-  mockSubmitData: vi.fn().mockResolvedValue({ submissionId: "mock-submission-id" }),
-  mockGetGewerbeRoutingInfo: vi.fn().mockResolvedValue({
-    ags: "03046001",
-    ars: "084210000000",
-    gewerbeamt: {
-      name: "Stadt Fulda",
-      adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
-      telefon: "0661 102-0",
-      onlineServices: [],
-    },
-    fitConnectDestinationInformation: { destinationId: "mock-destination-id" },
-  }),
-}));
-
-vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
-  getFitConnectClient: () => ({ submitData: mockSubmitData }),
-}));
-
-vi.mock("./getGewerbeRoutingInfo", () => ({
-  getGewerbeRoutingInfo: mockGetGewerbeRoutingInfo,
-}));
-
-import app from "../../app";
+import {
+  mockSubmitData,
+  mockGetGewerbeRoutingInfo,
+  postRegisterGewerbe,
+} from "./registerGewerbeIntegrationTestSetup";
 import {
   getFinanzamtId as mockGetFinanzamtId,
   sendFsE as mockSendFsE,
@@ -53,14 +15,6 @@ import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
 import { ErrorTypeSchema } from "./registerGewerbeInterfaces";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
 import { EricErrorFachlicheAblehnung } from "./registerGewerbeEndpoint";
-
-function postRegisterGewerbe(data = registerGewerbeSampleRequestAllFieldsFilled, queryString = "") {
-  return app.request(`/api/v1/register-gewerbe${queryString}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-}
 
 describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
   afterEach(() => vi.restoreAllMocks());
