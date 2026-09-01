@@ -31,13 +31,13 @@ const dresdenAdresse = {
 
 export const dresdenRequest: RegisterGewerbeRequest = {
   persönlicheDaten: {
-    vorname: "Fridolin",
+    vorname: "Greta",
     nachname: "Mustermann",
     geburtsname: "DigitalService",
     geburtsdatum: "1988-09-10",
     geburtsort: "Musterstadt",
     geburtsland: "Deutschland",
-    geschlecht: "keineAngabe",
+    geschlecht: "weiblich",
     staatsangehörigkeitIcao: "D",
     staatsangehörigkeit: "deutsch",
     adresse: {
@@ -53,10 +53,11 @@ export const dresdenRequest: RegisterGewerbeRequest = {
   },
   unternehmensDaten: {
     geschäftsbezeichnung: "Testbetrieb Schneller Gründen",
-    tätigkeitsbeschreibung: "Testeintrag Schneller Gründen",
+    tätigkeitsbeschreibung:
+      "Foodtruck / Imbisswagen f. Veranstaltungen. Speisenzubereitung warm/kalt",
     tätigkeitsbereich: "handwerk",
-    anmeldedatumFinanzamt: "2026-08-28",
-    anmeldedatumGewerbeamt: "2026-08-28",
+    anmeldedatumFinanzamt: "2026-09-01",
+    anmeldedatumGewerbeamt: "2026-09-01",
     gewerbeart: "hauptgewerbe",
     istReisegewerbe: false,
     rechtsform: "nichtEingetragenesEinzelunternehmen",
