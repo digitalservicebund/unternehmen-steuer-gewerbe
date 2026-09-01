@@ -40,7 +40,11 @@ describe("buildReceipt", () => {
   });
 
   it("covers every GewA 1 field number from 1 to 32", () => {
-    const numbers = new Set(rowsOf().map((row) => row.gewaNumber));
+    const numbers = new Set(
+      rowsOf()
+        .map((row) => row.gewaNumber)
+        .filter((number) => number !== undefined),
+    );
 
     expect(numbers).toEqual(new Set(Array.from({ length: 32 }, (_, index) => String(index + 1))));
   });
@@ -56,6 +60,7 @@ describe("buildReceipt", () => {
 
     expect(rowFor("Grund der Neuerrichtung / Übernahme", rows).value).toBe("Neugründung");
     expect(rowFor("Die Anmeldung wird erstattet für", rows).value).toBe("eine Hauptniederlassung");
+    expect(rowFor("Rechtsform", rows).value).toBe("Einzelunternehmen");
     expect(rowFor("Staatsangehörigkeit", rows).value).toBe("deutsch");
     expect(rowFor("Beteiligung der öffentlichen Hand", rows).value).toBe("nein");
   });

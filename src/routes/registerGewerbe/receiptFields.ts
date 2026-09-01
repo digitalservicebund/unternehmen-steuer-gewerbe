@@ -7,6 +7,7 @@ import {
   BETEILIGUNG_OEFFENTLICHE_HAND_LABEL,
   GESCHLECHT_LABEL,
   GRUND_ANMELDUNG_LABEL,
+  RECHTSFORM_LABEL,
   STAATSANGEHOERIGKEIT_LABEL,
   UNFALLVERSICHERUNGSTRAEGER_LABEL,
 } from "./requestDataTransformer/xGewerbeordnungCodeLabels";
@@ -117,6 +118,10 @@ export function buildReceipt(
           gewaNumber: "23",
           label: "Die Anmeldung wird erstattet für",
           value: labelFor(ART_BETRIEBSSTAETTE_LABEL, betriebsstaette?.artBetriebsstaette),
+        },
+        {
+          label: "Rechtsform",
+          value: labelFor(RECHTSFORM_LABEL, gewerbebetrieb?.rechtsformcode),
         },
       ],
     },

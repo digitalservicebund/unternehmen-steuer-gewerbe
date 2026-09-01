@@ -14,6 +14,11 @@ export const ART_BETRIEBSSTAETTE_LABEL: Record<string, string> = {
   "03": "eine unselbstständige Zweigstelle",
 };
 
+/** urn:xoev-de:xunternehmen:codeliste:rechtsformen_2; only "412000" is transmitted. */
+export const RECHTSFORM_LABEL: Record<string, string> = {
+  "412000": "Einzelunternehmen",
+};
+
 /** "x" (ohne Angabe) intentionally missing: it is rendered as an empty value. */
 export const GESCHLECHT_LABEL: Record<string, string> = {
   m: "männlich",

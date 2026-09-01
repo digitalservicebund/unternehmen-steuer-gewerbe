@@ -157,6 +157,7 @@ describe("generatePdfReceipt", () => {
     expect(text).toContain("Mustermann");
     expect(text).toContain("26. August 2020");
     expect(text).toContain("Neugründung");
+    expect(text).toContain("Einzelunternehmen");
     expect(text).toContain("deutsch");
     expect(text).toContain("Musterstraße 1, 12345 Musterstadt");
     expect(text).toContain("Mustertätigkeit");
