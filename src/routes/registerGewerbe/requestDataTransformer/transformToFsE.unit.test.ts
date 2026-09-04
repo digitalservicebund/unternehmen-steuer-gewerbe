@@ -1,6 +1,14 @@
 import { describe, it, expect, vi } from "vitest";
 import { defaultFinanzamtId, transformToEUnFsE } from "./transformToFsE";
-import { registerGewerbeSampleRequestAllFieldsFilled } from "../testHelpers";
+import {
+  registerGewerbeSampleRequestAllFieldsFilled,
+  withUnternehmensDatenOverrides,
+  adresseBerlinHausnummerRange,
+  adresseFuldaHausnummerRange,
+  adresseTestorfSteinfortMitZusatz,
+  adresseTestorfSteinfortOhneZusatz,
+  adresseAbweichendCoburg,
+} from "../testHelpers";
 import { ElsterFsEEUn } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 import { formatDatumDE } from "../../../helpers/formFieldTransformations";
 
@@ -65,31 +73,23 @@ describe("transformToEUnFsE", () => {
 
   describe("gewerbeArt (tätigkeitsbeschreibung)", () => {
     it("falls back to tätigkeitsbeschreibung when tätigkeitsbeschreibungKurz is missing", () => {
-      const request = {
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        unternehmensDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+      const result = transformToEUnFsE(
+        withUnternehmensDatenOverrides({
           tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
           tätigkeitsbeschreibungKurz: undefined,
-        },
-      };
-
-      const result = transformToEUnFsE(request);
+        }),
+      );
 
       expect(result.eUn?.allgAngaben?.artTaet?.gewerbeArt).toBe("Vertrieb von Vertriebsmustern");
     });
 
     it("truncates the tätigkeitsbeschreibung fallback to 200 characters", () => {
-      const request = {
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        unternehmensDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+      const result = transformToEUnFsE(
+        withUnternehmensDatenOverrides({
           tätigkeitsbeschreibung: "a".repeat(250),
           tätigkeitsbeschreibungKurz: undefined,
-        },
-      };
-
-      const result = transformToEUnFsE(request);
+        }),
+      );
 
       expect(result.eUn?.allgAngaben?.artTaet?.gewerbeArt).toBe("a".repeat(200));
     });
@@ -216,14 +216,12 @@ describe("transformToEUnFsE", () => {
   ] as const)(
     "maps istVersteuerungGrund '%s' to the %s flag and leaves the others unset",
     (grund, expectedFlag) => {
-      const result = transformToEUnFsE({
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        unternehmensDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+      const result = transformToEUnFsE(
+        withUnternehmensDatenOverrides({
           sollIstVersteuerung: "istVersteuerung",
           istVersteuerungGrund: grund,
-        },
-      });
+        }),
+      );
       const sollIstVersteuerung = result.eUn?.umsatzsteuer?.sollIstVersteuerung;
       for (const flag of [
         "istVerstUStGrundUmsatz",
@@ -236,24 +234,16 @@ describe("transformToEUnFsE", () => {
   );
 
   it("maps geschäftsbezeichnung to eUn.betrieb.unternehmen.abwFirmenname", () => {
-    const result = transformToEUnFsE({
-      ...registerGewerbeSampleRequestAllFieldsFilled,
-      unternehmensDaten: {
-        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-        geschäftsbezeichnung: "Musterhandel Schmidt",
-      },
-    });
+    const result = transformToEUnFsE(
+      withUnternehmensDatenOverrides({ geschäftsbezeichnung: "Musterhandel Schmidt" }),
+    );
     expect(result.eUn?.betrieb?.unternehmen?.abwFirmenname).toBe("Musterhandel Schmidt");
   });
 
   it("omits eUn.betrieb.unternehmen.abwFirmenname when geschäftsbezeichnung is not given", () => {
-    const result = transformToEUnFsE({
-      ...registerGewerbeSampleRequestAllFieldsFilled,
-      unternehmensDaten: {
-        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-        geschäftsbezeichnung: undefined,
-      },
-    });
+    const result = transformToEUnFsE(
+      withUnternehmensDatenOverrides({ geschäftsbezeichnung: undefined }),
+    );
     expect(result.eUn?.betrieb?.unternehmen?.abwFirmenname).toBeUndefined();
   });
 
@@ -280,18 +270,9 @@ describe("transformToEUnFsE", () => {
   });
 
   it("maps adresse to Unternehmen-Anschrift", () => {
-    const result = transformToEUnFsE({
-      ...registerGewerbeSampleRequestAllFieldsFilled,
-      unternehmensDaten: {
-        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-        adresse: {
-          strasse: "Betriebsweg",
-          hausnummer: "42a",
-          postleitzahl: "23936",
-          ort: "Testorf-Steinfort",
-        },
-      },
-    });
+    const result = transformToEUnFsE(
+      withUnternehmensDatenOverrides({ adresse: adresseTestorfSteinfortMitZusatz }),
+    );
     expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
       str: "Betriebsweg",
       hausNr: "42",
@@ -302,18 +283,9 @@ describe("transformToEUnFsE", () => {
   });
 
   it("maps the hausnummer 8-14 to hausNrZu -14", () => {
-    const result = transformToEUnFsE({
-      ...registerGewerbeSampleRequestAllFieldsFilled,
-      unternehmensDaten: {
-        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-        adresse: {
-          strasse: "Prinzessinnenstraße",
-          hausnummer: "8-14",
-          postleitzahl: "10969",
-          ort: "Berlin",
-        },
-      },
-    });
+    const result = transformToEUnFsE(
+      withUnternehmensDatenOverrides({ adresse: adresseBerlinHausnummerRange }),
+    );
     expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
       str: "Prinzessinnenstraße",
       hausNr: "8",
@@ -324,18 +296,9 @@ describe("transformToEUnFsE", () => {
   });
 
   it("maps the hausnummer 1C-1E to hausNrZu C-1E", () => {
-    const result = transformToEUnFsE({
-      ...registerGewerbeSampleRequestAllFieldsFilled,
-      unternehmensDaten: {
-        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-        adresse: {
-          strasse: "Domstraße",
-          hausnummer: "1C-1E",
-          postleitzahl: "36037",
-          ort: "Fulda",
-        },
-      },
-    });
+    const result = transformToEUnFsE(
+      withUnternehmensDatenOverrides({ adresse: adresseFuldaHausnummerRange }),
+    );
     expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
       str: "Domstraße",
       hausNr: "1",
@@ -346,23 +309,12 @@ describe("transformToEUnFsE", () => {
   });
 
   it("prefers adresse over adresseAbweichend", () => {
-    const result = transformToEUnFsE({
-      ...registerGewerbeSampleRequestAllFieldsFilled,
-      unternehmensDaten: {
-        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-        adresse: {
-          strasse: "Betriebsweg",
-          hausnummer: "42",
-          postleitzahl: "23936",
-          ort: "Testorf-Steinfort",
-        },
-        adresseAbweichend: {
-          strasseUndHausnummer: "Musterstraße 2 a",
-          postleitzahl: "96450",
-          ort: "Coburg",
-        },
-      },
-    });
+    const result = transformToEUnFsE(
+      withUnternehmensDatenOverrides({
+        adresse: adresseTestorfSteinfortOhneZusatz,
+        adresseAbweichend: adresseAbweichendCoburg,
+      }),
+    );
     expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
       str: "Betriebsweg",
       hausNr: "42",
