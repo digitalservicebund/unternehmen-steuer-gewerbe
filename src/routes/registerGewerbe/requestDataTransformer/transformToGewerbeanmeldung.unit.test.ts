@@ -369,7 +369,11 @@ describe("transformToGewerbeanmeldung", () => {
   it("leaves gemeindeschluesselErgaenzung undefined for unmapped Hamburg PLZ 20000", () => {
     const result = transformToGewerbeanmeldung(
       withUnternehmensDatenOverrides({
-        adresseAbweichend: { strasseUndHausnummer: "Musterstraße 1", postleitzahl: "20000", ort: "Hamburg" },
+        adresseAbweichend: {
+          strasseUndHausnummer: "Musterstraße 1",
+          postleitzahl: "20000",
+          ort: "Hamburg",
+        },
       }),
       testRoutingInfoHamburg,
     );

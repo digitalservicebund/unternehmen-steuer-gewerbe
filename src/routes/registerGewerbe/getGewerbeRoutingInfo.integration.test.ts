@@ -85,7 +85,10 @@ const expectedDorfstrasseLookup = {
   strasse: "Dorfstraße",
   hausnummer: "1",
 };
-const singleRouteFixture = { destinationId: "mock-destination-id", destinationSignature: "sig.nat.ure" };
+const singleRouteFixture = {
+  destinationId: "mock-destination-id",
+  destinationSignature: "sig.nat.ure",
+};
 
 describe("getGewerbeRoutingInfo", () => {
   describe("AGS (Amtlicher Gemeindeschlüssel)", () => {
@@ -212,7 +215,10 @@ describe("getGewerbeRoutingInfo", () => {
         count: 1,
         offset: 0,
         totalCount: 1,
-        routes: [singleRouteFixture, { ...singleRouteFixture, destinationId: "mock-destination-id2" }],
+        routes: [
+          singleRouteFixture,
+          { ...singleRouteFixture, destinationId: "mock-destination-id2" },
+        ],
       });
 
       const result = await getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled);
