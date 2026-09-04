@@ -22,7 +22,7 @@ importers:
         version: 0.6.1(hono@4.13.5)
       '@hono/zod-openapi':
         specifier: 1.6.1
-        version: 1.6.1(hono@4.13.5)(zod@4.4.3)
+        version: 1.6.1(hono@4.13.5)(zod@4.5.1)
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2
@@ -57,8 +57,8 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0(@types/node@26.4.0)
       zod:
-        specifier: ^4.4.3
-        version: 4.4.3
+        specifier: ^4.5.1
+        version: 4.5.1
     devDependencies:
       '@ls-lint/ls-lint':
         specifier: ^2.3.1
@@ -1623,15 +1623,15 @@ packages:
     resolution: {integrity: sha512-4LCcse/U2MHZ63HAJVE+v71o7yOdIe4cZ70Wpf8D/IyjDKYQLV5GD46B+hSTjJsvV5PztjvHoU580EftxjDZFQ==}
     engines: {node: '>=12.20'}
 
-  zod@4.4.3:
-    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
+  zod@4.5.1:
+    resolution: {integrity: sha512-P3GqeAEOEDqKvafVGLezbg+39YW/ze4xrD4qdS0adOY8eoI3zfjv1PQM4UwQzgT8mZKXEbqtVt8K+ZKGqkMFKg==}
 
 snapshots:
 
-  '@asteasolutions/zod-to-openapi@9.1.0(zod@4.4.3)':
+  '@asteasolutions/zod-to-openapi@9.1.0(zod@4.5.1)':
     dependencies:
       openapi3-ts: 4.6.1
-      zod: 4.4.3
+      zod: 4.5.1
 
   '@babel/helper-string-parser@7.29.7': {}
 
@@ -1738,18 +1738,18 @@ snapshots:
     dependencies:
       hono: 4.13.5
 
-  '@hono/zod-openapi@1.6.1(hono@4.13.5)(zod@4.4.3)':
+  '@hono/zod-openapi@1.6.1(hono@4.13.5)(zod@4.5.1)':
     dependencies:
-      '@asteasolutions/zod-to-openapi': 9.1.0(zod@4.4.3)
-      '@hono/zod-validator': 0.9.0(hono@4.13.5)(zod@4.4.3)
+      '@asteasolutions/zod-to-openapi': 9.1.0(zod@4.5.1)
+      '@hono/zod-validator': 0.9.0(hono@4.13.5)(zod@4.5.1)
       hono: 4.13.5
       openapi3-ts: 4.6.1
-      zod: 4.4.3
+      zod: 4.5.1
 
-  '@hono/zod-validator@0.9.0(hono@4.13.5)(zod@4.4.3)':
+  '@hono/zod-validator@0.9.0(hono@4.13.5)(zod@4.5.1)':
     dependencies:
       hono: 4.13.5
-      zod: 4.4.3
+      zod: 4.5.1
 
   '@jridgewell/resolve-uri@3.1.2': {}
 
@@ -2755,4 +2755,4 @@ snapshots:
 
   yocto-queue@1.2.2: {}
 
-  zod@4.4.3: {}
+  zod@4.5.1: {}
