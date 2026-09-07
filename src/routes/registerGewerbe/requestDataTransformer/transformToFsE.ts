@@ -198,10 +198,8 @@ export function transformToEUnFsE(
           natPers: {
             vorname: data.persönlicheDaten.vorname,
             name: data.persönlicheDaten.nachname,
-            //titel: undefined,
             gebName: data.persönlicheDaten.geburtsname,
             gebDat: formatDatumDE(data.persönlicheDaten.geburtsdatum),
-            // berufsbez: undefined,
             persIdNr: data.persönlicheDaten.steuerId,
             stNr: data.persönlicheDaten.steuernummer,
             religion: RELIGIONSSCHLUESSEL[data.persönlicheDaten.religion],
@@ -216,44 +214,9 @@ export function transformToEUnFsE(
                 plz: data.persönlicheDaten.adresse.postleitzahl,
                 ort: data.persönlicheDaten.adresse.ort,
               },
-              // auslAdr: {
-              //   str: undefined,
-              //   hausNr: undefined,
-              //   hausNrZu: undefined,
-              //   adressErg: undefined,
-              //   auslPlz: undefined,
-              //   ort: undefined,
-              //   staatId: undefined,
-              // },
             },
-            // standEhe: {
-            //   merker: undefined,
-            //   von: undefined
-            // },
           },
         },
-        // ehegatte: {
-        //   natPers: {
-        //     anredeId: undefined,
-        //     vorname: undefined,
-        //     name: undefined,
-        //     gebName: undefined,
-        //     gebDat: undefined,
-        //     berufsbez: undefined,
-        //     persIdNr: undefined,
-        //     religion: undefined,
-        //     adrkette: {
-        //       strAdr: {
-        //         str: undefined,
-        //         hausNr: undefined,
-        //         hausNrZu: undefined,
-        //         adressErg: undefined,
-        //         plz: undefined,
-        //         ort: undefined,
-        //       },
-        //     },
-        //   },
-        // },
         komm: {
           tel: [
             {
@@ -273,64 +236,6 @@ export function transformToEUnFsE(
             data.unternehmensDaten.tätigkeitsbeschreibung.slice(0, 200),
         },
         bankKonto: getBankKonto(data),
-        // steuerberater: {
-        //   natPers: {
-        //     anredeId: undefined,
-        //     vorname: undefined,
-        //     name: undefined,
-        //     vorsatz: undefined,
-        //     zusatz: undefined,
-        //     adrkette: {
-        //       auslAdr: {
-        //         str: undefined,
-        //         hausNr: undefined,
-        //         hausNrZu: undefined,
-        //         adressErg: undefined,
-        //         auslPlz: undefined,
-        //         ort: undefined,
-        //         staatId: undefined,
-        //       },
-        //       postfAdr: { postfach: undefined, plz: undefined, ort: undefined },
-        //     },
-        //     komm: {
-        //       tel: [
-        //         { intVorw: undefined, natVorw: undefined, rufNr: undefined },
-        //         { intVorw: undefined, natVorw: undefined, rufNr: undefined },
-        //       ],
-        //     },
-        //   },
-        // },
-        // empfangsbev: {
-        //   empfBevollmSteuerberater: undefined,
-        //   natPers: {
-        //     anredeId: undefined,
-        //     vorname: undefined,
-        //     name: undefined,
-        //     adrkette: {
-        //       strAdr: {
-        //         str: undefined,
-        //         hausNr: undefined,
-        //         hausNrZu: undefined,
-        //         adressErg: undefined,
-        //         plz: undefined,
-        //         ort: undefined,
-        //       },
-        //     },
-        //     komm: { tel: [{ intVorw: undefined, natVorw: undefined, rufNr: undefined }] },
-        //   },
-        // },
-        // bisherigeVerhaeltnisse: {
-        //   adrkette: {
-        //     strAdr: {
-        //       str: undefined,
-        //       hausNr: undefined,
-        //       hausNrZu: undefined,
-        //       adressErg: undefined,
-        //       plz: undefined,
-        //       ort: undefined,
-        //     },
-        //   },
-        // },
       },
       betrieb: {
         unternehmen: getUnternehmen(data),
