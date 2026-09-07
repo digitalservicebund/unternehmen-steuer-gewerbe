@@ -96,6 +96,7 @@ function leafPaths(value: unknown, prefix = ""): string[] {
 const transmitted = transformToGewerbeanmeldung(
   registerGewerbeSampleRequestAllFieldsFilled,
   gewerbeRoutingInfoFixture(),
+  "osci",
 );
 const receipt = buildReceipt(transmitted, gewerbeRoutingInfoFixture());
 const transmittedPaths = leafPaths(transmitted);

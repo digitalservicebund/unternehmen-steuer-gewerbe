@@ -131,11 +131,13 @@ async function submitGewerbeanmeldung(
     };
   }
 
-  const gewerbeanmeldung = transformToGewerbeanmeldung(data, routingInfo);
-
+  // A routing lookup that found no destination is what marks a commune as OSCI-only (see
+  // getFitConnectDestinationInformation); this is the only place that translation happens.
   const { fitConnectDestinationInformation } = routingInfo;
   const transportMethod: TransportMethod =
     fitConnectDestinationInformation === null ? "osci" : "fitConnect";
+
+  const gewerbeanmeldung = transformToGewerbeanmeldung(data, routingInfo, transportMethod);
 
   let gewerbeanmeldungXml: string;
   try {

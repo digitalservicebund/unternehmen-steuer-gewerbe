@@ -1,5 +1,8 @@
 import { randomUUID } from "node:crypto";
-import { type CreateGewerbeanmeldungXmlData } from "../../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
+import {
+  type CreateGewerbeanmeldungXmlData,
+  type TransportMethod,
+} from "../../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import { type RegisterGewerbeRequest } from "../registerGewerbeInterfaces";
 import { type GewerbeRoutingInfo } from "../getGewerbeRoutingInfo";
 import { type Nachweisdokument } from "../../../xmlBuilders/xGewerbeordnung/buildingBlocks/nachweisdokument";
@@ -83,6 +86,7 @@ function getGemeindeschluesselErgaenzung(gemeindeSchluessel: string, betriebsPlz
 export function transformToGewerbeanmeldung(
   data: RegisterGewerbeRequest,
   routingInfo: GewerbeRoutingInfo,
+  transportMethod: TransportMethod,
 ): CreateGewerbeanmeldungXmlData {
   const personStrasseHausnummer = splitStrasseHausnummer(
     data.persönlicheDaten.adresse.strasseUndHausnummer,
@@ -99,8 +103,6 @@ export function transformToGewerbeanmeldung(
   const gewerbeamtKennung = `MELDID:${gemeindeSchluessel}`;
   const gewerbeamtName = routingInfo.gewerbeamt.name || "Gewerbeamt";
   const personId = randomUUID();
-  // only the OSCI transport carries the PDF receipt along (see submitViaOsci)
-  const isSentViaOsci = routingInfo.fitConnectDestinationInformation === null;
 
   return {
     nachrichtenkopf: {
@@ -113,8 +115,10 @@ export function transformToGewerbeanmeldung(
     anzeigerenderId: personId,
     handelndePersonId: personId,
     handelndePersonVertrauensniveauCode: VERTRAUENSNIVEAU[data.persönlicheDaten.vertrauensniveau],
-    // the message may only declare the Anlage where it is actually sent along
-    nachweisdokumentOnlinedienst: isSentViaOsci ? PDF_RECEIPT_NACHWEISDOKUMENT : undefined,
+    // only the OSCI transport carries the PDF receipt along, and the message may only declare
+    // the Anlage where it is actually sent along (see submitViaOsci)
+    nachweisdokumentOnlinedienst:
+      transportMethod === "osci" ? PDF_RECEIPT_NACHWEISDOKUMENT : undefined,
     satzErstellung: new Date().toISOString(),
     ereigniszeitpunkt: new Date().toISOString(),
     istStorno: false,
