@@ -49,7 +49,7 @@ export interface OsciMetadata {
   };
 }
 
-// The ZKO resolves each content as form-data://<multipart field name>/<file name> and only accepts
+// The AKDB-Api resolves each content as form-data://<multipart field name>/<file name> and only accepts
 // the field names "metadata", "message" and "attachments". Every part has to be referenced here,
 // and every reference has to have a matching part.
 function createRequestPayload(attachments: OsciAttachment[]) {

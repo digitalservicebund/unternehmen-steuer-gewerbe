@@ -21,7 +21,7 @@ interface TokenResponse {
 interface SendMessageOptions {
   targetId: string;
   message: string;
-  /** Anlagen zur Fachnachricht; jede muss in der Nachricht als bk:nachweisdokument deklariert sein. */
+  /** "Anlagen" to the "Fachnachricht"; each "Anlage" needs to be declared as a  bk:nachweisdokument. */
   attachments?: OsciAttachment[];
 }
 
