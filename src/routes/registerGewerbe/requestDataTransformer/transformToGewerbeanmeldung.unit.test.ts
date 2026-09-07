@@ -25,6 +25,7 @@ describe("transformToGewerbeanmeldung", () => {
     const result = transformToGewerbeanmeldung(
       withUnternehmensDatenOverrides({ adresseAbweichend: undefined }),
       testRoutingInfo,
+      "fitConnect",
     );
 
     expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
@@ -39,6 +40,7 @@ describe("transformToGewerbeanmeldung", () => {
     const result = transformToGewerbeanmeldung(
       registerGewerbeSampleRequestAllFieldsFilled,
       testRoutingInfo,
+      "fitConnect",
     );
 
     expect(result.gewerbebetrieb!.betriebArt).toEqual({
@@ -53,6 +55,7 @@ describe("transformToGewerbeanmeldung", () => {
     const result = transformToGewerbeanmeldung(
       registerGewerbeSampleRequestAllFieldsFilled,
       testRoutingInfo,
+      "fitConnect",
     );
 
     expect(result.gewerbebetrieb!.istNebenerwerb).toBe(false);
@@ -62,6 +65,7 @@ describe("transformToGewerbeanmeldung", () => {
     const result = transformToGewerbeanmeldung(
       withPersönlicheDatenOverrides({ geburtsname: undefined }),
       testRoutingInfo,
+      "fitConnect",
     );
 
     expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.name!.geburtsname).toBeUndefined();
@@ -94,6 +98,7 @@ describe("transformToGewerbeanmeldung", () => {
     const result = transformToGewerbeanmeldung(
       registerGewerbeSampleRequestAllFieldsFilled,
       testRoutingInfo,
+      "fitConnect",
     );
 
     expect(actual(result)).toBe(expected);
@@ -103,6 +108,7 @@ describe("transformToGewerbeanmeldung", () => {
     const result = transformToGewerbeanmeldung(
       withPersönlicheDatenOverrides({ geburtsort: undefined, geburtsland: undefined }),
       testRoutingInfo,
+      "fitConnect",
     );
     const { geburt } = result.referenzierteSubjekte!.natuerlichePerson![0]!;
 
@@ -119,6 +125,7 @@ describe("transformToGewerbeanmeldung", () => {
       const result = transformToGewerbeanmeldung(
         withPersönlicheDatenOverrides({ geschlecht }),
         testRoutingInfo,
+        "fitConnect",
       );
 
       expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.geschlecht).toBe(expected);
@@ -129,12 +136,14 @@ describe("transformToGewerbeanmeldung", () => {
     const deutsch = transformToGewerbeanmeldung(
       registerGewerbeSampleRequestAllFieldsFilled,
       testRoutingInfo,
+      "fitConnect",
     );
     expect(deutsch.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe("000");
 
     const französisch = transformToGewerbeanmeldung(
       withPersönlicheDatenOverrides({ staatsangehörigkeit: "französisch" }),
       testRoutingInfo,
+      "fitConnect",
     );
     expect(französisch.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe(
       "129",
@@ -152,6 +161,7 @@ describe("transformToGewerbeanmeldung", () => {
       const result = transformToGewerbeanmeldung(
         withPersönlicheDatenOverrides({ staatsangehörigkeitIcao: icao }),
         testRoutingInfo,
+        "fitConnect",
       );
 
       expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe(
@@ -167,6 +177,7 @@ describe("transformToGewerbeanmeldung", () => {
         staatsangehörigkeitIcao: "ITA",
       }),
       testRoutingInfo,
+      "fitConnect",
     );
 
     expect(result.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe("137");
@@ -176,6 +187,7 @@ describe("transformToGewerbeanmeldung", () => {
     const result = transformToGewerbeanmeldung(
       registerGewerbeSampleRequestAllFieldsFilled,
       testRoutingInfo,
+      "fitConnect",
     );
 
     expect(result.gueltigAb).toBe(
@@ -196,6 +208,7 @@ describe("transformToGewerbeanmeldung", () => {
         },
       }),
       testRoutingInfo,
+      "fitConnect",
     );
 
     expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
@@ -210,6 +223,7 @@ describe("transformToGewerbeanmeldung", () => {
     const result = transformToGewerbeanmeldung(
       withUnternehmensDatenOverrides({ adresse: adresseTestorfSteinfortOhneZusatz }),
       testRoutingInfo,
+      "fitConnect",
     );
 
     expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
@@ -224,6 +238,7 @@ describe("transformToGewerbeanmeldung", () => {
     const result = transformToGewerbeanmeldung(
       withUnternehmensDatenOverrides({ adresse: adresseBerlinHausnummerRange }),
       testRoutingInfo,
+      "fitConnect",
     );
 
     expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
@@ -239,6 +254,7 @@ describe("transformToGewerbeanmeldung", () => {
     const result = transformToGewerbeanmeldung(
       withUnternehmensDatenOverrides({ adresse: adresseFuldaHausnummerRange }),
       testRoutingInfo,
+      "fitConnect",
     );
 
     expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
@@ -254,6 +270,7 @@ describe("transformToGewerbeanmeldung", () => {
     const result = transformToGewerbeanmeldung(
       withUnternehmensDatenOverrides({ adresse: adresseTestorfSteinfortMitZusatz }),
       testRoutingInfo,
+      "fitConnect",
     );
 
     expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
@@ -271,6 +288,7 @@ describe("transformToGewerbeanmeldung", () => {
         adresseAbweichend: adresseAbweichendCoburg,
       }),
       testRoutingInfo,
+      "fitConnect",
     );
 
     expect(result.gewerbebetrieb!.betriebsstaette!.anschrift).toEqual({
@@ -285,6 +303,7 @@ describe("transformToGewerbeanmeldung", () => {
     const result = transformToGewerbeanmeldung(
       withUnternehmensDatenOverrides({ geschäftsbezeichnung: "Musterhandel Schmidt" }),
       testRoutingInfo,
+      "fitConnect",
     );
 
     expect(result.gewerbebetrieb!.geschaeftsbezeichnung).toBe("Musterhandel Schmidt");
@@ -294,6 +313,7 @@ describe("transformToGewerbeanmeldung", () => {
     const result = transformToGewerbeanmeldung(
       withUnternehmensDatenOverrides({ geschäftsbezeichnung: undefined }),
       testRoutingInfo,
+      "fitConnect",
     );
 
     expect(result.gewerbebetrieb!.geschaeftsbezeichnung).toBeUndefined();
@@ -303,6 +323,7 @@ describe("transformToGewerbeanmeldung", () => {
     const result = transformToGewerbeanmeldung(
       registerGewerbeSampleRequestAllFieldsFilled,
       testRoutingInfo,
+      "fitConnect",
     );
 
     expect(result.gewerbebetrieb!.gemeindeMeldungNr).toBeUndefined();
@@ -315,6 +336,7 @@ describe("transformToGewerbeanmeldung", () => {
         anzahlTeilzeitBeschaeftigte: 4,
       }),
       testRoutingInfo,
+      "fitConnect",
     );
 
     expect(result.gewerbebetrieb!.anzahlVollzeitBeschaeftigte).toBe(3);
@@ -325,6 +347,7 @@ describe("transformToGewerbeanmeldung", () => {
     const result = transformToGewerbeanmeldung(
       registerGewerbeSampleRequestAllFieldsFilled,
       testRoutingInfo,
+      "fitConnect",
     );
 
     expect(result.gemeindeSchluessel).toBe(testRoutingInfo.ags);
@@ -340,6 +363,7 @@ describe("transformToGewerbeanmeldung", () => {
         },
       }),
       testRoutingInfoHamburg,
+      "fitConnect",
     );
 
     expect(result.gemeindeschluesselErgaenzung).toBe("02100000");
@@ -351,6 +375,7 @@ describe("transformToGewerbeanmeldung", () => {
         adresse: { strasse: "Reeperbahn", hausnummer: "1", postleitzahl: "22767", ort: "Hamburg" },
       }),
       testRoutingInfoHamburg,
+      "fitConnect",
     );
 
     expect(result.gemeindeschluesselErgaenzung).toBe("02100000");
@@ -360,6 +385,7 @@ describe("transformToGewerbeanmeldung", () => {
     const result = transformToGewerbeanmeldung(
       registerGewerbeSampleRequestAllFieldsFilled,
       testRoutingInfo,
+      "fitConnect",
     );
 
     expect(result.gemeindeSchluessel).not.toBe(testRoutingInfoHamburg.ags);
@@ -376,8 +402,34 @@ describe("transformToGewerbeanmeldung", () => {
         },
       }),
       testRoutingInfoHamburg,
+      "fitConnect",
     );
 
     expect(result.gemeindeschluesselErgaenzung).toBeUndefined();
+  });
+
+  it("declares the PDF receipt as nachweisdokument.onlinedienst for the osci transportMethod", () => {
+    const result = transformToGewerbeanmeldung(
+      registerGewerbeSampleRequestAllFieldsFilled,
+      testRoutingInfo,
+      "osci",
+    );
+
+    expect(result.nachweisdokumentOnlinedienst).toEqual({
+      dokumentid: "gewerbeanmeldung-beleg.pdf",
+      dateiname: "gewerbeanmeldung-beleg.pdf",
+      mimetype: "application/pdf",
+      kategorie: "Antrag im Original",
+    });
+  });
+
+  it("omits nachweisdokumentOnlinedienst for the fitConnect transportMethod", () => {
+    const result = transformToGewerbeanmeldung(
+      registerGewerbeSampleRequestAllFieldsFilled,
+      testRoutingInfo,
+      "fitConnect",
+    );
+
+    expect(result.nachweisdokumentOnlinedienst).toBeUndefined();
   });
 });

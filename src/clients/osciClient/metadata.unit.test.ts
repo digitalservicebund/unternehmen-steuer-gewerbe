@@ -39,6 +39,35 @@ describe("createMetadata", () => {
     });
   });
 
+  it("references every Anlage as a form-data attachments part", () => {
+    const result = createMetadata({
+      targetId: "MELDID:09000099",
+      attachments: [
+        { fileName: "beleg.pdf", mimeType: "application/pdf", content: Buffer.from("pdf") },
+        { fileName: "vollmacht.png", mimeType: "image/png", content: Buffer.from("png") },
+      ],
+    });
+
+    expect(result.payload.request.attachments).toEqual([
+      {
+        contentReference: "form-data://attachments/beleg.pdf",
+        contentMediaType: "application/pdf",
+      },
+      { contentReference: "form-data://attachments/vollmacht.png", contentMediaType: "image/png" },
+    ]);
+  });
+
+  it("omits attachments when no Anlage is given", () => {
+    const result = createMetadata({ targetId: "MELDID:09000099" });
+
+    expect(result.payload.request).toEqual({
+      message: {
+        contentReference: "form-data://message/payload.ext.gewerbemeldung.0400.xml",
+        contentMediaType: "text/plain",
+      },
+    });
+  });
+
   it("defaults sourceTimestamp to the current time when none is given with only seconds precision (AKDB rejects milliseconds)", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2024-10-24T13:00:39.123Z"));

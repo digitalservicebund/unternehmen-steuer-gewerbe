@@ -65,6 +65,10 @@ const NOT_SHOWN_AS_ROW: Record<string, string> = {
   gemeindeSchluessel: "shown as Gemeindekennzahl in the header",
   gemeindeschluesselErgaenzung: "Stadtbezirk, part of the Gemeindekennzahl",
   uuid: "shown as ID in the footer",
+  "nachweisdokumentOnlinedienst.dokumentid": "metadata of the attached PDF receipt itself",
+  "nachweisdokumentOnlinedienst.dateiname": "metadata of the attached PDF receipt itself",
+  "nachweisdokumentOnlinedienst.mimetype": "metadata of the attached PDF receipt itself",
+  "nachweisdokumentOnlinedienst.kategorie": "metadata of the attached PDF receipt itself",
   "gewerbebetrieb.gewerbebetriebID": "internal cross-reference id",
   "gewerbebetrieb.rechtsformcode": "GewA 1 has no field for it; design.pdf shows none",
 };
@@ -92,6 +96,7 @@ function leafPaths(value: unknown, prefix = ""): string[] {
 const transmitted = transformToGewerbeanmeldung(
   registerGewerbeSampleRequestAllFieldsFilled,
   gewerbeRoutingInfoFixture(),
+  "osci",
 );
 const receipt = buildReceipt(transmitted, gewerbeRoutingInfoFixture());
 const transmittedPaths = leafPaths(transmitted);

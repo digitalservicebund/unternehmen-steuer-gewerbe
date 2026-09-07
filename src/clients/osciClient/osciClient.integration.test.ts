@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { Agent, fetch, Response } from "undici";
+import { Agent, fetch, FormData, Response } from "undici";
 import { getOsciClient } from "./osciClient";
 
 // mock only fetch; the client builds a real Agent from the certificate secrets
@@ -86,6 +86,26 @@ describe("getOsciClient", () => {
         "https://soaptest.akdb.de/okkommozg/restapi/v3.0/messages/zko/json/multipart",
       );
       expect(sendOptions?.dispatcher).toBeUndefined();
+    });
+
+    it("appends every Anlage as a multipart part named attachments", async () => {
+      vi.stubEnv("AKDB_BASE_URL", "https://soaptest.akdb.de/okkommozg");
+      const fetchMock = mockSendMessageFetch();
+
+      await getOsciClient().sendMessage({
+        targetId: "MELDID:09000099",
+        message: "<xml/>",
+        attachments: [
+          { fileName: "beleg.pdf", mimeType: "application/pdf", content: Buffer.from("pdf-bytes") },
+        ],
+      });
+
+      const [, sendOptions] = fetchMock.mock.calls[1]!;
+      const [anlage] = (sendOptions!.body as FormData).getAll("attachments") as File[];
+
+      expect(anlage!.name).toBe("beleg.pdf");
+      expect(anlage!.type).toBe("application/pdf");
+      expect(await anlage!.text()).toBe("pdf-bytes");
     });
   });
 

@@ -216,6 +216,40 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(json.gewerbeanmeldung.ars).toBe("084210000000");
       expect(json.gewerbeanmeldung.fitConnectDestinationId).toBeUndefined();
     });
+
+    it("declares the PDF receipt as nachweisdokument.onlinedienst in the XML", async () => {
+      mockSendMessage.mockClear();
+      mockGetGewerbeRoutingInfo.mockResolvedValueOnce(routingInfoWithoutFitConnect);
+
+      const response = await postRegisterGewerbe();
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+
+      const [{ message }] = mockSendMessage.mock.calls[0]!;
+      const satz = parser.parse(message)["xga:ext.gewerbemeldung.0400"]["xga:satz"];
+      expect(satz["bk:nachweisdokument.onlinedienst"]).toEqual({
+        "bk:dokumentid": "gewerbeanmeldung-beleg.pdf",
+        "bk:dateiname": "gewerbeanmeldung-beleg.pdf",
+        "bk:mimetype": "application/pdf",
+        "bk:kategorie": "Antrag im Original",
+      });
+    });
+
+    it("sends the PDF receipt as the Anlage the XML refers to", async () => {
+      mockSendMessage.mockClear();
+      mockGetGewerbeRoutingInfo.mockResolvedValueOnce(routingInfoWithoutFitConnect);
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+
+      const [{ attachments }] = mockSendMessage.mock.calls[0]!;
+      expect(attachments).toEqual([
+        {
+          fileName: "gewerbeanmeldung-beleg.pdf",
+          mimeType: "application/pdf",
+          content: Buffer.from(json.gewerbeanmeldung.pdfReceiptBase64, "base64"),
+        },
+      ]);
+    });
   });
 
   describe("fseÜbermittlung submissionId", () => {
