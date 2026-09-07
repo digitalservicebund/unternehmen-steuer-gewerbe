@@ -205,6 +205,136 @@ describe("Route /api/v1/region/{plz} with mocked upstreams", () => {
       expect(body.supported).toBe(false);
     });
 
+    it("returns supported:true for Am Ende 3 in 01277 Dresden", async () => {
+      // PVOG resolves this address to two ARS: Dresden and, spuriously, Delligsen in Niedersachsen
+      mockGetLocationsDetails.mockResolvedValue([
+        {
+          ars: "146120000000",
+          arsFederalstate: "14",
+          name: "Dresden 'Gruna'",
+          gemeinde: "Stadt Dresden",
+          plz: "01277",
+          strasse: "Am Ende",
+          koordinaten: ["13.79163", "51.033696"],
+        },
+        {
+          ars: "032550008008",
+          arsFederalstate: "03",
+          name: "Delligsen 'Ammensen'",
+          gemeinde: "Delligsen, Flecken",
+          plz: "31073",
+          strasse: "Am Ende",
+          hausnummer: "3",
+          koordinaten: ["9.854299", "51.908625"],
+        },
+      ]);
+      mockGetGewerbeamt.mockImplementation(async (ars: string) => {
+        if (ars === "146120000000") {
+          return {
+            name: "Abteilung Gewerbeangelegenheiten",
+            adresse: {
+              strasse: "Augsburger Straße",
+              hausnummer: "3",
+              postleitzahl: "01309",
+              ort: "Dresden",
+            },
+            telefon: "+49 351 4885811",
+            email: "gewerbeangelegenheiten@dresden.de",
+          };
+        }
+        return {
+          name: "Flecken Delligsen - Fachbereich 1 Bürger-Service",
+          adresse: {
+            strasse: "Schulstraße",
+            hausnummer: "2",
+            postleitzahl: "31073",
+            ort: "Delligsen",
+          },
+          onlineServices: [
+            {
+              title: "SEPA-Lastschriftmandat",
+              description:
+                "Haben Sie ein Servicekonto Niedersachsen eingerichtet, können Sie den gesamten Vorgang Online einreichen. Die Einrichtung eines Servicekontos Niedersachsen ist kostenlos.\nSollte dieses nicht der Fall sein, können Sie Online Ihr SEPA-Lastschriftmandat ausfüllen, müssen dieses aber ausdrucken und anschließend unterschrieben bei uns einreichen. Eine Unterschrift ist zwingend erforderlich.",
+              uri: "https://www.delligsen.de/buergerservice/online/angebot/sepa-lastschriftmandat-900000003-25601.html",
+            },
+            {
+              title:
+                "Netzwerk Einheitlicher Ansprechpartner der EU-DLR für die Unterstützung der einfachen Abwicklung von Verwaltungsverfahren nutzen",
+              uri: "https://bcl.efa.niedersachsen.de/?verfahrenId=3998&startAPI=https%253A%252F%252Fwww.navo.niedersachsen.de%252Fnavo2%252Fportal%252Fa3start%252F242060%252Fapi1#/intro",
+            },
+            {
+              title: "Gewerbean-, um- und abmeldung",
+              description: "Gewerbe anmelden, ummelden oder abmelden",
+              uri: "https://www.delligsen.de/buergerservice/online/angebot/gewerbean-um-und-abmeldung-900000031-25601.html",
+            },
+          ],
+        };
+      });
+      mockGetFinanzamtId.mockReturnValue(["FA-DD-SUED"]);
+      mockGetFinanzamtDetailsById.mockReturnValue({
+        name: "Finanzamt Dresden-Süd",
+        hausanschrift: {
+          strasse: "Rabenerstraße",
+          hausnummer: "1",
+          postleitzahl: "01069",
+          ort: "Dresden",
+        },
+        telefonnummer: "0351 4691-0",
+      });
+
+      const response = await app.request(
+        "/api/v1/region/01277?ort=Dresden&strasse=Am+Ende&hausnummer=3&getAllOffices=true",
+      );
+      const body = (await response.json()) as RegionResponseBody;
+
+      expect(body.supported).toBe(true);
+    });
+
+    it("returns supported:true for Wiesenstr. 1 in 01277 Dresden", async () => {
+      // "Name" is not plain "Dresden", but "Dresden 'Gruna'"
+      mockGetLocationsDetails.mockResolvedValue([
+        {
+          ars: "146120000000",
+          arsFederalstate: "14",
+          name: "Dresden 'Gruna'",
+          gemeinde: "Stadt Dresden",
+          plz: "01277",
+          strasse: "Wiesenstraße",
+          hausnummer: "1",
+          koordinaten: ["13.778885", "51.035315"],
+        },
+      ]);
+      mockGetGewerbeamt.mockResolvedValue({
+        name: "Abteilung Gewerbeangelegenheiten",
+        adresse: {
+          strasse: "Augsburger Straße",
+          hausnummer: "3",
+          postleitzahl: "01309",
+          ort: "Dresden",
+        },
+        telefon: "+49 351 4885811",
+        email: "gewerbeangelegenheiten@dresden.de",
+      });
+      mockGetFinanzamtId.mockReturnValue(["FA-DD-SUED"]);
+      mockGetFinanzamtDetailsById.mockReturnValue({
+        name: "Finanzamt Dresden-Süd",
+        hausanschrift: {
+          strasse: "Rabenerstraße",
+          hausnummer: "1",
+          postleitzahl: "01069",
+          ort: "Dresden",
+        },
+        telefonnummer: "0351 4691-0",
+      });
+
+      const response = await app.request(
+        "/api/v1/region/01277?ort=Dresden&strasse=Wiesenstr.&hausnummer=1",
+      );
+      const body = (await response.json()) as RegionResponseBody;
+
+      expect(body.supported).toBe(true);
+    });
+
     it("returns the responsible Gewerbeamt and Finanzamt for an unsupported Kommune", async () => {
       const { body } = await requestRegionResolvingTo("89073", ["084210000000"]);
 

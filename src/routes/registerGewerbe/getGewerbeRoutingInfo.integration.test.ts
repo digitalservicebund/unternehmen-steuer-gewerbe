@@ -7,22 +7,28 @@ const {
   mockVerifyDestinationSignature,
   mockDestinationIdOverride,
   mockArsOverride,
-} = vi.hoisted(() => ({
-  mockGetLocationsDetails: vi
-    .fn()
-    .mockResolvedValue([{ ars: "030460014004", name: "Cottbus, Stadt", plz: "03046" }]),
-  mockGetGewerbeamt: vi.fn().mockResolvedValue({
+  stadtFuldaGewerbeamt,
+} = vi.hoisted(() => {
+  const stadtFuldaGewerbeamt = {
     name: "Stadt Fulda",
     adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
     telefon: "0661 102-0",
     onlineServices: [],
-  }),
-  mockGetRoutes: vi.fn().mockResolvedValue({ count: 0, offset: 0, totalCount: 0, routes: [] }),
-  mockVerifyDestinationSignature: vi.fn().mockResolvedValue(undefined),
-  // unset env vars resolve to an empty string
-  mockDestinationIdOverride: vi.fn().mockReturnValue(""),
-  mockArsOverride: vi.fn().mockReturnValue(""),
-}));
+  };
+
+  return {
+    mockGetLocationsDetails: vi
+      .fn()
+      .mockResolvedValue([{ ars: "030460014004", name: "Cottbus, Stadt", plz: "03046" }]),
+    mockGetGewerbeamt: vi.fn().mockResolvedValue(stadtFuldaGewerbeamt),
+    mockGetRoutes: vi.fn().mockResolvedValue({ count: 0, offset: 0, totalCount: 0, routes: [] }),
+    mockVerifyDestinationSignature: vi.fn().mockResolvedValue(undefined),
+    // unset env vars resolve to an empty string
+    mockDestinationIdOverride: vi.fn().mockReturnValue(""),
+    mockArsOverride: vi.fn().mockReturnValue(""),
+    stadtFuldaGewerbeamt,
+  };
+});
 
 vi.mock("../../clients/pvogClient", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../../clients/pvogClient")>()),
@@ -56,6 +62,34 @@ vi.mock("../../secretsAndEnvironmentVariables", async (importOriginal) => {
 import { getGewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
 import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
 
+const marktstrasse1Husum = {
+  strasse: "Marktstraße",
+  hausnummer: "1",
+  postleitzahl: "25813",
+  ort: "Husum",
+};
+const expectedMarktstrasseLookup = {
+  plz: "25813",
+  ort: "Husum",
+  strasse: "Marktstraße",
+  hausnummer: "1",
+};
+const dorfstrasse1Luetjenholm = {
+  strasseUndHausnummer: "Dorfstraße 1",
+  postleitzahl: "25842",
+  ort: "Lütjenholm",
+};
+const expectedDorfstrasseLookup = {
+  plz: "25842",
+  ort: "Lütjenholm",
+  strasse: "Dorfstraße",
+  hausnummer: "1",
+};
+const singleRouteFixture = {
+  destinationId: "mock-destination-id",
+  destinationSignature: "sig.nat.ure",
+};
+
 describe("getGewerbeRoutingInfo", () => {
   describe("AGS (Amtlicher Gemeindeschlüssel)", () => {
     it("uses persönlicheDaten.adresse.postleitzahl when neither adresse nor adresseAbweichend is set", async () => {
@@ -71,12 +105,7 @@ describe("getGewerbeRoutingInfo", () => {
         },
       });
 
-      expect(mockGetLocationsDetails).toHaveBeenCalledWith({
-        plz: "25813",
-        ort: "Husum",
-        strasse: "Marktstraße",
-        hausnummer: "1",
-      });
+      expect(mockGetLocationsDetails).toHaveBeenCalledWith(expectedMarktstrasseLookup);
     });
 
     it("uses adresseAbweichend.postleitzahl when provided", async () => {
@@ -84,20 +113,11 @@ describe("getGewerbeRoutingInfo", () => {
         ...registerGewerbeSampleRequestAllFieldsFilled,
         unternehmensDaten: {
           ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-          adresseAbweichend: {
-            strasseUndHausnummer: "Dorfstraße 1",
-            postleitzahl: "25842",
-            ort: "Lütjenholm",
-          },
+          adresseAbweichend: dorfstrasse1Luetjenholm,
         },
       });
 
-      expect(mockGetLocationsDetails).toHaveBeenCalledWith({
-        plz: "25842",
-        ort: "Lütjenholm",
-        strasse: "Dorfstraße",
-        hausnummer: "1",
-      });
+      expect(mockGetLocationsDetails).toHaveBeenCalledWith(expectedDorfstrasseLookup);
     });
 
     it("passes adresse.strasse and adresse.hausnummer to the location lookup", async () => {
@@ -105,21 +125,11 @@ describe("getGewerbeRoutingInfo", () => {
         ...registerGewerbeSampleRequestAllFieldsFilled,
         unternehmensDaten: {
           ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-          adresse: {
-            strasse: "Marktstraße",
-            hausnummer: "1",
-            postleitzahl: "25813",
-            ort: "Husum",
-          },
+          adresse: marktstrasse1Husum,
         },
       });
 
-      expect(mockGetLocationsDetails).toHaveBeenCalledWith({
-        plz: "25813",
-        ort: "Husum",
-        strasse: "Marktstraße",
-        hausnummer: "1",
-      });
+      expect(mockGetLocationsDetails).toHaveBeenCalledWith(expectedMarktstrasseLookup);
     });
 
     // A Hausnummer-Zusatz makes the PVOG full-text search pick a different municipality for
@@ -151,26 +161,12 @@ describe("getGewerbeRoutingInfo", () => {
         ...registerGewerbeSampleRequestAllFieldsFilled,
         unternehmensDaten: {
           ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-          adresse: {
-            strasse: "Marktstraße",
-            hausnummer: "1",
-            postleitzahl: "25813",
-            ort: "Husum",
-          },
-          adresseAbweichend: {
-            strasseUndHausnummer: "Dorfstraße 1",
-            postleitzahl: "25842",
-            ort: "Lütjenholm",
-          },
+          adresse: marktstrasse1Husum,
+          adresseAbweichend: dorfstrasse1Luetjenholm,
         },
       });
 
-      expect(mockGetLocationsDetails).toHaveBeenCalledWith({
-        plz: "25813",
-        ort: "Husum",
-        strasse: "Marktstraße",
-        hausnummer: "1",
-      });
+      expect(mockGetLocationsDetails).toHaveBeenCalledWith(expectedMarktstrasseLookup);
     });
 
     it("returns undefined when no location is found for the address", async () => {
@@ -187,12 +183,7 @@ describe("getGewerbeRoutingInfo", () => {
       const result = await getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled);
 
       expect(mockGetGewerbeamt).toHaveBeenCalledWith("030460014004");
-      expect(result!.gewerbeamt).toEqual({
-        name: "Stadt Fulda",
-        adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
-        telefon: "0661 102-0",
-        onlineServices: [],
-      });
+      expect(result!.gewerbeamt).toEqual(stadtFuldaGewerbeamt);
     });
 
     it("propagates any error from the Gewerbeamt lookup", async () => {
@@ -225,8 +216,8 @@ describe("getGewerbeRoutingInfo", () => {
         offset: 0,
         totalCount: 1,
         routes: [
-          { destinationId: "mock-destination-id", destinationSignature: "sig.nat.ure" },
-          { destinationId: "mock-destination-id2", destinationSignature: "sig.nat.ure" },
+          singleRouteFixture,
+          { ...singleRouteFixture, destinationId: "mock-destination-id2" },
         ],
       });
 
@@ -249,7 +240,7 @@ describe("getGewerbeRoutingInfo", () => {
         count: 1,
         offset: 0,
         totalCount: 1,
-        routes: [{ destinationId: "mock-destination-id", destinationSignature: "sig.nat.ure" }],
+        routes: [singleRouteFixture],
       });
 
       await getGewerbeRoutingInfo(registerGewerbeSampleRequestAllFieldsFilled);
@@ -267,7 +258,7 @@ describe("getGewerbeRoutingInfo", () => {
         count: 1,
         offset: 0,
         totalCount: 1,
-        routes: [{ destinationId: "mock-destination-id", destinationSignature: "sig.nat.ure" }],
+        routes: [singleRouteFixture],
       });
       mockVerifyDestinationSignature.mockRejectedValueOnce(new Error("untrusted issuer"));
 

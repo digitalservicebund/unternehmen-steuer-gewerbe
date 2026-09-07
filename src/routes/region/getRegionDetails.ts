@@ -62,6 +62,25 @@ function limitToBestMatch<T>(matches: T[]): T[] {
   return bestMatch === undefined ? [] : [bestMatch];
 }
 
+// PVOG names a location after its Ortsteil, e.g. "Dresden 'Gruna'", not the Kommune itself, so
+// matching the Kommune requires the gemeinde field instead of name.
+const GEMEINDE_STADT_DRESDEN = "Stadt Dresden";
+
+function limitGewerbeamtToBestMatch<T>(matches: T[], locationQuery: LocationQuery): T[] {
+  // Dresden override:
+  // If the query is for some Dresden address and the locations contain an entry for Dresden: return it
+  if (locationQuery.ort === "Dresden") {
+    const dresdenMatch = matches.find(
+      (e) => (e as LocationDetails).gemeinde === GEMEINDE_STADT_DRESDEN,
+    );
+    if (dresdenMatch) {
+      return [dresdenMatch];
+    }
+  }
+
+  return limitToBestMatch(matches);
+}
+
 /**
  * Get the ARS of every Kommune the given PLZ, ort, street and house number resolve to, plus the
  * responsible Finanzämter and Gewerbeämter.
@@ -75,14 +94,27 @@ export async function getRegionDetails(
   getAllOffices: boolean,
 ): Promise<RegionDetails> {
   const allFinanzamtIds = getAllFinanzamtIds(locationQuery);
-  const allLocations = await getAllLocations(locationQuery);
+  const allGewerbeamtLocations = await getAllLocations(locationQuery);
 
-  const arsList = allLocations.map((location) => location.ars);
+  const arsListGewerbeamt = allGewerbeamtLocations.map((location) => location.ars);
 
   const selectedFinanzamtIds = getAllOffices ? allFinanzamtIds : limitToBestMatch(allFinanzamtIds);
-  const selectedLocations = getAllOffices ? allLocations : limitToBestMatch(allLocations);
+  const selectedLocationsGewerbeamt = getAllOffices
+    ? allGewerbeamtLocations
+    : limitGewerbeamtToBestMatch(allGewerbeamtLocations, locationQuery); // incl. Dresden override
 
   const finanzaemter = createFinanzaemterOfficeDetails(selectedFinanzamtIds);
-  const gewerbeaemter = await createGewerbeaemterOfficeDetails(selectedLocations);
-  return { arsList, finanzaemter, gewerbeaemter };
+  const gewerbeaemter = await createGewerbeaemterOfficeDetails(selectedLocationsGewerbeamt);
+
+  // City of Dresden override
+  if (locationQuery.ort === "Dresden") {
+    const arsListGewerbeamtDresden = allGewerbeamtLocations
+      .filter((location) => location.gemeinde === GEMEINDE_STADT_DRESDEN)
+      .map((location) => location.ars);
+    // none of the matches may belong to the city of Dresden, in which case we fall back to the default result
+    if (arsListGewerbeamtDresden.length > 0)
+      return { arsList: arsListGewerbeamtDresden, finanzaemter, gewerbeaemter };
+  }
+
+  return { arsList: arsListGewerbeamt, finanzaemter, gewerbeaemter };
 }

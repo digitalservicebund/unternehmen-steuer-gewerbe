@@ -1,7 +1,16 @@
 import { describe, it, expect } from "vitest";
 import { transformToGewerbeanmeldung } from "./transformToGewerbeanmeldung";
 import { type CreateGewerbeanmeldungXmlData } from "../../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
-import { registerGewerbeSampleRequestAllFieldsFilled } from "../testHelpers";
+import {
+  registerGewerbeSampleRequestAllFieldsFilled,
+  withUnternehmensDatenOverrides,
+  withPersönlicheDatenOverrides,
+  adresseBerlinHausnummerRange,
+  adresseFuldaHausnummerRange,
+  adresseTestorfSteinfortMitZusatz,
+  adresseTestorfSteinfortOhneZusatz,
+  adresseAbweichendCoburg,
+} from "../testHelpers";
 
 const testRoutingInfo = {
   ags: "03046001",
@@ -14,13 +23,7 @@ const testRoutingInfoHamburg = { ...testRoutingInfo, ags: "02000000" };
 describe("transformToGewerbeanmeldung", () => {
   it("falls back to persönlicheDaten.adresse as betriebsstaette anschrift when adresseAbweichend is not given", () => {
     const result = transformToGewerbeanmeldung(
-      {
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        unternehmensDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-          adresseAbweichend: undefined,
-        },
-      },
+      withUnternehmensDatenOverrides({ adresseAbweichend: undefined }),
       testRoutingInfo,
     );
 
@@ -57,13 +60,7 @@ describe("transformToGewerbeanmeldung", () => {
 
   it("omits natuerlichePerson.geburtsname when geburtsname is not given", () => {
     const result = transformToGewerbeanmeldung(
-      {
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        persönlicheDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
-          geburtsname: undefined,
-        },
-      },
+      withPersönlicheDatenOverrides({ geburtsname: undefined }),
       testRoutingInfo,
     );
 
@@ -104,14 +101,7 @@ describe("transformToGewerbeanmeldung", () => {
 
   it("falls back to 'keine Angabe' for geburt.ort and geburt.staat when geburtsort and geburtsland are not given", () => {
     const result = transformToGewerbeanmeldung(
-      {
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        persönlicheDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
-          geburtsort: undefined,
-          geburtsland: undefined,
-        },
-      },
+      withPersönlicheDatenOverrides({ geburtsort: undefined, geburtsland: undefined }),
       testRoutingInfo,
     );
     const { geburt } = result.referenzierteSubjekte!.natuerlichePerson![0]!;
@@ -127,13 +117,7 @@ describe("transformToGewerbeanmeldung", () => {
     "maps geschlecht $geschlecht to the XInneres code $expected",
     ({ geschlecht, expected }) => {
       const result = transformToGewerbeanmeldung(
-        {
-          ...registerGewerbeSampleRequestAllFieldsFilled,
-          persönlicheDaten: {
-            ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
-            geschlecht,
-          },
-        },
+        withPersönlicheDatenOverrides({ geschlecht }),
         testRoutingInfo,
       );
 
@@ -149,13 +133,7 @@ describe("transformToGewerbeanmeldung", () => {
     expect(deutsch.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe("000");
 
     const französisch = transformToGewerbeanmeldung(
-      {
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        persönlicheDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
-          staatsangehörigkeit: "französisch",
-        },
-      },
+      withPersönlicheDatenOverrides({ staatsangehörigkeit: "französisch" }),
       testRoutingInfo,
     );
     expect(französisch.referenzierteSubjekte!.natuerlichePerson![0]!.staatsangehoerigkeit).toBe(
@@ -172,13 +150,7 @@ describe("transformToGewerbeanmeldung", () => {
     "maps the staatsangehörigkeitIcao $icao to the destatis code $expected",
     ({ icao, expected }) => {
       const result = transformToGewerbeanmeldung(
-        {
-          ...registerGewerbeSampleRequestAllFieldsFilled,
-          persönlicheDaten: {
-            ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
-            staatsangehörigkeitIcao: icao,
-          },
-        },
+        withPersönlicheDatenOverrides({ staatsangehörigkeitIcao: icao }),
         testRoutingInfo,
       );
 
@@ -190,14 +162,10 @@ describe("transformToGewerbeanmeldung", () => {
 
   it("prefers staatsangehörigkeitIcao over the deprecated staatsangehörigkeit", () => {
     const result = transformToGewerbeanmeldung(
-      {
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        persönlicheDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
-          staatsangehörigkeit: "französisch",
-          staatsangehörigkeitIcao: "ITA",
-        },
-      },
+      withPersönlicheDatenOverrides({
+        staatsangehörigkeit: "französisch",
+        staatsangehörigkeitIcao: "ITA",
+      }),
       testRoutingInfo,
     );
 
@@ -220,17 +188,13 @@ describe("transformToGewerbeanmeldung", () => {
 
   it("uses adresseAbweichend as betriebsstaette anschrift when provided", () => {
     const result = transformToGewerbeanmeldung(
-      {
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        unternehmensDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-          adresseAbweichend: {
-            strasseUndHausnummer: "Betriebsweg 42a",
-            postleitzahl: "23936",
-            ort: "Testorf-Steinfort",
-          },
+      withUnternehmensDatenOverrides({
+        adresseAbweichend: {
+          strasseUndHausnummer: "Betriebsweg 42a",
+          postleitzahl: "23936",
+          ort: "Testorf-Steinfort",
         },
-      },
+      }),
       testRoutingInfo,
     );
 
@@ -244,18 +208,7 @@ describe("transformToGewerbeanmeldung", () => {
 
   it("uses adresse as betriebsstaette anschrift when provided", () => {
     const result = transformToGewerbeanmeldung(
-      {
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        unternehmensDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-          adresse: {
-            strasse: "Betriebsweg",
-            hausnummer: "42",
-            postleitzahl: "23936",
-            ort: "Testorf-Steinfort",
-          },
-        },
-      },
+      withUnternehmensDatenOverrides({ adresse: adresseTestorfSteinfortOhneZusatz }),
       testRoutingInfo,
     );
 
@@ -269,18 +222,7 @@ describe("transformToGewerbeanmeldung", () => {
 
   it("maps the hausnummer 8-14 to hausnummerVon 8 and hausnummerBis 14", () => {
     const result = transformToGewerbeanmeldung(
-      {
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        unternehmensDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-          adresse: {
-            strasse: "Prinzessinnenstraße",
-            hausnummer: "8-14",
-            postleitzahl: "10969",
-            ort: "Berlin",
-          },
-        },
-      },
+      withUnternehmensDatenOverrides({ adresse: adresseBerlinHausnummerRange }),
       testRoutingInfo,
     );
 
@@ -295,18 +237,7 @@ describe("transformToGewerbeanmeldung", () => {
 
   it("maps the hausnummer 1C-1E to hausnummerVon 1C and hausnummerBis 1E", () => {
     const result = transformToGewerbeanmeldung(
-      {
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        unternehmensDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-          adresse: {
-            strasse: "Domstraße",
-            hausnummer: "1C-1E",
-            postleitzahl: "36037",
-            ort: "Fulda",
-          },
-        },
-      },
+      withUnternehmensDatenOverrides({ adresse: adresseFuldaHausnummerRange }),
       testRoutingInfo,
     );
 
@@ -321,18 +252,7 @@ describe("transformToGewerbeanmeldung", () => {
 
   it("appends the hausnummer Zusatz to hausnummerVon for 42a", () => {
     const result = transformToGewerbeanmeldung(
-      {
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        unternehmensDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-          adresse: {
-            strasse: "Betriebsweg",
-            hausnummer: "42a",
-            postleitzahl: "23936",
-            ort: "Testorf-Steinfort",
-          },
-        },
-      },
+      withUnternehmensDatenOverrides({ adresse: adresseTestorfSteinfortMitZusatz }),
       testRoutingInfo,
     );
 
@@ -346,23 +266,10 @@ describe("transformToGewerbeanmeldung", () => {
 
   it("prefers adresse over adresseAbweichend", () => {
     const result = transformToGewerbeanmeldung(
-      {
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        unternehmensDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-          adresse: {
-            strasse: "Betriebsweg",
-            hausnummer: "42",
-            postleitzahl: "23936",
-            ort: "Testorf-Steinfort",
-          },
-          adresseAbweichend: {
-            strasseUndHausnummer: "Musterstraße 2 a",
-            postleitzahl: "96450",
-            ort: "Coburg",
-          },
-        },
-      },
+      withUnternehmensDatenOverrides({
+        adresse: adresseTestorfSteinfortOhneZusatz,
+        adresseAbweichend: adresseAbweichendCoburg,
+      }),
       testRoutingInfo,
     );
 
@@ -376,13 +283,7 @@ describe("transformToGewerbeanmeldung", () => {
 
   it("maps geschäftsbezeichnung to gewerbebetrieb.geschaeftsbezeichnung", () => {
     const result = transformToGewerbeanmeldung(
-      {
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        unternehmensDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-          geschäftsbezeichnung: "Musterhandel Schmidt",
-        },
-      },
+      withUnternehmensDatenOverrides({ geschäftsbezeichnung: "Musterhandel Schmidt" }),
       testRoutingInfo,
     );
 
@@ -391,13 +292,7 @@ describe("transformToGewerbeanmeldung", () => {
 
   it("omits gewerbebetrieb.geschaeftsbezeichnung when geschäftsbezeichnung is not given", () => {
     const result = transformToGewerbeanmeldung(
-      {
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        unternehmensDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-          geschäftsbezeichnung: undefined,
-        },
-      },
+      withUnternehmensDatenOverrides({ geschäftsbezeichnung: undefined }),
       testRoutingInfo,
     );
 
@@ -415,14 +310,10 @@ describe("transformToGewerbeanmeldung", () => {
 
   it("maps anzahlVollzeitBeschaeftigte and anzahlTeilzeitBeschaeftigte to gewerbebetrieb", () => {
     const result = transformToGewerbeanmeldung(
-      {
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        unternehmensDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-          anzahlVollzeitBeschaeftigte: 3,
-          anzahlTeilzeitBeschaeftigte: 4,
-        },
-      },
+      withUnternehmensDatenOverrides({
+        anzahlVollzeitBeschaeftigte: 3,
+        anzahlTeilzeitBeschaeftigte: 4,
+      }),
       testRoutingInfo,
     );
 
@@ -441,17 +332,13 @@ describe("transformToGewerbeanmeldung", () => {
 
   it("derives the Hamburg gemeindeschluesselErgaenzung 02100000 from adresseAbweichend.postleitzahl 22767", () => {
     const result = transformToGewerbeanmeldung(
-      {
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        unternehmensDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-          adresseAbweichend: {
-            strasseUndHausnummer: "Reeperbahn 1",
-            postleitzahl: "22767",
-            ort: "Hamburg",
-          },
+      withUnternehmensDatenOverrides({
+        adresseAbweichend: {
+          strasseUndHausnummer: "Reeperbahn 1",
+          postleitzahl: "22767",
+          ort: "Hamburg",
         },
-      },
+      }),
       testRoutingInfoHamburg,
     );
 
@@ -460,18 +347,9 @@ describe("transformToGewerbeanmeldung", () => {
 
   it("derives the Hamburg gemeindeschluesselErgaenzung 02100000 from adresse.postleitzahl 22767", () => {
     const result = transformToGewerbeanmeldung(
-      {
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        unternehmensDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-          adresse: {
-            strasse: "Reeperbahn",
-            hausnummer: "1",
-            postleitzahl: "22767",
-            ort: "Hamburg",
-          },
-        },
-      },
+      withUnternehmensDatenOverrides({
+        adresse: { strasse: "Reeperbahn", hausnummer: "1", postleitzahl: "22767", ort: "Hamburg" },
+      }),
       testRoutingInfoHamburg,
     );
 
@@ -490,17 +368,13 @@ describe("transformToGewerbeanmeldung", () => {
 
   it("leaves gemeindeschluesselErgaenzung undefined for unmapped Hamburg PLZ 20000", () => {
     const result = transformToGewerbeanmeldung(
-      {
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        unternehmensDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
-          adresseAbweichend: {
-            strasseUndHausnummer: "Musterstraße 1",
-            postleitzahl: "20000",
-            ort: "Hamburg",
-          },
+      withUnternehmensDatenOverrides({
+        adresseAbweichend: {
+          strasseUndHausnummer: "Musterstraße 1",
+          postleitzahl: "20000",
+          ort: "Hamburg",
         },
-      },
+      }),
       testRoutingInfoHamburg,
     );
 

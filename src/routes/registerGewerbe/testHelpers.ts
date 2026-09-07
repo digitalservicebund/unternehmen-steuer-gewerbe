@@ -78,6 +78,64 @@ export const registerGewerbeSampleRequestAllFieldsFilled: RegisterGewerbeRequest
   },
 };
 
+export function withUnternehmensDatenOverrides(
+  overrides: Partial<RegisterGewerbeRequest["unternehmensDaten"]>,
+): RegisterGewerbeRequest {
+  return {
+    ...registerGewerbeSampleRequestAllFieldsFilled,
+    unternehmensDaten: {
+      ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+      ...overrides,
+    },
+  };
+}
+
+export function withPersönlicheDatenOverrides(
+  overrides: Partial<RegisterGewerbeRequest["persönlicheDaten"]>,
+): RegisterGewerbeRequest {
+  return {
+    ...registerGewerbeSampleRequestAllFieldsFilled,
+    persönlicheDaten: {
+      ...registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten,
+      ...overrides,
+    },
+  };
+}
+
+export const adresseBerlinHausnummerRange = {
+  strasse: "Prinzessinnenstraße",
+  hausnummer: "8-14",
+  postleitzahl: "10969",
+  ort: "Berlin",
+};
+
+export const adresseFuldaHausnummerRange = {
+  strasse: "Domstraße",
+  hausnummer: "1C-1E",
+  postleitzahl: "36037",
+  ort: "Fulda",
+};
+
+export const adresseTestorfSteinfortMitZusatz = {
+  strasse: "Betriebsweg",
+  hausnummer: "42a",
+  postleitzahl: "23936",
+  ort: "Testorf-Steinfort",
+};
+
+export const adresseTestorfSteinfortOhneZusatz = {
+  strasse: "Betriebsweg",
+  hausnummer: "42",
+  postleitzahl: "23936",
+  ort: "Testorf-Steinfort",
+};
+
+export const adresseAbweichendCoburg = {
+  strasseUndHausnummer: "Musterstraße 2 a",
+  postleitzahl: "96450",
+  ort: "Coburg",
+};
+
 export function gewerbeanmeldungFixture(): CreateGewerbeanmeldungXmlData {
   const personId = "3f2b1b8e-6a51-4d0f-9f3f-2a5f0f0a1b2c";
 
