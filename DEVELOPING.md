@@ -1,5 +1,11 @@
 # Developing
 
+## Prerequisites
+
+- Node.js `26.5.0` (see `engines` in [`package.json`](./package.json))
+- pnpm `11.13.1` (see `packageManager`; `corepack enable` picks up the pinned version)
+- Optional: Docker (for `build:image` / `start:image`) and the [1Password CLI](https://developer.1password.com/docs/cli/) — `op` is needed to run the API locally and for the contract and load tests, but not for the unit and integration tests
+
 ## Using Git Hooks (DO NOT SKIP as a contributor)
 
 We use GitHooks to prevent some problems from reaching the remote repository. This includes _security-related_ issues.
@@ -71,6 +77,17 @@ pnpm run start:image
 
 ## Running the Tests
 
+A test's file name suffix decides its tier, and each tier has its own vitest config. See
+[ADR 0004](./doc/adr/adr-0004-testing-and-qa.md) for the reasoning behind them.
+
+- `*.unit.test.ts` — one unit under test, all externals mocked, no network
+- `*.integration.test.ts` — the app driven through `app.request(...)` with all API clients mocked, no network
+- `*.contract.test.ts` — the only tier that calls the real test endpoints of the services we depend on (PVOG, FIT-Connect, ELSTER/ERiC, OSCI)
+- `*.load.test.ts` / `*.smoke.test.ts` — concurrency behavior, and health of a deployment
+
+Unit and integration tests are the tiers that gate a merge. They need neither secrets nor
+network access:
+
 ```bash
 pnpm run test
 ```
@@ -81,11 +98,14 @@ or in watch mode, restarting on changes
 pnpm run test:watch
 ```
 
+Contract and load tests talk to third parties and therefore need credentials, which is why
+those scripts go through `op run`.
+
 For CI scenarios there are more test-related NPM scripts. See the list below.
 
 ### Running Tests in VSCodium/VSCode with secrets stored in 1Password
 
-The VSCode test runner is not able to read required secrets from 1Password. As a workaround, you can make make the test runner use a (1Password-aware) wrapper script instead of plain `node`. In order to do so, add this to your settings:
+Only relevant for the contract and load tests — the other tiers need no secrets. The VSCode test runner is not able to read secrets from 1Password. As a workaround, you can make the test runner use a (1Password-aware) wrapper script instead of plain `node`. In order to do so, add this to your settings:
 
 `"vitest.nodeExecutable": "vitest.wrapper.sh",`
 
@@ -103,16 +123,16 @@ The VSCode test runner is not able to read required secrets from 1Password. As a
 - `start` — Start API locally via tsx (no building involved)
 - `start:image` — Start API via Docker (built via `build:image`)
 - `start:watch` — Start API locally via nodemon, restart on changes to TS, JSON, YAML, MD files
-- `test` — Run all tests once (unit + integration)
-- `test:unit` — Run only unit tests (`*.unit.test.ts`, mocked/no network, no secrets needed)
-- `test:unit:ci` — Same as `test:unit` but without 1Password secrets injection, plus coverage and a blob report for later merging (for CI)
-- `test:integration` — Run only integration tests (`*.integration.test.ts`, real network calls)
-- `test:integration:ci` — Same as `test:integration` but without 1Password secrets injection, plus coverage and a blob report for later merging (for CI)
-- `test:contract` — Run only contract tests (`*.contract.test.ts`), via 1Password
-- `test:contract:ci` — Same as `test:contract` but without 1Password secrets injection, plus coverage and a blob report for later merging (for CI)
-- `test:coverage:merge` — Merge the unit, integration, and contract blob reports from `.vitest-reports/` into a single coverage report at `./coverage/` (lcov for SonarCloud); used in CI after the test jobs complete
+- `test` — Run the merge-gating tests once (unit + integration)
+- `test:unit` — Run only unit tests (`*.unit.test.ts`, all externals mocked, no network, no secrets)
+- `test:unit:ci` — Same as `test:unit`, plus coverage and a blob report for later merging (for CI)
+- `test:integration` — Run only integration tests (`*.integration.test.ts`, all API clients mocked, no network, no secrets)
+- `test:integration:ci` — Same as `test:integration`, plus coverage and a blob report for later merging (for CI)
+- `test:contract` — Run only contract tests (`*.contract.test.ts`, real third-party test endpoints); needs credentials, injected via 1Password
+- `test:contract:ci` — Same as `test:contract` but with credentials from the CI environment instead of 1Password, plus coverage and a blob report (for CI); runs on a schedule, not in the commit pipeline
+- `test:coverage:merge` — Merge the unit and integration blob reports from `.vitest-reports/` into a single coverage report at `./coverage/` (lcov for SonarCloud); used in CI after the test jobs complete
 - `test:load` — Run load tests once
 - `test:load:ci` — Same as `test:load` but without 1Password secrets injection (for CI)
 - `test:smoke:ci` — Run smoke tests (CI only, no 1Password)
-- `test:coverage` — Run all tests once, report coverage to console and `./coverage/` (lcov for SonarCloud)
+- `test:coverage` — Run unit and integration tests once, report coverage to console and `./coverage/` (lcov for SonarCloud)
 - `test:watch` — Run tests, restart on code changes
