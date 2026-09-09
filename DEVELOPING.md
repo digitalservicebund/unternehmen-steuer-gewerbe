@@ -43,9 +43,9 @@ This is a one-time setup per machine. Once set up, `pnpm install` is all that's 
 
 In production, secrets and environment variables are exclusively provided through a secrets manager.
 
-For local development and testing, [`.env`](.env) is read. See [`.env.example`](.env.example) for details.
+For local development and testing, [`.env`](.env) is read. See [`.env.example`](.env.example) for details — `cp .env.example .env` is enough to run the unit and integration tests.
 
-We strongly recommend against storing plaintext secrets in either of these files. Use a tool like [1Password](https://developer.1password.com/docs/cli/secrets-environment-variables/) instead.
+We strongly recommend against storing plaintext secrets in either of these files. Use a tool like [1Password](https://developer.1password.com/docs/cli/secrets-environment-variables/) instead: the scripts that do need real secrets (running the API, contract and load tests) resolve the `op://` references from `.env` through `op run`.
 
 ## Running the API (by default on port 3000)
 
@@ -85,8 +85,9 @@ A test's file name suffix decides its tier, and each tier has its own vitest con
 - `*.contract.test.ts` — the only tier that calls the real test endpoints of the services we depend on (PVOG, FIT-Connect, ELSTER/ERiC, OSCI)
 - `*.load.test.ts` / `*.smoke.test.ts` — concurrency behavior, and health of a deployment
 
-Unit and integration tests are the tiers that gate a merge. They need neither secrets nor
-network access:
+Unit and integration tests are the tiers that gate a merge. They need no secrets and make
+no network calls; a `.env` copied from `.env.example` is enough (`ERIC_HERSTELLERID` is read
+by a fail-fast guard that most route-level tests reach):
 
 ```bash
 pnpm run test
