@@ -12,20 +12,6 @@ on:
   # allow for running this workflow manually (button in GitHub Actions UI)
   workflow_dispatch:
 
-# On each branch, the latest commit cancels the pipelines of any earlier commits.
-#
-# Goal: The latest state is processed as quickly as possible.
-#       Especially great for `main` (change lead time, no concurrency issues).
-#
-# Other consequences:
-#   * The pipeline may be cancelled during / between deployments to dev and prod.
-#   * If the latest commit fails, the ones before don't make it to production.
-#   * We don't know the state (green/red) of the cancelled flows.
-#   * We don't spend pipeline minutes on (probably) outdated outcomes.
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 env:
   PROJECT_NAME: unternehmen-steuer-gewerbe
   CONTAINER_REGISTRY: ghcr.io
@@ -48,7 +34,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413
         name: Install pnpm
         with:
           cache: true
@@ -91,7 +77,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413
         name: Install pnpm
         with:
           cache: true
@@ -106,13 +92,10 @@ jobs:
       - name: Run unit tests (shard ${{ matrix.shard }}/${{ strategy.job-total }}) with coverage report
         run: pnpm run test:unit:ci --shard=${{ matrix.shard }}/${{ strategy.job-total }} --outputFile.blob=.vitest-reports/unit-tests-shard-${{ matrix.shard }}-of-${{ strategy.job-total }}.blob.json
         env:
-          # Not used for network calls in unit tests, but still required:
-          # - ERIC_HERSTELLERID is checked at import time (fail-fast guard in transformToFsE.ts),
-          #   and transitively imported by nearly every route-level unit test via app.ts.
-          # - the FIT_CONNECT JWKs are used by crypto.unit.test.ts for a real (local) encrypt/decrypt roundtrip.
+          # Not used for network calls in unit tests, but still required: ERIC_HERSTELLERID is
+          # checked by a fail-fast guard in transformToFsE.ts, which nearly every route-level
+          # unit test reaches transitively via app.ts.
           ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
-          FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK: ${{ vars.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK }}
-          FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK: ${{ secrets.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK }}
 
       - name: Upload coverage blob
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -132,7 +115,7 @@ jobs:
   test-integration:
     strategy:
       matrix:
-        shard: [1]
+        shard: [1, 2]
       fail-fast: false
     runs-on: ubuntu-latest
     permissions:
@@ -144,7 +127,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413
         name: Install pnpm
         with:
           cache: true
@@ -196,7 +179,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413
         name: Install pnpm
         with:
           cache: true
@@ -234,7 +217,7 @@ jobs:
       # Break pipeline on Sonar quality gate
       - name: SonarQube Quality Gate check
         id: sonarqube-quality-gate-check
-        uses: sonarsource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b
+        uses: sonarsource/sonarqube-quality-gate-action@7a5fffe8e523c40e0c740b6bc2712ab503e52efa
         with:
           pollingTimeoutSec: 600
         env:
@@ -260,7 +243,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413
         name: Install pnpm
         with:
           cache: true
@@ -297,8 +280,7 @@ jobs:
           scanners: "vuln,config,secret"
 
       - name: Convert Trivy results to sarif
-        run:
-          trivy convert --format sarif --output trivy-image-results.sarif trivy-image-results.json
+        run: trivy convert --format sarif --output trivy-image-results.sarif trivy-image-results.json
 
           # Not possible in public repo
       # - name: Upload Trivy scan results to GitHub Security tab (on `main`)
@@ -344,7 +326,7 @@ jobs:
 
       - name: Login to GitHub Container Registry
         if: github.ref == 'refs/heads/main'
-        uses: docker/login-action@06fb636fac595d6fb4b28a5dfcb21a6f5091859c # v4.5.0
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -407,7 +389,7 @@ jobs:
           name: vulnerabilities-attestation
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@06fb636fac595d6fb4b28a5dfcb21a6f5091859c # v4.5.0
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -474,11 +456,23 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
 
-  deploy-development:
-    name: Deploy to development environment
+  # Deploy-development, smoke-test and deploy-production are one job (not three) so the
+  # concurrency group below holds for the whole deploy phase. Splitting them into separate
+  # jobs would let a later run's deploy-development jump the queue ahead of an earlier run's
+  # smoke-test/deploy-production, since GitHub's concurrency FIFO only orders entries into a
+  # single job, not across a chain of jobs.
+  deploy:
+    name: Deploy to development and production environments
     needs: [publish-image]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    environment: development
+    permissions:
+      contents: read
+    concurrency:
+      group: deploy-${{ github.ref }}
+      cancel-in-progress: false
+      queue: max
     steps:
       - name: Deploy to development
         uses: digitalservicebund/argocd-deploy@e8f6b8f77c8b8eeef3f67fc5bba9521f89145645
@@ -493,22 +487,6 @@ jobs:
           argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
           argocd_server: ${{ secrets.ARGOCD_SERVER_STACKIT }}
 
-      - name: Send failure to Slack
-        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
-
-  smoke-test-development:
-    name: Smoke test development environment
-    needs: deploy-development
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    environment: development
-    permissions:
-      contents: read
-    steps:
       - name: Wait for development to serve the correct commit
         run: |
           echo "Waiting for ${{ vars.DEVELOPMENT_BASE_URL }} to serve commit ${{ github.sha }}..."
@@ -530,7 +508,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413
         name: Install pnpm
         with:
           cache: true
@@ -554,24 +532,10 @@ jobs:
           FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK: ${{ secrets.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK }}
           FIT_CONNECT_CLIENT_ID: ${{ vars.FIT_CONNECT_CLIENT_ID }}
           FIT_CONNECT_CLIENT_SECRET: ${{ secrets.FIT_CONNECT_CLIENT_SECRET }}
-          FIT_CONNECT_DESTINATION_ID: ${{ vars.FIT_CONNECT_DESTINATION_ID }}
+          TEST_FIT_CONNECT_DESTINATION_ID_OVERRIDE: ${{ vars.TEST_FIT_CONNECT_DESTINATION_ID_OVERRIDE }}
+          TEST_OSCI_ARS_OVERRIDE: ${{ vars.TEST_OSCI_ARS_OVERRIDE }}
           ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
 
-      - name: Send failure to Slack
-        uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
-
-  deploy-production:
-    name: Deploy to production environment
-    needs: smoke-test-development
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
       - name: Deploy to production
         uses: digitalservicebund/argocd-deploy@e8f6b8f77c8b8eeef3f67fc5bba9521f89145645
         with:

@@ -17,6 +17,8 @@ export interface Gewerbebetrieb {
   eingetragenerName?: string;
   /** Dieses Kerndatenobjekt fasst die Daten, mit welchen die Eintragung eines wirtschaftlich Tätigen bzw. eines Gewerbebetriebs in ein Register (Handels-, Gesellschafts-, Genossenschafts-, Vereins- oder Stiftungsregister) oder in ein Verzeichnis (Stiftungsverzeichnis) identifiziert werden kann */
   eintragung?: Eintragung;
+  /** Bezeichnung des Unternehmens, sofern abweichend vom Namen des Gewerbetreibenden. */
+  geschaeftsbezeichnung?: string;
   /** Angaben zu der Betriebsstätte. */
   betriebsstaette?: Betriebsstaette;
   /** Mittels dieses Datentyps werden die an der Betriebsstätte tatsächlich ausgeübten Tätigkeiten angegeben. */
@@ -55,6 +57,7 @@ export function createGewerbebetrieb(
       ${optionalTag("wt:wirtschaftlichTaetiger.id", wirtschaftlichTaetigerId)}
       ${optionalTag("ename:eingetragenerName", gewerbebetrieb.eingetragenerName)}
       ${createEintragung(gewerbebetrieb.eintragung)}
+      ${optionalTag("wt:geschaeftsbezeichnung", gewerbebetrieb.geschaeftsbezeichnung)}
       ${createBetriebsstaette(gewerbebetrieb.betriebsstaette)}
       ${createTaetigkeiten(gewerbebetrieb.taetigkeitenGesamt)}
       <xga:gewerbetreibender>

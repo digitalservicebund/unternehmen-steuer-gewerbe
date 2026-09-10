@@ -1,9 +1,16 @@
 import { describe, it, expect, vi } from "vitest";
 import { defaultFinanzamtId, transformToEUnFsE } from "./transformToFsE";
-import { registerGewerbeSampleRequestAllFieldsFilled } from "../testHelpers";
-import { RegisterGewerbeRequestSchema } from "../registerGewerbeInterfaces";
-import { formatDatumDE } from "../../../helpers/formFieldTransformations";
+import {
+  registerGewerbeSampleRequestAllFieldsFilled,
+  withUnternehmensDatenOverrides,
+  adresseBerlinHausnummerRange,
+  adresseFuldaHausnummerRange,
+  adresseTestorfSteinfortMitZusatz,
+  adresseTestorfSteinfortOhneZusatz,
+  adresseAbweichendCoburg,
+} from "../testHelpers";
 import { ElsterFsEEUn } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
+import { formatDatumDE } from "../../../helpers/formFieldTransformations";
 
 describe("transformToEUnFsE", () => {
   it("maps output fields from request data", () => {
@@ -14,26 +21,27 @@ describe("transformToEUnFsE", () => {
     expect(natPers?.name).toBe("Mustermann");
     expect(natPers?.gebName).toBe("Muster");
     expect(natPers?.gebDat).toBe("10.09.1988");
+    expect(natPers?.persIdNr).toBe("06646829576");
     expect(natPers?.adrkette?.strAdr).toMatchObject({
       str: "Musterstraße",
       hausNr: "1",
-      adressErg: "a",
+      hausNrZu: "a",
       plz: "03046",
       ort: "Cottbus",
     });
     expect(result.eUn?.allgAngaben?.komm?.tel?.[0]).toEqual({
-      intVorw: "+49",
-      natVorw: "234",
-      rufNr: "121314",
+      intVorw: "+1",
+      natVorw: "415",
+      rufNr: "5552671",
     });
-    expect(result.eUn?.allgAngaben?.artTaet?.gewerbeArt).toBe("Vertrieb von Vertriebsmustern");
+    expect(result.eUn?.allgAngaben?.artTaet?.gewerbeArt).toBe("Vertrieb von Mustern");
     expect(result.eUn?.betrieb?.betrBeginn?.betriebsbeginn).toBe("17.04.2026");
     expect(result.eUn?.betrieb?.gruendungsangaben?.gruendungsForm?.uebertrStichtag).toBe(
-      "18.05.2026",
+      "17.04.2026",
     );
     expect(result.eUn?.umsatzsteuer?.sollIstVersteuerung?.auswahlSollIstVerst).toBe("1");
-    expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toBe("2"); // 1 means "zahllast", 2 means "überschuss"
-    expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toBe(222);
+    expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toBe("1"); // 1 means "zahllast", 2 means "überschuss"
+    expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toBe(0);
 
     expect(
       result.eUn?.festsetzungsAngaben?.voraussichtlicheEinkuenfte?.einkGewBetr?.gruendJahrA,
@@ -43,6 +51,48 @@ describe("transformToEUnFsE", () => {
     ).toBe(1);
 
     expect(result.eUn?.umsatzsteuer?.uStIdNr?.uStIdAntrag?.merkerAntragUStId).toBe(true);
+  });
+
+  it("maps gründungsart to gruendungsForm.gruendungsArt (neugründung = 1)", () => {
+    const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+
+    expect(result.eUn?.betrieb?.gruendungsangaben?.gruendungsForm?.gruendungsArt).toBe("1");
+  });
+
+  it("maps anmeldedatumFinanzamt to both betriebsbeginn and uebertrStichtag", () => {
+    const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+    const expectedDate = formatDatumDE(
+      registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten.anmeldedatumFinanzamt,
+    );
+
+    expect(result.eUn?.betrieb?.betrBeginn?.betriebsbeginn).toBe(expectedDate);
+    expect(result.eUn?.betrieb?.gruendungsangaben?.gruendungsForm?.uebertrStichtag).toBe(
+      expectedDate,
+    );
+  });
+
+  describe("gewerbeArt (tätigkeitsbeschreibung)", () => {
+    it("falls back to tätigkeitsbeschreibung when tätigkeitsbeschreibungKurz is missing", () => {
+      const result = transformToEUnFsE(
+        withUnternehmensDatenOverrides({
+          tätigkeitsbeschreibung: "Vertrieb von Vertriebsmustern",
+          tätigkeitsbeschreibungKurz: undefined,
+        }),
+      );
+
+      expect(result.eUn?.allgAngaben?.artTaet?.gewerbeArt).toBe("Vertrieb von Vertriebsmustern");
+    });
+
+    it("truncates the tätigkeitsbeschreibung fallback to 200 characters", () => {
+      const result = transformToEUnFsE(
+        withUnternehmensDatenOverrides({
+          tätigkeitsbeschreibung: "a".repeat(250),
+          tätigkeitsbeschreibungKurz: undefined,
+        }),
+      );
+
+      expect(result.eUn?.allgAngaben?.artTaet?.gewerbeArt).toBe("a".repeat(200));
+    });
   });
 
   describe("finanzamtId", () => {
@@ -72,57 +122,90 @@ describe("transformToEUnFsE", () => {
   });
 
   describe("umsatzsteuer", () => {
-    it("maps a positive number to zahllast and it's absolute value", () => {
-      const dataWithNegativeNumberAsUmsatzImErstenJahr = structuredClone(
-        registerGewerbeSampleRequestAllFieldsFilled,
-      );
-      // set deprecated values to the opposite of what we expect the new value to result in
-      dataWithNegativeNumberAsUmsatzImErstenJahr.unternehmensDaten.zahllastUeberschussAuswahl =
-        "ueberschuss";
-      dataWithNegativeNumberAsUmsatzImErstenJahr.unternehmensDaten.zahllastUeberschussBetrag = 0;
-      // set the new value
-      dataWithNegativeNumberAsUmsatzImErstenJahr.unternehmensDaten.umsatzsteuerImErstenJahr = 111;
+    it.each([
+      {
+        zahllastUeberschussAuswahl: "zahllast" as const,
+        zahllastUeberschussBetrag: 111,
+        expectedAuswahl: "1",
+        deprecatedUmsatzsteuerImErstenJahr: -111,
+      },
+      {
+        zahllastUeberschussAuswahl: "ueberschuss" as const,
+        zahllastUeberschussBetrag: 222,
+        expectedAuswahl: "2",
+        deprecatedUmsatzsteuerImErstenJahr: 222,
+      },
+    ])(
+      "maps zahllastUeberschussAuswahl $zahllastUeberschussAuswahl and zahllastUeberschussBetrag $zahllastUeberschussBetrag, ignoring the deprecated umsatzsteuerImErstenJahr",
+      ({
+        zahllastUeberschussAuswahl,
+        zahllastUeberschussBetrag,
+        expectedAuswahl,
+        deprecatedUmsatzsteuerImErstenJahr,
+      }) => {
+        const data = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+        data.unternehmensDaten.zahllastUeberschussAuswahl = zahllastUeberschussAuswahl;
+        data.unternehmensDaten.zahllastUeberschussBetrag = zahllastUeberschussBetrag;
+        // deprecated field must be ignored; set to a value that would flip the result if it were still read
+        data.unternehmensDaten.umsatzsteuerImErstenJahr = deprecatedUmsatzsteuerImErstenJahr;
 
-      const result = transformToEUnFsE(dataWithNegativeNumberAsUmsatzImErstenJahr);
+        const result = transformToEUnFsE(data);
 
-      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toEqual("1"); // 1 for zahllast
-      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toEqual(111);
-    });
+        expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toEqual(expectedAuswahl);
+        expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toEqual(
+          zahllastUeberschussBetrag,
+        );
+      },
+    );
 
-    it("maps undefined umsatzSteuerImErstenJahr to zahllast and a betrag of 0", () => {
-      const dataWithUndefined = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
-
-      dataWithUndefined.unternehmensDaten.umsatzsteuerImErstenJahr = undefined;
-
-      const result = transformToEUnFsE(dataWithUndefined);
-
-      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toEqual("1"); // 1 for zahllast
-      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toEqual(0);
-    });
-
-    it("maps 0 umsatzSteuerImErstenJahr to zahllast and a betrag of 0", () => {
-      const dataWithUndefined = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
-
-      dataWithUndefined.unternehmensDaten.umsatzsteuerImErstenJahr = 0;
-
-      const result = transformToEUnFsE(dataWithUndefined);
-
-      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.auswahl).toEqual("1"); // 1 for zahllast
-      expect(result.eUn?.umsatzsteuer?.zahllastUeberschuss?.betrag).toEqual(0);
-    });
-
-    it("maps uStIdNr to undefined if umsatzsteuerIdMitbeantragen=false or undefined", () => {
+    it("maps uStIdNr to undefined if umsatzsteuerIdMitbeantragen=false", () => {
       const caseFalse = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
       caseFalse.unternehmensDaten.umsatzsteuerIdMitbeantragen = false;
 
-      const caseUndefined = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
-      caseUndefined.unternehmensDaten.umsatzsteuerIdMitbeantragen = undefined;
+      const result = transformToEUnFsE(caseFalse);
 
-      const resultForFalse = transformToEUnFsE(caseUndefined);
-      const resultForUndefined = transformToEUnFsE(caseFalse);
+      expect(result.eUn?.umsatzsteuer?.uStIdNr).toBeUndefined();
+    });
 
-      expect(resultForFalse.eUn?.umsatzsteuer?.uStIdNr).toBeUndefined();
-      expect(resultForUndefined.eUn?.umsatzsteuer?.uStIdNr).toBeUndefined();
+    it("maps onlinehandel and influencer", () => {
+      const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+
+      expect(result.eUn?.umsatzsteuer?.onlinehandel).toEqual({
+        eigenerWebshop: true,
+        adresseEigenerWebshop: "https://example.org",
+        onlineMarktplaetze: true,
+        onlineMarktplatz: [{ nameMarktplatz: "Amazon", nameAccount: "example-shop" }],
+      });
+      expect(result.eUn?.umsatzsteuer?.influencer).toEqual({
+        influencerUmsatz: true,
+        plattform: [{ namePlattform: "Instagram", nameAccount: "example" }],
+      });
+    });
+
+    it("omits eigenerWebshop/onlineMarktplaetze/influencerUmsatz when false (JaTrueBaseSType only allows 'true')", () => {
+      const data = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+      data.unternehmensDaten.onlinehandel = {
+        eigenerWebshop: false,
+        onlineMarktplaetze: false,
+      };
+      data.unternehmensDaten.influencer = { influencerUmsatz: false };
+
+      const result = transformToEUnFsE(data);
+
+      expect(result.eUn?.umsatzsteuer?.onlinehandel?.eigenerWebshop).toBeUndefined();
+      expect(result.eUn?.umsatzsteuer?.onlinehandel?.onlineMarktplaetze).toBeUndefined();
+      expect(result.eUn?.umsatzsteuer?.influencer?.influencerUmsatz).toBeUndefined();
+    });
+
+    it("omits onlinehandel and influencer entirely when not given", () => {
+      const data = structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+      data.unternehmensDaten.onlinehandel = undefined;
+      data.unternehmensDaten.influencer = undefined;
+
+      const result = transformToEUnFsE(data);
+
+      expect(result.eUn?.umsatzsteuer?.onlinehandel).toBeUndefined();
+      expect(result.eUn?.umsatzsteuer?.influencer).toBeUndefined();
     });
   });
 
@@ -133,14 +216,12 @@ describe("transformToEUnFsE", () => {
   ] as const)(
     "maps istVersteuerungGrund '%s' to the %s flag and leaves the others unset",
     (grund, expectedFlag) => {
-      const result = transformToEUnFsE({
-        ...registerGewerbeSampleRequestAllFieldsFilled,
-        unternehmensDaten: {
-          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+      const result = transformToEUnFsE(
+        withUnternehmensDatenOverrides({
           sollIstVersteuerung: "istVersteuerung",
           istVersteuerungGrund: grund,
-        },
-      });
+        }),
+      );
       const sollIstVersteuerung = result.eUn?.umsatzsteuer?.sollIstVersteuerung;
       for (const flag of [
         "istVerstUStGrundUmsatz",
@@ -152,7 +233,21 @@ describe("transformToEUnFsE", () => {
     },
   );
 
-  it("sets entsprichtWohnanschrift: true when adresseAbweichend is not set", () => {
+  it("maps geschäftsbezeichnung to eUn.betrieb.unternehmen.abwFirmenname", () => {
+    const result = transformToEUnFsE(
+      withUnternehmensDatenOverrides({ geschäftsbezeichnung: "Musterhandel Schmidt" }),
+    );
+    expect(result.eUn?.betrieb?.unternehmen?.abwFirmenname).toBe("Musterhandel Schmidt");
+  });
+
+  it("omits eUn.betrieb.unternehmen.abwFirmenname when geschäftsbezeichnung is not given", () => {
+    const result = transformToEUnFsE(
+      withUnternehmensDatenOverrides({ geschäftsbezeichnung: undefined }),
+    );
+    expect(result.eUn?.betrieb?.unternehmen?.abwFirmenname).toBeUndefined();
+  });
+
+  it("sets entsprichtWohnanschrift: true when neither adresse nor adresseAbweichend is set", () => {
     const { adresseAbweichend: _, ...unternehmensDatenOhneAbweichung } =
       registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten;
     const result = transformToEUnFsE({
@@ -168,9 +263,63 @@ describe("transformToEUnFsE", () => {
     expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
       str: "Musterstraße",
       hausNr: "2",
-      adressErg: "a",
+      hausNrZu: "a",
       plz: "96450",
       ort: "Coburg",
+    });
+  });
+
+  it("maps adresse to Unternehmen-Anschrift", () => {
+    const result = transformToEUnFsE(
+      withUnternehmensDatenOverrides({ adresse: adresseTestorfSteinfortMitZusatz }),
+    );
+    expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
+      str: "Betriebsweg",
+      hausNr: "42",
+      hausNrZu: "a",
+      plz: "23936",
+      ort: "Testorf-Steinfort",
+    });
+  });
+
+  it("maps the hausnummer 8-14 to hausNrZu -14", () => {
+    const result = transformToEUnFsE(
+      withUnternehmensDatenOverrides({ adresse: adresseBerlinHausnummerRange }),
+    );
+    expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
+      str: "Prinzessinnenstraße",
+      hausNr: "8",
+      hausNrZu: "-14",
+      plz: "10969",
+      ort: "Berlin",
+    });
+  });
+
+  it("maps the hausnummer 1C-1E to hausNrZu C-1E", () => {
+    const result = transformToEUnFsE(
+      withUnternehmensDatenOverrides({ adresse: adresseFuldaHausnummerRange }),
+    );
+    expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
+      str: "Domstraße",
+      hausNr: "1",
+      hausNrZu: "C-1E",
+      plz: "36037",
+      ort: "Fulda",
+    });
+  });
+
+  it("prefers adresse over adresseAbweichend", () => {
+    const result = transformToEUnFsE(
+      withUnternehmensDatenOverrides({
+        adresse: adresseTestorfSteinfortOhneZusatz,
+        adresseAbweichend: adresseAbweichendCoburg,
+      }),
+    );
+    expect(result.eUn?.betrieb?.unternehmen?.adrkette?.strAdr).toMatchObject({
+      str: "Betriebsweg",
+      hausNr: "42",
+      plz: "23936",
+      ort: "Testorf-Steinfort",
     });
   });
 
@@ -180,6 +329,79 @@ describe("transformToEUnFsE", () => {
       kleinUnternUStVerzicht: true,
     });
     expect(result.eUn?.umsatzsteuer?.kleinunternehmerRegelung?.kleinUnternUSt).toBeUndefined();
+  });
+
+  describe("bankKonto", () => {
+    it("maps personensteuerkonto and betriebssteuerkonto to BankKonto entries with matching Steuerart", () => {
+      const result = transformToEUnFsE(registerGewerbeSampleRequestAllFieldsFilled);
+
+      expect(result.eUn?.allgAngaben?.bankKonto).toEqual([
+        {
+          iban: "DE02120300000000202051",
+          steuerart: "1", // 1 means "Personensteuern", 2 means "Betriebssteuern"
+          kontoinhaber: { rolleKontoinhaber: "1", abwKontoinhaber: undefined }, // 1 means "die steuerpflichtige Person"
+        },
+        {
+          iban: "DE02500105170137075030",
+          steuerart: "2", // 1 means "Personensteuern", 2 means "Betriebssteuern"
+          kontoinhaber: { rolleKontoinhaber: "99", abwKontoinhaber: "Max Mustermann" }, // 99 means "eine andere Person"
+        },
+      ]);
+    });
+
+    it("puts a foreign IBAN (identified by a non-DE country code) into ibanAusland instead of iban", () => {
+      const result = transformToEUnFsE({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          bankKonto: {
+            personensteuerkonto: {
+              iban: "FR7630006000011234567890189",
+              bic: "AGRIFRPP",
+              kontoinhaber: "steuerpflichtigePerson",
+            },
+          },
+        },
+      });
+
+      expect(result.eUn?.allgAngaben?.bankKonto).toEqual([
+        {
+          ibanAusland: "FR7630006000011234567890189",
+          bic: "AGRIFRPP",
+          steuerart: "1", // 1 means "Personensteuern", 2 means "Betriebssteuern"
+          kontoinhaber: { rolleKontoinhaber: "1", abwKontoinhaber: undefined }, // 1 means "die steuerpflichtige Person"
+        },
+      ]);
+    });
+
+    it("omits betriebssteuerkonto's entry when not given", () => {
+      const result = transformToEUnFsE({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          bankKonto: {
+            personensteuerkonto: {
+              iban: "DE02120300000000202051",
+              kontoinhaber: "steuerpflichtigePerson",
+            },
+          },
+        },
+      });
+
+      expect(result.eUn?.allgAngaben?.bankKonto).toHaveLength(1);
+    });
+
+    it("is undefined when no bankKonto is given", () => {
+      const result = transformToEUnFsE({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          bankKonto: undefined,
+        },
+      });
+
+      expect(result.eUn?.allgAngaben?.bankKonto).toBeUndefined();
+    });
   });
 
   it("sets kleinUnternUSt=true when kleinunternehmerRegelung is true, kleinUnternUStVerzicht is undefined", () => {
@@ -196,22 +418,5 @@ describe("transformToEUnFsE", () => {
     expect(
       result.eUn?.umsatzsteuer?.kleinunternehmerRegelung?.kleinUnternUStVerzicht,
     ).toBeUndefined();
-  });
-
-  // Note: temporary — the gründungsdatum default exists only to give the OSS time to
-  // start sending the field. Remove this test together with the schema default once
-  // gründungsdatum is always provided (field made required).
-  it("falls back to today's date for uebertrStichtag when gründungsdatum is omitted", () => {
-    const { gründungsdatum: _, ...unternehmensDatenOhneGründung } =
-      registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten;
-    const parsed = RegisterGewerbeRequestSchema.parse({
-      ...registerGewerbeSampleRequestAllFieldsFilled,
-      unternehmensDaten: unternehmensDatenOhneGründung,
-    });
-
-    const result = transformToEUnFsE(parsed);
-
-    const heute = formatDatumDE(new Date().toISOString().split("T")[0]!);
-    expect(result.eUn?.betrieb?.gruendungsangaben?.gruendungsForm?.uebertrStichtag).toBe(heute);
   });
 });

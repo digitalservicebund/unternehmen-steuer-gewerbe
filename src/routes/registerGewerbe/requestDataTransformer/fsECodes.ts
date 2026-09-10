@@ -32,8 +32,8 @@ export const RELIGIONSSCHLUESSEL_KEYS = Object.keys(RELIGIONSSCHLUESSEL) as [
 
 export const GEWINN_ERMITTLUNG = {
   einnahmenüberschussrechnung: "01",
-  betriebsvermögensvergleich: "02",
-  gewinnermittlungDurchschnittssätze: "03",
+  betriebsvermögensvergleich: "02", // Bilanz mit Gewinn- und Verlustrechnung
+  gewinnermittlungDurchschnittssätze: "03", // nur bei Land- und Forstwirtschaft
   sonstige: "04",
 } as const;
 
@@ -76,3 +76,29 @@ export const ZAHLLAST_UEBERSCHUSS_KEYS = Object.keys(ZAHLLAST_UEBERSCHUSS) as [
   ZahllastUeberschuss,
   ...ZahllastUeberschuss[],
 ];
+
+// Gründungsform of the business; further codes exist in the ELSTER data set description
+// but are not supported (see Neugründung-only scope). Keys mirror GRUNDANMELDUNGSSCHLUESSEL,
+// both are mapped from the same request field.
+export const GRUENDUNGSART = {
+  neugründung: "1",
+} as const;
+
+export const ROLLE_KONTOINHABER = {
+  steuerpflichtigePerson: "1",
+  ehePartner: "2",
+  gemeinsamMitEhePartner: "3",
+  anderePerson: "99",
+} as const;
+
+type RolleKontoinhaber = keyof typeof ROLLE_KONTOINHABER;
+export const ROLLE_KONTOINHABER_KEYS = Object.keys(ROLLE_KONTOINHABER) as [
+  RolleKontoinhaber,
+  ...RolleKontoinhaber[],
+];
+
+// Which taxes a BankKonto entry applies to; fixed per account slot, not user-selected.
+export const BANKKONTO_STEUERART = {
+  personensteuern: "1",
+  betriebssteuern: "2",
+} as const;

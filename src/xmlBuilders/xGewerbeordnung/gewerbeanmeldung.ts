@@ -11,10 +11,16 @@ import {
 } from "./buildingBlocks/g2gNachrichtenkopf";
 import { createGewerbebetrieb, type Gewerbebetrieb } from "./buildingBlocks/gewerbebetrieb";
 import {
+  createNachweisdokumentOnlinedienst,
+  type Nachweisdokument,
+} from "./buildingBlocks/nachweisdokument";
+import {
   createReferenzierteSubjekte,
   type ReferenzierteSubjekte,
 } from "./buildingBlocks/referenzierteSubjekte";
 import { optionalTag, optionalWrappedTag } from "../../helpers/xmlTag";
+
+export type TransportMethod = "fitConnect" | "osci";
 
 export interface CreateGewerbeanmeldungXmlData {
   nachrichtenkopf?: Nachrichtenkopf;
@@ -28,6 +34,8 @@ export interface CreateGewerbeanmeldungXmlData {
   handelndePersonVertrauensniveauCode?: string;
   /** ID-Querverweis auf das natuerlichePerson-Element des Ansprechpartners. */
   ansprechpartnerId?: string;
+  /** Vom Online-Dienst selbst erstelltes Nachweisdokument, das als Anlage mitübermittelt wird. */
+  nachweisdokumentOnlinedienst?: Nachweisdokument;
   /** Angabe des Zeitpunkts der Erstellung des XML-Datensatzes für die Übermittlung. */
   satzErstellung?: string;
   /** Der Zeitpunkt, zu welchem der die Übermittlung auslösende Verwaltungsvorgang (Aufnahme / Änderung / Korrektur eines Datensatzes) im gemeindlichen Gewerbeverzeichnis gespeichert wurde. */
@@ -54,10 +62,16 @@ export interface CreateGewerbeanmeldungXmlData {
   grundAnmeldungSchluessel?: string;
 }
 
-const ROOT_ATTRIBUTES = `
-  xmlns:xga="http://www.xgewerbeordnung.de/spezifikation/xga/1.6"
+// FIT-Connect needs the xmlns:xsi and xsi:schemaLocation to be present, OSCI does not
+const XSI_ATTRIBUTES = `
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.xgewerbeordnung.de/spezifikation/xga/1.6 xgewerbeordnung-gewerbeanzeige.xsd"
+  xsi:schemaLocation="http://www.xgewerbeordnung.de/spezifikation/xga/1.6 xgewerbeordnung-gewerbeanzeige.xsd"` as const;
+
+function createRootAttributes(transportMethod: TransportMethod) {
+  const xsiAttributes = transportMethod === "fitConnect" ? XSI_ATTRIBUTES : "";
+
+  return `
+  xmlns:xga="http://www.xgewerbeordnung.de/spezifikation/xga/1.6"${xsiAttributes}
   xmlns:erl="http://www.xgewerbeordnung.de/spezifikation/erl/1.6"
   xmlns:bk="http://www.xgewerbeordnung.de/spezifikation/baukasten/1.6"
   xmlns:nachr="urn:xoev-de:xunternehmen:standard:basismodul:nachrichtenstruktur_1.2"
@@ -87,7 +101,8 @@ const ROOT_ATTRIBUTES = `
   produktversion="1"
   standard="XGewerbeordnung"
   version="1.6"
-` as const;
+`;
+}
 
 function createAutor(autor: Behoerde | undefined) {
   if (!autor) return "";
@@ -96,17 +111,19 @@ function createAutor(autor: Behoerde | undefined) {
 
 export async function createGewerbeanmeldungXml(
   gewerbeanmeldung: CreateGewerbeanmeldungXmlData,
+  transportMethod: TransportMethod,
 ): Promise<string> {
   const natuerlichePerson0 = gewerbeanmeldung.referenzierteSubjekte?.natuerlichePerson?.[0];
 
   const gewerbeanmeldungXml = `<?xml version="1.0" encoding="UTF-8"?>
-    <xga:ext.gewerbemeldung.0400 ${ROOT_ATTRIBUTES}>
+    <xga:ext.gewerbemeldung.0400 ${createRootAttributes(transportMethod)}>
       ${createG2gNachrichtenkopf(gewerbeanmeldung.nachrichtenkopf)}
       <xga:satz>
         ${optionalTag("antr:anzeigender.id", gewerbeanmeldung.anzeigerenderId)}
         ${optionalTag("antr:handelndePerson.id", gewerbeanmeldung.handelndePersonId)}
         ${optionalWrappedTag("bk:handelndePerson.vertrauensniveauIdentifikation", "code", gewerbeanmeldung.handelndePersonVertrauensniveauCode, ' listVersionID="4"')}
         ${optionalTag("antr:ansprechpartner.id", gewerbeanmeldung.ansprechpartnerId)}
+        ${createNachweisdokumentOnlinedienst(gewerbeanmeldung.nachweisdokumentOnlinedienst)}
         <xga:anmeldung>
             ${createAutor(gewerbeanmeldung.autor)}
             ${optionalTag("xga:satzErstellung", gewerbeanmeldung.satzErstellung)}

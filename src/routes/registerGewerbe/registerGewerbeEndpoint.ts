@@ -9,17 +9,26 @@ import {
 } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
 import { getEnvironmentVariable } from "../../secretsAndEnvironmentVariables";
 import pLimit from "p-limit";
-import { createGewerbeanmeldungXml } from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
+import { XMLParser } from "fast-xml-parser";
+import {
+  createGewerbeanmeldungXml,
+  type TransportMethod,
+} from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import {
   ErrorTypeSchema,
   type RegisterGewerbeRequest,
   type RegisterGewerbeResponseItem,
 } from "./registerGewerbeInterfaces";
 import { registerGewerbeRoute } from "./registerGewerbeRoute";
-import { transformToGewerbeanmeldung, transformToEUnFsE } from "./requestDataTransformer";
-import { getGewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
+import {
+  transformToGewerbeanmeldung,
+  transformToEUnFsE,
+  PDF_RECEIPT_NACHWEISDOKUMENT,
+} from "./requestDataTransformer";
+import { getGewerbeRoutingInfo, type GewerbeRoutingInfo } from "./getGewerbeRoutingInfo";
+import { getOsciClient } from "../../clients/osciClient/osciClient";
 import { generatePdfReceipt } from "./registerGewerbePdfGenerator";
-import { splitStrasseHausnummer } from "../../helpers/formFieldTransformations";
+import { getBetriebsAdresse } from "../../helpers/formFieldTransformations";
 import {
   createOfficeDetailsFromFinanzamt,
   createOfficeDetailsFromGewerbeamt,
@@ -36,10 +45,84 @@ const maxConcurrency =
   Number(getEnvironmentVariable("REGISTER_GEWERBE_MAX_CONCURRENCY")) || DEFAULT_MAX_CONCURRENCY;
 const concurrentSubmissionPairsLimit = pLimit(maxConcurrency);
 
+interface GewerbeanmeldungTransportResult {
+  submissionId: string;
+  // Set only on the FIT-Connect path; its absence marks an OSCI submission for the events endpoint.
+  fitConnectDestinationId?: string;
+}
+
+interface SubmitViaFitConnectOptions {
+  destinationId: string;
+  gewerbeanmeldungXml: string;
+}
+
+async function submitViaFitConnect({
+  destinationId,
+  gewerbeanmeldungXml,
+}: SubmitViaFitConnectOptions): Promise<GewerbeanmeldungTransportResult> {
+  const response = await getFitConnectClient().submitData({
+    destinationId,
+    publicService: {
+      identifier: GEWERBEANMELDUNG_LEIKA_KEY_URN,
+      name: "Gewerbe Anmeldung",
+    },
+    dataSchema: {
+      schemaUri: "urn:xoev-de:kosit:standard:xgewerbeordnung",
+      mimeType: "application/xml",
+    },
+    data: gewerbeanmeldungXml,
+  });
+
+  return {
+    submissionId: response.submissionId,
+    fitConnectDestinationId: destinationId,
+  };
+}
+
+interface SubmitViaOsciOptions {
+  ags: string;
+  gewerbeanmeldungXml: string;
+  pdfReceiptBase64: string;
+}
+
+async function submitViaOsci({
+  ags,
+  gewerbeanmeldungXml,
+  pdfReceiptBase64,
+}: SubmitViaOsciOptions): Promise<GewerbeanmeldungTransportResult> {
+  const response = await getOsciClient().sendMessage({
+    targetId: `MELDID:${ags}`,
+    message: gewerbeanmeldungXml,
+    // the XML declares this file as bk:nachweisdokument.onlinedienst
+    attachments: [
+      {
+        fileName: PDF_RECEIPT_NACHWEISDOKUMENT.dateiname,
+        mimeType: PDF_RECEIPT_NACHWEISDOKUMENT.mimetype,
+        content: Buffer.from(pdfReceiptBase64, "base64"),
+      },
+    ],
+  });
+
+  return { submissionId: response.metadata.source.sourceMessageId };
+}
+
 async function submitGewerbeanmeldung(
   data: RegisterGewerbeRequest,
 ): Promise<RegisterGewerbeResponseItem> {
-  const routingInfo = await getGewerbeRoutingInfo(data);
+  // NOTE: a failing routing lookup has no OSCI fallback, because it cannot be told apart from a
+  // successful one without a route — only the latter means "this commune uses OSCI".
+  let routingInfo: GewerbeRoutingInfo | undefined;
+  try {
+    routingInfo = await getGewerbeRoutingInfo(data);
+  } catch (error) {
+    console.error("Gewerbe routing lookup failed", error);
+    return {
+      success: false,
+      errorType: ErrorTypeSchema.enum.upstream_error,
+      info: "Upstream service unavailable",
+    };
+  }
+
   if (!routingInfo) {
     return {
       success: false,
@@ -48,11 +131,17 @@ async function submitGewerbeanmeldung(
     };
   }
 
+  // A routing lookup that found no destination is what marks a commune as OSCI-only (see
+  // getFitConnectDestinationInformation); this is the only place that translation happens.
+  const { fitConnectDestinationInformation } = routingInfo;
+  const transportMethod: TransportMethod =
+    fitConnectDestinationInformation === null ? "osci" : "fitConnect";
+
+  const gewerbeanmeldung = transformToGewerbeanmeldung(data, routingInfo, transportMethod);
+
   let gewerbeanmeldungXml: string;
   try {
-    gewerbeanmeldungXml = await createGewerbeanmeldungXml(
-      transformToGewerbeanmeldung(data, routingInfo),
-    );
+    gewerbeanmeldungXml = await createGewerbeanmeldungXml(gewerbeanmeldung, transportMethod);
   } catch (error) {
     console.error("Gewerbeanmeldung XML validation failed", error);
     return {
@@ -62,40 +151,35 @@ async function submitGewerbeanmeldung(
     };
   }
 
-  const gewerbeanmeldungPdfReceipt = await generatePdfReceipt(gewerbeanmeldungXml);
+  const gewerbeanmeldungPdfReceipt = await generatePdfReceipt(gewerbeanmeldung, routingInfo);
 
   const gewerbeamtDetails = createOfficeDetailsFromGewerbeamt(routingInfo.gewerbeamt);
-  // Before using FIT-Connect -> Check in context if FIT-Connect or OSCI is supported by
-  // the Communes as soon as we have Pilot-Communes
+
   try {
-    // The destination varies from commune to commune.
-    // We can hard‑code it here for the first iterations, but in the future we need to
-    // use the Fit‑Connect routing API to determine the destination ID.
-    const destinationId = getEnvironmentVariable("FIT_CONNECT_DESTINATION_ID");
-    const response = await getFitConnectClient().submitData({
-      destinationId,
-      publicService: {
-        identifier: GEWERBEANMELDUNG_LEIKA_KEY_URN,
-        name: "Gewerbe Anmeldung",
-      },
-      dataSchema: {
-        schemaUri: "urn:xoev-de:kosit:standard:xgewerbeordnung",
-        mimeType: "application/xml",
-      },
-      data: gewerbeanmeldungXml,
-    });
+    let transportResult: GewerbeanmeldungTransportResult;
+    if (fitConnectDestinationInformation === null) {
+      transportResult = await submitViaOsci({
+        ags: routingInfo.ags,
+        gewerbeanmeldungXml,
+        pdfReceiptBase64: gewerbeanmeldungPdfReceipt,
+      });
+    } else {
+      transportResult = await submitViaFitConnect({
+        destinationId: fitConnectDestinationInformation.destinationId,
+        gewerbeanmeldungXml,
+      });
+    }
+
     return {
       success: true,
-      submissionId: response.submissionId,
+      submissionId: transportResult.submissionId,
       ars: routingInfo.ars,
-      // Set only on the FIT-Connect path; once the OSCI submit is wired up its branch
-      // returns just `ars`, which the events endpoint reads as an OSCI submission.
-      fitConnectDestinationId: destinationId,
+      fitConnectDestinationId: transportResult.fitConnectDestinationId,
       pdfReceiptBase64: gewerbeanmeldungPdfReceipt,
       officeDetails: gewerbeamtDetails,
     };
   } catch (error) {
-    console.error("FIT-Connect submission failed", error);
+    console.error("Gewerbeanmeldung submission failed", error);
     return {
       success: false,
       errorType: ErrorTypeSchema.enum.upstream_error,
@@ -107,20 +191,33 @@ async function submitGewerbeanmeldung(
 // Sending fails because of semantic errors
 export const EricErrorFachlicheAblehnung = 610001002;
 
+// parseTagValue: false keeps an all-digit TransferTicket a string.
+const elsterServerResponseParser = new XMLParser({ parseTagValue: false });
+
+// ELSTER identifies the submission by the TransferTicket in the TransferHeader of its response.
+function getTransferTicket(serverResponse: string | undefined): string | undefined {
+  if (serverResponse === undefined) {
+    return undefined;
+  }
+  const parsed = elsterServerResponseParser.parse(serverResponse);
+  return parsed.Elster?.TransferHeader?.TransferTicket;
+}
+
 async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeResponseItem> {
   try {
-    const address = data.unternehmensDaten.adresseAbweichend ?? data.persönlicheDaten.adresse;
-
-    const { strasse, hausnummer, hausnummerBis } = splitStrasseHausnummer(
-      address.strasseUndHausnummer,
-    );
+    const { adresse, adresseAbweichend } = data.unternehmensDaten;
+    const betriebsAdresse = getBetriebsAdresse({
+      adresse,
+      adresseAbweichend,
+      persönlicheAdresse: data.persönlicheDaten.adresse,
+    });
 
     const finanzamtIds = getFinanzamtId({
-      postleitzahl: address.postleitzahl,
-      ort: address.ort,
-      strassenName: strasse,
-      hausnummerVon: hausnummer,
-      hausnummerBis: hausnummerBis,
+      postleitzahl: betriebsAdresse.postleitzahl,
+      ort: betriebsAdresse.ort,
+      strassenName: betriebsAdresse.strasse,
+      hausnummerVon: betriebsAdresse.hausnummer,
+      hausnummerBis: betriebsAdresse.hausnummerBis,
     });
 
     const finanzamtId = getFirstAssumingItsTheBestMatch(finanzamtIds);
@@ -158,13 +255,15 @@ async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeR
           : ErrorTypeSchema.enum.upstream_error;
       return {
         success: false,
+        // ELSTER creates transfer tickets for rejected submissions
+        submissionId: getTransferTicket(result.serverResponse),
         errorType: type,
         info: result.info,
       };
     }
     return {
       success: true,
-      submissionId: "implementation missing",
+      submissionId: getTransferTicket(result.serverResponse),
       info: result.info,
       pdfReceiptBase64: result.pdf?.toString("base64"),
       officeDetails,

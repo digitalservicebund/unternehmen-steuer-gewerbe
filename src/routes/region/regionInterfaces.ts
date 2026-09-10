@@ -7,7 +7,7 @@ export const RegionParamsSchema = z.object({
     .regex(/^\d{5}$/, "plz must be a 5-digit number")
     .openapi({
       param: { name: "plz", in: "path" },
-      example: "25813",
+      example: "01067",
     }),
 });
 
@@ -18,7 +18,7 @@ export const RegionQuerySchema = z.object({
     .optional()
     .openapi({
       param: { name: "ort", in: "query" },
-      example: "Husum",
+      example: "Dresden",
       description: "Optional city/municipality name to narrow down the responsible offices",
     }),
   strasse: z
@@ -27,7 +27,7 @@ export const RegionQuerySchema = z.object({
     .optional()
     .openapi({
       param: { name: "strasse", in: "query" },
-      example: "Marktstraße",
+      example: "Münzgasse",
       description: "Optional street name to narrow down the responsible offices",
     }),
   hausnummer: z
@@ -36,7 +36,7 @@ export const RegionQuerySchema = z.object({
     .optional()
     .openapi({
       param: { name: "hausnummer", in: "query" },
-      example: "1",
+      example: "2",
       description: "Optional house number to narrow down the responsible offices",
     }),
   getAllOffices: z
@@ -72,7 +72,10 @@ export const OfficeDetailsSchema = z
 
 export const RegionResponseSchema = z
   .object({
-    supported: z.boolean(),
+    supported: z.boolean().openapi({
+      description:
+        "True only when the address resolves to exactly one Kommune and that Kommune is supported. A PLZ spanning several Kommunen is reported as unsupported — narrow it down with ort, strasse and hausnummer.",
+    }),
     finanzaemter: z.array(OfficeDetailsSchema),
     gewerbeaemter: z.array(OfficeDetailsSchema),
   })
