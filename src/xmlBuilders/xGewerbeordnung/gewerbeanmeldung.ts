@@ -1,5 +1,5 @@
 // https://www.xrepository.de/details/urn:xoev-de:kosit:standard:xgewerbeordnung_1.6#version
-import { validateXml } from "../../helpers/xmlValidator";
+import { createValidationErrorSummary, validateXml } from "../../helpers/xmlValidator";
 import { createBehoerde, type Behoerde } from "./buildingBlocks/behoerde";
 import {
   createBisherigeUnfallversicherung,
@@ -145,14 +145,9 @@ export async function createGewerbeanmeldungXml(
   const xmlValidationResult = await validateXml(gewerbeanmeldungXml);
 
   if (!xmlValidationResult.isValid) {
-    const errorText = `
-        Generated XGewerbeanmeldung is invalid.
-        Schema related errors: ${JSON.stringify(xmlValidationResult.schemaValidationResult.errors)}.
-        Principle Result: ${JSON.stringify(xmlValidationResult.schematronValidationResult.principalResult)}.
-      `;
-
-    //Schematron related errors: ${JSON.stringify(xmlValidationResult.schematronValidationResult)}.
-    throw new Error(errorText);
+    throw new Error(
+      `Generated XGewerbeanmeldung is invalid. ${createValidationErrorSummary(xmlValidationResult)}`,
+    );
   }
 
   return gewerbeanmeldungXml;
