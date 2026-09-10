@@ -18,6 +18,10 @@ Alle sicherheitsrelevanten Hinweise bitte an [security@digitalservice.bund.de](m
 - Falls sich das bestätigt, klären wir die Relevanz und mögliche Lösungen.
 - Wenn es möglich ist, halten wir Sie über relevante Fortschritte auf dem Laufenden.
 
+## Personenbezogene Daten
+
+Welche personenbezogenen Daten der Dienst verarbeitet, wohin er sie sendet, was er protokolliert und was er speichert, beschreibt [doc/data-protection.md](./doc/data-protection.md).
+
 # 🇬🇧 Security Vulnerabilities
 
 Security is a top priority for this project. We actively work to keep the
@@ -39,3 +43,8 @@ Please send any security concerns to [security@digitalservice.bund.de](mailto:se
 - We assess whether the report describes a valid security issue.
 - If confirmed, we assess impact and a possible fix.
 - We keep you informed about relevant progress when possible.
+
+## Personal data
+
+[doc/data-protection.md](./doc/data-protection.md) describes what personal data the service
+processes, where it sends it, what it logs and what it keeps.
