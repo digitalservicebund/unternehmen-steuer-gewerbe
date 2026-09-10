@@ -22,7 +22,7 @@ Es gibt keine Datenbank und keinen persistenten Speicher. Nichts aus einer Anfra
 
 Das gilt auch für den PDF-Beleg: er wird pro Anfrage erzeugt, als Base64 im Response-Body zurückgegeben und nie in eine Datei geschrieben.
 
-Der Dienst liest Dateien (XSD- und Schematron-Ressourcen, Schriften) und hält diese über Anfragen hinweg im Cache. Geschrieben wird keine.
+Der Dienst liest Dateien (XSD- und Schematron-Ressourcen) und hält diese über Anfragen hinweg im Cache. Geschrieben wird keine.
 
 ## Wohin Daten gesendet werden
 
@@ -86,7 +86,7 @@ There is no database and no persistent storage. Nothing taken from a request is 
 
 This includes the PDF receipt: it is generated per request, returned to the caller as base64 in the response body, and never written to a file.
 
-The service reads files (XSD and Schematron resources, fonts) and caches those between requests. It writes none.
+The service reads files (XSD and Schematron resources) and caches those between requests. It writes none.
 
 ## Where data is sent
 
