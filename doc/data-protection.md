@@ -1,4 +1,68 @@
-# Personal Data in this Service
+# 🇩🇪 Personenbezogene Daten in diesem Dienst
+
+Welche personenbezogenen Daten diese API entgegennimmt, wohin sie sie sendet und was sie behält.
+
+Beschrieben wird das technische Verhalten des Codes in diesem Repository. Es ist nicht die Datenschutzerklärung für die Menschen, deren Daten hier verarbeitet werden — diese stellt der [One-Stop-Shop](https://github.com/digitalservicebund/unternehmen-one-stop-shop) bereit, der diese API nutzt und die Daten erhebt.
+
+## Was der Dienst entgegennimmt
+
+Eine Anfrage an `POST /api/v1/register-gewerbe` enthält alles, was eine Gewerbeanmeldung und ein Fragebogen zur steuerlichen Erfassung brauchen, unter anderem:
+
+- Name, Geburtsname, Geburtsdatum und -ort, Geschlecht, Staatsangehörigkeit
+- Wohnanschrift, Betriebsanschrift, Telefonnummer, E-Mail-Adresse
+- Steuer-ID, Steuernummer, Religionszugehörigkeit
+- IBAN (bei ausländischen Konten zusätzlich BIC) der Konten für Steuerzahlungen
+- Angaben zum Betrieb: Tätigkeit, erwarteter Umsatz und Gewinn, Zahl der Beschäftigten
+
+Die vollständige Feldliste ist das OpenAPI-Schema, als JSON unter `/doc` und gerendert unter `/ui`. Wo jedes Feld in den beiden Zielformaten landet, dokumentiert [data-paths-and-origins.md](./data-paths-and-origins.md).
+
+## Was gespeichert wird: nichts
+
+Es gibt keine Datenbank und keinen persistenten Speicher. Nichts aus einer Anfrage wird auf die Festplatte geschrieben oder zwischengespeichert — die Daten einer Anfrage liegen nur für deren Dauer im Speicher und sind danach weg.
+
+Das gilt auch für den PDF-Beleg: er wird pro Anfrage erzeugt, als Base64 im Response-Body zurückgegeben und nie in eine Datei geschrieben.
+
+Der Dienst liest Dateien (XSD- und Schematron-Ressourcen, Schriften) und hält diese über Anfragen hinweg im Cache. Geschrieben wird keine.
+
+## Wohin Daten gesendet werden
+
+| Empfänger                            | Daten                                                                                                                 | Schutz                                                                                                                                                                                                                            |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PVOG (FITKO), `pvog.fitko.net`       | ausschließlich die Betriebsanschrift — PLZ, Ort, Straße, Hausnummer — als Volltextabfrage; kein Name, keine Kennungen | HTTPS. Löst die Anschrift auf einen ARS und das zuständige Gewerbeamt auf                                                                                                                                                         |
+| Gewerbeamt, über FIT-Connect (FITKO) | das vollständige XGewerbeordnung-XML                                                                                  | JWE, verschlüsselt mit dem öffentlichen Schlüssel des Empfängers. Auch die Metadaten der Einreichung sind verschlüsselt und enthalten nur die Schema-URI und einen SHA-512-Hash der Daten — die FITKO kann den Inhalt nicht lesen |
+| Gewerbeamt, über OSCI/DVDV (AKDB)    | das XGewerbeordnung-XML und der PDF-Beleg, als Multipart-Request                                                      | TLS mit Client-Zertifikat (mTLS). Anders als beim FIT-Connect-Weg ist das nur Transportverschlüsselung                                                                                                                            |
+| Finanzamt, über ELSTER (ERiC)        | der FsE-Datensatz                                                                                                     | von der ERiC-Bibliothek verschlüsselt und komprimiert (`CMSEncryptedData`, GZIP), bevor er den Prozess verlässt                                                                                                                   |
+
+Welcher der beiden Wege zum Gewerbeamt genutzt wird, hängt von der Kommune ab; die Entscheidung fällt in [getGewerbeRoutingInfo.ts](../src/routes/registerGewerbe/getGewerbeRoutingInfo.ts).
+
+`GET /api/v1/register-gewerbe/gewerbemeldung/events` gibt eine Submission-ID an FIT-Connect oder OSCI weiter, um den Status einer früheren Einreichung abzufragen. Dabei werden keine personenbezogenen Daten gesendet und keine Ergebnisse gespeichert.
+
+## Was protokolliert wird
+
+[requestLogging.ts](../src/routes/logging/requestLogging.ts) schreibt für Anfragen an `/api/*` je eine JSON-Zeile nach stdout: eine, wenn die Anfrage eintrifft, und eine, wenn sie abgeschlossen ist.
+
+- Zeitstempel, Ereignis, HTTP-Methode, Pfad, Status der Antwort, Dauer
+- die IP-Adresse des Clients — aus `x-forwarded-for`, sonst aus der Socket-Verbindung. Das ist ein personenbezogenes Datum.
+
+Request-Bodies, Header und Response-Bodies werden nicht protokolliert.
+
+Schlägt die Validierung des erzeugten XGewerbeordnung-XML fehl, nennt der protokollierte Fehler die verletzten Regeln und die Anzahl der Schema-Fehler — etwa `0 schema error(s); failed schematron rule(s): SCH-0189` (`createValidationErrorSummary` in [xmlValidator.ts](../src/helpers/xmlValidator.ts)). Die Rohausgabe des Validators bleibt absichtlich aus dem Log: ein Schema-Fehler zitiert den zurückgewiesenen Wert — `'1965-13-45' is not a valid value of the atomic type 'xs:date'` bei einem fehlerhaften Geburtsdatum — und das ist ein personenbezogenes Datum.
+
+Die ERiC-Bibliothek führt ein eigenes technisches Log (`eric.log`) im Arbeitsverzeichnis. Es hält Bibliotheksversionen, Verarbeitungsschritte und Rückgabecodes fest, nicht die Inhalte der Einreichung, und es ist flüchtig: es liegt im Dateisystem des Containers und verschwindet mit dem Pod.
+
+Logs gehen nach stdout. Wie sie gesammelt und wie lange sie aufbewahrt werden, entscheidet die Betriebsplattform und ist nicht Teil dieses Repositorys.
+
+## Umgebungen
+
+Nur `production` erreicht echte Gewerbeämter und Finanzämter, und diese Umgebung ist nicht aus dem Internet erreichbar — sie kann nur von der One-Stop-Shop-App aufgerufen werden. Siehe [ADR 0001](./adr/adr-0001-environments.md) und [ADR 0003](./adr/adr-0003-access-control.md).
+
+Die Umgebung `development` ist sandboxed: dort wird nichts angemeldet. Sie ist aber öffentlich erreichbar, deshalb dürfen **keine echten personenbezogenen Daten** dorthin gesendet werden.
+
+## Probleme mitteilen
+
+Alle sicherheitsrelevanten Hinweise, auch solche zu personenbezogenen Daten, bitte an die Adresse in [SECURITY.md](../SECURITY.md) — und nicht über GitHub "issues".
+
+# 🇬🇧 Personal Data in this Service
 
 What personal data this API receives, where it sends it, and what it keeps.
 

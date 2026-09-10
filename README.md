@@ -29,7 +29,7 @@ _¹ Sending the tax registration questionnaire requires proprietary code ([ERiC]
 - [CONTRIBUTING.md](./CONTRIBUTING.md) - Für alle, die mithelfen möchten (DE/EN)
 - [LICENSE.md](./LICENSE.md) - Unsere Open-Source-Lizenz (MIT) (EN)
 - [CODE_OF_CONDUCT_DE.md](./CODE_OF_CONDUCT_DE.md) - Unser Verhaltenskodex (DE)
-- [doc/data-protection.md](./doc/data-protection.md) - Welche personenbezogenen Daten der Dienst verarbeitet, wohin er sie sendet und was er speichert (EN)
+- [doc/data-protection.md](./doc/data-protection.md) - Welche personenbezogenen Daten der Dienst verarbeitet, wohin er sie sendet und was er speichert (DE/EN)
 
 ## 🇬🇧 Further Information
 
@@ -38,4 +38,4 @@ _¹ Sending the tax registration questionnaire requires proprietary code ([ERiC]
 - [CONTRIBUTING.md](./CONTRIBUTING.md) - For anyone interested in improving the project (DE/EN)
 - [LICENSE.md](./LICENSE.md) - Our open-source license (MIT) (EN)
 - [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) - Our code of conduct (EN)
-- [doc/data-protection.md](./doc/data-protection.md) - What personal data the service processes, where it sends it and what it keeps (EN)
+- [doc/data-protection.md](./doc/data-protection.md) - What personal data the service processes, where it sends it and what it keeps (DE/EN)
