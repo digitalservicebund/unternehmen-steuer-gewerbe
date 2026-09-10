@@ -41,8 +41,10 @@ const FIELD_ROWS: Record<string, string> = {
   "gewerbebetrieb.betriebArt.handwerk": "Art des angemeldeten Betriebes",
   "gewerbebetrieb.betriebArt.handel": "Art des angemeldeten Betriebes",
   "gewerbebetrieb.betriebArt.sonstiges": "Art des angemeldeten Betriebes",
-  "gewerbebetrieb.anzahlVollzeitBeschaeftigte": "Zahl der tätigen Personen (Vollzeit / Teilzeit)",
-  "gewerbebetrieb.anzahlTeilzeitBeschaeftigte": "Zahl der tätigen Personen (Vollzeit / Teilzeit)",
+  "gewerbebetrieb.anzahlVollzeitBeschaeftigte":
+    "Zahl der beschäftigten Personen (Vollzeit / Teilzeit)",
+  "gewerbebetrieb.anzahlTeilzeitBeschaeftigte":
+    "Zahl der beschäftigten Personen (Vollzeit / Teilzeit)",
   "gewerbebetrieb.istReisegewerbe": "Reisegewerbe",
   "gewerbebetrieb.beteiligungOeffentlicheHand": "Beteiligung der öffentlichen Hand",
 };
