@@ -12,6 +12,7 @@ const FIELD_ROWS: Record<string, string> = {
   datumMeldung: "Datum der Anmeldung",
   grundAnmeldungSchluessel: "Grund der Neuerrichtung / Übernahme",
   "gewerbebetrieb.betriebsstaette.artBetriebsstaette": "Die Anmeldung wird erstattet für",
+  "gewerbebetrieb.rechtsformcode": "Rechtsform",
   "referenzierteSubjekte.natuerlichePerson.name.familienname": "Name",
   "referenzierteSubjekte.natuerlichePerson.name.vornamen": "Vornamen",
   "referenzierteSubjekte.natuerlichePerson.geschlecht": "Geschlecht",
@@ -70,7 +71,6 @@ const NOT_SHOWN_AS_ROW: Record<string, string> = {
   "nachweisdokumentOnlinedienst.mimetype": "metadata of the attached PDF receipt itself",
   "nachweisdokumentOnlinedienst.kategorie": "metadata of the attached PDF receipt itself",
   "gewerbebetrieb.gewerbebetriebID": "internal cross-reference id",
-  "gewerbebetrieb.rechtsformcode": "GewA 1 has no field for it; design.pdf shows none",
 };
 
 // "x" (ohne Angabe) is transmitted but rendered as an empty value.
