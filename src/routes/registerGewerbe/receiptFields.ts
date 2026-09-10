@@ -207,7 +207,7 @@ export function buildReceipt(
         },
         {
           gewaNumber: "22",
-          label: "Zahl der tätigen Personen (Vollzeit / Teilzeit)",
+          label: "Zahl der beschäftigten Personen (Vollzeit / Teilzeit)",
           value: formatBeschaeftigte(
             gewerbebetrieb?.anzahlVollzeitBeschaeftigte,
             gewerbebetrieb?.anzahlTeilzeitBeschaeftigte,

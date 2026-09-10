@@ -85,7 +85,9 @@ describe("buildReceipt", () => {
       "Betriebsweg 2, 12345 Musterstadt",
     );
     expect(rowFor("Geburtsort und -land", rows).value).toBe("Musterstadt, Deutschland");
-    expect(rowFor("Zahl der tätigen Personen (Vollzeit / Teilzeit)", rows).value).toBe("1 / 0");
+    expect(rowFor("Zahl der beschäftigten Personen (Vollzeit / Teilzeit)", rows).value).toBe(
+      "1 / 0",
+    );
   });
 
   it("renders a Hausnummernbereich as von-bis", () => {
