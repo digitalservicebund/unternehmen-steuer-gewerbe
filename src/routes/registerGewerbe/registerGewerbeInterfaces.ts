@@ -19,9 +19,10 @@ import {
   ROLLE_KONTOINHABER_KEYS,
 } from "./requestDataTransformer/fsECodes";
 
-// ELSTER FsE integer bounds (FsE_EUn XSD), derived from totalDigits restrictions on the
-// GanzzahlNichtNegOhneFuehrNull/GanzzahlOhneFuehrNull base types.
+// ELSTER FsE integer bounds (FsE_EUn XSD). The MaxVK12 types also carry a pattern ".{0,12}",
+// which limits the written value to 12 characters — a minus sign takes one of them.
 const MAX_VK_12 = 999_999_999_999; // 12 digits (GesUmsatz.*, EinkGewBetr.*)
+const MIN_VK_12_SIGNED = -99_999_999_999; // 11 digits plus sign (EinkGewBetr.*)
 const MAX_VK_10 = 9_999_999_999; // 10 digits (ZahllastUeberschuss.Betrag)
 
 const AdresseSchema = z.object({
@@ -316,11 +317,11 @@ const UnternehmensDatenSchema = z
       example: false,
       description: "Wird die Kleinunternehmer-Regelung (§ 19 UStG) in Anspruch genommen?",
     }),
-    umsatzGruendungsjahr: z.number().int().min(0).max(MAX_VK_12).default(1).openapi({
+    umsatzGruendungsjahr: z.number().int().min(0).max(MAX_VK_12).openapi({
       example: 25000,
       description: "Voraussichtlicher Gesamtumsatz (in Euro) im Jahr der Betriebseröffnung.",
     }),
-    umsatzFolgejahr: z.number().int().min(0).max(MAX_VK_12).default(1).openapi({
+    umsatzFolgejahr: z.number().int().min(0).max(MAX_VK_12).openapi({
       example: 26000,
       description: "Voraussichtlicher Gesamtumsatz (in Euro) im Folgejahr.",
     }),
@@ -328,12 +329,12 @@ const UnternehmensDatenSchema = z
       example: false,
       description: "Soll mit dem FsE auch eine UmsatzsteuerId mitbeantragt werden?",
     }),
-    gewinnGründungsjahr: z.number().int().min(-MAX_VK_12).max(MAX_VK_12).default(1).openapi({
+    gewinnGründungsjahr: z.number().int().min(MIN_VK_12_SIGNED).max(MAX_VK_12).openapi({
       example: 25000,
       description:
         "Voraussichtlicher Gewinn (in Euro) im Jahr der Betriebseröffnung. Negativ bei Verlust.",
     }),
-    gewinnFolgejahr: z.number().int().min(-MAX_VK_12).max(MAX_VK_12).default(1).openapi({
+    gewinnFolgejahr: z.number().int().min(MIN_VK_12_SIGNED).max(MAX_VK_12).openapi({
       example: 26000,
       description: "Voraussichtlicher Gewinn (in Euro) im Folgejahr. Negativ bei Verlust.",
     }),
@@ -354,10 +355,7 @@ const UnternehmensDatenSchema = z
       example: 0,
       description: "Voraussichtliche Zahllast oder Überschuss in Euro.",
     }),
-    // Sign is an application-level convention (positive = Zahllast, negative/zero = Überschuss),
-    // consumed by getZahllastUeberschuss() in transformToFsE.ts, which takes Math.abs() before
-    // mapping to the XSD's non-negative 10-digit Betrag field — hence the range here is symmetric
-    // around that bound, unlike the other (always non-negative) integer fields.
+    // The sign carries the Zahllast/Überschuss direction, so the Betrag bound applies to both signs.
     umsatzsteuerImErstenJahr: z.number().int().min(-MAX_VK_10).max(MAX_VK_10).optional().openapi({
       example: 100,
       description:

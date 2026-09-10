@@ -2,6 +2,10 @@ import { describe, it, expect } from "vitest";
 import { RegisterGewerbeRequestSchema } from "./registerGewerbeInterfaces";
 import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
 
+const MAX_VK_12 = 999_999_999_999;
+const MIN_VK_12_SIGNED = -99_999_999_999;
+const MAX_VK_10 = 9_999_999_999;
+
 function validRequest() {
   return structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
 }
@@ -278,6 +282,21 @@ describe("RegisterGewerbeRequestSchema", () => {
   });
 
   describe("numeric bounds", () => {
+    const upperLimits = [
+      ["umsatzGruendungsjahr", MAX_VK_12],
+      ["umsatzFolgejahr", MAX_VK_12],
+      ["gewinnGründungsjahr", MAX_VK_12],
+      ["gewinnFolgejahr", MAX_VK_12],
+      ["zahllastUeberschussBetrag", MAX_VK_10],
+      ["umsatzsteuerImErstenJahr", MAX_VK_10],
+    ] as const;
+
+    const lowerLimits = [
+      ["gewinnGründungsjahr", MIN_VK_12_SIGNED],
+      ["gewinnFolgejahr", MIN_VK_12_SIGNED],
+      ["umsatzsteuerImErstenJahr", -MAX_VK_10],
+    ] as const;
+
     it.each([
       ["umsatzGruendungsjahr"],
       ["umsatzFolgejahr"],
@@ -301,10 +320,27 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["gewinnGründungsjahr"],
       ["gewinnFolgejahr"],
       ["zahllastUeberschussBetrag"],
+      ["umsatzsteuerImErstenJahr"],
       ["anzahlVollzeitBeschaeftigte"],
       ["anzahlTeilzeitBeschaeftigte"],
     ])("rejects a non-integer value for %s", (field) => {
       expect(parseWithFieldSet("unternehmensDaten", field, 1.5).success).toBe(false);
+    });
+
+    it.each(upperLimits)("accepts %s at its maximum %d", (field, maximum) => {
+      expect(parseWithFieldSet("unternehmensDaten", field, maximum).success).toBe(true);
+    });
+
+    it.each(upperLimits)("rejects %s one above its maximum %d", (field, maximum) => {
+      expect(parseWithFieldSet("unternehmensDaten", field, maximum + 1).success).toBe(false);
+    });
+
+    it.each(lowerLimits)("accepts %s at its minimum %d", (field, minimum) => {
+      expect(parseWithFieldSet("unternehmensDaten", field, minimum).success).toBe(true);
+    });
+
+    it.each(lowerLimits)("rejects %s one below its minimum %d", (field, minimum) => {
+      expect(parseWithFieldSet("unternehmensDaten", field, minimum - 1).success).toBe(false);
     });
   });
 
