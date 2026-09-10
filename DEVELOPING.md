@@ -28,12 +28,18 @@ If you don't have access to that repository, you can check the interface and imp
 
 If you do have access, you still need to authenticate in order to fetch the dependency:
 
-- Create a [GitHub personal access token](https://github.com/settings/tokens), assign the `read:packages` scope.
+- Create a [GitHub personal access token](https://github.com/settings/tokens) (classic) assign, the `read:packages` scope (starts with `ghp_`)
 - Set it in pnpm's user-level config (not this repo's committed `.npmrc` — recent pnpm versions refuse to expand env vars for auth tokens read from a committed/project `.npmrc`, as a safeguard against a malicious commit redirecting where a secret gets sent):
 
-```bash
-pnpm config set "//npm.pkg.github.com/:_authToken" "<your token>"
-```
+  ```bash
+  pnpm config set "//npm.pkg.github.com/:_authToken" "<your token>"
+  ```
+
+- confirm the configuration by installing the dependencies (including the private package)
+
+  ```bash
+  pnpm install
+  ```
 
 This is a one-time setup per machine. Once set up, `pnpm install` is all that's needed; there is an `.npmrc` in this repo that routes the `@digitalservicebund` scope to `npm.pkg.github.com`, and pnpm reads the auth token from your user-level config set above.
 
@@ -60,6 +66,8 @@ or in watch mode, restarting on changes
 ```bash
 pnpm run start:watch
 ```
+
+You can see the sawgger UI at http://localhost:3000/ui
 
 ### Locally via Docker
 

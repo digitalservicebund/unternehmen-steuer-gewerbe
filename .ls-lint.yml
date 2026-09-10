@@ -20,3 +20,4 @@ ignore:
   - .eric-certificates
   - .fallow
   - src/resources
+  - .pnpm-store

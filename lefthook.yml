@@ -10,4 +10,4 @@ pre-commit:
       run: pnpm run format:fix
       stage_fixed: true
     - name: Secret scanning
-      run: trivy fs --scanners secret --exit-code 1 --skip-files "**/generated.spezifikation.sef.json" --skip-files "**/.env" --skip-dirs ".claude" .
+      run: trivy fs --scanners secret --exit-code 1 --skip-files "**/generated.spezifikation.sef.json" --skip-files "**/.env" --skip-dirs ".claude" --skip-dirs ".pnpm-store" .
