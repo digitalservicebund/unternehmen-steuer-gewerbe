@@ -1,48 +1,11 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 
-// Note 1: mocking is "global" on file level, therefore we have separate files for tests that mock and those that don't.
-// Note 2: We need to mock here, such that the private library correctly initializes their internal libraries before the tests are run.
-vi.mock("@digitalservicebund/unternehmen-steuer-gewerbe-privat", () => ({
-  validateFsE: vi.fn().mockReturnValue({ valid: true }),
-  createElsterFsEEUnXml: vi.fn().mockReturnValue("<xml/>"),
-  sendFsE: vi.fn().mockReturnValue({ success: true }),
-  getFinanzamtId: vi.fn().mockReturnValue(["mock-finanzamt-id"]),
-  getFinanzamtDetailsById: vi.fn().mockReturnValue({
-    name: "Finanzamt Mock",
-    hausanschrift: {
-      strasse: "Mockstraße",
-      hausnummer: "1",
-      postleitzahl: "00000",
-      ort: "Mockstadt",
-    },
-    telefonnummer: "0000 000-0",
-  }),
-}));
-
-const { mockSubmitData, mockGetGewerbeRoutingInfo } = vi.hoisted(() => ({
-  mockSubmitData: vi.fn().mockResolvedValue({ submissionId: "mock-submission-id" }),
-  mockGetGewerbeRoutingInfo: vi.fn().mockResolvedValue({
-    ags: "03046001",
-    ars: "084210000000",
-    gewerbeamt: {
-      name: "Stadt Fulda",
-      adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
-      telefon: "0661 102-0",
-      onlineServices: [],
-    },
-    fitConnectDestinationInformation: { destinationId: "mock-destination-id" },
-  }),
-}));
-
-vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
-  getFitConnectClient: () => ({ submitData: mockSubmitData }),
-}));
-
-vi.mock("./getGewerbeRoutingInfo", () => ({
-  getGewerbeRoutingInfo: mockGetGewerbeRoutingInfo,
-}));
-
-import app from "../../app";
+import {
+  mockSubmitData,
+  mockSendMessage,
+  mockGetGewerbeRoutingInfo,
+  postRegisterGewerbe,
+} from "./registerGewerbeIntegrationTestSetup";
 import {
   validateFsE as mockValidateFsE,
   sendFsE as mockSendFsE,
@@ -51,17 +14,12 @@ import {
 import * as gewerbeanmeldung from "../../xmlBuilders/xGewerbeordnung/gewerbeanmeldung";
 import * as pdfGenerator from "./registerGewerbePdfGenerator";
 
-import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
+import {
+  elsterServerResponseFixture,
+  registerGewerbeSampleRequestAllFieldsFilled,
+} from "./testHelpers";
 import { ErrorTypeSchema } from "./registerGewerbeInterfaces";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
-
-function postRegisterGewerbe(data = registerGewerbeSampleRequestAllFieldsFilled, queryString = "") {
-  return app.request(`/api/v1/register-gewerbe${queryString}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-}
 
 describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
   afterEach(() => vi.restoreAllMocks());
@@ -76,6 +34,34 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
       expect(json.gewerbeanmeldung.success).toBe(false);
       expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.invalid_data);
       expect(json.gewerbeanmeldung.info).toBe("No Gewerbeamt found for address");
+      expect(json.fseÜbermittlung.success).toBe(true);
+    });
+
+    it("Returns 207 MULTI-STATUS with gewerbeanmeldung upstream_error when the routing lookup throws, fseÜbermittlung still succeeds", async () => {
+      mockGetGewerbeRoutingInfo.mockRejectedValueOnce(new Error("Routing API unavailable"));
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+      expect(response.status).toEqual(HttpStatusCode.MultiStatus);
+      expect(json.gewerbeanmeldung.success).toBe(false);
+      expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
+      expect(json.fseÜbermittlung.success).toBe(true);
+    });
+
+    it("Returns 207 MULTI-STATUS with gewerbeanmeldung upstream_error when the OSCI submission fails, fseÜbermittlung still succeeds", async () => {
+      mockGetGewerbeRoutingInfo.mockResolvedValueOnce({
+        ags: "03046001",
+        ars: "084210000000",
+        gewerbeamt: { name: "Stadt Fulda", onlineServices: [] },
+        fitConnectDestinationInformation: null,
+      });
+      mockSendMessage.mockRejectedValueOnce(new Error("AKDB unavailable"));
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+      expect(response.status).toEqual(HttpStatusCode.MultiStatus);
+      expect(json.gewerbeanmeldung.success).toBe(false);
+      expect(json.gewerbeanmeldung.errorType).toBe(ErrorTypeSchema.enum.upstream_error);
       expect(json.fseÜbermittlung.success).toBe(true);
     });
 
@@ -144,6 +130,20 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
         expect(json.gewerbeanmeldung.submissionId).toBeTruthy();
       },
     );
+
+    it("Returns the TransferTicket as fseÜbermittlung submissionId when sendFsE reports failure", async () => {
+      vi.mocked(mockSendFsE).mockReturnValueOnce({
+        success: false,
+        info: "ERiC rejected submission",
+        serverResponse: elsterServerResponseFixture("t6wq2rjkxa90fbn4hs7cvmzl3dpuy8ge"),
+      });
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+      expect(response.status).toEqual(HttpStatusCode.MultiStatus);
+      expect(json.fseÜbermittlung.success).toBe(false);
+      expect(json.fseÜbermittlung.submissionId).toBe("t6wq2rjkxa90fbn4hs7cvmzl3dpuy8ge");
+    });
   });
 
   describe("in case of error", () => {
@@ -212,6 +212,95 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
           istVersteuerungGrund: "unterschreitungUmsatzgrenze",
         },
       });
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+    });
+
+    it("Returns 400 BAD REQUEST when vertrauensniveau is missing", async () => {
+      const { vertrauensniveau: _vertrauensniveau, ...persönlicheDatenOhneVertrauensniveau } =
+        registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten;
+
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        persönlicheDaten: persönlicheDatenOhneVertrauensniveau,
+      } as unknown as typeof registerGewerbeSampleRequestAllFieldsFilled);
+
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+    });
+
+    it.each(["gewinnGründungsjahr", "gewinnFolgejahr"] as const)(
+      "Returns 400 BAD REQUEST when %s is missing",
+      async (field) => {
+        const unternehmensDaten = {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+        };
+        delete (unternehmensDaten as Record<string, unknown>)[field];
+
+        const response = await postRegisterGewerbe({
+          ...registerGewerbeSampleRequestAllFieldsFilled,
+          unternehmensDaten,
+        });
+        expect(response.status).toEqual(HttpStatusCode.BadRequest);
+      },
+    );
+
+    it.each([
+      "umsatzGruendungsjahr",
+      "umsatzFolgejahr",
+      "anmeldedatumFinanzamt",
+      "anmeldedatumGewerbeamt",
+    ] as const)("Returns 400 BAD REQUEST when %s is missing", async (field) => {
+      const unternehmensDaten = {
+        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+      };
+      delete (unternehmensDaten as Record<string, unknown>)[field];
+
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten,
+      });
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+    });
+
+    it("Returns 400 BAD REQUEST when umsatzsteuerIdMitbeantragen is missing", async () => {
+      const unternehmensDaten = {
+        ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+      };
+      delete (unternehmensDaten as Record<string, unknown>).umsatzsteuerIdMitbeantragen;
+
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten,
+      });
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+    });
+
+    it("Returns 400 BAD REQUEST when steuerId is missing", async () => {
+      const { steuerId: _steuerId, ...persönlicheDatenOhneSteuerId } =
+        registerGewerbeSampleRequestAllFieldsFilled.persönlicheDaten;
+
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        persönlicheDaten: persönlicheDatenOhneSteuerId,
+      } as unknown as typeof registerGewerbeSampleRequestAllFieldsFilled);
+
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+    });
+
+    it("Returns 400 BAD REQUEST when iban is foreign and bic is missing", async () => {
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          bankKonto: {
+            ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten.bankKonto,
+            personensteuerkonto: {
+              iban: "FR1420041010050500013M02606",
+              kontoinhaber: "steuerpflichtigePerson",
+            },
+          },
+        },
+      });
+
       expect(response.status).toEqual(HttpStatusCode.BadRequest);
     });
 

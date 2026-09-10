@@ -1,78 +1,21 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { XMLParser } from "fast-xml-parser";
 
-// Note 1: mocking is "global" on file level, therefore we have separate files for tests that mock and those that don't.
-// Note 2: We need to mock here, such that the private library correctly initializes their internal libraries before the tests are run.
-vi.mock("@digitalservicebund/unternehmen-steuer-gewerbe-privat", () => ({
-  validateFsE: vi.fn().mockReturnValue({ valid: true }),
-  createElsterFsEEUnXml: vi.fn().mockReturnValue("<xml/>"),
-  sendFsE: vi.fn().mockReturnValue({ success: true }),
-  getFinanzamtId: vi.fn().mockReturnValue(["mock-finanzamt-id"]),
-  getFinanzamtDetailsById: vi.fn().mockReturnValue({
-    name: "Finanzamt Mock",
-    hausanschrift: {
-      strasse: "Mockstraße",
-      hausnummer: "1",
-      postleitzahl: "00000",
-      ort: "Mockstadt",
-    },
-    telefonnummer: "0000 000-0",
-  }),
-}));
-
-const { mockSubmitData, mockGetGewerbeRoutingInfo } = vi.hoisted(() => ({
-  mockSubmitData: vi.fn().mockResolvedValue({ submissionId: "mock-submission-id" }),
-  mockGetGewerbeRoutingInfo: vi.fn().mockResolvedValue({
-    ags: "03046001",
-    ars: "084210000000",
-    gewerbeamt: {
-      name: "Stadt Fulda",
-      adresse: { strasse: "Schlossstraße", hausnummer: "1", postleitzahl: "36037", ort: "Fulda" },
-      telefon: "0661 102-0",
-      onlineServices: [],
-    },
-    fitConnectDestinationInformation: { destinationId: "mock-destination-id" },
-  }),
-}));
-
-vi.mock("../../clients/fitConnectClient/fitConnectClient", () => ({
-  getFitConnectClient: () => ({ submitData: mockSubmitData }),
-}));
-
-vi.mock("./getGewerbeRoutingInfo", () => ({
-  getGewerbeRoutingInfo: mockGetGewerbeRoutingInfo,
-}));
-
-const { testFitConnectDestinationId } = vi.hoisted(() => ({
-  testFitConnectDestinationId: "mock-destination-id",
-}));
-
-// Override only FIT_CONNECT_DESTINATION_ID so the events routing context is asserted
-// against a known value; every other env var still resolves through the real getter.
-// NOTE: this can be removed as soon as we use the routing service from fit connect ([SG-1015])
-vi.mock("../../secretsAndEnvironmentVariables", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("../../secretsAndEnvironmentVariables")>();
-  const getEnvironmentVariable: typeof actual.getEnvironmentVariable = (name) =>
-    name === "FIT_CONNECT_DESTINATION_ID"
-      ? testFitConnectDestinationId
-      : actual.getEnvironmentVariable(name);
-  return { ...actual, getEnvironmentVariable };
-});
-
-import app from "../../app";
-
-import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
+import {
+  mockSubmitData,
+  mockSendMessage,
+  mockGetGewerbeRoutingInfo,
+  fuldaRoutingInfoFixture,
+  postRegisterGewerbe,
+} from "./registerGewerbeIntegrationTestSetup";
+import { sendFsE as mockSendFsE } from "@digitalservicebund/unternehmen-steuer-gewerbe-privat";
+import {
+  elsterServerResponseFixture,
+  registerGewerbeSampleRequestAllFieldsFilled,
+} from "./testHelpers";
 import { HttpStatusCode } from "../../helpers/httpStatusCodes";
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
-
-function postRegisterGewerbe(data = registerGewerbeSampleRequestAllFieldsFilled, queryString = "") {
-  return app.request(`/api/v1/register-gewerbe${queryString}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-}
 
 describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
   afterEach(() => vi.restoreAllMocks());
@@ -151,6 +94,44 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
     });
   });
 
+  describe("Betriebsstätten-Anschrift in the submitted xGewerbeanmeldung", () => {
+    it("splits the hausnummer range 1C-1E into hausnummerVon and hausnummerBis", async () => {
+      mockSubmitData.mockClear();
+
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          adresse: {
+            strasse: "Domstraße",
+            hausnummer: "1C-1E",
+            postleitzahl: "36037",
+            ort: "Fulda",
+          },
+        },
+      });
+
+      // a 200 also means the generated XML passed XSD and Schematron validation
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+
+      const submittedXml = mockSubmitData.mock.calls[0]![0].data;
+      const xGewO = parser.parse(submittedXml)["xga:ext.gewerbemeldung.0400"];
+      const anschrift =
+        xGewO["xga:satz"]["xga:anmeldung"]["xga:gewerbebetrieb"]["xga:betriebsstaette"][
+          "bk:anschrift"
+        ]["bk:strassenanschriftInland"];
+
+      expect(anschrift).toEqual({
+        "adr:strasse": "Domstraße",
+        "bk:hausnummerVon": "1C",
+        "bk:hausnummerBis": "1E",
+        // the XML parser turns the numeric PLZ into a number
+        "adr:postleitzahl": 36037,
+        "adr:ort": "Fulda",
+      });
+    });
+  });
+
   describe("gemeindeschluesselErgaenzung for Hamburg", () => {
     it("includes the Hamburg Stadtbezirk gemeindeschluesselErgaenzung derived from the betriebsstaette PLZ", async () => {
       mockSubmitData.mockClear();
@@ -167,6 +148,7 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
           },
           onlineServices: [],
         },
+        fitConnectDestinationInformation: { destinationId: "mock-destination-id" },
       });
 
       const response = await postRegisterGewerbe({
@@ -197,7 +179,117 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
 
       expect(response.status).toEqual(HttpStatusCode.Ok);
       expect(json.gewerbeanmeldung.ars).toBe("084210000000");
-      expect(json.gewerbeanmeldung.fitConnectDestinationId).toBe(testFitConnectDestinationId);
+      expect(json.gewerbeanmeldung.fitConnectDestinationId).toBe("mock-destination-id");
+    });
+  });
+
+  describe("OSCI submission when no FIT-Connect destination exists", () => {
+    const routingInfoWithoutFitConnect = {
+      ...fuldaRoutingInfoFixture,
+      fitConnectDestinationInformation: null,
+    };
+
+    it("sends the Gewerbeanmeldung XML via OSCI to MELDID:03046001", async () => {
+      mockSendMessage.mockClear();
+      mockGetGewerbeRoutingInfo.mockResolvedValueOnce(routingInfoWithoutFitConnect);
+
+      const response = await postRegisterGewerbe();
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+
+      const [{ targetId, message }] = mockSendMessage.mock.calls[0]!;
+      expect(targetId).toBe("MELDID:03046001");
+      const xGewO = parser.parse(message)["xga:ext.gewerbemeldung.0400"];
+      expect(xGewO["xga:satz"]["xga:anmeldung"]["xga:autor"]["bn-beh:kennung"]).toBe(
+        "MELDID:03046001",
+      );
+    });
+
+    it("returns the OSCI sourceMessageId as submissionId and no fitConnectDestinationId", async () => {
+      mockGetGewerbeRoutingInfo.mockResolvedValueOnce(routingInfoWithoutFitConnect);
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+      expect(json.gewerbeanmeldung.success).toBe(true);
+      expect(json.gewerbeanmeldung.submissionId).toBe("mock-osci-message-id");
+      expect(json.gewerbeanmeldung.ars).toBe("084210000000");
+      expect(json.gewerbeanmeldung.fitConnectDestinationId).toBeUndefined();
+    });
+
+    it("declares the PDF receipt as nachweisdokument.onlinedienst in the XML", async () => {
+      mockSendMessage.mockClear();
+      mockGetGewerbeRoutingInfo.mockResolvedValueOnce(routingInfoWithoutFitConnect);
+
+      const response = await postRegisterGewerbe();
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+
+      const [{ message }] = mockSendMessage.mock.calls[0]!;
+      const satz = parser.parse(message)["xga:ext.gewerbemeldung.0400"]["xga:satz"];
+      expect(satz["bk:nachweisdokument.onlinedienst"]).toEqual({
+        "bk:dokumentid": "gewerbeanmeldung-beleg.pdf",
+        "bk:dateiname": "gewerbeanmeldung-beleg.pdf",
+        "bk:mimetype": "application/pdf",
+        "bk:kategorie": "Antrag im Original",
+      });
+    });
+
+    it("sends the PDF receipt as the Anlage the XML refers to", async () => {
+      mockSendMessage.mockClear();
+      mockGetGewerbeRoutingInfo.mockResolvedValueOnce(routingInfoWithoutFitConnect);
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+
+      const [{ attachments }] = mockSendMessage.mock.calls[0]!;
+      expect(attachments).toEqual([
+        {
+          fileName: "gewerbeanmeldung-beleg.pdf",
+          mimeType: "application/pdf",
+          content: Buffer.from(json.gewerbeanmeldung.pdfReceiptBase64, "base64"),
+        },
+      ]);
+    });
+  });
+
+  describe("fseÜbermittlung submissionId", () => {
+    it("returns the TransferTicket from the ELSTER server response as submissionId", async () => {
+      vi.mocked(mockSendFsE).mockReturnValueOnce({
+        success: true,
+        serverResponse: elsterServerResponseFixture("eh23053phmwjw2411dsn98z8picgyoue"),
+      });
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+      expect(json.fseÜbermittlung.submissionId).toBe("eh23053phmwjw2411dsn98z8picgyoue");
+    });
+
+    it("returns no submissionId when sendFsE returns no serverResponse", async () => {
+      vi.mocked(mockSendFsE).mockReturnValueOnce({ success: true });
+
+      const response = await postRegisterGewerbe();
+      const json = await response.json();
+
+      expect(response.status).toEqual(HttpStatusCode.Ok);
+      expect(json.fseÜbermittlung.success).toBe(true);
+      expect(json.fseÜbermittlung.submissionId).toBeUndefined();
+    });
+  });
+
+  describe("gewinnGründungsjahr and gewinnFolgejahr", () => {
+    it("accepts negative values (a projected loss)", async () => {
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          gewinnGründungsjahr: -5000,
+          gewinnFolgejahr: -1000,
+        },
+      });
+
+      expect(response.status).toEqual(HttpStatusCode.Ok);
     });
   });
 });

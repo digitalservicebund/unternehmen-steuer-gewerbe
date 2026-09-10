@@ -1,10 +1,14 @@
 import { z } from "@hono/zod-openapi";
+import { isValidPhoneNumber } from "libphonenumber-js";
 import { OfficeDetailsSchema } from "../region/regionInterfaces";
+import { type Adresse, type AdresseMitHausnummer } from "../../helpers/formFieldTransformations";
 import {
   UNFALLVERSICHERUNGSTRAEGER,
   UNFALLVERSICHERUNGSTRAEGER_KEYS,
   VERTRAUENSNIVEAU_KEYS,
   STAATSANGEHOERIGKEIT_KEYS,
+  STAATSANGEHOERIGKEIT_ICAO_KEYS,
+  GESCHLECHT_KEYS,
 } from "./requestDataTransformer/xGewerbeordnungCodes";
 import {
   RELIGIONSSCHLUESSEL_KEYS,
@@ -12,6 +16,7 @@ import {
   SOLL_IST_VERSTEUERUNG_KEYS,
   IST_VERSTEUERUNG_GRUND_KEYS,
   ZAHLLAST_UEBERSCHUSS_KEYS,
+  ROLLE_KONTOINHABER_KEYS,
 } from "./requestDataTransformer/fsECodes";
 
 // ELSTER FsE integer bounds (FsE_EUn XSD), derived from totalDigits restrictions on the
@@ -24,16 +29,93 @@ const AdresseSchema = z.object({
     .string()
     .regex(/^\D.*\d/)
     .openapi({
-      example: "Musterstraße 1",
+      example: "Münzgasse 2",
       description:
         "Street name followed by street number; must start with letters and contain a digit",
     }),
   postleitzahl: z
     .string()
     .regex(/^\d{5}$/)
-    .openapi({ example: "36037", description: "5-digit German postal code" }),
-  ort: z.string().openapi({ example: "Fulda" }),
+    .openapi({ example: "01067", description: "5-digit German postal code" }),
+  ort: z.string().openapi({ example: "Dresden" }),
+}) satisfies z.ZodType<Adresse>;
+
+const AdresseMitHausnummerSchema = z.object({
+  strasse: z.string().min(1).openapi({ example: "Münzgasse" }),
+  hausnummer: z.string().min(1).openapi({
+    example: "2",
+    description: 'House number; a range can be given as "8-14" or "8/14"',
+  }),
+  postleitzahl: z
+    .string()
+    .regex(/^\d{5}$/)
+    .openapi({ example: "01067", description: "5-digit German postal code" }),
+  ort: z.string().openapi({ example: "Dresden" }),
+}) satisfies z.ZodType<AdresseMitHausnummer>;
+
+const OnlinehandelSchema = z.object({
+  eigenerWebshop: z.boolean(),
+  adresseEigenerWebshop: z.string().min(1).max(128).optional(),
+  onlineMarktplaetze: z.boolean(),
+  onlineMarktplatz: z
+    .array(
+      z.object({
+        nameMarktplatz: z.string().min(1).max(100),
+        nameAccount: z.string().min(1).max(100),
+      }),
+    )
+    .max(99)
+    .optional(),
 });
+
+const InfluencerSchema = z.object({
+  influencerUmsatz: z.boolean(),
+  plattform: z
+    .array(
+      z.object({
+        namePlattform: z.string().min(1).max(100),
+        nameAccount: z.string().min(1).max(100),
+      }),
+    )
+    .max(99)
+    .optional(),
+});
+
+// FsE_EUn XSD: String_MinL5_MaxL34_Musterm188614856_SType, used for both Iban and IbanAusland
+const BankKontoIbanSchema = z
+  .string()
+  .min(5)
+  .max(34)
+  .regex(/^[A-Za-z]{2}\d{2}[\dA-Za-z]{1,30}$/)
+  .openapi({ example: "DE02120300000000202051", description: "IBAN" });
+
+// FsE_EUn XSD: BICBaseSType
+const BankKontoBicSchema = z
+  .string()
+  .regex(/^[A-Za-z]{6}[\dA-Za-z]{2}([\dA-Za-z]{3})?$/)
+  .openapi({
+    example: "BYLADEM1SWU",
+    description: "BIC; only required for a foreign IBAN.",
+  });
+
+// FsE_EUn XSD: String_MinL1_MaxL128_SType
+const BankKontoKontoinhaberNameSchema = z.string().min(1).max(128).openapi({
+  example: "Max Mustermann",
+  description: 'Name of the account holder; only meaningful when kontoinhaber is "anderePerson".',
+});
+
+// A domestic IBAN starts with the "DE" country code (ISO 13616); anything else is foreign.
+const BankKontoSchema = z
+  .object({
+    iban: BankKontoIbanSchema,
+    bic: BankKontoBicSchema.optional(),
+    kontoinhaber: z.enum(ROLLE_KONTOINHABER_KEYS),
+    kontoinhaberName: BankKontoKontoinhaberNameSchema.optional(),
+  })
+  .refine((konto) => konto.iban.slice(0, 2).toUpperCase() === "DE" || konto.bic !== undefined, {
+    error: "bic is required for a foreign IBAN (one that doesn't start with 'DE').",
+    path: ["bic"],
+  });
 
 const PersönlicheDatenSchema = z.object({
   vorname: z.string().openapi({ example: "Erika" }),
@@ -42,30 +124,38 @@ const PersönlicheDatenSchema = z.object({
   geburtsdatum: z.iso.date().openapi({ example: "1988-09-10" }),
   geburtsort: z.string().openapi({ example: "Musterstadt" }).optional(),
   geburtsland: z.string().openapi({ example: "Deutschland" }).optional(),
-  staatsangehörigkeitDeutsch: z
-    .boolean()
-    .openapi({
-      deprecated: true,
-      example: true,
-      description:
-        "Whether the person holds German citizenship. Deprecated: redundant with `staatsangehörigkeit` (derivable from it). Must be consistent with `staatsangehörigkeit`: true exactly when `staatsangehörigkeit` is 'deutsch' (code 000).",
-    })
-    .optional(),
+  staatsangehörigkeitIcao: z.enum(STAATSANGEHOERIGKEIT_ICAO_KEYS).optional().openapi({
+    example: "D",
+    description:
+      "Citizenship of the person as an ICAO Doc 9303 nationality code (e.g. 'D' for Germany). Takes precedence over the deprecated `staatsangehörigkeit`.",
+  }),
   staatsangehörigkeit: z.enum(STAATSANGEHOERIGKEIT_KEYS).default("deutsch").openapi({
+    deprecated: true,
     example: "deutsch",
     description:
-      "Citizenship of the person according to the code list of the German Federal Statistical Office. Defaults to 'deutsch' (code 000).",
+      "Citizenship of the person according to the code list of the German Federal Statistical Office. Defaults to 'deutsch' (code 000). Deprecated: still transmitted to the Gewerbeamt, but will stop being read in a future version.",
   }),
   adresse: AdresseSchema,
   telefon: z
     .string()
-    .regex(/^\+\d{1,5}\s\d{1,5}\s\d{1,13}(-\d{1,5})?$/)
+    .regex(/^\+[1-9]\d{1,14}$/)
+    .refine((value) => isValidPhoneNumber(value), {
+      message: "Phone number must be a valid number in E.164 format",
+    })
     .openapi({
-      example: "+49 234 121314",
+      example: "+491701234567",
       description:
-        "Phone numbers are encoded according to the DIN 5008 standard as follows: +[Country code] (up to 5 digits) [Area code] (up to 5 digits) [Phone number] (up to 13 digits) [-Extension] (optional, up to 5 digits).",
+        "Phone number in E.164 format: +[Country code][Subscriber number], no spaces or separators.",
     }),
   email: z.email().openapi({ example: "e.mustermann@example.org" }),
+  steuerId: z
+    .string()
+    .regex(/^\d{11}$/)
+    .openapi({
+      example: "06646829576",
+      description:
+        "Steuerliche Identifikationsnummer (IdNr) der Person, 11 Ziffern. ELSTER prüft zusätzlich die Prüfziffer; Nummern mit führender 0 sind Test-IdNr und nur im Testbetrieb zugelassen.",
+    }),
   steuernummer: z
     .string()
     .regex(/^\d{4}0\d{8}$/)
@@ -78,40 +168,151 @@ const PersönlicheDatenSchema = z.object({
   religion: z.enum(RELIGIONSSCHLUESSEL_KEYS).openapi({
     example: "nichtKirchensteuerpflichtig",
   }),
-  vertrauensniveau: z.enum(VERTRAUENSNIVEAU_KEYS).default("unbestimmt").openapi({
+  vertrauensniveau: z.enum(VERTRAUENSNIVEAU_KEYS).openapi({
     example: "substantiell",
     description: "Vertrauensniveau des verwendeten Identifizierungsmittels gemäß eIDAS-Verordnung",
+  }),
+  geschlecht: z.enum(GESCHLECHT_KEYS).openapi({
+    example: "keineAngabe",
+    description:
+      "Geschlecht der Person gemäß urn:xoev-de:xinneres:codeliste:geschlecht_1 (Pflichtangabe in der xGewerbeordnung, SCH-EXISTS).",
   }),
 });
 
 const UnternehmensDatenSchema = z
   .object({
-    adresseAbweichend: AdresseSchema.openapi({
+    adresse: AdresseMitHausnummerSchema.optional().openapi({
       example: {
-        strasseUndHausnummer: "Musterstraße 2",
-        postleitzahl: "36037",
-        ort: "Fulda",
+        strasse: "Münzgasse",
+        hausnummer: "2",
+        postleitzahl: "01067",
+        ort: "Dresden",
       },
-    }).optional(),
-    tätigkeitsbeschreibung: z.string().openapi({ example: "Vertrieb von Vertriebsmustern" }),
+      description:
+        "Address of the business, if it differs from the private address. Takes precedence over the deprecated `adresseAbweichend`.",
+    }),
+    adresseAbweichend: AdresseSchema.optional().openapi({
+      deprecated: true,
+      example: {
+        strasseUndHausnummer: "Münzgasse 2",
+        postleitzahl: "01067",
+        ort: "Dresden",
+      },
+      description:
+        "Deprecated: use `adresse` instead, which takes street and house number as separate fields. Still read while `adresse` is optional.",
+    }),
+    onlinehandel: OnlinehandelSchema.optional().openapi({
+      example: {
+        eigenerWebshop: true,
+        adresseEigenerWebshop: "https://amazon.de/TheSimpleShop",
+        onlineMarktplaetze: true,
+        onlineMarktplatz: [
+          {
+            nameMarktplatz: "Amazon",
+            nameAccount: "TheSimpleShop",
+          },
+        ],
+      },
+    }),
+    influencer: InfluencerSchema.optional().openapi({
+      example: {
+        influencerUmsatz: true,
+        plattform: [
+          {
+            namePlattform: "Instagram",
+            nameAccount: "TheSimpleVid",
+          },
+        ],
+      },
+    }),
+    bankKonto: z
+      .object({
+        personensteuerkonto: BankKontoSchema.openapi({
+          example: {
+            iban: "DE02120300000000202051",
+            bic: "BYLADEM1SWU",
+            kontoinhaber: "steuerpflichtigePerson",
+          },
+          description:
+            "Rule: 'kontoinhaber: steuerpflichtigePerson' must not go with using 'kontoinhaberName'",
+        }),
+        betriebssteuerkonto: BankKontoSchema.optional().openapi({
+          example: {
+            iban: "DE02120300000000202051",
+            bic: "BYLADEM1SWU",
+            kontoinhaber: "anderePerson",
+            kontoinhaberName: "Friedo Müller",
+          },
+          description: "Rule: 'kontoinhaber: anderePerson' requires 'kontoinhaberName'",
+        }),
+      })
+      .optional()
+      .openapi({
+        description: "Bank accounts for private and optional business taxes.",
+      }),
+    geschäftsbezeichnung: z.string().max(120).optional().openapi({
+      example: "Musterhandel",
+      description:
+        "Bezeichnung des Unternehmens, falls abweichend vom Namen des Gewerbetreibenden.",
+    }),
+    tätigkeitsbeschreibung: z.string().min(1).openapi({ example: "Vertrieb von Vertriebsmustern" }),
+    tätigkeitsbeschreibungKurz: z.string().min(1).max(200).optional().openapi({
+      example: "Vertrieb von Mustern",
+      description:
+        "Kurzfassung der Tätigkeitsbeschreibung für den FsE (max. 200 Zeichen). Fehlt sie, wird `tätigkeitsbeschreibung` auf 200 Zeichen gekürzt.",
+    }),
     tätigkeitsbereich: z
       .enum(["industrie", "handwerk", "handel", "sonstiges"])
       .openapi({ example: "handwerk" }),
-    tätigkeitsbeginn: z.iso.date().openapi({ example: "2026-04-17" }),
-    // TODO: temporary default — remove it (make gründungsdatum required) once the OSS
-    // always sends the field.
-    gründungsdatum: z.iso
-      .date()
-      .default(() => new Date().toISOString().split("T")[0]!)
-      .openapi({
-        example: "2026-04-17",
-        description: "Founding date of the business.",
-      }),
+    anmeldedatumFinanzamt: z.iso.date().openapi({
+      example: "2026-04-17",
+      description: "Date reported to the Finanzamt as the start of business activity.",
+    }),
+    anmeldedatumGewerbeamt: z.iso.date().openapi({
+      example: "2026-04-17",
+      description: "Date reported to the Gewerbeamt as the business's founding date.",
+    }),
     gewerbeart: z.enum(["hauptgewerbe", "nebengewerbe"]).openapi({ example: "hauptgewerbe" }),
+    istReisegewerbe: z.literal(false).openapi({
+      example: false,
+      description: "Handelt es sich um ein Reisegewerbe? Aktuell wird nur 'false' unterstützt.",
+    }),
+    rechtsform: z.literal("nichtEingetragenesEinzelunternehmen").openapi({
+      example: "nichtEingetragenesEinzelunternehmen",
+      description:
+        "Rechtsform des Unternehmens. Aktuell wird nur 'nichtEingetragenesEinzelunternehmen' unterstützt.",
+    }),
+    gründungsart: z.literal("neugründung").openapi({
+      example: "neugründung",
+      description:
+        "Anlass der Gründung: Grund der Gewerbeanmeldung (xGewerbeordnung) und Gründungsform (FsE). Aktuell wird nur 'neugründung' unterstützt.",
+    }),
+    artBetriebsstaette: z.literal("hauptniederlassung").openapi({
+      example: "hauptniederlassung",
+      description:
+        "Art der Betriebsstätte gemäß urn:xoev-de:xunternehmen:codeliste:artniederlassung_1. Aktuell wird nur 'hauptniederlassung' unterstützt.",
+    }),
+    beteiligungOeffentlicheHand: z.literal("nein").openapi({
+      example: "nein",
+      description:
+        "Liegt eine Beteiligung der öffentlichen Hand vor? Aktuell wird nur 'nein' unterstützt.",
+    }),
+    anzahlVollzeitBeschaeftigte: z.number().int().min(0).default(0).openapi({
+      example: 0,
+      description:
+        "Anzahl der Vollzeitbeschäftigten (inklusive Ehe- oder Lebenspartner, Aushilfen, jedoch stets ohne den Inhaber selbst), die zum Zeitpunkt der Gewerbemeldung in der Betriebsstätte tätig sind.",
+    }),
+    anzahlTeilzeitBeschaeftigte: z.number().int().min(0).default(0).openapi({
+      example: 0,
+      description:
+        "Anzahl der Teilzeitbeschäftigten (inklusive Ehe- oder Lebenspartner, Aushilfen, jedoch stets ohne den Inhaber selbst), die zum Zeitpunkt der Gewerbemeldung in der Betriebsstätte tätig sind.",
+    }),
     gewinnErmittlung: z.enum(GEWINN_ERMITTLUNG_KEYS).openapi({
       example: "einnahmenüberschussrechnung",
+      description:
+        "Method of profit calculation. Enumeration:\n- einnahmenüberschussrechnung\n- betriebsvermögensvergleich (Bilanz mit Gewinn- und Verlustrechnung)\n- gewinnermittlungDurchschnittssätze (nur bei Land- und Forstwirtschaft)]\n- sonstige (z. B. § 5a EStG)]",
     }),
-    kleinunternehmerRegelung: z.boolean().default(false).openapi({
+    kleinunternehmerRegelung: z.boolean().openapi({
       example: false,
       description: "Wird die Kleinunternehmer-Regelung (§ 19 UStG) in Anspruch genommen?",
     }),
@@ -123,21 +324,22 @@ const UnternehmensDatenSchema = z
       example: 26000,
       description: "Voraussichtlicher Gesamtumsatz (in Euro) im Folgejahr.",
     }),
-    umsatzsteuerIdMitbeantragen: z.boolean().default(false).optional().openapi({
+    umsatzsteuerIdMitbeantragen: z.boolean().openapi({
+      example: false,
       description: "Soll mit dem FsE auch eine UmsatzsteuerId mitbeantragt werden?",
     }),
     gewinnGründungsjahr: z.number().int().min(-MAX_VK_12).max(MAX_VK_12).default(1).openapi({
       example: 25000,
-      description: "Voraussichtlicher Gewinn (in Euro) im Jahr der Betriebseröffnung.",
+      description:
+        "Voraussichtlicher Gewinn (in Euro) im Jahr der Betriebseröffnung. Negativ bei Verlust.",
     }),
     gewinnFolgejahr: z.number().int().min(-MAX_VK_12).max(MAX_VK_12).default(1).openapi({
       example: 26000,
-      description: "Voraussichtlicher Gewinn (in Euro) im Folgejahr.",
+      description: "Voraussichtlicher Gewinn (in Euro) im Folgejahr. Negativ bei Verlust.",
     }),
-    sollIstVersteuerung: z.enum(SOLL_IST_VERSTEUERUNG_KEYS).default("sollVersteuerung").openapi({
+    sollIstVersteuerung: z.enum(SOLL_IST_VERSTEUERUNG_KEYS).openapi({
       example: "istVersteuerung",
-      description:
-        "Art der Umsatzbesteuerung gemäß § 16 bzw. § 20 UStG. Standard ist Sollversteuerung (nach vereinbarten Entgelten).",
+      description: "Art der Umsatzbesteuerung gemäß § 16 bzw. § 20 UStG.",
     }),
     istVersteuerungGrund: z.enum(IST_VERSTEUERUNG_GRUND_KEYS).optional().openapi({
       example: "unterschreitungUmsatzgrenze",
@@ -146,15 +348,11 @@ const UnternehmensDatenSchema = z
     }),
     zahllastUeberschussAuswahl: z.enum(ZAHLLAST_UEBERSCHUSS_KEYS).default("zahllast").openapi({
       example: "zahllast",
-      description:
-        "Deprecated. Use 'umsatzsteuerImErstenJahr instead. (Ob voraussichtlich eine Zahllast oder ein Überschuss erwartet wird.)",
-      deprecated: true,
+      description: "Ob voraussichtlich eine Zahllast oder ein Überschuss erwartet wird.",
     }),
     zahllastUeberschussBetrag: z.number().int().min(0).max(MAX_VK_10).default(0).openapi({
       example: 0,
-      description:
-        "Deprecated. Use 'umsatzsteuerImErstenJahr instead. (Voraussichtliche Zahllast oder Überschuss in Euro.)",
-      deprecated: true,
+      description: "Voraussichtliche Zahllast oder Überschuss in Euro.",
     }),
     // Sign is an application-level convention (positive = Zahllast, negative/zero = Überschuss),
     // consumed by getZahllastUeberschuss() in transformToFsE.ts, which takes Math.abs() before
@@ -163,7 +361,8 @@ const UnternehmensDatenSchema = z
     umsatzsteuerImErstenJahr: z.number().int().min(-MAX_VK_10).max(MAX_VK_10).optional().openapi({
       example: 100,
       description:
-        "Voraussichtliche Umsatzsteuer im ersten Jahr. (Größer als 0 => Nutzer hat 'Zahllast' => muss was bezahlen; kleiner oder gleich 0 => 'Überschuss' => Rückzahlung vom / Guthaben beim Finanzamt.)",
+        "Deprecated. Use 'zahllastUeberschussAuswahl'/'zahllastUeberschussBetrag' instead. (Voraussichtliche Umsatzsteuer im ersten Jahr. Größer als 0 => Nutzer hat 'Zahllast' => muss was bezahlen; kleiner oder gleich 0 => 'Überschuss' => Rückzahlung vom / Guthaben beim Finanzamt.)",
+      deprecated: true,
     }),
   })
   .refine(
@@ -194,7 +393,7 @@ const unfallversicherungstraegerCodesDescription = Object.entries(UNFALLVERSICHE
   .map(([name, code]) => `- \`${name}\` (${code})`)
   .join("\n");
 
-// Not used as long as we only support 'grundAnmeldungSchluessel: "01"' ("Neugründung")
+// Not used while SCH-0007 requires bisherigeUnfallversicherung to stay empty (see transform)
 const _BisherigeUnfallversicherungSchema = z
   .object({
     traeger: z.enum(UNFALLVERSICHERUNGSTRAEGER_KEYS).openapi({

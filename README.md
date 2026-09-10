@@ -25,7 +25,7 @@ _¹ Sending the tax registration questionnaire requires proprietary code ([ERiC]
 ## 🇩🇪 Weitere Informationen
 
 - [SECURITY.md](./SECURITY.md) - Für Hinweise zu Schwachstellen/Sicherheitslücken (DE/EN)
-- [DEVELOPING.md](./DEVELOPING.md) - Für Software-Entwickler:innen (DE/EN)
+- [DEVELOPING.md](./DEVELOPING.md) - Für Software-Entwickler:innen (EN)
 - [CONTRIBUTING.md](./CONTRIBUTING.md) - Für alle, die mithelfen möchten (DE/EN)
 - [LICENSE.md](./LICENSE.md) - Unsere Open-Source-Lizenz (MIT) (EN)
 - [CODE_OF_CONDUCT_DE.md](./CODE_OF_CONDUCT_DE.md) - Unser Verhaltenskodex (DE)
@@ -33,7 +33,7 @@ _¹ Sending the tax registration questionnaire requires proprietary code ([ERiC]
 ## 🇬🇧 Further Information
 
 - [SECURITY.md](./SECURITY.md) - For vulnerability reports (DE/EN)
-- [DEVELOPING.md](./DEVELOPING.md) - For Software-Engineers (DE/EN)
+- [DEVELOPING.md](./DEVELOPING.md) - For Software-Engineers (EN)
 - [CONTRIBUTING.md](./CONTRIBUTING.md) - For anyone interested in improving the project (DE/EN)
 - [LICENSE.md](./LICENSE.md) - Our open-source license (MIT) (EN)
 - [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) - Our code of conduct (EN)

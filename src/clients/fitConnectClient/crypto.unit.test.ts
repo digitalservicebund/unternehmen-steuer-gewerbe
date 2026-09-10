@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { describe, it, expect } from "vitest";
 import { generateKeyPair, SignJWT, exportJWK } from "jose";
 import { encryptData, decryptData, verifyEventToken } from "./crypto";
@@ -9,12 +8,19 @@ async function generateSigningKeyPair() {
   return { privateKey, publicJwk };
 }
 
-const publicKeyEncryption = process.env.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK
-  ? JSON.parse(process.env.FIT_CONNECT_PUBLIC_KEY_ENCRYPTION_JWK)
-  : undefined;
-const privateKeyDecryption = process.env.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK
-  ? JSON.parse(process.env.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK)
-  : undefined;
+// key_ops and kid mirror the shape of the JWKs FIT-Connect hands out, so that the key_ops
+// stripping in encryptData/decryptData stays covered
+const { publicKey, privateKey } = await generateKeyPair("RSA-OAEP-256", { extractable: true });
+const publicKeyEncryption = {
+  ...(await exportJWK(publicKey)),
+  kid: "test-kid",
+  key_ops: ["encrypt"],
+};
+const privateKeyDecryption = {
+  ...(await exportJWK(privateKey)),
+  kid: "test-kid",
+  key_ops: ["decrypt"],
+};
 
 describe("crypto", () => {
   it("encrypts and decrypts data", async () => {

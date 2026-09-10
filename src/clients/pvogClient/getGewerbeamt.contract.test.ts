@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  fetchOrganisationUnitArs,
   fetchOrganisationUnitDetail,
   fetchOrganisationUnitTitles,
   fetchServiceDescriptionDetail,
@@ -65,16 +66,34 @@ describe("getGewerbeamt raw PVOG endpoints", () => {
     );
   });
 
-  // temporarily skipped because of unstable API
-  it.skip("returns an empty onlineServices list for Fraureuth (ARS 146120000000), which has no online services", async () => {
-    const gewerbeamt = await getGewerbeamt("146120000000");
+  it("returns the ARS the organisation unit for Ulm is responsible for", async () => {
+    const result = await fetchOrganisationUnitArs(ORGANISATION_UNIT_ID_ULM);
 
-    expect(gewerbeamt!.name).toBe("Gewerbeamt");
-    expect(gewerbeamt!.onlineServices).toEqual([]);
+    expect(result).toEqual([ARS_ULM]);
+  });
+
+  it("returns the Stadt Husum for ARS 010540056056, not the Einheitlicher Ansprechpartner Schleswig-Holstein", async () => {
+    const gewerbeamt = await getGewerbeamt("010540056056");
+
+    expect(gewerbeamt!.name).toBe("Stadt Husum - Der Bürgermeister - Gewerbewesen");
+  });
+
+  it("returns the Stadt Goslar for ARS 031530017017, not the Einheitlicher Ansprechpartner Landkreis Goslar", async () => {
+    const gewerbeamt = await getGewerbeamt("031530017017");
+
+    expect(gewerbeamt!.name).toBe("Einheitlicher Ansprechpartner Stadt Goslar");
   });
 
   it("returns no service description for the non-existent ARS 000000000000", async () => {
     const result = await fetchServiceDescriptionsByArs("000000000000");
+
+    expect(result.content).toEqual([]);
+  });
+
+  // Turns red once the Gewerbeanmeldung is registered for Dresden, at which point
+  // the hardcoded fallback in getGewerbeamt can be removed.
+  it("returns no service description for Dresden (ARS 146120000000)", async () => {
+    const result = await fetchServiceDescriptionsByArs("146120000000");
 
     expect(result.content).toEqual([]);
   });

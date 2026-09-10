@@ -20,7 +20,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413
         name: Install pnpm
         with:
           cache: true
@@ -48,7 +48,7 @@ jobs:
           FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK: ${{ secrets.FIT_CONNECT_PRIVATE_KEY_DECRYPTION_JWK }}
           FIT_CONNECT_CLIENT_ID: ${{ vars.FIT_CONNECT_CLIENT_ID }}
           FIT_CONNECT_CLIENT_SECRET: ${{ secrets.FIT_CONNECT_CLIENT_SECRET }}
-          FIT_CONNECT_DESTINATION_ID: ${{ vars.FIT_CONNECT_DESTINATION_ID }}
+          TEST_FIT_CONNECT_DESTINATION_ID_OVERRIDE: ${{ vars.TEST_FIT_CONNECT_DESTINATION_ID_OVERRIDE }}
           ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
           ERIC_CERTIFICATE_BASE64: ${{ secrets.ERIC_CERTIFICATE_BASE64 }}
           ERIC_CERTIFICATE_PIN: ${{ secrets.ERIC_CERTIFICATE_PIN }}
@@ -56,9 +56,9 @@ jobs:
           AKDB_USERNAME: ${{ vars.AKDB_USERNAME }}
           AKDB_PASSWORD: ${{ secrets.AKDB_PASSWORD }}
 
-      - name: Send failure to Slack
+      - name: Send failure to notifications channel on Slack
         uses: digitalservicebund/notify-on-failure-gha@671832f192aee0a068fd92b2f6deb975df794a84 #v1.6.1
         if: ${{ failure() }}
         with:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.ALERTS_CHANNEL_ID }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_NOTIFICATIONS_CHANNEL_ID }}

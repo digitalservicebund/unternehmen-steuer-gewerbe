@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { Agent, fetch, Response } from "undici";
+import { Agent, fetch, FormData, Response } from "undici";
 import { getOsciClient } from "./osciClient";
 
 // mock only fetch; the client builds a real Agent from the certificate secrets
@@ -87,6 +87,26 @@ describe("getOsciClient", () => {
       );
       expect(sendOptions?.dispatcher).toBeUndefined();
     });
+
+    it("appends every Anlage as a multipart part named attachments", async () => {
+      vi.stubEnv("AKDB_BASE_URL", "https://soaptest.akdb.de/okkommozg");
+      const fetchMock = mockSendMessageFetch();
+
+      await getOsciClient().sendMessage({
+        targetId: "MELDID:09000099",
+        message: "<xml/>",
+        attachments: [
+          { fileName: "beleg.pdf", mimeType: "application/pdf", content: Buffer.from("pdf-bytes") },
+        ],
+      });
+
+      const [, sendOptions] = fetchMock.mock.calls[1]!;
+      const [anlage] = (sendOptions!.body as FormData).getAll("attachments") as File[];
+
+      expect(anlage!.name).toBe("beleg.pdf");
+      expect(anlage!.type).toBe("application/pdf");
+      expect(await anlage!.text()).toBe("pdf-bytes");
+    });
   });
 
   describe("getTransportReport", () => {
@@ -128,6 +148,22 @@ describe("getOsciClient", () => {
           "http://www.xgewerbeordnung.de/spezifikation/xga/1.6/xgewo16gewerbemeldung-ext.wsdl",
         authorityKey: "MELDID:09000099",
       });
+    });
+
+    it("returns undefined when the transport report request responds 404", async () => {
+      vi.stubEnv("AKDB_BASE_URL", "https://soaptest.akdb.de/okkommozg");
+      vi.stubEnv("AKDB_CERTIFICATE_BASE64", "");
+      vi.stubEnv("AKDB_CERTIFICATE_PASSPHRASE", "");
+      vi.mocked(fetch)
+        .mockResolvedValueOnce(new Response(TOKEN_RESPONSE, { status: 200 }))
+        .mockResolvedValueOnce(new Response("not found", { status: 404, statusText: "Not Found" }));
+
+      const report = await getOsciClient().getTransportReport({
+        messageId: "vps_by_178357726143931b13e14-2c78-4aa6-ba2c-0d911ec02d82",
+        authorityKey: "MELDID:09000099",
+      });
+
+      expect(report).toBeUndefined();
     });
 
     it("throws when the transport report request fails", async () => {

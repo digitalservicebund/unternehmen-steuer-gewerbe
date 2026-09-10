@@ -1,38 +1,12 @@
-interface PLZRange {
-  from: string;
-  to: string;
-}
-
-// There is no good single source of truth, unfortunately. When adding new supported regions, a
-// good starting point is Wikipedia to get the Postleitzahlen (ranges) and then verify them one by
-// one against other sources from the cities/regions themselves
+// ARS (Amtlicher Regionalschlüssel) of every Kommune we support. Unlike a PLZ, an ARS identifies
+// exactly one Kommune, so a neighbouring Kommune sharing the PLZ can no longer match. Resolve the
+// ARS of a new Kommune via the PVOG v3 locations endpoint.
 const SUPPORTED_REGIONS = {
-  aachen: [rangeOfPLZs("52062", "52080")],
-  dresden: [rangeOfPLZs("01067", "01328"), "01465"],
-  fulda: [rangeOfPLZs("36037", "36043")],
-  münchen: [rangeOfPLZs("80331", "81929")],
-  nordfriesland: [rangeOfPLZs("25811", "25999")],
-  // This range is reserved for Düsseldorf, but not all of them are in use.
-  // Range source: https://de.wikipedia.org/wiki/D%C3%BCsseldorf)
-  // Reference with gaps: https://www.dasoertliche.de/?st=&ci=D%C3%BCsseldorf&form_name=search_pc
-  düsseldorf: [rangeOfPLZs("40210", "40629")],
-  goslar: ["38640", "38642", "38644", "38690"],
-  hamburg: [rangeOfPLZs("20095", "21149"), rangeOfPLZs("22041", "22769"), "27499"],
-  mannheim: [rangeOfPLZs("68159", "68309")],
-} as const satisfies Record<string, ReadonlyArray<string | PLZRange>>;
+  dresden: "146120000000",
+} as const satisfies Record<string, string>;
 
-function rangeOfPLZs(from: string, to: string): PLZRange {
-  return { from, to };
-}
+const ALL_SUPPORTED_ARS: ReadonlyArray<string> = Object.values(SUPPORTED_REGIONS);
 
-export function isSupportedRegion(plz: number): boolean {
-  const allSupportedPlzEntries = Object.values(SUPPORTED_REGIONS).flat();
-
-  return allSupportedPlzEntries.some((entry) => {
-    const isSinglePLZ = typeof entry === "string";
-    if (isSinglePLZ) {
-      return plz === Number(entry);
-    }
-    return plz >= Number(entry.from) && plz <= Number(entry.to);
-  });
+export function isSupportedRegion(ars: string): boolean {
+  return ALL_SUPPORTED_ARS.includes(ars);
 }

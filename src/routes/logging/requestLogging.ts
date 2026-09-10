@@ -8,20 +8,29 @@ export function addRequestLogging(app: HonoAppType): HonoAppType {
     app.use("/api/*", async (c, next) => {
       const start = Date.now();
 
+      // Get IP
+      const info = getConnInfo(c);
+      const ip = c.req.header("x-forwarded-for")?.split(",")[0] || info.remote.address; // handle forwanding in kubernetes
+
+      console.log(
+        JSON.stringify({
+          isoDatetime: new Date(start).toISOString(),
+          event: "request received",
+          requestIP: ip,
+          requestMethod: c.req.method,
+          requestPath: c.req.path,
+        }),
+      );
+
       // Wait for the actual request to process
       await next();
 
       // Now we have the response details and the Context 'c'
       const ms = Date.now() - start;
-      const now = new Date().toISOString();
-
-      // Get IP
-      const info = getConnInfo(c);
-      const ip = c.req.header("x-forwarded-for")?.split(",")[0] || info.remote.address; // handle forwanding in kubernetes
 
       const requestResponseData = {
-        isoDatetime: now,
-        event: "request received",
+        isoDatetime: new Date().toISOString(),
+        event: "request completed",
         requestIP: ip,
         requestMethod: c.req.method,
         requestPath: c.req.path,
