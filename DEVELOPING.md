@@ -41,17 +41,15 @@ If you do have access, you still need to authenticate in order to fetch the depe
   pnpm install
   ```
 
-This is a one-time setup per machine. Once set up, `pnpm install` is all that's needed; there is an `.npmrc` in this repo that routes the `@digitalservicebund` scope to `npm.pkg.github.com`, and pnpm reads the auth token from your user-level config set above.
+This is a one-time setup per machine. There is an `.npmrc` in this repo that routes the `@digitalservicebund` scope to `npm.pkg.github.com`, and pnpm reads the auth token from your user-level config set above.
 
 (It's also possible to extend the default GitHub CLI token (`gh auth token`) to include `read:packages`, but using it this way is a security risk.)
 
 ## Secrets and Environment Variables
 
-In production, secrets and environment variables are exclusively provided through a secrets manager.
+Secrets and environment variables are exclusively provided through a secrets manager.
 
-For local development and testing, [`.env`](.env) is read. See [`.env.example`](.env.example) for details — `cp .env.example .env` is enough to run the unit and integration tests.
-
-We strongly recommend against storing plaintext secrets in either of these files. Use a tool like [1Password](https://developer.1password.com/docs/cli/secrets-environment-variables/) instead: the scripts that do need real secrets (running the API, contract and load tests) resolve the `op://` references from `.env` through `op run`.
+For local development and testing, [`.env`](.env) is read. See [`.env.example`](.env.example) for details — `cp .env.example .env` is enough to run the unit and integration tests. The scripts that need secrets (running the API, contract and load tests) resolve the `op://` references from `.env` through `op run`.
 
 ## Running the API (by default on port 3000)
 
