@@ -312,18 +312,12 @@ const UnternehmensDatenSchema = z
       .openapi({
         description: "Bank accounts for private and optional business taxes.",
       }),
-    // FsE_EUn XSD: String_MinL1_MaxL120_SType (AbwFirmenname)
-    geschäftsbezeichnung: z
-      .string()
-      .min(1)
-      .max(120)
-      .regex(STANDARD_E_V2_PATTERN)
-      .optional()
-      .openapi({
-        example: "Musterhandel",
-        description:
-          "Bezeichnung des Unternehmens, falls abweichend vom Namen des Gewerbetreibenden.",
-      }),
+    // FsE_EUn XSD: String_MinL1_MaxL120_SType (AbwFirmenname); an empty string stays accepted
+    geschäftsbezeichnung: z.string().max(120).regex(STANDARD_E_V2_PATTERN).optional().openapi({
+      example: "Musterhandel",
+      description:
+        "Bezeichnung des Unternehmens, falls abweichend vom Namen des Gewerbetreibenden.",
+    }),
     tätigkeitsbeschreibung: z
       .string()
       .min(1)

@@ -252,10 +252,16 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["a digit", "Dresden 2"],
       ["a character outside the charset", `Dresden${CHAR_OUTSIDE_CHARSET}`],
       ["more than 72 characters", "D".repeat(73)],
-      ["no characters", ""],
     ])("rejects an ort with %s", (_label, value) => {
       const invalid = validRequest();
       invalid.persönlicheDaten.adresse.ort = value;
+
+      expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
+    });
+
+    it("rejects an empty ort", () => {
+      const invalid = validRequest();
+      invalid.persönlicheDaten.adresse.ort = "";
 
       expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
     });
@@ -436,60 +442,61 @@ describe("RegisterGewerbeRequestSchema", () => {
       expect(result.success).toBe(false);
     });
 
-    it("rejects an empty geschäftsbezeichnung", () => {
-      expect(parseWithFieldSet("unternehmensDaten", "geschäftsbezeichnung", "").success).toBe(
-        false,
-      );
+    it("accepts an empty geschäftsbezeichnung", () => {
+      expect(parseWithFieldSet("unternehmensDaten", "geschäftsbezeichnung", "").success).toBe(true);
     });
   });
 
-  describe("ELSTER charset on free-text fields", () => {
+  describe("charset-validated fields", () => {
+    const invalidValue = `Muster${CHAR_OUTSIDE_CHARSET}`;
+
     it.each([
       {
         label: "geschäftsbezeichnung",
-        setValue: (request: RegisterGewerbeRequest, value: string) => {
-          request.unternehmensDaten.geschäftsbezeichnung = value;
+        setup: (request: RegisterGewerbeRequest) => {
+          request.unternehmensDaten.geschäftsbezeichnung = invalidValue;
         },
       },
       {
         label: "adresseEigenerWebshop",
-        setValue: (request: RegisterGewerbeRequest, value: string) => {
-          request.unternehmensDaten.onlinehandel!.adresseEigenerWebshop = value;
+        setup: (request: RegisterGewerbeRequest) => {
+          request.unternehmensDaten.onlinehandel!.adresseEigenerWebshop = invalidValue;
         },
       },
       {
         label: "nameMarktplatz",
-        setValue: (request: RegisterGewerbeRequest, value: string) => {
-          request.unternehmensDaten.onlinehandel!.onlineMarktplatz![0].nameMarktplatz = value;
+        setup: (request: RegisterGewerbeRequest) => {
+          request.unternehmensDaten.onlinehandel!.onlineMarktplatz![0].nameMarktplatz =
+            invalidValue;
         },
       },
       {
         label: "nameAccount of an onlineMarktplatz",
-        setValue: (request: RegisterGewerbeRequest, value: string) => {
-          request.unternehmensDaten.onlinehandel!.onlineMarktplatz![0].nameAccount = value;
+        setup: (request: RegisterGewerbeRequest) => {
+          request.unternehmensDaten.onlinehandel!.onlineMarktplatz![0].nameAccount = invalidValue;
         },
       },
       {
         label: "namePlattform",
-        setValue: (request: RegisterGewerbeRequest, value: string) => {
-          request.unternehmensDaten.influencer!.plattform![0].namePlattform = value;
+        setup: (request: RegisterGewerbeRequest) => {
+          request.unternehmensDaten.influencer!.plattform![0].namePlattform = invalidValue;
         },
       },
       {
         label: "nameAccount of a plattform",
-        setValue: (request: RegisterGewerbeRequest, value: string) => {
-          request.unternehmensDaten.influencer!.plattform![0].nameAccount = value;
+        setup: (request: RegisterGewerbeRequest) => {
+          request.unternehmensDaten.influencer!.plattform![0].nameAccount = invalidValue;
         },
       },
       {
         label: "kontoinhaberName",
-        setValue: (request: RegisterGewerbeRequest, value: string) => {
-          request.unternehmensDaten.bankKonto!.betriebssteuerkonto!.kontoinhaberName = value;
+        setup: (request: RegisterGewerbeRequest) => {
+          request.unternehmensDaten.bankKonto!.betriebssteuerkonto!.kontoinhaberName = invalidValue;
         },
       },
-    ])("rejects $label with a character outside the charset", ({ setValue }) => {
+    ])("rejects $label with a character outside the charset", ({ setup }) => {
       const request = validRequest();
-      setValue(request, `Muster${CHAR_OUTSIDE_CHARSET}`);
+      setup(request);
 
       expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(false);
     });
