@@ -1,7 +1,11 @@
 import { z } from "@hono/zod-openapi";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { OfficeDetailsSchema } from "../region/regionInterfaces";
-import { type Adresse, type AdresseMitHausnummer } from "../../helpers/formFieldTransformations";
+import {
+  splitStrasseHausnummer,
+  type Adresse,
+  type AdresseMitHausnummer,
+} from "../../helpers/formFieldTransformations";
 import {
   UNFALLVERSICHERUNGSTRAEGER,
   UNFALLVERSICHERUNGSTRAEGER_KEYS,
@@ -56,20 +60,49 @@ const PostleitzahlSchema = z
   .regex(/^(?:0[1-9]\d{3}|[1-9]\d{4})$/)
   .openapi({ example: "01067", description: "5-digit German postal code" });
 
-// FsE_EUn XSD: String_MaxL72_Muster90562_SType (StrAdr.Ort), whose pattern rules out digits
+// Digits are ruled out by the FsE_EUn XSD (String_MaxL72_Muster90562_SType, StrAdr.Ort); the length
+// comes from XGewerbe's Schematron SCH-FL-adr-ort (1-60), which is stricter than the XSD's 72.
+const MAX_ORT_LENGTH = 60;
 const OrtSchema = z
   .string()
   .min(1)
-  .max(72)
+  .max(MAX_ORT_LENGTH)
   .regex(/^\D+$/)
   .regex(STANDARD_E_V2_PATTERN)
-  .openapi({ example: "Dresden" });
+  .openapi({
+    example: "Dresden",
+    description: "Municipality name; no digits, at most 60 characters",
+  });
+
+// XGewerbe has no separate field for the Hausnummer-Zusatz, so hausnummerVon carries it too; both
+// hausnummerVon and hausnummerBis are capped by Schematron SCH-FL-bk-hausnummerVon/-Bis.
+const MAX_HAUSNUMMER_FELD_LENGTH = 10;
+
+// Calls the real splitter so this rule cannot drift from it: what it cannot parse would otherwise
+// throw inside the transform and surface as an upstream_error instead of a validation error.
+function splitsIntoAcceptedHausnummerFelder(strasseUndHausnummer: string): boolean {
+  try {
+    const { hausnummer, hausnummerBis, hausnummerZusatz } =
+      splitStrasseHausnummer(strasseUndHausnummer);
+    const hausnummerVonLength = (hausnummer ?? "").length + (hausnummerZusatz ?? "").length;
+    return (
+      hausnummerVonLength <= MAX_HAUSNUMMER_FELD_LENGTH &&
+      (hausnummerBis ?? "").length <= MAX_HAUSNUMMER_FELD_LENGTH
+    );
+  } catch {
+    return false;
+  }
+}
 
 const AdresseSchema = z.object({
   strasseUndHausnummer: z
     .string()
     .regex(/^\D.*\d/)
     .regex(STANDARD_E_V2_PATTERN)
+    .refine(splitsIntoAcceptedHausnummerFelder, {
+      error:
+        "strasseUndHausnummer must be a Strasse of at most 72 characters followed by a Hausnummer of at most 4 digits, optionally with a Zusatz and a bis-Hausnummer.",
+    })
     .openapi({
       example: "Münzgasse 2",
       description:
@@ -184,8 +217,23 @@ const PersönlicheDatenSchema = z.object({
     .openapi({ example: "Muster" })
     .optional(),
   geburtsdatum: z.iso.date().openapi({ example: "1988-09-10" }),
-  geburtsort: z.string().regex(DIN_91379_C_PATTERN).openapi({ example: "Musterstadt" }).optional(),
-  geburtsland: z.string().regex(DIN_91379_C_PATTERN).openapi({ example: "Deutschland" }).optional(),
+  // XGewerbe only, so DIN 91379 C applies rather than the narrower FsE charset. The Geburtsort is
+  // serialized as an adr:ort and therefore falls under the same SCH-FL-adr-ort length rule.
+  geburtsort: z
+    .string()
+    .min(1)
+    .max(MAX_ORT_LENGTH)
+    .regex(DIN_91379_C_PATTERN)
+    .openapi({ example: "Musterstadt" })
+    .optional(),
+  // XGewerbe Schematron SCH-FL-bk-geburt-bk-staat: 1 to 50 characters
+  geburtsland: z
+    .string()
+    .min(1)
+    .max(50)
+    .regex(DIN_91379_C_PATTERN)
+    .openapi({ example: "Deutschland" })
+    .optional(),
   staatsangehörigkeitIcao: z.enum(STAATSANGEHOERIGKEIT_ICAO_KEYS).optional().openapi({
     example: "D",
     description:
@@ -312,12 +360,19 @@ const UnternehmensDatenSchema = z
       .openapi({
         description: "Bank accounts for private and optional business taxes.",
       }),
-    // FsE_EUn XSD: String_MinL1_MaxL120_SType (AbwFirmenname); an empty string stays accepted
-    geschäftsbezeichnung: z.string().max(120).regex(STANDARD_E_V2_PATTERN).optional().openapi({
-      example: "Musterhandel",
-      description:
-        "Bezeichnung des Unternehmens, falls abweichend vom Namen des Gewerbetreibenden.",
-    }),
+    // FsE_EUn XSD: String_MinL1_MaxL120_SType (AbwFirmenname); an empty string would be serialized
+    // as an empty tag, which both that type and XGewerbe's SCH-FL-wt-geschaeftsbezeichnung reject
+    geschäftsbezeichnung: z
+      .string()
+      .min(1)
+      .max(120)
+      .regex(STANDARD_E_V2_PATTERN)
+      .optional()
+      .openapi({
+        example: "Musterhandel",
+        description:
+          "Bezeichnung des Unternehmens, falls abweichend vom Namen des Gewerbetreibenden.",
+      }),
     tätigkeitsbeschreibung: z
       .string()
       .min(1)
