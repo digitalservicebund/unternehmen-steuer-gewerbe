@@ -49,6 +49,22 @@ const DIN_91379_C_PATTERN = new RegExp(
   "u",
 );
 
+// Shared by both address schemas so they cannot drift apart.
+// FsE_EUn XSD: String_MinL5_MaxL5_Muster2084297628_SType (Plz)
+const PostleitzahlSchema = z
+  .string()
+  .regex(/^(?:0[1-9]\d{3}|[1-9]\d{4})$/)
+  .openapi({ example: "01067", description: "5-digit German postal code" });
+
+// FsE_EUn XSD: String_MaxL72_Muster90562_SType (StrAdr.Ort), whose pattern rules out digits
+const OrtSchema = z
+  .string()
+  .min(1)
+  .max(72)
+  .regex(/^\D+$/)
+  .regex(STANDARD_E_V2_PATTERN)
+  .openapi({ example: "Dresden" });
+
 const AdresseSchema = z.object({
   strasseUndHausnummer: z
     .string()
@@ -59,35 +75,39 @@ const AdresseSchema = z.object({
       description:
         "Street name followed by street number; must start with letters and contain a digit",
     }),
-  postleitzahl: z
-    .string()
-    .regex(/^\d{5}$/)
-    .openapi({ example: "01067", description: "5-digit German postal code" }),
-  ort: z.string().openapi({ example: "Dresden" }),
+  postleitzahl: PostleitzahlSchema,
+  ort: OrtSchema,
 }) satisfies z.ZodType<Adresse>;
 
 const AdresseMitHausnummerSchema = z.object({
-  strasse: z.string().min(1).openapi({ example: "Münzgasse" }),
-  hausnummer: z.string().min(1).openapi({
-    example: "2",
-    description: 'House number; a range can be given as "8-14" or "8/14"',
-  }),
-  postleitzahl: z
+  // FsE_EUn XSD: String_MinL1_MaxL72_SType (Str)
+  strasse: z.string().min(1).max(72).regex(STANDARD_E_V2_PATTERN).openapi({ example: "Münzgasse" }),
+  // Mirrors the shape splitHausnummer parses: FsE's HausNr takes the leading digits (at most 4),
+  // Zusatz and bis part end up in HausNrZu (<= 20 chars).
+  hausnummer: z
     .string()
-    .regex(/^\d{5}$/)
-    .openapi({ example: "01067", description: "5-digit German postal code" }),
-  ort: z.string().openapi({ example: "Dresden" }),
+    .regex(/^\d{1,4}(?:\s*[a-z]\.?)?(?:\s*[-/]\s*\d{1,6}(?:\s*[a-z])?)?$/i)
+    .openapi({
+      example: "2",
+      description: 'House number; a range can be given as "8-14" or "8/14"',
+    }),
+  postleitzahl: PostleitzahlSchema,
+  ort: OrtSchema,
 }) satisfies z.ZodType<AdresseMitHausnummer>;
+
+// FsE_EUn XSD: String_MinL1_MaxL100_SType (NameMarktplatz, NamePlattform, NameAccount)
+const OnlinehandelNameSchema = z.string().min(1).max(100).regex(STANDARD_E_V2_PATTERN);
 
 const OnlinehandelSchema = z.object({
   eigenerWebshop: z.boolean(),
-  adresseEigenerWebshop: z.string().min(1).max(128).optional(),
+  // FsE_EUn XSD: String_MinL1_MaxL128_SType (AdresseEigenerWebshop)
+  adresseEigenerWebshop: z.string().min(1).max(128).regex(STANDARD_E_V2_PATTERN).optional(),
   onlineMarktplaetze: z.boolean(),
   onlineMarktplatz: z
     .array(
       z.object({
-        nameMarktplatz: z.string().min(1).max(100),
-        nameAccount: z.string().min(1).max(100),
+        nameMarktplatz: OnlinehandelNameSchema,
+        nameAccount: OnlinehandelNameSchema,
       }),
     )
     .max(99)
@@ -99,8 +119,8 @@ const InfluencerSchema = z.object({
   plattform: z
     .array(
       z.object({
-        namePlattform: z.string().min(1).max(100),
-        nameAccount: z.string().min(1).max(100),
+        namePlattform: OnlinehandelNameSchema,
+        nameAccount: OnlinehandelNameSchema,
       }),
     )
     .max(99)
@@ -125,10 +145,15 @@ const BankKontoBicSchema = z
   });
 
 // FsE_EUn XSD: String_MinL1_MaxL128_SType
-const BankKontoKontoinhaberNameSchema = z.string().min(1).max(128).openapi({
-  example: "Max Mustermann",
-  description: 'Name of the account holder; only meaningful when kontoinhaber is "anderePerson".',
-});
+const BankKontoKontoinhaberNameSchema = z
+  .string()
+  .min(1)
+  .max(128)
+  .regex(STANDARD_E_V2_PATTERN)
+  .openapi({
+    example: "Max Mustermann",
+    description: 'Name of the account holder; only meaningful when kontoinhaber is "anderePerson".',
+  });
 
 // A domestic IBAN starts with the "DE" country code (ISO 13616); anything else is foreign.
 const BankKontoSchema = z
@@ -287,11 +312,18 @@ const UnternehmensDatenSchema = z
       .openapi({
         description: "Bank accounts for private and optional business taxes.",
       }),
-    geschäftsbezeichnung: z.string().max(120).optional().openapi({
-      example: "Musterhandel",
-      description:
-        "Bezeichnung des Unternehmens, falls abweichend vom Namen des Gewerbetreibenden.",
-    }),
+    // FsE_EUn XSD: String_MinL1_MaxL120_SType (AbwFirmenname)
+    geschäftsbezeichnung: z
+      .string()
+      .min(1)
+      .max(120)
+      .regex(STANDARD_E_V2_PATTERN)
+      .optional()
+      .openapi({
+        example: "Musterhandel",
+        description:
+          "Bezeichnung des Unternehmens, falls abweichend vom Namen des Gewerbetreibenden.",
+      }),
     tätigkeitsbeschreibung: z
       .string()
       .min(1)

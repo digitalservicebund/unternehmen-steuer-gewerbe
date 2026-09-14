@@ -1,13 +1,33 @@
 import { describe, it, expect } from "vitest";
-import { RegisterGewerbeRequestSchema } from "./registerGewerbeInterfaces";
+import {
+  RegisterGewerbeRequestSchema,
+  type RegisterGewerbeRequest,
+} from "./registerGewerbeInterfaces";
 import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
+import { type AdresseMitHausnummer } from "../../helpers/formFieldTransformations";
 
 const MAX_VK_12 = 999_999_999_999;
 const MIN_VK_12_SIGNED = -99_999_999_999;
 const MAX_VK_10 = 9_999_999_999;
 
+// Outside the ELSTER "Standard_E_V2" charset
+const CHAR_OUTSIDE_CHARSET = "😀";
+
+const sampleUnternehmensAdresse: AdresseMitHausnummer = {
+  strasse: "Prinzessinnenstraße",
+  hausnummer: "8",
+  postleitzahl: "10969",
+  ort: "Berlin",
+};
+
 function validRequest() {
   return structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+}
+
+function parseWithUnternehmensAdresse(overrides: Partial<AdresseMitHausnummer>) {
+  const request = validRequest();
+  request.unternehmensDaten.adresse = { ...sampleUnternehmensAdresse, ...overrides };
+  return RegisterGewerbeRequestSchema.safeParse(request);
 }
 
 function parseWithFieldDeleted(section: string, field: string) {
@@ -217,6 +237,61 @@ describe("RegisterGewerbeRequestSchema", () => {
       expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
     });
 
+    it("rejects the postleitzahl 00123 in persönlicheDaten.adresse", () => {
+      const invalid = validRequest();
+      invalid.persönlicheDaten.adresse.postleitzahl = "00123";
+
+      expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
+    });
+
+    it("rejects the postleitzahl 00123 in unternehmensDaten.adresse", () => {
+      expect(parseWithUnternehmensAdresse({ postleitzahl: "00123" }).success).toBe(false);
+    });
+
+    it.each([
+      ["a digit", "Dresden 2"],
+      ["a character outside the charset", `Dresden${CHAR_OUTSIDE_CHARSET}`],
+      ["more than 72 characters", "D".repeat(73)],
+      ["no characters", ""],
+    ])("rejects an ort with %s", (_label, value) => {
+      const invalid = validRequest();
+      invalid.persönlicheDaten.adresse.ort = value;
+
+      expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
+    });
+
+    it("accepts the ort Frankfurt (Oder)", () => {
+      const request = validRequest();
+      request.persönlicheDaten.adresse.ort = "Frankfurt (Oder)";
+
+      expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(true);
+    });
+
+    it("rejects the ort Berlin 2 in unternehmensDaten.adresse", () => {
+      expect(parseWithUnternehmensAdresse({ ort: "Berlin 2" }).success).toBe(false);
+    });
+
+    it.each([
+      ["a character outside the charset", `Münzgasse${CHAR_OUTSIDE_CHARSET}`],
+      ["more than 72 characters", "M".repeat(73)],
+    ])("rejects a strasse with %s", (_label, value) => {
+      expect(parseWithUnternehmensAdresse({ strasse: value }).success).toBe(false);
+    });
+
+    it.each([["8"], ["8-14"], ["8/14"], ["42a"], ["42 a"], ["8 - 14"]])(
+      "accepts the hausnummer %s",
+      (value) => {
+        expect(parseWithUnternehmensAdresse({ hausnummer: value }).success).toBe(true);
+      },
+    );
+
+    it.each([["abc"], ["12345"], ["8-1234567"], ["8-14-20"]])(
+      "rejects the hausnummer %s",
+      (value) => {
+        expect(parseWithUnternehmensAdresse({ hausnummer: value }).success).toBe(false);
+      },
+    );
+
     describe("telefon (E.164)", () => {
       it.each([["+14155552671"], ["+491701234567"], ["+4930183948"]])(
         "accepts a valid E.164 number %s",
@@ -359,6 +434,64 @@ describe("RegisterGewerbeRequestSchema", () => {
       const result = RegisterGewerbeRequestSchema.safeParse(request);
 
       expect(result.success).toBe(false);
+    });
+
+    it("rejects an empty geschäftsbezeichnung", () => {
+      expect(parseWithFieldSet("unternehmensDaten", "geschäftsbezeichnung", "").success).toBe(
+        false,
+      );
+    });
+  });
+
+  describe("ELSTER charset on free-text fields", () => {
+    it.each([
+      {
+        label: "geschäftsbezeichnung",
+        setValue: (request: RegisterGewerbeRequest, value: string) => {
+          request.unternehmensDaten.geschäftsbezeichnung = value;
+        },
+      },
+      {
+        label: "adresseEigenerWebshop",
+        setValue: (request: RegisterGewerbeRequest, value: string) => {
+          request.unternehmensDaten.onlinehandel!.adresseEigenerWebshop = value;
+        },
+      },
+      {
+        label: "nameMarktplatz",
+        setValue: (request: RegisterGewerbeRequest, value: string) => {
+          request.unternehmensDaten.onlinehandel!.onlineMarktplatz![0].nameMarktplatz = value;
+        },
+      },
+      {
+        label: "nameAccount of an onlineMarktplatz",
+        setValue: (request: RegisterGewerbeRequest, value: string) => {
+          request.unternehmensDaten.onlinehandel!.onlineMarktplatz![0].nameAccount = value;
+        },
+      },
+      {
+        label: "namePlattform",
+        setValue: (request: RegisterGewerbeRequest, value: string) => {
+          request.unternehmensDaten.influencer!.plattform![0].namePlattform = value;
+        },
+      },
+      {
+        label: "nameAccount of a plattform",
+        setValue: (request: RegisterGewerbeRequest, value: string) => {
+          request.unternehmensDaten.influencer!.plattform![0].nameAccount = value;
+        },
+      },
+      {
+        label: "kontoinhaberName",
+        setValue: (request: RegisterGewerbeRequest, value: string) => {
+          request.unternehmensDaten.bankKonto!.betriebssteuerkonto!.kontoinhaberName = value;
+        },
+      },
+    ])("rejects $label with a character outside the charset", ({ setValue }) => {
+      const request = validRequest();
+      setValue(request, `Muster${CHAR_OUTSIDE_CHARSET}`);
+
+      expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(false);
     });
   });
 
