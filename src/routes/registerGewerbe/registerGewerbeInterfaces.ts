@@ -86,7 +86,7 @@ const AdresseMitHausnummerSchema = z.object({
   // Zusatz and bis part end up in HausNrZu (<= 20 chars).
   hausnummer: z
     .string()
-    .regex(/^\d{1,4}(?:\s*[a-z]\.?)?(?:\s*[-/]\s*\d{1,6}(?:\s*[a-z])?)?$/i)
+    .regex(/^\d{1,4}(?:\s*[a-z])?(?:\s*[-/]\s*\d{1,6}[a-z]?)?$/i)
     .openapi({
       example: "2",
       description: 'House number; a range can be given as "8-14" or "8/14"',

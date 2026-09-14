@@ -291,7 +291,7 @@ describe("RegisterGewerbeRequestSchema", () => {
       },
     );
 
-    it.each([["abc"], ["12345"], ["8-1234567"], ["8-14-20"]])(
+    it.each([["abc"], ["12345"], ["8-1234567"], ["8-14-20"], ["8a."]])(
       "rejects the hausnummer %s",
       (value) => {
         expect(parseWithUnternehmensAdresse({ hausnummer: value }).success).toBe(false);
