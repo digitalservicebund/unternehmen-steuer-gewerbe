@@ -25,6 +25,27 @@ minimumReleaseAgeExclude:
   - "@typescript/typescript-win32-arm64@7.0.2"
   - "@typescript/typescript-win32-x64@7.0.2"
   - typescript@7.0.2
+  - "@koromix/koffi-android-arm64@3.3.0"
+  - "@koromix/koffi-android-x64@3.3.0"
+  - "@koromix/koffi-darwin-arm64@3.3.0"
+  - "@koromix/koffi-darwin-x64@3.3.0"
+  - "@koromix/koffi-freebsd-arm64@3.3.0"
+  - "@koromix/koffi-freebsd-ia32@3.3.0"
+  - "@koromix/koffi-freebsd-x64@3.3.0"
+  - "@koromix/koffi-linux-arm64@3.3.0"
+  - "@koromix/koffi-linux-arm@3.3.0"
+  - "@koromix/koffi-linux-ia32@3.3.0"
+  - "@koromix/koffi-linux-loong64@3.3.0"
+  - "@koromix/koffi-linux-ppc64@3.3.0"
+  - "@koromix/koffi-linux-riscv64@3.3.0"
+  - "@koromix/koffi-linux-x64@3.3.0"
+  - "@koromix/koffi-openbsd-arm64@3.3.0"
+  - "@koromix/koffi-openbsd-ia32@3.3.0"
+  - "@koromix/koffi-openbsd-x64@3.3.0"
+  - "@koromix/koffi-win32-arm64@3.3.0"
+  - "@koromix/koffi-win32-ia32@3.3.0"
+  - "@koromix/koffi-win32-x64@3.3.0"
+  - koffi@3.3.0
 
 overrides:
   "brace-expansion": "^5.0.8"
