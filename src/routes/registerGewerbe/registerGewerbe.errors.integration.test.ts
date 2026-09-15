@@ -303,5 +303,16 @@ describe("Route /api/v1/register-gewerbe (with ERiC mocked)", () => {
 
       expect(response.status).toEqual(HttpStatusCode.BadRequest);
     });
+
+    it("Returns 400 BAD REQUEST when gewinnGründungsjahr exceeds the 12-digit limit", async () => {
+      const response = await postRegisterGewerbe({
+        ...registerGewerbeSampleRequestAllFieldsFilled,
+        unternehmensDaten: {
+          ...registerGewerbeSampleRequestAllFieldsFilled.unternehmensDaten,
+          gewinnGründungsjahr: 999_999_999_999 + 1,
+        },
+      });
+      expect(response.status).toEqual(HttpStatusCode.BadRequest);
+    });
   });
 });

@@ -1,7 +1,11 @@
 import { z } from "@hono/zod-openapi";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { OfficeDetailsSchema } from "../region/regionInterfaces";
-import { type Adresse, type AdresseMitHausnummer } from "../../helpers/formFieldTransformations";
+import {
+  splitStrasseHausnummer,
+  type Adresse,
+  type AdresseMitHausnummer,
+} from "../../helpers/formFieldTransformations";
 import {
   UNFALLVERSICHERUNGSTRAEGER,
   UNFALLVERSICHERUNGSTRAEGER_KEYS,
@@ -19,44 +23,124 @@ import {
   ROLLE_KONTOINHABER_KEYS,
 } from "./requestDataTransformer/fsECodes";
 
+// ELSTER FsE integer bounds (FsE_EUn XSD). The MaxVK12 types also carry a pattern ".{0,12}",
+// which limits the written value to 12 characters — a minus sign takes one of them.
+const MAX_VK_12 = 999_999_999_999; // 12 digits (GesUmsatz.*, EinkGewBetr.*)
+const MIN_VK_12_SIGNED = -99_999_999_999; // 11 digits plus sign (EinkGewBetr.*)
+const MAX_VK_10 = 9_999_999_999; // 10 digits (ZahllastUeberschuss.Betrag)
+
+// ELSTER "Standard_E_V2" charset (FsE StringBaseSType) — no line breaks.
+// The " -~" span is the full printable ASCII block (U+0020-007E), which already
+// covers a-z/A-Z/digits/punctuation; "¿-ÿ" is the tail of Latin-1 Supplement
+// (U+00BF-00FF), which covers ä/ö/ü/Ä/Ö/Ü/ß — neither is spelled out letter by letter.
+const STANDARD_E_V2_CHARS = " -~¡-£¥§ª-¬®-³µ¹-»¿-ÿŒ-œŠ-šŸŽ-ž€";
+const STANDARD_E_V2_PATTERN = new RegExp(`^[${STANDARD_E_V2_CHARS}]*$`, "u");
+// Same charset but line breaks allowed (FsE StringZUBaseSType) — used only for tätigkeitsbeschreibung.
+const STANDARD_E_V2_ZU_PATTERN = new RegExp(String.raw`^[\n\r${STANDARD_E_V2_CHARS}]*$`, "u");
+
+// DIN SPEC 91379 datatype C (2022-08 edition, din-norm-91379-datatypes.xsd) —
+// XGewerbe's shared free-text charset. Includes both the single-codepoint
+// ranges and the base-letter + combining-diacritic *sequences* the XSD's
+// xs:pattern permits in addition (e.g. "K" + U+035F + "h" for Vietnamese, or
+// "C" + one of several combining marks for Baltic spellings) — precomposed
+// letters alone aren't enough to represent those names in NFC form.
+const DIN_91379_C_BASE_CHARS =
+  "\t-\n\r -~ -¬®-žƇ-ƈƏƗƠ-ơƯ-ưƷǍ-ǜǞ-ǟǢ-ǰǴ-ǵǸ-ǿȒ-ȓȘ-țȞ-ȟȧ-ȳəɨʒʹ-ʺʾ-ʿˈˌḂ-ḃḆ-ḇḊ-ḑḗḜ-ḫḯ-ḷḺ-ḻṀ-ṉṒ-ṛṞ-ṣṪ-ṯẀ-ẇẌ-ẗẞẠ-ỹ’‡€";
+const DIN_91379_C_SEQUENCES =
+  "A̋|C(?:̀|̄|̆|̈|̕|̣|̦|̨̆)|D̂|F(?:̀|̄)|G̀|H(?:̄|̦|̱)|J(?:́|̌)|K(?:̀|̂|̄|̇|̕|̛|̦|͟H|͟h)|L(?:̂|̥|̥̄|̦)|M(?:̀|̂|̆|̐)|N(?:̂|̄|̆|̦)|P(?:̀|̄|̕|̣)|R(?:̆|̥|̥̄)|S(?:̀|̄|̛̄|̱)|T(?:̀|̄|̈|̕|̛)|U̇|Z(?:̀|̄|̆|̈|̧)|a̋|c(?:̀|̄|̆|̈|̕|̣|̦|̨̆)|d̂|f(?:̀|̄)|g̀|h(?:̄|̦)|j́|k(?:̀|̂|̄|̇|̕|̛|̦|͟h)|l(?:̂|̥|̥̄|̦)|m(?:̀|̂|̆|̐)|n(?:̂|̄|̆|̦)|p(?:̀|̄|̕|̣)|r(?:̆|̥|̥̄)|s(?:̀|̄|̛̄|̱)|t(?:̀|̄|̕|̛)|u̇|z(?:̀|̄|̆|̈|̧)|Ç̆|Û̄|ç̆|û̄|ÿ́|Č(?:̕|̣)|č(?:̕|̣)|ē̍|Ī́|ī́|ō̍|Ž(?:̦|̧)|ž(?:̦|̧)|Ḳ̄|ḳ̄|Ṣ̄|ṣ̄|Ṭ̄|ṭ̄|Ạ̈|ạ̈|Ọ̈|ọ̈|Ụ(?:̄|̈)|ụ(?:̄|̈)";
+const DIN_91379_C_PATTERN = new RegExp(
+  `^(?:[${DIN_91379_C_BASE_CHARS}]|${DIN_91379_C_SEQUENCES})*$`,
+  "u",
+);
+
+// Shared by both address schemas so they cannot drift apart.
+// FsE_EUn XSD: String_MinL5_MaxL5_Muster2084297628_SType (Plz)
+const PostleitzahlSchema = z
+  .string()
+  .regex(/^(?:0[1-9]\d{3}|[1-9]\d{4})$/)
+  .openapi({ example: "01067", description: "5-digit German postal code" });
+
+// Digits are ruled out by the FsE_EUn XSD (String_MaxL72_Muster90562_SType, StrAdr.Ort); the length
+// comes from XGewerbe's Schematron SCH-FL-adr-ort (1-60), which is stricter than the XSD's 72.
+const MAX_ORT_LENGTH = 60;
+const OrtSchema = z
+  .string()
+  .min(1)
+  .max(MAX_ORT_LENGTH)
+  .regex(/^\D+$/)
+  .regex(STANDARD_E_V2_PATTERN)
+  .openapi({
+    example: "Dresden",
+    description: "Municipality name; no digits, at most 60 characters",
+  });
+
+// XGewerbe has no separate field for the Hausnummer-Zusatz, so hausnummerVon carries it too; both
+// hausnummerVon and hausnummerBis are capped by Schematron SCH-FL-bk-hausnummerVon/-Bis.
+const MAX_HAUSNUMMER_FELD_LENGTH = 10;
+
+// Calls the real splitter so this rule cannot drift from it: what it cannot parse would otherwise
+// throw inside the transform and surface as an upstream_error instead of a validation error.
+function splitsIntoAcceptedHausnummerFelder(strasseUndHausnummer: string): boolean {
+  try {
+    const { hausnummer, hausnummerBis, hausnummerZusatz } =
+      splitStrasseHausnummer(strasseUndHausnummer);
+    const hausnummerVonLength = (hausnummer ?? "").length + (hausnummerZusatz ?? "").length;
+    return (
+      hausnummerVonLength <= MAX_HAUSNUMMER_FELD_LENGTH &&
+      (hausnummerBis ?? "").length <= MAX_HAUSNUMMER_FELD_LENGTH
+    );
+  } catch {
+    return false;
+  }
+}
+
 const AdresseSchema = z.object({
   strasseUndHausnummer: z
     .string()
     .regex(/^\D.*\d/)
+    .regex(STANDARD_E_V2_PATTERN)
+    .refine(splitsIntoAcceptedHausnummerFelder, {
+      error:
+        "strasseUndHausnummer must be a Strasse of at most 72 characters followed by a Hausnummer of at most 4 digits, optionally with a Zusatz and a bis-Hausnummer.",
+    })
     .openapi({
       example: "Münzgasse 2",
       description:
         "Street name followed by street number; must start with letters and contain a digit",
     }),
-  postleitzahl: z
-    .string()
-    .regex(/^\d{5}$/)
-    .openapi({ example: "01067", description: "5-digit German postal code" }),
-  ort: z.string().openapi({ example: "Dresden" }),
+  postleitzahl: PostleitzahlSchema,
+  ort: OrtSchema,
 }) satisfies z.ZodType<Adresse>;
 
 const AdresseMitHausnummerSchema = z.object({
-  strasse: z.string().min(1).openapi({ example: "Münzgasse" }),
-  hausnummer: z.string().min(1).openapi({
-    example: "2",
-    description: 'House number; a range can be given as "8-14" or "8/14"',
-  }),
-  postleitzahl: z
+  // FsE_EUn XSD: String_MinL1_MaxL72_SType (Str)
+  strasse: z.string().min(1).max(72).regex(STANDARD_E_V2_PATTERN).openapi({ example: "Münzgasse" }),
+  // Mirrors the shape splitHausnummer parses: FsE's HausNr takes the leading digits (at most 4),
+  // Zusatz and bis part end up in HausNrZu (<= 20 chars).
+  hausnummer: z
     .string()
-    .regex(/^\d{5}$/)
-    .openapi({ example: "01067", description: "5-digit German postal code" }),
-  ort: z.string().openapi({ example: "Dresden" }),
+    .regex(/^\d{1,4}(?:\s*[a-z])?(?:\s*[-/]\s*\d{1,6}[a-z]?)?$/i)
+    .openapi({
+      example: "2",
+      description: 'House number; a range can be given as "8-14" or "8/14"',
+    }),
+  postleitzahl: PostleitzahlSchema,
+  ort: OrtSchema,
 }) satisfies z.ZodType<AdresseMitHausnummer>;
+
+// FsE_EUn XSD: String_MinL1_MaxL100_SType (NameMarktplatz, NamePlattform, NameAccount)
+const OnlinehandelNameSchema = z.string().min(1).max(100).regex(STANDARD_E_V2_PATTERN);
 
 const OnlinehandelSchema = z.object({
   eigenerWebshop: z.boolean(),
-  adresseEigenerWebshop: z.string().min(1).max(128).optional(),
+  // FsE_EUn XSD: String_MinL1_MaxL128_SType (AdresseEigenerWebshop)
+  adresseEigenerWebshop: z.string().min(1).max(128).regex(STANDARD_E_V2_PATTERN).optional(),
   onlineMarktplaetze: z.boolean(),
   onlineMarktplatz: z
     .array(
       z.object({
-        nameMarktplatz: z.string().min(1).max(100),
-        nameAccount: z.string().min(1).max(100),
+        nameMarktplatz: OnlinehandelNameSchema,
+        nameAccount: OnlinehandelNameSchema,
       }),
     )
     .max(99)
@@ -68,8 +152,8 @@ const InfluencerSchema = z.object({
   plattform: z
     .array(
       z.object({
-        namePlattform: z.string().min(1).max(100),
-        nameAccount: z.string().min(1).max(100),
+        namePlattform: OnlinehandelNameSchema,
+        nameAccount: OnlinehandelNameSchema,
       }),
     )
     .max(99)
@@ -94,10 +178,15 @@ const BankKontoBicSchema = z
   });
 
 // FsE_EUn XSD: String_MinL1_MaxL128_SType
-const BankKontoKontoinhaberNameSchema = z.string().min(1).max(128).openapi({
-  example: "Max Mustermann",
-  description: 'Name of the account holder; only meaningful when kontoinhaber is "anderePerson".',
-});
+const BankKontoKontoinhaberNameSchema = z
+  .string()
+  .min(1)
+  .max(128)
+  .regex(STANDARD_E_V2_PATTERN)
+  .openapi({
+    example: "Max Mustermann",
+    description: 'Name of the account holder; only meaningful when kontoinhaber is "anderePerson".',
+  });
 
 // A domestic IBAN starts with the "DE" country code (ISO 13616); anything else is foreign.
 const BankKontoSchema = z
@@ -113,12 +202,38 @@ const BankKontoSchema = z
   });
 
 const PersönlicheDatenSchema = z.object({
-  vorname: z.string().openapi({ example: "Erika" }),
-  nachname: z.string().openapi({ example: "Mustermann" }),
-  geburtsname: z.string().openapi({ example: "Muster" }).optional(),
+  vorname: z.string().min(1).max(72).regex(STANDARD_E_V2_PATTERN).openapi({ example: "Erika" }),
+  nachname: z
+    .string()
+    .min(1)
+    .max(72)
+    .regex(STANDARD_E_V2_PATTERN)
+    .openapi({ example: "Mustermann" }),
+  geburtsname: z
+    .string()
+    .min(1)
+    .max(72)
+    .regex(STANDARD_E_V2_PATTERN)
+    .openapi({ example: "Muster" })
+    .optional(),
   geburtsdatum: z.iso.date().openapi({ example: "1988-09-10" }),
-  geburtsort: z.string().openapi({ example: "Musterstadt" }).optional(),
-  geburtsland: z.string().openapi({ example: "Deutschland" }).optional(),
+  // XGewerbe only, so DIN 91379 C applies rather than the narrower FsE charset. The Geburtsort is
+  // serialized as an adr:ort and therefore falls under the same SCH-FL-adr-ort length rule.
+  geburtsort: z
+    .string()
+    .min(1)
+    .max(MAX_ORT_LENGTH)
+    .regex(DIN_91379_C_PATTERN)
+    .openapi({ example: "Musterstadt" })
+    .optional(),
+  // XGewerbe Schematron SCH-FL-bk-geburt-bk-staat: 1 to 50 characters
+  geburtsland: z
+    .string()
+    .min(1)
+    .max(50)
+    .regex(DIN_91379_C_PATTERN)
+    .openapi({ example: "Deutschland" })
+    .optional(),
   staatsangehörigkeitIcao: z.enum(STAATSANGEHOERIGKEIT_ICAO_KEYS).optional().openapi({
     example: "D",
     description:
@@ -245,17 +360,35 @@ const UnternehmensDatenSchema = z
       .openapi({
         description: "Bank accounts for private and optional business taxes.",
       }),
-    geschäftsbezeichnung: z.string().max(120).optional().openapi({
-      example: "Musterhandel",
-      description:
-        "Bezeichnung des Unternehmens, falls abweichend vom Namen des Gewerbetreibenden.",
-    }),
-    tätigkeitsbeschreibung: z.string().min(1).openapi({ example: "Vertrieb von Vertriebsmustern" }),
-    tätigkeitsbeschreibungKurz: z.string().min(1).max(200).optional().openapi({
-      example: "Vertrieb von Mustern",
-      description:
-        "Kurzfassung der Tätigkeitsbeschreibung für den FsE (max. 200 Zeichen). Fehlt sie, wird `tätigkeitsbeschreibung` auf 200 Zeichen gekürzt.",
-    }),
+    // FsE_EUn XSD: String_MinL1_MaxL120_SType (AbwFirmenname); an empty string would be serialized
+    // as an empty tag, which both that type and XGewerbe's SCH-FL-wt-geschaeftsbezeichnung reject
+    geschäftsbezeichnung: z
+      .string()
+      .min(1)
+      .max(120)
+      .regex(STANDARD_E_V2_PATTERN)
+      .optional()
+      .openapi({
+        example: "Musterhandel",
+        description:
+          "Bezeichnung des Unternehmens, falls abweichend vom Namen des Gewerbetreibenden.",
+      }),
+    tätigkeitsbeschreibung: z
+      .string()
+      .min(1)
+      .regex(STANDARD_E_V2_ZU_PATTERN)
+      .openapi({ example: "Vertrieb von Vertriebsmustern" }),
+    tätigkeitsbeschreibungKurz: z
+      .string()
+      .min(1)
+      .max(200)
+      .regex(STANDARD_E_V2_ZU_PATTERN)
+      .optional()
+      .openapi({
+        example: "Vertrieb von Mustern",
+        description:
+          "Kurzfassung der Tätigkeitsbeschreibung für den FsE (max. 200 Zeichen). Fehlt sie, wird `tätigkeitsbeschreibung` auf 200 Zeichen gekürzt.",
+      }),
     tätigkeitsbereich: z
       .enum(["industrie", "handwerk", "handel", "sonstiges"])
       .openapi({ example: "handwerk" }),
@@ -311,11 +444,11 @@ const UnternehmensDatenSchema = z
       example: false,
       description: "Wird die Kleinunternehmer-Regelung (§ 19 UStG) in Anspruch genommen?",
     }),
-    umsatzGruendungsjahr: z.number().int().min(0).openapi({
+    umsatzGruendungsjahr: z.number().int().min(0).max(MAX_VK_12).openapi({
       example: 25000,
       description: "Voraussichtlicher Gesamtumsatz (in Euro) im Jahr der Betriebseröffnung.",
     }),
-    umsatzFolgejahr: z.number().int().min(0).openapi({
+    umsatzFolgejahr: z.number().int().min(0).max(MAX_VK_12).openapi({
       example: 26000,
       description: "Voraussichtlicher Gesamtumsatz (in Euro) im Folgejahr.",
     }),
@@ -323,12 +456,12 @@ const UnternehmensDatenSchema = z
       example: false,
       description: "Soll mit dem FsE auch eine UmsatzsteuerId mitbeantragt werden?",
     }),
-    gewinnGründungsjahr: z.number().int().openapi({
+    gewinnGründungsjahr: z.number().int().min(MIN_VK_12_SIGNED).max(MAX_VK_12).openapi({
       example: 25000,
       description:
         "Voraussichtlicher Gewinn (in Euro) im Jahr der Betriebseröffnung. Negativ bei Verlust.",
     }),
-    gewinnFolgejahr: z.number().int().openapi({
+    gewinnFolgejahr: z.number().int().min(MIN_VK_12_SIGNED).max(MAX_VK_12).openapi({
       example: 26000,
       description: "Voraussichtlicher Gewinn (in Euro) im Folgejahr. Negativ bei Verlust.",
     }),
@@ -345,11 +478,12 @@ const UnternehmensDatenSchema = z
       example: "zahllast",
       description: "Ob voraussichtlich eine Zahllast oder ein Überschuss erwartet wird.",
     }),
-    zahllastUeberschussBetrag: z.number().int().min(0).default(0).openapi({
+    zahllastUeberschussBetrag: z.number().int().min(0).max(MAX_VK_10).default(0).openapi({
       example: 0,
       description: "Voraussichtliche Zahllast oder Überschuss in Euro.",
     }),
-    umsatzsteuerImErstenJahr: z.int().optional().openapi({
+    // The sign carries the Zahllast/Überschuss direction, so the Betrag bound applies to both signs.
+    umsatzsteuerImErstenJahr: z.number().int().min(-MAX_VK_10).max(MAX_VK_10).optional().openapi({
       example: 100,
       description:
         "Deprecated. Use 'zahllastUeberschussAuswahl'/'zahllastUeberschussBetrag' instead. (Voraussichtliche Umsatzsteuer im ersten Jahr. Größer als 0 => Nutzer hat 'Zahllast' => muss was bezahlen; kleiner oder gleich 0 => 'Überschuss' => Rückzahlung vom / Guthaben beim Finanzamt.)",

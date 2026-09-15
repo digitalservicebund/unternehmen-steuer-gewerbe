@@ -1,9 +1,33 @@
 import { describe, it, expect } from "vitest";
-import { RegisterGewerbeRequestSchema } from "./registerGewerbeInterfaces";
+import {
+  RegisterGewerbeRequestSchema,
+  type RegisterGewerbeRequest,
+} from "./registerGewerbeInterfaces";
 import { registerGewerbeSampleRequestAllFieldsFilled } from "./testHelpers";
+import { type AdresseMitHausnummer } from "../../helpers/formFieldTransformations";
+
+const MAX_VK_12 = 999_999_999_999;
+const MIN_VK_12_SIGNED = -99_999_999_999;
+const MAX_VK_10 = 9_999_999_999;
+
+// Outside the ELSTER "Standard_E_V2" charset
+const CHAR_OUTSIDE_CHARSET = "😀";
+
+const sampleUnternehmensAdresse: AdresseMitHausnummer = {
+  strasse: "Prinzessinnenstraße",
+  hausnummer: "8",
+  postleitzahl: "10969",
+  ort: "Berlin",
+};
 
 function validRequest() {
   return structuredClone(registerGewerbeSampleRequestAllFieldsFilled);
+}
+
+function parseWithUnternehmensAdresse(overrides: Partial<AdresseMitHausnummer>) {
+  const request = validRequest();
+  request.unternehmensDaten.adresse = { ...sampleUnternehmensAdresse, ...overrides };
+  return RegisterGewerbeRequestSchema.safeParse(request);
 }
 
 function parseWithFieldDeleted(section: string, field: string) {
@@ -201,6 +225,24 @@ describe("RegisterGewerbeRequestSchema", () => {
     });
 
     it.each([
+      ["a Strasse of more than 72 characters", `${"M".repeat(73)} 1`],
+      ["a Hausnummer of more than four digits", "Musterstraße 12345"],
+      ["a bis-Hausnummer longer than 10 characters", "Musterstraße 1-123456      z"],
+    ])("rejects a strasseUndHausnummer with %s", (_label, value) => {
+      const invalid = validRequest();
+      invalid.persönlicheDaten.adresse.strasseUndHausnummer = value;
+
+      expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
+    });
+
+    it("accepts the strasseUndHausnummer Domstraße 1C-1E", () => {
+      const request = validRequest();
+      request.persönlicheDaten.adresse.strasseUndHausnummer = "Domstraße 1C-1E";
+
+      expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(true);
+    });
+
+    it.each([
       [
         "hausnummer",
         { strasse: "Prinzessinnenstraße", hausnummer: "", postleitzahl: "10969", ort: "Berlin" },
@@ -212,6 +254,74 @@ describe("RegisterGewerbeRequestSchema", () => {
 
       expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
     });
+
+    it("rejects the postleitzahl 00123 in persönlicheDaten.adresse", () => {
+      const invalid = validRequest();
+      invalid.persönlicheDaten.adresse.postleitzahl = "00123";
+
+      expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
+    });
+
+    it("rejects the postleitzahl 00123 in unternehmensDaten.adresse", () => {
+      expect(parseWithUnternehmensAdresse({ postleitzahl: "00123" }).success).toBe(false);
+    });
+
+    it.each([
+      ["a digit", "Dresden 2"],
+      ["a character outside the charset", `Dresden${CHAR_OUTSIDE_CHARSET}`],
+      ["more than 60 characters", "D".repeat(61)],
+    ])("rejects an ort with %s", (_label, value) => {
+      const invalid = validRequest();
+      invalid.persönlicheDaten.adresse.ort = value;
+
+      expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
+    });
+
+    it("accepts an ort of exactly 60 characters", () => {
+      const request = validRequest();
+      request.persönlicheDaten.adresse.ort = "D".repeat(60);
+
+      expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(true);
+    });
+
+    it("rejects an empty ort", () => {
+      const invalid = validRequest();
+      invalid.persönlicheDaten.adresse.ort = "";
+
+      expect(RegisterGewerbeRequestSchema.safeParse(invalid).success).toBe(false);
+    });
+
+    it("accepts the ort Frankfurt (Oder)", () => {
+      const request = validRequest();
+      request.persönlicheDaten.adresse.ort = "Frankfurt (Oder)";
+
+      expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(true);
+    });
+
+    it("rejects the ort Berlin 2 in unternehmensDaten.adresse", () => {
+      expect(parseWithUnternehmensAdresse({ ort: "Berlin 2" }).success).toBe(false);
+    });
+
+    it.each([
+      ["a character outside the charset", `Münzgasse${CHAR_OUTSIDE_CHARSET}`],
+      ["more than 72 characters", "M".repeat(73)],
+    ])("rejects a strasse with %s", (_label, value) => {
+      expect(parseWithUnternehmensAdresse({ strasse: value }).success).toBe(false);
+    });
+
+    it.each([["8"], ["8-14"], ["8/14"], ["42a"], ["42 a"], ["8 - 14"]])(
+      "accepts the hausnummer %s",
+      (value) => {
+        expect(parseWithUnternehmensAdresse({ hausnummer: value }).success).toBe(true);
+      },
+    );
+
+    it.each([["abc"], ["12345"], ["8-1234567"], ["8-14-20"], ["8a."]])(
+      "rejects the hausnummer %s",
+      (value) => {
+        expect(parseWithUnternehmensAdresse({ hausnummer: value }).success).toBe(false);
+      },
+    );
 
     describe("telefon (E.164)", () => {
       it.each([["+14155552671"], ["+491701234567"], ["+4930183948"]])(
@@ -278,6 +388,21 @@ describe("RegisterGewerbeRequestSchema", () => {
   });
 
   describe("numeric bounds", () => {
+    const upperLimits = [
+      ["umsatzGruendungsjahr", MAX_VK_12],
+      ["umsatzFolgejahr", MAX_VK_12],
+      ["gewinnGründungsjahr", MAX_VK_12],
+      ["gewinnFolgejahr", MAX_VK_12],
+      ["zahllastUeberschussBetrag", MAX_VK_10],
+      ["umsatzsteuerImErstenJahr", MAX_VK_10],
+    ] as const;
+
+    const lowerLimits = [
+      ["gewinnGründungsjahr", MIN_VK_12_SIGNED],
+      ["gewinnFolgejahr", MIN_VK_12_SIGNED],
+      ["umsatzsteuerImErstenJahr", -MAX_VK_10],
+    ] as const;
+
     it.each([
       ["umsatzGruendungsjahr"],
       ["umsatzFolgejahr"],
@@ -301,10 +426,27 @@ describe("RegisterGewerbeRequestSchema", () => {
       ["gewinnGründungsjahr"],
       ["gewinnFolgejahr"],
       ["zahllastUeberschussBetrag"],
+      ["umsatzsteuerImErstenJahr"],
       ["anzahlVollzeitBeschaeftigte"],
       ["anzahlTeilzeitBeschaeftigte"],
     ])("rejects a non-integer value for %s", (field) => {
       expect(parseWithFieldSet("unternehmensDaten", field, 1.5).success).toBe(false);
+    });
+
+    it.each(upperLimits)("accepts %s at its maximum %d", (field, maximum) => {
+      expect(parseWithFieldSet("unternehmensDaten", field, maximum).success).toBe(true);
+    });
+
+    it.each(upperLimits)("rejects %s one above its maximum %d", (field, maximum) => {
+      expect(parseWithFieldSet("unternehmensDaten", field, maximum + 1).success).toBe(false);
+    });
+
+    it.each(lowerLimits)("accepts %s at its minimum %d", (field, minimum) => {
+      expect(parseWithFieldSet("unternehmensDaten", field, minimum).success).toBe(true);
+    });
+
+    it.each(lowerLimits)("rejects %s one below its minimum %d", (field, minimum) => {
+      expect(parseWithFieldSet("unternehmensDaten", field, minimum - 1).success).toBe(false);
     });
   });
 
@@ -323,6 +465,127 @@ describe("RegisterGewerbeRequestSchema", () => {
       const result = RegisterGewerbeRequestSchema.safeParse(request);
 
       expect(result.success).toBe(false);
+    });
+
+    it("rejects an empty geschäftsbezeichnung", () => {
+      expect(parseWithFieldSet("unternehmensDaten", "geschäftsbezeichnung", "").success).toBe(
+        false,
+      );
+    });
+
+    it("accepts a missing geschäftsbezeichnung", () => {
+      expect(parseWithFieldDeleted("unternehmensDaten", "geschäftsbezeichnung").success).toBe(true);
+    });
+
+    it("rejects a geburtsort longer than 60 characters", () => {
+      const request = validRequest();
+      request.persönlicheDaten.geburtsort = "O".repeat(61);
+
+      expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(false);
+    });
+
+    it("rejects a geburtsland longer than 50 characters", () => {
+      const request = validRequest();
+      request.persönlicheDaten.geburtsland = "L".repeat(51);
+
+      expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(false);
+    });
+
+    it.each([["geburtsort"], ["geburtsland"]])("rejects an empty string for %s", (field) => {
+      expect(parseWithFieldSet("persönlicheDaten", field, "").success).toBe(false);
+    });
+  });
+
+  describe("charset-validated fields", () => {
+    const invalidValue = `Muster${CHAR_OUTSIDE_CHARSET}`;
+
+    it.each([
+      {
+        label: "geschäftsbezeichnung",
+        setup: (request: RegisterGewerbeRequest) => {
+          request.unternehmensDaten.geschäftsbezeichnung = invalidValue;
+        },
+      },
+      {
+        label: "adresseEigenerWebshop",
+        setup: (request: RegisterGewerbeRequest) => {
+          request.unternehmensDaten.onlinehandel!.adresseEigenerWebshop = invalidValue;
+        },
+      },
+      {
+        label: "nameMarktplatz",
+        setup: (request: RegisterGewerbeRequest) => {
+          request.unternehmensDaten.onlinehandel!.onlineMarktplatz![0].nameMarktplatz =
+            invalidValue;
+        },
+      },
+      {
+        label: "nameAccount of an onlineMarktplatz",
+        setup: (request: RegisterGewerbeRequest) => {
+          request.unternehmensDaten.onlinehandel!.onlineMarktplatz![0].nameAccount = invalidValue;
+        },
+      },
+      {
+        label: "namePlattform",
+        setup: (request: RegisterGewerbeRequest) => {
+          request.unternehmensDaten.influencer!.plattform![0].namePlattform = invalidValue;
+        },
+      },
+      {
+        label: "nameAccount of a plattform",
+        setup: (request: RegisterGewerbeRequest) => {
+          request.unternehmensDaten.influencer!.plattform![0].nameAccount = invalidValue;
+        },
+      },
+      {
+        label: "kontoinhaberName",
+        setup: (request: RegisterGewerbeRequest) => {
+          request.unternehmensDaten.bankKonto!.betriebssteuerkonto!.kontoinhaberName = invalidValue;
+        },
+      },
+    ])("rejects $label with a character outside the charset", ({ setup }) => {
+      const request = validRequest();
+      setup(request);
+
+      expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(false);
+    });
+
+    it("rejects the nachname Paweł, whose ł is outside the FsE charset", () => {
+      const request = validRequest();
+      request.persönlicheDaten.nachname = "Paweł";
+
+      expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(false);
+    });
+
+    it.each([["Đà Nẵng"], ["K͟ho"]])(
+      "accepts the geburtsort %s, which XGewerbe allows via DIN 91379 C",
+      (value) => {
+        const request = validRequest();
+        request.persönlicheDaten.geburtsort = value;
+
+        expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(true);
+      },
+    );
+
+    it("rejects a geburtsort with a character outside DIN 91379 C", () => {
+      const request = validRequest();
+      request.persönlicheDaten.geburtsort = `Musterstadt${CHAR_OUTSIDE_CHARSET}`;
+
+      expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(false);
+    });
+
+    it("accepts a line break in tätigkeitsbeschreibung", () => {
+      const request = validRequest();
+      request.unternehmensDaten.tätigkeitsbeschreibung = "Vertrieb\nvon Mustern";
+
+      expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(true);
+    });
+
+    it("rejects a line break in vorname", () => {
+      const request = validRequest();
+      request.persönlicheDaten.vorname = "Erika\nMaria";
+
+      expect(RegisterGewerbeRequestSchema.safeParse(request).success).toBe(false);
     });
   });
 

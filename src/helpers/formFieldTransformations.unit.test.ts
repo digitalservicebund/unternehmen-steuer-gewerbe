@@ -44,6 +44,27 @@ describe("splitStrasseHausnummer", () => {
       "The given address format is not supported",
     );
   });
+
+  it("throws for a Strasse longer than 72 characters", () => {
+    expect(() => splitStrasseHausnummer(`${"M".repeat(73)} 1`)).toThrow(
+      "The given address format is not supported",
+    );
+  });
+
+  it("splits a Strasse of exactly 72 characters", () => {
+    expect(splitStrasseHausnummer(`${"M".repeat(72)} 1`)).toEqual({
+      strasse: "M".repeat(72),
+      hausnummer: "1",
+      hausnummerBis: undefined,
+      hausnummerZusatz: undefined,
+    });
+  });
+
+  it("throws for a Hausnummer with more than four digits", () => {
+    expect(() => splitStrasseHausnummer("Musterstraße 12345")).toThrow(
+      "The given address format is not supported",
+    );
+  });
 });
 
 describe("splitHausnummer", () => {
