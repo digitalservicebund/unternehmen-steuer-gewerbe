@@ -18,12 +18,16 @@ interface SplitStrasseHausnummer {
 }
 
 export function splitStrasseHausnummer(strasseUndHausnummer: string): SplitStrasseHausnummer {
+  // FsE's Str caps at 72 chars and HausNr at 4 digits; hausnummerZusatz/hausnummerBis
+  // land in FsE fields with more room (AdressErg <=46 chars, HausNrZu <=20 chars), so
+  // upToSixNumbers is still safe for those.
+  const upToFourNumbers = String.raw`\d{1,4}`;
   const upToSixNumbers = String.raw`\d{1,6}`;
   // Zusatz allows whitespace around the slash, up to three letters after it and a trailing dot.
   // The letters are capped because XGewerbe puts Hausnummer + Zusatz into hausnummerVon (max 10).
   const zusatzPattern = String.raw`(?:\s+${upToSixNumbers})?(?:\s*/\s*(?:${upToSixNumbers}|[a-z]{1,3}))?(?:\s*[a-z]\.?)?`;
   const addressPattern = new RegExp(
-    String.raw`^(?<strasse>.{1,100}?)\s+(?<hausnummer>${upToSixNumbers})(?<hausnummerZusatz>${zusatzPattern})(?:\s*-\s*(?<hausnummerBis>${upToSixNumbers}(?:\s*[a-z])?))?$`,
+    String.raw`^(?<strasse>.{1,72}?)\s+(?<hausnummer>${upToFourNumbers})(?<hausnummerZusatz>${zusatzPattern})(?:\s*-\s*(?<hausnummerBis>${upToSixNumbers}(?:\s*[a-z])?))?$`,
     "i",
   );
 
