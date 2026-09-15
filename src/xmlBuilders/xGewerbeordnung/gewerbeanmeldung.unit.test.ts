@@ -517,6 +517,36 @@ describe("createGewerbeanmeldungXml", () => {
     );
   });
 
+  it("names the violated schematron rule SCH-0189 in the error", async () => {
+    const hamburgWithoutErgaenzung: DataForCreateGewerbeanmeldungXml = {
+      ...gewerbeanmeldung,
+      autor: { ...gewerbeanmeldung.autor, kennung: "MELDID:02000000" },
+      gemeindeSchluessel: "02000000",
+    };
+
+    await expect(createGewerbeanmeldungXml(hamburgWithoutErgaenzung, "fitConnect")).rejects.toThrow(
+      "SCH-0189",
+    );
+  });
+
+  it("omits the invalid geburtsdatum 1965-13-45 from the schema validation error", async () => {
+    const person = gewerbeanmeldung.referenzierteSubjekte!.natuerlichePerson![0]!;
+    const invalidGeburtsdatum: DataForCreateGewerbeanmeldungXml = {
+      ...gewerbeanmeldung,
+      referenzierteSubjekte: {
+        natuerlichePerson: [
+          { ...person, geburt: { ...person.geburt, geburtsdatum: "1965-13-45" } },
+        ],
+      },
+    };
+
+    const errorMessage = await createGewerbeanmeldungXml(invalidGeburtsdatum, "fitConnect").catch(
+      (error: Error) => error.message,
+    );
+
+    expect(errorMessage).not.toContain("1965-13-45");
+  });
+
   it("includes bisherigeUnfallversicherung without unternehmensnummer when omitted", async () => {
     const withUnfallversicherungButNoUnternehmensummer: DataForCreateGewerbeanmeldungXml = {
       ...gewerbeanmeldung,

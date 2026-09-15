@@ -2,10 +2,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 // no types exist for saxon-js; we have defined a placeholder in /src/declarations.d.ts, so the compiler does not complain
 import SaxonJS from "saxonjs-he";
+import { XMLParser } from "fast-xml-parser";
 import { validateXML, XMLValidationResult } from "xmllint-wasm";
 import { getResourcesDir } from "./resourcesDir";
 
-interface XmlValidationResult {
+export interface XmlValidationResult {
   isValid: boolean;
   schemaValidationResult: XMLValidationResult;
   schematronValidationResult: SaxonTransformResult;
@@ -63,6 +64,42 @@ export async function validateXml(xml: string): Promise<XmlValidationResult> {
     schemaValidationResult,
     schematronValidationResult: schematronValidationResult.result,
   };
+}
+
+const svrlParser = new XMLParser({
+  ignoreAttributes: false,
+  attributeNamePrefix: "@_",
+  isArray: (name) => name === "svrl:failed-assert",
+});
+
+interface SvrlOutput {
+  "svrl:schematron-output"?: {
+    "svrl:failed-assert"?: { "@_id"?: string }[];
+  };
+}
+
+// Rule ids and line numbers only: a schema error message quotes the value it rejected (e.g. a
+// malformed geburtsdatum), and that is personal data (see doc/data-protection.md).
+export function createValidationErrorSummary({
+  schemaValidationResult,
+  schematronValidationResult,
+}: XmlValidationResult): string {
+  const svrl: SvrlOutput = svrlParser.parse(schematronValidationResult.principalResult);
+  const failedAsserts = svrl["svrl:schematron-output"]?.["svrl:failed-assert"] ?? [];
+  const failedRuleIds = [
+    ...new Set(failedAsserts.map((failedAssert) => failedAssert["@_id"] ?? "unknown rule")),
+  ];
+  const schemaErrorLines = [
+    ...new Set(
+      schemaValidationResult.errors.map((error) =>
+        error.loc === null ? "unknown" : String(error.loc.lineNumber),
+      ),
+    ),
+  ];
+  const schemaErrorLocation =
+    schemaErrorLines.length === 0 ? "" : ` in XML line(s) ${schemaErrorLines.join(", ")}`;
+
+  return `${schemaValidationResult.errors.length} schema error(s)${schemaErrorLocation}; failed schematron rule(s): ${failedRuleIds.join(", ") || "none"}`;
 }
 
 async function validateAgainstSchema(xml: string): Promise<XMLValidationResult> {
