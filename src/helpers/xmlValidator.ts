@@ -78,8 +78,8 @@ interface SvrlOutput {
   };
 }
 
-// Rule ids only: a schema error message quotes the value it rejected (e.g. a malformed
-// geburtsdatum), and that is personal data (see doc/data-protection.md).
+// Rule ids and line numbers only: a schema error message quotes the value it rejected (e.g. a
+// malformed geburtsdatum), and that is personal data (see doc/data-protection.md).
 export function createValidationErrorSummary({
   schemaValidationResult,
   schematronValidationResult,
@@ -89,8 +89,17 @@ export function createValidationErrorSummary({
   const failedRuleIds = [
     ...new Set(failedAsserts.map((failedAssert) => failedAssert["@_id"] ?? "unknown rule")),
   ];
+  const schemaErrorLines = [
+    ...new Set(
+      schemaValidationResult.errors.map((error) =>
+        error.loc === null ? "unknown" : String(error.loc.lineNumber),
+      ),
+    ),
+  ];
+  const schemaErrorLocation =
+    schemaErrorLines.length === 0 ? "" : ` in XML line(s) ${schemaErrorLines.join(", ")}`;
 
-  return `${schemaValidationResult.errors.length} schema error(s); failed schematron rule(s): ${failedRuleIds.join(", ") || "none"}`;
+  return `${schemaValidationResult.errors.length} schema error(s)${schemaErrorLocation}; failed schematron rule(s): ${failedRuleIds.join(", ") || "none"}`;
 }
 
 async function validateAgainstSchema(xml: string): Promise<XMLValidationResult> {

@@ -56,7 +56,7 @@ Schlägt der Aufruf eines Zielsystems fehl, enthält die protokollierte Fehlerme
 
 Schlägt die Validierung des erzeugten XGewerbeordnung-XML fehl, nennt der protokollierte Fehler die verletzten Regeln und die Anzahl der Schema-Fehler, etwa `0 schema error(s); failed schematron rule(s): SCH-0189` ([xmlValidator.ts](../src/helpers/xmlValidator.ts)). Die Rohausgabe des Validators bleibt absichtlich aus dem Log, weil ein Schema-Fehler den zurückgewiesenen Wert zitiert und dieser Wert personenbezogen sein kann.
 
-Die ERiC-Bibliothek führt ein eigenes technisches Log (`eric.log`) im Arbeitsverzeichnis. Es hält Bibliotheksversionen, Verarbeitungsschritte und Rückgabecodes fest, nicht die Inhalte der Einreichung, und es ist flüchtig: es liegt im Dateisystem des Containers und verschwindet mit dem Pod.
+Die ERiC-Bibliothek führt ein eigenes technisches Log (`eric.log`) in `/tmp`. Es hält Bibliotheksversionen, Verarbeitungsschritte und Rückgabecodes fest, nicht die Inhalte der Einreichung, und es ist flüchtig: es liegt im Dateisystem des Containers und verschwindet mit dem Pod.
 
 Logs gehen nach stdout. Wie sie gesammelt und wie lange sie aufbewahrt werden, entscheidet die Betriebsplattform und ist nicht Teil dieses Repositorys.
 
@@ -128,7 +128,7 @@ When a call to a target system fails, the logged error carries that call's statu
 
 When the generated XGewerbeordnung XML fails validation, the logged error names the violated rules and counts the schema errors, for example `0 schema error(s); failed schematron rule(s): SCH-0189` ([xmlValidator.ts](../src/helpers/xmlValidator.ts)). The raw validator output is deliberately kept out of the log, because a schema error quotes the value it rejected and that value can be personal data.
 
-The ERiC library keeps a technical log of its own (`eric.log`) in the working directory. It records library versions, validation steps and return codes rather than submission content, and it is ephemeral: it lives in the container's file system and is discarded with the pod.
+The ERiC library keeps a technical log of its own (`eric.log`) in `/tmp`. It records library versions, validation steps and return codes rather than submission content, and it is ephemeral: it lives in the container's file system and is discarded with the pod.
 
 Logs go to stdout. How they are collected and how long they are kept is decided by the deployment platform and is out of scope for this repository.
 

@@ -530,7 +530,7 @@ describe("createGewerbeanmeldungXml", () => {
   });
 
   it("omits the invalid geburtsdatum 1965-13-45 from the schema validation error", async () => {
-    const person = gewerbeanmeldung.referenzierteSubjekte!.natuerlichePerson![0];
+    const person = gewerbeanmeldung.referenzierteSubjekte!.natuerlichePerson![0]!;
     const invalidGeburtsdatum: DataForCreateGewerbeanmeldungXml = {
       ...gewerbeanmeldung,
       referenzierteSubjekte: {
