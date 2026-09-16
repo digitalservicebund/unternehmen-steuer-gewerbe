@@ -106,7 +106,7 @@ const AdresseSchema = z.object({
     .openapi({
       example: "Münzgasse 2",
       description:
-        "Street name followed by street number; must start with letters and contain a digit",
+        "Street name followed by street number; must start with a non-digit and contain a digit",
     }),
   postleitzahl: PostleitzahlSchema,
   ort: OrtSchema,

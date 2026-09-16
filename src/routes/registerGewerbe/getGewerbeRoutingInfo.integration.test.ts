@@ -132,8 +132,8 @@ describe("getGewerbeRoutingInfo", () => {
       expect(mockGetLocationsDetails).toHaveBeenCalledWith(expectedMarktstrasseLookup);
     });
 
-    // A Hausnummer-Zusatz makes the PVOG full-text search pick a different municipality for
-    // ambiguous PLZ (e.g. "25842 Dorfstraße 1C" resolves to Hohenhorn instead of Langenhorn)
+    // The PVOG lookup is a full-text query, and PVOG itself carries the Hausnummer as plain
+    // digits — a Zusatz or bis-Hausnummer has nothing to match there.
     it("passes only the leading digits of the hausnummer 1C-1E to the location lookup", async () => {
       await getGewerbeRoutingInfo({
         ...registerGewerbeSampleRequestAllFieldsFilled,
