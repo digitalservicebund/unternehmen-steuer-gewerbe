@@ -475,7 +475,7 @@ jobs:
       queue: max
     steps:
       - name: Deploy to development
-        uses: digitalservicebund/argocd-deploy@e8f6b8f77c8b8eeef3f67fc5bba9521f89145645
+        uses: digitalservicebund/argocd-deploy@355b2c4b9d9191a5048c8307f13e1cfc05150387
         with:
           environment: development/unternehmen-steuer-gewerbe
           version: ${{ github.sha }}
@@ -537,7 +537,7 @@ jobs:
           ERIC_HERSTELLERID: ${{ vars.ERIC_HERSTELLERID }}
 
       - name: Deploy to production
-        uses: digitalservicebund/argocd-deploy@e8f6b8f77c8b8eeef3f67fc5bba9521f89145645
+        uses: digitalservicebund/argocd-deploy@355b2c4b9d9191a5048c8307f13e1cfc05150387
         with:
           environment: production/unternehmen-steuer-gewerbe
           version: ${{ github.sha }}
