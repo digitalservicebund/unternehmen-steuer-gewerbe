@@ -40,7 +40,7 @@
     "@hono/zod-openapi": "1.6.3",
     "dotenv": "^17.4.2",
     "fast-xml-parser": "^5.11.1",
-    "hono": "^4.13.9",
+    "hono": "^4.13.10",
     "jose": "^6.2.12",
     "koffi": "^3.3.2",
     "libphonenumber-js": "^1.13.14",
