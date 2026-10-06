@@ -39,7 +39,7 @@
     "@hono/swagger-ui": "^0.6.1",
     "@hono/zod-openapi": "1.6.3",
     "dotenv": "^18.0.2",
-    "fast-xml-parser": "^5.11.1",
+    "fast-xml-parser": "^5.11.2",
     "hono": "^4.13.10",
     "jose": "^6.2.12",
     "koffi": "^3.3.2",
