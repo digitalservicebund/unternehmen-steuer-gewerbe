@@ -16,13 +16,13 @@ importers:
         version: 8.0.0-410
       '@hono/node-server':
         specifier: ^2.1.3
-        version: 2.1.3(hono@4.13.10)
+        version: 2.1.3(hono@4.13.12)
       '@hono/swagger-ui':
         specifier: ^0.6.1
-        version: 0.6.1(hono@4.13.10)
+        version: 0.6.1(hono@4.13.12)
       '@hono/zod-openapi':
         specifier: 1.6.3
-        version: 1.6.3(hono@4.13.10)(zod@4.6.5)
+        version: 1.6.3(hono@4.13.12)(zod@4.6.5)
       dotenv:
         specifier: ^18.0.2
         version: 18.0.2
@@ -30,8 +30,8 @@ importers:
         specifier: ^5.11.2
         version: 5.11.2
       hono:
-        specifier: ^4.13.10
-        version: 4.13.10
+        specifier: ^4.13.12
+        version: 4.13.12
       jose:
         specifier: ^6.2.12
         version: 6.2.12
@@ -1089,8 +1089,8 @@ packages:
     resolution: {integrity: sha512-sKJf1+ceQBr4SMkvQnBDNDtf4TXpVhVGateu0t918bl30FnbE2m4vNLX+VWe/dpjlb+HugGYzW7uQXH98HPEYw==}
     engines: {node: '>=4'}
 
-  hono@4.13.10:
-    resolution: {integrity: sha512-dQuLsa5oO+47QVMVMaaD9cIv8ctmVtK1iRvwWngkfloFJMeFeuoUFDswIqZGxmGX3hrRzREgEArjkK9OgsQEhA==}
+  hono@4.13.12:
+    resolution: {integrity: sha512-6E2QDAc9Ick9Sq77ZrGS/dk2WUYni91aufTw6LJKpV7w8kW5/GxVUc650FOADOmlwg3K+f7Pun6XlV+pYmW6gw==}
     engines: {node: '>=16.9.0'}
 
   ignore-by-default@1.0.1:
@@ -1631,25 +1631,25 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
-  '@hono/node-server@2.1.3(hono@4.13.10)':
+  '@hono/node-server@2.1.3(hono@4.13.12)':
     dependencies:
-      hono: 4.13.10
+      hono: 4.13.12
 
-  '@hono/swagger-ui@0.6.1(hono@4.13.10)':
+  '@hono/swagger-ui@0.6.1(hono@4.13.12)':
     dependencies:
-      hono: 4.13.10
+      hono: 4.13.12
 
-  '@hono/zod-openapi@1.6.3(hono@4.13.10)(zod@4.6.5)':
+  '@hono/zod-openapi@1.6.3(hono@4.13.12)(zod@4.6.5)':
     dependencies:
       '@asteasolutions/zod-to-openapi': 9.1.0(zod@4.6.5)
-      '@hono/zod-validator': 0.9.1(hono@4.13.10)(zod@4.6.5)
-      hono: 4.13.10
+      '@hono/zod-validator': 0.9.1(hono@4.13.12)(zod@4.6.5)
+      hono: 4.13.12
       openapi3-ts: 4.6.1
       zod: 4.6.5
 
-  '@hono/zod-validator@0.9.1(hono@4.13.10)(zod@4.6.5)':
+  '@hono/zod-validator@0.9.1(hono@4.13.12)(zod@4.6.5)':
     dependencies:
-      hono: 4.13.10
+      hono: 4.13.12
       zod: 4.6.5
 
   '@jridgewell/resolve-uri@3.1.2': {}
@@ -2149,7 +2149,7 @@ snapshots:
 
   has-flag@3.0.0: {}
 
-  hono@4.13.10: {}
+  hono@4.13.12: {}
 
   ignore-by-default@1.0.1: {}
 
