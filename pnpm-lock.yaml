@@ -24,8 +24,8 @@ importers:
         specifier: 1.6.3
         version: 1.6.3(hono@4.13.12)(zod@4.6.5)
       dotenv:
-        specifier: ^18.0.2
-        version: 18.0.2
+        specifier: ^18.0.5
+        version: 18.0.5
       fast-xml-parser:
         specifier: ^5.11.2
         version: 5.11.2
@@ -1027,8 +1027,8 @@ packages:
   dfa@1.2.0:
     resolution: {integrity: sha512-ED3jP8saaweFTjeGX8HQPjeC1YYyZs98jGNZx6IiBvxW7JG5v492kamAQB3m2wop07CvU/RQmzcKr6bgcC5D/Q==}
 
-  dotenv@18.0.2:
-    resolution: {integrity: sha512-wl0U3CxC0iobaryqEKpFJxzyp4AxQFYAKj/WWszXZr87vVHLi2yJv2syax5Vxt+u02xqNgE277rsc3lOKg9sPg==}
+  dotenv@18.0.5:
+    resolution: {integrity: sha512-aBrGvt6KhjxbEnatqMWOMidftwsrCiCvqh1yNIGB9QyF0J+VcWkKDMsvYOEm7ZS82oiV+BT1sTOtIlAmUlTpwQ==}
     engines: {node: '>=12'}
     hasBin: true
 
@@ -2067,7 +2067,7 @@ snapshots:
 
   dfa@1.2.0: {}
 
-  dotenv@18.0.2: {}
+  dotenv@18.0.5: {}
 
   es-module-lexer@2.3.2: {}
 
