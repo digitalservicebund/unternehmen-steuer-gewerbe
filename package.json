@@ -43,7 +43,7 @@
     "hono": "^4.13.13",
     "jose": "^6.2.12",
     "koffi": "^3.3.2",
-    "libphonenumber-js": "^1.13.14",
+    "libphonenumber-js": "^1.13.15",
     "p-limit": "^7.3.3",
     "pdfkit": "^0.20.2",
     "saxonjs-he": "3.0.0-beta2",
