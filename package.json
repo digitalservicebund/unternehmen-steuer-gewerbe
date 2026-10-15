@@ -60,7 +60,7 @@
     "nodemon": "^3.1.14",
     "oxfmt": "^0.72.0",
     "oxlint": "^1.87.0",
-    "rolldown": "^1.2.12",
+    "rolldown": "^1.2.13",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "unpdf": "^1.8.1",
