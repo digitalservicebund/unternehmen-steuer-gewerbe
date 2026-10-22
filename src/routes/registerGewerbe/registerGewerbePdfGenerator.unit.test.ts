@@ -250,7 +250,14 @@ describe("generatePdfReceipt", () => {
     const markInfo = await pdf.getMarkInfo();
     const metadata = await pdf.getMetadata();
 
-    expect(markInfo?.Marked).toBe(true);
+    // pdf.js returns a Map here, despite its declared object type.
+    expect(markInfo).toEqual(
+      new Map([
+        ["Marked", true],
+        ["UserProperties", false],
+        ["Suspects", false],
+      ]),
+    );
     expect(metadata.info).toMatchObject({
       Title: "Bestätigung über den Eingang der Gewerbeanmeldung",
       Language: "de-DE",
