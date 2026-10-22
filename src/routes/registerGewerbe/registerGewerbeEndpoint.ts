@@ -203,7 +203,7 @@ function getTransferTicket(serverResponse: string | undefined): string | undefin
   return parsed.Elster?.TransferHeader?.TransferTicket;
 }
 
-async function submitFsE(data: RegisterGewerbeRequest): Promise<RegisterGewerbeResponseItem> {
+function submitFsE(data: RegisterGewerbeRequest): RegisterGewerbeResponseItem {
   try {
     const { adresse, adresseAbweichend } = data.unternehmensDaten;
     const betriebsAdresse = getBetriebsAdresse({
@@ -311,7 +311,7 @@ export function addRegisterGewerbeEndpoint(app: HonoAppType): HonoAppType {
       const [gewerbeanmeldung, fseÜbermittlung] = await concurrentSubmissionPairsLimit(async () => {
         const gewerbeanmeldung =
           only === "fseÜbermittlung" ? undefined : await submitGewerbeanmeldung(data);
-        const fseÜbermittlung = only === "gewerbeanmeldung" ? undefined : await submitFsE(data);
+        const fseÜbermittlung = only === "gewerbeanmeldung" ? undefined : submitFsE(data);
         return [gewerbeanmeldung, fseÜbermittlung] as const;
       });
 
