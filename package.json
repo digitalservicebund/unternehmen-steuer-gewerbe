@@ -34,8 +34,8 @@
     "test:watch": "NODE_EXTRA_CA_CERTS=akdb-ca.public.test.pem vitest"
   },
   "dependencies": {
-    "@digitalservicebund/unternehmen-steuer-gewerbe-privat": "8.0.0-430",
-    "@hono/node-server": "^2.1.5",
+    "@digitalservicebund/unternehmen-steuer-gewerbe-privat": "8.0.0-455",
+    "@hono/node-server": "^2.1.4",
     "@hono/swagger-ui": "^0.6.1",
     "@hono/zod-openapi": "1.6.3",
     "dotenv": "^18.0.7",
@@ -53,7 +53,7 @@
   },
   "devDependencies": {
     "@ls-lint/ls-lint": "^2.3.1",
-    "@types/node": "^26.6.4",
+    "@types/node": "^26.6.5",
     "@types/pdfkit": "^0.17.6",
     "@vitest/coverage-v8": "5.0.1",
     "fast-xml-builder": "^1.3.1",
