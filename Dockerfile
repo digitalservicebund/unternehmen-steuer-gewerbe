@@ -1,4 +1,4 @@
-FROM cgr.dev/chainguard/node@sha256:44c5ac2029f7a9b61e1bd12fef9e33f6025d64ea17fa3ecf21a2056f11ac99ca
+FROM cgr.dev/chainguard/node@sha256:efa14a42578e5931c351eb562ee2bed3e9c55e9abbfd683e218c88ab3889bcba
 
 WORKDIR /app
 
