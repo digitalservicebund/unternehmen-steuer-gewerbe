@@ -42,7 +42,7 @@
     "fast-xml-parser": "^5.11.2",
     "hono": "^4.13.14",
     "jose": "^6.2.13",
-    "koffi": "^3.3.4",
+    "koffi": "^3.3.5",
     "libphonenumber-js": "^1.13.15",
     "p-limit": "^7.3.3",
     "pdfkit": "^0.20.2",
