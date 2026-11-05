@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@digitalservicebund/unternehmen-steuer-gewerbe-privat": "8.0.0-456",
-    "@hono/node-server": "^2.1.5",
+    "@hono/node-server": "^2.1.6",
     "@hono/swagger-ui": "^0.6.2",
     "@hono/zod-openapi": "1.6.3",
     "dotenv": "^18.0.9",
