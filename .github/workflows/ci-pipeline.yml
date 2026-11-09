@@ -413,7 +413,7 @@ jobs:
           echo "Package visibility confirmed: private"
 
       - name: Install cosign
-        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6
+        uses: sigstore/cosign-installer@756fe2d284c7292c4e9b62c8a28f1e5629c59532
         with:
           cosign-release: "v2.6.0" # We need this, because the kyverno policy that is validating the signature is not yet compatible with the newer version of cosign. Cosign switch the bundle format in version 3.
 
