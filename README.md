@@ -1,5 +1,3 @@
-[![Pipeline](https://github.com/digitalservicebund/unternehmen-steuer-gewerbe/actions/workflows/ci-pipeline.yml/badge.svg)](https://github.com/digitalservicebund/unternehmen-steuer-gewerbe/actions/workflows/ci-pipeline.yml?query=branch%3Amain) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=digitalservicebund_unternehmen-steuer-gewerbe&metric=alert_status&token=7c61b88cddfc5068587a0c54be1d03bc674fd3b6)](https://sonarcloud.io/summary/new_code?id=digitalservicebund_unternehmen-steuer-gewerbe)
-
 # 🇩🇪 Schneller Gründen API für Steuernummer und Gewerbeantrag
 
 Open-Source¹-API, die die zur Unternehmensgründung notwendigen Daten im richtigen Format an die passenden Stellen weiterleitet:
