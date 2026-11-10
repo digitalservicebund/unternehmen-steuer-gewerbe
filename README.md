@@ -1,3 +1,6 @@
+> [!WARNING]
+> **Archiviert, wird nicht mehr gewartet.** Das Projekt wurde am 30.09.2026 beendet, alle Umgebungen sind abgeschaltet. Es gibt keine Sicherheits- oder Abhängigkeitsupdates, Issues und Pull Requests werden nicht bearbeitet.
+
 # 🇩🇪 Schneller Gründen API für Steuernummer und Gewerbeantrag
 
 Open-Source¹-API, die die zur Unternehmensgründung notwendigen Daten im richtigen Format an die passenden Stellen weiterleitet:
